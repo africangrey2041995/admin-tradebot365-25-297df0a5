@@ -19,9 +19,7 @@ export default function SSOCallback() {
         
         // Handle sign in
         if (searchParams.has('__clerk_status') && searchParams.get('__clerk_status') === 'running') {
-          await signIn.attemptFirstFactor({
-            redirectUrl: '/sso-callback',
-          });
+          await signIn.attemptFirstFactor({});
           navigate('/');
           return;
         }
@@ -30,9 +28,7 @@ export default function SSOCallback() {
         const firstParam = window.location.search.substring(1).split('&')[0];
         if (firstParam.startsWith('__clerk_ticket')) {
           // Handle sign-up OAuth callback
-          await signUp.attemptEmailAddressVerification({
-            redirectUrl: '/sso-callback',
-          });
+          await signUp.attemptEmailAddressVerification({});
           navigate('/');
           return;
         }
