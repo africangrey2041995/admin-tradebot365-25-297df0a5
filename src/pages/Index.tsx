@@ -1,9 +1,9 @@
+
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
-import StatusIndicator from '@/components/ui/StatusIndicator';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, TrendingUp, BarChart3, Wallet, DollarSign } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Wallet, DollarSign, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Index = () => {
@@ -15,12 +15,13 @@ const Index = () => {
     activeBots: 3,
     totalAccounts: 12,
     connectedAccounts: 8,
-    disconnectedAccounts: 3,
     pendingAccounts: 1,
+    disconnectedAccounts: 3,
     totalRevenue: '$18,426.96',
     todaySignals: 8,
     weeklyGrowth: '16.24%',
-    monthlyOrders: 398
+    monthlyOrders: 398,
+    monthlyGrowth: '12.5%'
   };
 
   const cardVariants = {
@@ -97,7 +98,7 @@ const Index = () => {
             <DashboardCard 
               title="Tổng Lệnh" 
               description="Tháng này"
-              onClick={() => navigate('/accounts')}
+              onClick={() => navigate('/bots')}
               icon={<BarChart3 className="h-5 w-5" />}
               color="warning"
             >
@@ -105,7 +106,7 @@ const Index = () => {
                 <div className="text-2xl font-semibold">{dashboardStats.monthlyOrders}</div>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-sm font-medium text-green-500">+ 12.5%</span>
+                  <span className="text-sm font-medium text-green-500">+ {dashboardStats.monthlyGrowth}</span>
                   <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">so với tháng trước</span>
                 </div>
               </div>
@@ -121,8 +122,8 @@ const Index = () => {
             <DashboardCard 
               title="Tín Hiệu Mới" 
               description="Hôm nay"
-              onClick={() => navigate('/accounts')}
-              icon={<BarChart3 className="h-5 w-5" />}
+              onClick={() => navigate('/bots')}
+              icon={<Bell className="h-5 w-5" />}
               color="info"
             >
               <div className="mt-4">
@@ -144,11 +145,13 @@ const Index = () => {
             variants={cardVariants}
             initial="hidden"
             animate="visible"
+            onClick={() => navigate('/accounts')}
           >
             <DashboardCard
               title="Đã Kết Nối"
               icon={<div className="h-5 w-5 rounded-full bg-green-500"></div>}
               color="success"
+              onClick={() => navigate('/accounts')}
             >
               <div className="text-3xl font-semibold">{dashboardStats.connectedAccounts}</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
@@ -162,11 +165,13 @@ const Index = () => {
             variants={cardVariants}
             initial="hidden"
             animate="visible"
+            onClick={() => navigate('/accounts')}
           >
             <DashboardCard
               title="Đang Xử Lý"
               icon={<div className="h-5 w-5 rounded-full bg-yellow-500"></div>}
               color="warning"
+              onClick={() => navigate('/accounts')}
             >
               <div className="text-3xl font-semibold">{dashboardStats.pendingAccounts}</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
@@ -180,11 +185,13 @@ const Index = () => {
             variants={cardVariants}
             initial="hidden"
             animate="visible"
+            onClick={() => navigate('/accounts')}
           >
             <DashboardCard
               title="Mất Kết Nối"
               icon={<div className="h-5 w-5 rounded-full bg-red-500"></div>}
               color="danger"
+              onClick={() => navigate('/accounts')}
             >
               <div className="text-3xl font-semibold">{dashboardStats.disconnectedAccounts}</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
@@ -214,10 +221,10 @@ const Index = () => {
             <div className="mt-4 space-y-2">
               <h3 className="text-lg font-medium text-slate-800 dark:text-white">Bắt Đầu Nhanh</h3>
               <ul className="list-disc pl-5 text-slate-600 dark:text-slate-300 space-y-2">
-                <li>Thêm bot của bạn trong phần <span className="font-medium text-primary">Quản Lý Bot</span></li>
-                <li>Cấu hình tài khoản của bạn trong phần <span className="font-medium text-primary">Quản Lý Tài Khoản</span></li>
-                <li>Theo dõi trạng thái kết nối trong phần <span className="font-medium text-primary">Trạng Thái Kết Nối</span></li>
-                <li>Theo dõi hoạt động tín hiệu trong phần <span className="font-medium text-primary">Nhật Ký Tín Hiệu</span></li>
+                <li>Thêm bot của bạn trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/bots')}>Quản Lý Bot</span></li>
+                <li>Cấu hình tài khoản của bạn trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/accounts')}>Quản Lý Tài Khoản</span></li>
+                <li>Theo dõi trạng thái kết nối trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/accounts')}>Trạng Thái Kết Nối</span></li>
+                <li>Theo dõi hoạt động tín hiệu trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/bots')}>Nhật Ký Tín Hiệu</span></li>
               </ul>
             </div>
           </div>
