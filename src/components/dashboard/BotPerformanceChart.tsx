@@ -34,6 +34,11 @@ const BotPerformanceChart = ({ data }: BotPerformanceProps) => {
     return data[timeframe] || [];
   };
 
+  // Function to determine if the chart should use positive or negative styles
+  const chartData = getChartData();
+  const hasPositiveValues = chartData.some(item => item.value >= 0);
+  const hasNegativeValues = chartData.some(item => item.value < 0);
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -100,14 +105,28 @@ const BotPerformanceChart = ({ data }: BotPerformanceProps) => {
                     />
                   } 
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="value"
-                  stroke={(d) => (d && d.value >= 0) ? "#10b981" : "#ef4444"} 
-                  fillOpacity={1} 
-                  fill="url(#colorPositive)" 
-                  activeDot={{ r: 6 }}
-                />
+                {hasPositiveValues && (
+                  <Area 
+                    type="monotone" 
+                    dataKey="value"
+                    stroke="#10b981" 
+                    fillOpacity={1} 
+                    fill="url(#colorPositive)" 
+                    activeDot={{ r: 6 }}
+                    isAnimationActive={true}
+                  />
+                )}
+                {hasNegativeValues && (
+                  <Area 
+                    type="monotone" 
+                    dataKey="value"
+                    stroke="#ef4444" 
+                    fillOpacity={1} 
+                    fill="url(#colorNegative)" 
+                    activeDot={{ r: 6 }}
+                    isAnimationActive={true}
+                  />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
