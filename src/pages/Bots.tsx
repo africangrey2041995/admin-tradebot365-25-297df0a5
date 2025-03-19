@@ -15,7 +15,8 @@ import {
   Calendar, 
   Star, 
   MoreHorizontal, 
-  Bookmark
+  Bookmark,
+  Eye
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -38,6 +39,7 @@ interface BotCardProps {
   isFavorite?: boolean;
   colorScheme?: 'red' | 'blue' | 'green' | 'purple' | 'default';
   onAddAccount?: () => void;
+  onViewBot?: () => void;
 }
 
 const BotCard = ({
@@ -49,34 +51,35 @@ const BotCard = ({
   onFavorite,
   isFavorite = false,
   colorScheme = 'default',
-  onAddAccount
+  onAddAccount,
+  onViewBot
 }: BotCardProps) => {
   
   const colorClasses = {
-    red: 'bg-red-50 border-red-100',
-    blue: 'bg-blue-50 border-blue-100',
-    green: 'bg-green-50 border-green-100',
-    purple: 'bg-purple-50 border-purple-100',
-    default: 'bg-white border-slate-200'
+    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200',
+    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
+    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
+    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
+    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
   };
   
   return (
-    <div className={`relative rounded-lg border shadow-sm p-4 ${colorClasses[colorScheme]}`}>
+    <div className={`relative rounded-lg border shadow-sm p-5 transition-all duration-200 hover:shadow-md ${colorClasses[colorScheme]}`}>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="font-medium text-lg">{title}</h3>
+          <h3 className="font-semibold text-lg">{title}</h3>
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         <div className="flex space-x-2">
           <button 
             onClick={onFavorite}
-            className="text-yellow-400 hover:text-yellow-500"
+            className="text-yellow-400 hover:text-yellow-500 transition-colors"
           >
             <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="text-muted-foreground hover:text-foreground">
+              <button className="text-muted-foreground hover:text-foreground transition-colors">
                 <MoreHorizontal className="h-5 w-5" />
               </button>
             </DropdownMenuTrigger>
@@ -93,9 +96,9 @@ const BotCard = ({
         </div>
       </div>
       
-      <div className="flex items-center justify-between mb-4 border-t border-b py-2 border-slate-200">
+      <div className="flex items-center justify-between mb-4 border-t border-b py-2.5 border-slate-200/70">
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-2">ID</p>
+          <p className="text-sm font-medium mr-2 text-muted-foreground">ID</p>
           <div className="text-sm font-medium">{botId}</div>
         </div>
         
@@ -107,17 +110,28 @@ const BotCard = ({
         )}
       </div>
       
-      <div className="flex justify-between items-center pt-2">
+      <div className="flex justify-between items-center">
         <div className="flex items-center">
           <p className="text-sm text-muted-foreground mr-2">Accounts: </p>
           <div className="text-sm font-medium mr-3">{accountCount}</div>
           <button 
             onClick={onAddAccount}
-            className="h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xs font-medium border-2 border-white"
+            className="h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors"
           >
             <Plus className="h-3 w-3" />
           </button>
         </div>
+      </div>
+      
+      <div className="mt-4 pt-3 border-t border-slate-200/70">
+        <Button 
+          variant="outline" 
+          onClick={onViewBot} 
+          className="w-full bg-white hover:bg-slate-50 transition-colors"
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View Bot
+        </Button>
       </div>
     </div>
   );
@@ -217,13 +231,19 @@ const Bots = () => {
       description: 'Tính năng thêm tài khoản sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
+  
+  const handleViewBot = (botId: string) => {
+    toast('Xem Bot', {
+      description: `Xem chi tiết bot ${botId}. Tính năng này sẽ được triển khai trong phiên bản tiếp theo.`,
+    });
+  };
 
   return (
     <MainLayout title="Quản Lý Bot">
       <div className="flex flex-col">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
-            <Button variant="outline" className="mr-2">
+            <Button variant="outline" className="mr-2 border-slate-300 shadow-sm">
               <Bookmark className="h-4 w-4 mr-2" />
               BOT LIST
             </Button>
@@ -234,19 +254,19 @@ const Bots = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search..." 
-                className="pl-10"
+                className="pl-10 border-slate-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button onClick={handleAddBot}>
+            <Button onClick={handleAddBot} className="shadow-sm">
               <Plus className="h-4 w-4 mr-2" />
               Add New BOT
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           {filteredBots.map((bot, index) => (
             <BotCard 
               key={index} 
@@ -254,11 +274,12 @@ const Bots = () => {
               isFavorite={favorites[index] || false}
               onFavorite={() => toggleFavorite(index)}
               onAddAccount={handleAddAccount}
+              onViewBot={() => handleViewBot(bot.botId)}
             />
           ))}
         </div>
 
-        <div className="mt-6">
+        <div className="mt-8">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
