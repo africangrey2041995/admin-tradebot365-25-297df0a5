@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChartLine, Users, Gauge, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
+import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -105,19 +105,32 @@ export const PremiumBotCard = ({
     navigate(`/premium-bots/${id}`);
   };
 
+  const getExchangeLogo = (exchange: string) => {
+    switch (exchange.toLowerCase()) {
+      case 'coinstart pro':
+        return (
+          <div className="flex items-center justify-center w-5 h-5 bg-blue-600 rounded-full">
+            <span className="text-[10px] font-bold text-white">CP</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Card className={`overflow-hidden border shadow hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
-      <CardHeader className="p-4 pb-0">
-        <div className="flex justify-between items-start mb-2">
-          <div className="flex gap-3 items-center">
-            <div className={`p-2 rounded-lg ${
+    <Card className={`overflow-hidden border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
+      <CardHeader className="p-3 pb-0">
+        <div className="flex justify-between items-start">
+          <div className="flex gap-2 items-center">
+            <div className={`p-1.5 rounded-lg ${
               colorScheme === 'default' ? 'bg-slate-100 dark:bg-zinc-800' : 
               colorScheme === 'red' ? 'bg-red-100/80 dark:bg-red-900/30' : 
               colorScheme === 'blue' ? 'bg-blue-100/80 dark:bg-blue-900/30' : 
               colorScheme === 'green' ? 'bg-green-100/80 dark:bg-green-900/30' : 
               'bg-purple-100/80 dark:bg-purple-900/30'
             }`}>
-              <Bot className={`h-5 w-5 ${
+              <Bot className={`h-4 w-4 ${
                 colorScheme === 'default' ? 'text-slate-600 dark:text-slate-300' : 
                 colorScheme === 'red' ? 'text-red-600 dark:text-red-300' : 
                 colorScheme === 'blue' ? 'text-blue-600 dark:text-blue-300' : 
@@ -126,75 +139,78 @@ export const PremiumBotCard = ({
               }`} />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-1">
+              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
                 {name}
-                <Sparkles className="h-4 w-4 text-yellow-500 ml-1" />
+                <Sparkles className="h-3 w-3 text-yellow-500 ml-1" />
               </h3>
-              <div className="flex gap-1 mt-1">
-                <Badge variant="outline">{exchange}</Badge>
-                <Badge className={getTypeColor(type)}>{getTypeLabel(type)}</Badge>
+              <div className="flex gap-1 mt-1 items-center text-xs">
+                {getExchangeLogo(exchange)}
+                <span className="text-xs text-slate-500">{exchange}</span>
+                <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
               </div>
             </div>
           </div>
-          <Badge className={getRiskColor(risk)}>
-            Rủi ro: {getRiskLabel(risk)}
+          <Badge className={`text-[10px] py-0 px-1.5 ${getRiskColor(risk)}`}>
+            {getRiskLabel(risk)}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 h-[60px]">
+      <CardContent className="p-3">
+        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 h-[32px] mb-2">
           {description}
         </p>
         
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="bg-white/80 dark:bg-zinc-800/80 p-3 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <ChartLine className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tháng</span>
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
+            <div className="flex items-center gap-1 mb-0.5">
+              <ChartLine className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tháng</span>
             </div>
-            <div className={`text-lg font-semibold ${getPerformanceColor(performanceLastMonth)}`}>
+            <div className={`text-sm font-semibold ${getPerformanceColor(performanceLastMonth)}`}>
               {performanceLastMonth}
             </div>
           </div>
           
-          <div className="bg-white/80 dark:bg-zinc-800/80 p-3 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tổng</span>
+          <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
+            <div className="flex items-center gap-1 mb-0.5">
+              <TrendingUp className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tổng</span>
             </div>
-            <div className={`text-lg font-semibold ${getPerformanceColor(performanceAllTime)}`}>
+            <div className={`text-sm font-semibold ${getPerformanceColor(performanceAllTime)}`}>
               {performanceAllTime}
             </div>
           </div>
         </div>
         
-        <div className="flex items-center justify-between mt-4 bg-white/80 dark:bg-zinc-800/80 p-3 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            <span className="text-sm">Vốn tối thiểu:</span>
-            <span className="font-semibold">{minCapital}</span>
+        <div className="flex items-center justify-between mb-1 bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
+          <div className="flex items-center gap-1">
+            <Wallet className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+            <span className="text-[10px]">Vốn tối thiểu:</span>
+            <span className="text-xs font-semibold">{minCapital}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            <span className="text-sm font-semibold">{subscribers}</span>
-            <span className="text-sm">người dùng</span>
+          <div className="flex items-center gap-1">
+            <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+            <span className="text-xs font-semibold">{subscribers}</span>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="p-4 pt-0 gap-2 flex-col sm:flex-row">
+      <CardFooter className="p-3 pt-0 gap-1 flex-col">
         <Button 
           variant="default" 
-          className="w-full" 
+          size="sm"
+          className="w-full text-xs h-8" 
           onClick={handleSubscribe}
         >
           Đăng Ký Sử Dụng
         </Button>
         <Button 
           variant="outline" 
-          className="w-full" 
+          size="sm"
+          className="w-full text-xs h-7" 
           onClick={handleViewDetails}
         >
-          <ExternalLink className="h-4 w-4 mr-2" />
+          <ExternalLink className="h-3 w-3 mr-1" />
           Chi Tiết
         </Button>
       </CardFooter>
