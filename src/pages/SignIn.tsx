@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
-import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -14,27 +13,17 @@ import {
   KeyIcon, 
   Loader2
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const SignIn = () => {
-  const { isLoaded, signIn, setActive } = useSignIn();
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
-  // Show a proper loading state rather than infinite spinner
-  if (!isLoaded) {
-    return (
-      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
-        <Loader2 className="h-12 w-12 animate-spin text-white/50 mb-4" />
-        <p className="text-white/70">Đang tải ứng dụng...</p>
-      </div>
-    );
-  }
-
-  // Handle mock sign in for demonstration without Clerk credentials
+  // Handle mock sign in for demonstration
   const handleMockSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -43,16 +32,13 @@ const SignIn = () => {
     // Simulate API call
     setTimeout(() => {
       if (emailAddress && password) {
-        toast({
-          title: "Đăng nhập thành công",
-          description: "Chào mừng bạn quay trở lại",
+        toast.success(t('Login successful'), {
+          description: t('Welcome back'),
         });
         navigate('/');
       } else {
-        toast({
-          variant: "destructive",
-          title: "Đăng nhập thất bại",
-          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
+        toast.error(t('Login failed'), {
+          description: t('Please check your login information'),
         });
       }
       setIsLoading(false);
@@ -65,77 +51,13 @@ const SignIn = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast({
-        title: "Đăng nhập thành công",
-        description: "Đã đăng nhập với Google",
+      toast.success(t('Login successful'), {
+        description: t('Logged in with Google'),
       });
       navigate('/');
       setIsGoogleLoading(false);
     }, 1500);
   };
-
-  // Real Clerk auth handler
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isLoaded) return;
-
-    try {
-      setIsLoading(true);
-      const result = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        toast({
-          title: "Đăng nhập thành công",
-          description: "Chào mừng bạn quay trở lại",
-        });
-        navigate('/');
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Đăng nhập thất bại",
-          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
-        });
-      }
-    } catch (err: any) {
-      console.error("Login error:", err);
-      toast({
-        variant: "destructive",
-        title: "Lỗi đăng nhập",
-        description: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng nhập",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignInWithGoogle = async () => {
-    if (!isLoaded) return;
-
-    try {
-      setIsGoogleLoading(true);
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/",
-        redirectUrlComplete: "/",
-      });
-    } catch (err: any) {
-      console.error("Google login error:", err);
-      toast({
-        variant: "destructive",
-        title: "Lỗi đăng nhập với Google",
-        description: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng nhập với Google",
-      });
-      setIsGoogleLoading(false);
-    }
-  };
-
-  // Use mock handlers if Clerk setup has issues
-  const onSubmit = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSubmit : handleMockSignIn;
-  const onGoogleSignIn = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSignInWithGoogle : handleMockGoogleSignIn;
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
@@ -152,7 +74,7 @@ const SignIn = () => {
       <div className="absolute top-8 right-8">
         <Link to="/sign-up">
           <Button variant="outline" className="border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white">
-            Đăng ký
+            {t('Sign up')}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -166,9 +88,9 @@ const SignIn = () => {
       >
         <Card className="border-zinc-700 bg-zinc-900/80 backdrop-blur-lg shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-white">Đăng Nhập</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">{t('Login')}</CardTitle>
             <CardDescription className="text-zinc-400">
-              Đăng nhập để truy cập hệ thống quản lý bot giao dịch
+              {t('Login to access the trading bot management system')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -176,7 +98,7 @@ const SignIn = () => {
               <Button 
                 variant="outline" 
                 className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
-                onClick={onGoogleSignIn}
+                onClick={handleMockGoogleSignIn}
                 disabled={isGoogleLoading}
               >
                 {isGoogleLoading ? (
@@ -201,7 +123,7 @@ const SignIn = () => {
                     />
                   </svg>
                 )}
-                Đăng nhập với Google
+                {t('Login with Google')}
               </Button>
             </div>
             
@@ -211,14 +133,14 @@ const SignIn = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-zinc-900 px-2 text-zinc-500">
-                  Hoặc đăng nhập với
+                  {t('Or login with')}
                 </span>
               </div>
             </div>
             
-            <form onSubmit={onSubmit} className="space-y-4">
+            <form onSubmit={handleMockSignIn} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-zinc-400">Email</Label>
+                <Label htmlFor="email" className="text-zinc-400">{t('Email')}</Label>
                 <div className="relative">
                   <MailIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                   <Input
@@ -235,19 +157,18 @@ const SignIn = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-zinc-400">Mật khẩu</Label>
+                  <Label htmlFor="password" className="text-zinc-400">{t('Password')}</Label>
                   <Link 
                     to="#" 
                     className="text-xs text-tradebot hover:underline"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast({
-                        title: "Chức năng đang phát triển",
-                        description: "Tính năng quên mật khẩu đang được phát triển"
+                      toast(t('Feature in development'), {
+                        description: t('The forgot password feature is under development')
                       });
                     }}
                   >
-                    Quên mật khẩu?
+                    {t('Forgot password?')}
                   </Link>
                 </div>
                 <div className="relative">
@@ -266,15 +187,15 @@ const SignIn = () => {
               
               <Button
                 type="submit"
-                variant="tradebot"
-                className="w-full"
+                variant="default"
+                className="w-full bg-tradebot hover:bg-tradebot/90"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    Đăng Nhập
+                    {t('Login')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -283,9 +204,9 @@ const SignIn = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800 pt-4">
             <p className="text-center text-sm text-zinc-500">
-              Chưa có tài khoản?{" "}
+              {t('Don\'t have an account?')}{" "}
               <Link to="/sign-up" className="text-tradebot hover:underline">
-                Đăng ký ngay
+                {t('Sign up now')}
               </Link>
             </p>
           </CardFooter>
