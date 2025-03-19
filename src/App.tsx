@@ -15,6 +15,9 @@ import PremiumBots from "./pages/PremiumBots";
 import PremiumBotDetail from "./pages/PremiumBotDetail";
 import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
 import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
+import PropTradingBots from "./pages/PropTradingBots";
+import IntegratedPropBots from "./pages/IntegratedPropBots";
+import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -63,6 +66,9 @@ const App = () => (
               <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
               <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
               <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+              <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+              <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+              <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
               <Route path="/accounts" element={<Accounts />} />
               <Route path="/accounts/:accountId" element={<AccountProfile />} />
               

@@ -21,6 +21,7 @@ import {
   Users, 
   Sparkles,
   Layers,
+  TrendingUp,
 } from 'lucide-react';
 
 const SidebarNav = () => {
@@ -43,6 +44,17 @@ const SidebarNav = () => {
         { 
           label: 'Đã Tích Hợp', 
           path: '/integrated-premium-bots' 
+        }
+      ]
+    },
+    { 
+      icon: TrendingUp, 
+      label: 'Prop Trading Bots', 
+      path: '/prop-trading-bots',
+      subItems: [
+        { 
+          label: 'Đã Tích Hợp', 
+          path: '/integrated-prop-bots' 
         }
       ]
     },
