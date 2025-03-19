@@ -121,6 +121,12 @@ export default {
 				'pulse-status': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' }
+				},
+				blob: {
+					'0%': { transform: 'translate(0px, 0px) scale(1)' },
+					'33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+					'66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+					'100%': { transform: 'translate(0px, 0px) scale(1)' }
 				}
 			},
 			animation: {
@@ -130,7 +136,8 @@ export default {
 				'fade-out': 'fade-out 0.2s ease-out',
 				'slide-up': 'slide-up 0.4s ease-out',
 				'slide-down': 'slide-down 0.4s ease-out',
-				'pulse-status': 'pulse-status 2s ease-in-out infinite'
+				'pulse-status': 'pulse-status 2s ease-in-out infinite',
+				'blob': 'blob 7s infinite'
 			},
 			backdropFilter: {
 				'none': 'none',
@@ -138,5 +145,16 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function ({ addUtilities, theme, e }) {
+			const animationDelayUtilities = {};
+			for (let i = 1; i <= 10; i++) {
+				animationDelayUtilities[`.${e(`animation-delay-${i * 1000}`)}`] = {
+					'animation-delay': `${i}s`,
+				};
+			}
+			addUtilities(animationDelayUtilities);
+		}
+	],
 } satisfies Config;
