@@ -1,18 +1,6 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from '@/components/ui/pagination';
-import {
-  Search, 
-  Plus, 
-  Bookmark,
   Bot,
   Cpu,
   Server,
@@ -23,6 +11,10 @@ import {
 import { toast } from 'sonner';
 import BotCard, { BotCardProps } from '@/components/bots/BotCard';
 import { AddBotDialog } from '@/components/bots/AddBotDialog';
+import BotSearch from '@/components/bots/BotSearch';
+import BotListing from '@/components/bots/BotListing';
+import BotsHeader from '@/components/bots/BotsHeader';
+import BotsPagination from '@/components/bots/BotsPagination';
 
 const Bots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -169,58 +161,15 @@ const Bots = () => {
   return (
     <MainLayout title="Quản Lý Bot">
       <div className="flex flex-col">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <Button variant="outline" className="border-slate-200 shadow-sm font-medium px-4 py-2 h-10">
-              <Bookmark className="h-4 w-4 mr-2" />
-              BOT LIST
-            </Button>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search..." 
-                className="pl-9 border-slate-200 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleAddBot} className="bg-primary hover:bg-primary/90 shadow-sm font-medium h-10 px-4">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New BOT
-            </Button>
-          </div>
+        <BotsHeader onAddBot={handleAddBot} />
+
+        <div className="flex items-center justify-end mb-8">
+          <BotSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-          {filteredBots.map((bot, index) => (
-            <BotCard 
-              key={index} 
-              {...bot} 
-              isFavorite={favorites[index] || false}
-            />
-          ))}
-        </div>
+        <BotListing bots={filteredBots} favorites={favorites} />
 
-        <div className="mt-8 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationLink href="#" isActive className="bg-primary text-white font-medium">
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" className="font-medium">2</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" className="font-medium">3</PaginationLink>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        <BotsPagination />
       </div>
       
       <AddBotDialog 
