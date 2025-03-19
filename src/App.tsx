@@ -29,15 +29,23 @@ const App = () => (
   <ClerkProvider 
     publishableKey={PUBLISHABLE_KEY}
     appearance={{
-      baseTheme: {
-        variables: {
-          colorPrimary: '#04ce91',
-          colorBackground: '#111111',
-          colorInputBackground: '#1a1a1a',
-          colorTextOnPrimaryBackground: '#222222',
-          colorText: '#ffffff',
-          colorInputText: '#ffffff'
-        }
+      elements: {
+        formButtonPrimary: 'bg-[#04ce91] hover:bg-[#03b17d]',
+        card: 'bg-[#111111]',
+        formInput: 'bg-[#1a1a1a] text-white',
+        footerActionLink: 'text-[#04ce91] hover:text-[#03b17d]',
+        headerTitle: 'text-white',
+        headerSubtitle: 'text-zinc-400',
+        socialButtonsBlockButton: 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white',
+        dividerLine: 'bg-zinc-700',
+        dividerText: 'text-zinc-500',
+        formFieldLabel: 'text-zinc-400',
+        identityPreviewText: 'text-white',
+        identityPreviewEditButton: 'text-[#04ce91]'
+      },
+      layout: {
+        showOptionalFields: false,
+        socialButtonsVariant: 'iconButton',
       }
     }}
   >
