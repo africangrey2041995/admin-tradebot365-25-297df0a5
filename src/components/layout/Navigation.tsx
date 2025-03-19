@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
@@ -10,30 +10,12 @@ import {
   X, 
   ChevronDown, 
   Settings, 
-  Sparkles,
-  LogOut
+  Sparkles
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useUser, useClerk } from '@clerk/clerk-react';
-import { useToast } from '@/hooks/use-toast';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const routes = [
   {
@@ -70,11 +52,7 @@ const routes = [
 
 const Navigation = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { user } = useUser();
-  const { signOut } = useClerk();
-  const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -88,22 +66,6 @@ const Navigation = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Đăng xuất thành công",
-        description: "Hẹn gặp lại bạn lần sau",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Lỗi đăng xuất",
-        description: "Đã có lỗi xảy ra khi đăng xuất, vui lòng thử lại",
-      });
-    }
   };
 
   const Logo = () => (
@@ -243,24 +205,9 @@ const Navigation = () => {
               <Logo />
             </div>
             <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.imageUrl} alt={user?.username || ''} />
-                      <AvatarFallback>{user?.username?.charAt(0) || user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Tài khoản</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Đăng xuất
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>TB</AvatarFallback>
+              </Avatar>
               <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
@@ -325,18 +272,16 @@ const Navigation = () => {
                 {!isCollapsed && (
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.imageUrl} alt={user?.username || ''} />
-                      <AvatarFallback>{user?.username?.charAt(0) || user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
+                      <AvatarFallback>TB</AvatarFallback>
                     </Avatar>
                     <div className="text-sm font-medium text-white overflow-hidden text-ellipsis">
-                      {user?.username || user?.fullName || 'Người dùng'}
+                      Admin
                     </div>
                   </div>
                 )}
                 {isCollapsed && (
                   <Avatar className="h-8 w-8 mx-auto">
-                    <AvatarImage src={user?.imageUrl} alt={user?.username || ''} />
-                    <AvatarFallback>{user?.username?.charAt(0) || user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
+                    <AvatarFallback>TB</AvatarFallback>
                   </Avatar>
                 )}
               </div>
@@ -348,22 +293,9 @@ const Navigation = () => {
                     "flex-1 hover:bg-primary hover:text-white text-white border-zinc-700/50 bg-transparent",
                     isCollapsed && "p-0 flex justify-center items-center h-10 w-10"
                   )} 
-                  onClick={() => {}}
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   {!isCollapsed && "Cài Đặt"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className={cn(
-                    "flex-1 hover:bg-red-500 hover:text-white text-white border-zinc-700/50 bg-transparent",
-                    isCollapsed && "p-0 flex justify-center items-center h-10 w-10"
-                  )} 
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  {!isCollapsed && "Đăng xuất"}
                 </Button>
               </div>
             </div>
@@ -378,9 +310,6 @@ const Navigation = () => {
                 {routes.find(route => route.path === location.pathname)?.label || 
                 routes.flatMap(route => route.children || []).find(child => child.path === location.pathname)?.label ||
                 "Bảng Điều Khiển"}
-              </div>
-              <div className="flex items-center gap-2">
-                {/* Add user profile or other header items here */}
               </div>
             </div>
           </div>
