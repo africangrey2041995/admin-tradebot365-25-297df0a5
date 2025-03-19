@@ -129,7 +129,8 @@ const Bots = () => {
                     </TableCell>
                     <TableCell className="font-mono text-sm">{bot.signalToken}</TableCell>
                     <TableCell>
-                      <Badge variant={bot.status === 'Active' ? 'success' : 'secondary'}>
+                      <Badge variant={bot.status === 'Active' ? 'default' : 'secondary'} 
+                             className={bot.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}>
                         {bot.status}
                       </Badge>
                     </TableCell>
