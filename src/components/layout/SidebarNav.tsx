@@ -1,19 +1,10 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
   SidebarSeparator,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { 
   Home, 
@@ -22,10 +13,10 @@ import {
   Sparkles,
   Layers,
   TrendingUp,
-  ChevronDown,
-  ChevronRight,
 } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import NavGroup from './sidebar/NavGroup';
+import NavMenuItem from './sidebar/NavMenuItem';
+import CollapsibleMenuItem from './sidebar/CollapsibleMenuItem';
 
 const SidebarNav = () => {
   const location = useLocation();
@@ -94,91 +85,33 @@ const SidebarNav = () => {
         
         <SidebarSeparator />
         
-        <SidebarGroup>
-          <SidebarGroupLabel>Tổng Quan</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.path)}
-                    tooltip={item.label}
-                  >
-                    <Link to={item.path}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavGroup label="Tổng Quan">
+          {mainNavItems.map((item) => (
+            <NavMenuItem
+              key={item.path}
+              icon={item.icon}
+              label={item.label}
+              path={item.path}
+              isActive={isActive(item.path)}
+            />
+          ))}
+        </NavGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Premium</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="flex flex-col space-y-0">
-              {premiumItems.map((item) => (
-                <SidebarMenuItem key={item.path} className="flex flex-col mb-0">
-                  {/* Main item link */}
-                  <Link 
-                    to={item.path}
-                    className={`
-                      flex items-center py-2 px-3 text-sm rounded-md w-full mb-0
-                      ${isActive(item.path) && !item.isOpen
-                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
-                        : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
-                      }
-                    `}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.label}</span>
-                  </Link>
-                  
-                  {/* Collapsible sub-items */}
-                  <Collapsible 
-                    open={item.isOpen} 
-                    onOpenChange={item.setOpen}
-                    className="w-full"
-                  >
-                    <CollapsibleTrigger asChild>
-                      <button
-                        className={`
-                          flex items-center justify-end py-0.5 px-3 text-sm rounded-md w-full
-                          text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
-                        `}
-                      >
-                        <ChevronDown 
-                          className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" 
-                        />
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-0.5">
-                      {item.subItems.map((subItem) => (
-                        <Link 
-                          key={subItem.path} 
-                          to={subItem.path}
-                          className={`
-                            flex items-center py-1.5 px-6 text-sm rounded-md ml-4
-                            ${isActive(subItem.path) 
-                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
-                              : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
-                            }
-                          `}
-                        >
-                          <subItem.icon className="h-3.5 w-3.5 mr-2" />
-                          <span>{subItem.label}</span>
-                        </Link>
-                      ))}
-                    </CollapsibleContent>
-                  </Collapsible>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavGroup label="Premium" noSpacing={true}>
+          {premiumItems.map((item) => (
+            <CollapsibleMenuItem
+              key={item.path}
+              icon={item.icon}
+              label={item.label}
+              path={item.path}
+              isActive={isActive(item.path)}
+              isOpen={item.isOpen}
+              setOpen={item.setOpen}
+              subItems={item.subItems}
+              isActiveSubItem={isActive}
+            />
+          ))}
+        </NavGroup>
       </SidebarContent>
     </Sidebar>
   );
