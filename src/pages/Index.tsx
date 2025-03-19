@@ -1,8 +1,9 @@
+
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles, ArrowRight, Zap, Trophy, ChevronRight, Star, User, ChartBarIcon, LineChart, DollarSign, ArrowUpRight } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles, ArrowRight, Zap, Trophy, ChevronRight, Star, User, LineChart, DollarSign, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -149,7 +150,7 @@ const Index = () => {
                         </div>
                       </div>
                       <Badge className="bg-blue-500/20 text-blue-300 border-0">
-                        Mục tiêu <10%
+                        Mục tiêu &lt;10%
                       </Badge>
                     </div>
                   </div>
