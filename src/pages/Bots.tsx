@@ -93,11 +93,18 @@ const BotCard = ({
         </div>
       </div>
       
-      <div className="flex items-center mb-4 border-t border-b py-2 border-slate-200">
-        <div className="flex-1">
-          <p className="text-sm font-medium">ID</p>
+      <div className="flex items-center justify-between mb-4 border-t border-b py-2 border-slate-200">
+        <div className="flex items-center">
+          <p className="text-sm font-medium mr-2">ID</p>
+          <div className="text-sm font-medium">{botId}</div>
         </div>
-        <div className="text-sm font-medium">{botId}</div>
+        
+        {lastUpdated && (
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 mr-1" />
+            {lastUpdated}
+          </div>
+        )}
       </div>
       
       <div className="flex justify-between items-center pt-2">
@@ -111,13 +118,6 @@ const BotCard = ({
             <Plus className="h-3 w-3" />
           </button>
         </div>
-        
-        {lastUpdated && (
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3 mr-1" />
-            {lastUpdated}
-          </div>
-        )}
       </div>
     </div>
   );
