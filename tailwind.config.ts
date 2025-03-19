@@ -122,11 +122,14 @@ export default {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' }
 				},
-				blob: {
+				'blob': {
 					'0%': { transform: 'translate(0px, 0px) scale(1)' },
 					'33%': { transform: 'translate(30px, -50px) scale(1.1)' },
 					'66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
 					'100%': { transform: 'translate(0px, 0px) scale(1)' }
+				},
+				'shimmer': {
+					'100%': { transform: 'translateX(100%)' }
 				}
 			},
 			animation: {
@@ -137,7 +140,8 @@ export default {
 				'slide-up': 'slide-up 0.4s ease-out',
 				'slide-down': 'slide-down 0.4s ease-out',
 				'pulse-status': 'pulse-status 2s ease-in-out infinite',
-				'blob': 'blob 7s infinite'
+				'blob': 'blob 7s infinite',
+				'shimmer': 'shimmer 1.5s infinite'
 			},
 			backdropFilter: {
 				'none': 'none',

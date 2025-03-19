@@ -2,10 +2,11 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles, ArrowRight, Zap, Trophy, ChevronRight, Star, User } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles, ArrowRight, Zap, Trophy, ChevronRight, Star, User, ChartBarIcon, LineChart, DollarSign, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Index = () => {
 
   return (
     <MainLayout title="Bảng Điều Khiển">
-      {/* Prop Trading Promotion - Enhanced design */}
+      {/* Prop Trading Promotion - New compact design */}
       <motion.div
         className="mb-8"
         variants={{
@@ -51,73 +52,63 @@ const Index = () => {
         animate="visible"
         transition={{ duration: 0.5 }}
       >
-        <div className="relative overflow-hidden rounded-xl shadow-2xl">
-          {/* Background with gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 opacity-95"></div>
-          
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute -left-8 top-0 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-          
-          {/* Pattern overlay */}
-          <div className="absolute inset-0 opacity-10" 
-            style={{ 
-              backgroundImage: 'url("data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23ffffff" fill-opacity="1" fill-rule="evenodd"%3E%3Cpath d="M0 40L40 0H20L0 20M40 40V20L20 40"/%3E%3C/g%3E%3C/svg%3E")',
-              backgroundSize: '30px 30px'
-            }}>
-          </div>
-          
-          <div className="relative px-6 py-8 sm:px-10 md:py-12 overflow-hidden z-10">
-            <div className="flex flex-col md:flex-row gap-8 items-center">
-              <div className="text-center md:text-left">
-                <Badge className="mb-4 bg-white/90 text-blue-700 hover:bg-white/100 font-semibold px-3 py-1 text-sm transition-colors shadow-sm">
-                  <Star className="h-3.5 w-3.5 mr-1 text-yellow-500" />
-                  Mới Ra Mắt
-                </Badge>
+        <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-r from-violet-600 to-indigo-700">
+          <div className="relative p-6">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full opacity-5"></div>
+            <div className="absolute bottom-0 left-20 w-32 h-32 bg-white rounded-full opacity-5"></div>
+            
+            {/* Pattern overlay */}
+            <div className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E\")",
+                backgroundSize: '30px 30px'
+              }}
+            ></div>
+
+            <div className="grid md:grid-cols-5 gap-6 relative z-10">
+              <div className="md:col-span-3 space-y-4">
+                <div className="inline-flex px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium">
+                  <Star className="h-4 w-4 mr-2 text-yellow-300" />
+                  Dịch vụ mới
+                </div>
                 
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Prop Trading Bots</h2>
+                <h2 className="text-2xl font-bold text-white">Prop Trading Bot</h2>
                 
-                <p className="text-white/90 text-lg mb-6 md:max-w-md leading-relaxed">
-                  Vượt qua các vòng thử thách Prop Trading với bộ Bot đặc biệt được thiết kế để tối ưu 
-                  hiệu suất và giảm thiểu rủi ro. Khởi đầu sự nghiệp Prop Trader của bạn với Trade Bot 365.
+                <p className="text-white/80 text-sm">
+                  Vượt qua các vòng thử thách Prop Trading với bộ Bot tối ưu hiệu suất & giảm thiểu rủi ro.
+                  Bắt đầu sự nghiệp Prop Trader với các công cụ chuyên nghiệp ngay hôm nay.
                 </p>
                 
-                <ul className="text-white text-base mb-6 text-left space-y-4">
-                  <li className="flex items-center gap-3">
-                    <span className="flex-shrink-0 bg-white/20 p-2 rounded-full">
-                      <Zap className="h-5 w-5 text-yellow-300" />
-                    </span>
-                    <span>Tỷ lệ thành công 80% trong các bài kiểm tra</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="flex-shrink-0 bg-white/20 p-2 rounded-full">
-                      <User className="h-5 w-5 text-yellow-300" />
-                    </span>
-                    <span>��ược 130+ trader tin dùng</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="flex-shrink-0 bg-white/20 p-2 rounded-full">
-                      <Sparkles className="h-5 w-5 text-yellow-300" />
-                    </span>
-                    <span>Hỗ trợ kỹ thuật trực tiếp từ đội ngũ chuyên gia</span>
-                  </li>
-                </ul>
+                <div className="grid grid-cols-2 gap-3 py-2">
+                  <div className="flex items-center text-white/90 text-sm">
+                    <div className="flex-shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                      <TrendingUp className="h-3.5 w-3.5 text-teal-300" />
+                    </div>
+                    Tỷ lệ thành công 80%+
+                  </div>
+                  <div className="flex items-center text-white/90 text-sm">
+                    <div className="flex-shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                      <Users className="h-3.5 w-3.5 text-teal-300" />
+                    </div>
+                    130+ trader sử dụng
+                  </div>
+                </div>
                 
-                <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                <div className="space-x-3 pt-2">
                   <Button 
-                    size="lg"
-                    variant="tradebot"
-                    className="font-medium text-base group"
+                    variant="tradebot" 
+                    size="sm"
+                    className="group"
                     onClick={() => navigate('/premium-bots')}
                   >
-                    Khám phá ngay
-                    <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    Khám phá
+                    <ArrowUpRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Button>
                   <Button 
-                    variant="outline" 
-                    size="lg"
-                    className="border-white/80 bg-white/10 text-white hover:bg-white/20 text-base backdrop-blur-sm"
+                    size="sm"
+                    variant="ghost" 
+                    className="bg-white/10 text-white hover:bg-white/20 border border-white/20"
                     onClick={() => navigate('/accounts')}
                   >
                     Kết nối tài khoản
@@ -125,58 +116,48 @@ const Index = () => {
                 </div>
               </div>
               
-              <div className="md:block relative mt-6 md:mt-0">
-                {/* Glowing effect behind card */}
-                <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-blue-400 to-indigo-400 opacity-70 blur-lg"></div>
-                
-                {/* Card */}
-                <div className="relative bg-zinc-900/90 p-6 rounded-xl border border-white/20 backdrop-blur-sm shadow-xl">
-                  <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Trophy className="h-5 w-5 text-yellow-400" />
-                        <span className="text-white font-bold">Hiệu suất Prop Master</span>
+              <div className="md:col-span-2 flex items-center justify-center">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-4 w-full">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center mr-3">
+                          <LineChart className="h-4 w-4 text-emerald-400" />
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-sm">Hiệu suất</div>
+                          <div className="text-emerald-400 text-lg font-bold">+11.2%</div>
+                        </div>
                       </div>
-                      <Badge className="bg-green-500 text-white px-2.5 py-1 text-sm font-semibold shadow-sm">+11.2%</Badge>
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border-0">
+                        +0.8% hôm nay
+                      </Badge>
                     </div>
                     
-                    <div className="space-y-2">
-                      <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style={{ width: '65%' }}></div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/70">Drawdown: 4.8%</span>
-                        <span className="text-white/70">Mục tiêu: 10%</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 space-y-5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Star className="h-5 w-5 text-yellow-400" />
-                        <span className="text-white font-bold">Tỷ lệ thành công</span>
-                      </div>
-                      <Badge className="bg-blue-500 text-white px-2.5 py-1 text-sm font-semibold shadow-sm">80%+</Badge>
+                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full" style={{width: "78%"}}></div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: '80%' }}></div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mr-3">
+                          <DollarSign className="h-4 w-4 text-blue-400" />
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-sm">Drawdown</div>
+                          <div className="text-white text-lg font-bold">4.2%</div>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/70">Trader sử dụng: 130+</span>
-                        <span className="text-white/70">Đang online: 42</span>
-                      </div>
+                      <Badge className="bg-blue-500/20 text-blue-300 border-0">
+                        Mục tiêu <10%
+                      </Badge>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </motion.div>
 
       <div className="mb-8">
