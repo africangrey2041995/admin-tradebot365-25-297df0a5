@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -12,9 +11,8 @@ import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
-import { SubscribePremiumBotDialog } from '@/components/premium/SubscribePremiumBotDialog';
+import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 
-// Mock data for prop trading bots
 const propTradingBots = [
   {
     id: 'ptb-001',
@@ -101,7 +99,6 @@ const PropTradingBotDetail = () => {
   const navigate = useNavigate();
   const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
   
-  // Find the bot from the mock data
   const bot = propTradingBots.find(b => b.id === botId);
   
   if (!bot) {
@@ -139,7 +136,6 @@ const PropTradingBotDetail = () => {
   
   const riskColor = getColorByRisk(bot.risk);
   
-  // Determine color scheme for badges and accents
   const colorSchemeClasses = {
     blue: {
       badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400',
@@ -197,7 +193,6 @@ const PropTradingBotDetail = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content - left side */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader className="pb-3">
@@ -306,7 +301,7 @@ const PropTradingBotDetail = () => {
                   </TabsContent>
                   
                   <TabsContent value="accounts" className="pt-4">
-                    <BotAccountsTable accounts={[]} />
+                    <BotAccountsTable botId={botId || ''} />
                     <div className="text-center py-8">
                       <p className="text-slate-500 dark:text-slate-400 mb-4">
                         Bạn chưa tích hợp bot này với tài khoản nào
@@ -329,7 +324,6 @@ const PropTradingBotDetail = () => {
             </Card>
           </div>
           
-          {/* Sidebar - right side */}
           <div className="space-y-6">
             <Card>
               <CardHeader className="pb-2">
@@ -404,6 +398,7 @@ const PropTradingBotDetail = () => {
         botName={bot.name}
         open={isSubscribeDialogOpen}
         onOpenChange={setIsSubscribeDialogOpen}
+        onSubscribe={(data) => console.log('Subscribe data:', data)}
       />
     </MainLayout>
   );
