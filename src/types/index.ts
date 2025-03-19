@@ -27,6 +27,7 @@ export interface Account {
   createdDate: string;
   lastUpdated: string;
   expireDate?: string;
+  volumeMultiplier?: string;
 }
 
 export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Pending';

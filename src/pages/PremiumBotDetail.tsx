@@ -26,10 +26,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { motion } from 'framer-motion';
-import { Account } from '@/types';
 import { 
   AreaChart, 
   Area, 
@@ -43,6 +39,8 @@ import {
   Legend
 } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
+import { Account } from '@/types';
 
 const premiumBots = [
   {
@@ -100,44 +98,10 @@ Bot này phù hợp cho các nhà đầu tư muốn tận dụng các xu hướn
   // ... other premium bots
 ];
 
-const mockAccounts: Account[] = [
-  {
-    id: "acc1",
-    name: "Trading Account 1",
-    status: "Connected",
-    lastUpdated: "2023-11-05",
-    createdDate: "2023-10-01",
-    tradingAccountBalance: "$10,500.25",
-    tradingAccount: "CTrader Pro",
-    tradingAccountType: "Live",
-  },
-  {
-    id: "acc2",
-    name: "Trading Account 2",
-    status: "Connected",
-    lastUpdated: "2023-11-10",
-    createdDate: "2023-09-15",
-    tradingAccountBalance: "$5,890.50",
-    tradingAccount: "CTrader Standard",
-    tradingAccountType: "Demo",
-  },
-  {
-    id: "acc3",
-    name: "Trading Account 3",
-    status: "Disconnected",
-    lastUpdated: "2023-10-28",
-    createdDate: "2023-08-20",
-    tradingAccountBalance: "$2,100.75",
-    tradingAccount: "CTrader Basic",
-    tradingAccountType: "Live",
-  }
-];
-
 const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
 
   const bot = premiumBots.find(b => b.id === botId);
@@ -164,18 +128,10 @@ const PremiumBotDetail = () => {
     setSubscribeDialogOpen(true);
   };
 
-  const confirmSubscription = () => {
-    if (!selectedAccount) {
-      toast.error("Vui lòng chọn tài khoản để đăng ký sử dụng bot", {
-        description: "Bạn cần chọn một tài khoản đã kết nối để tiếp tục."
-      });
-      return;
-    }
-
+  const confirmSubscription = (subscriptionData: any) => {
     toast.success(`Đăng ký thành công!`, {
-      description: `Bạn đã đăng ký sử dụng ${bot.name} cho tài khoản đã chọn.`,
+      description: `Bạn đã đăng ký sử dụng ${bot.name} cho tài khoản đã chọn với hệ số khối lượng x${subscriptionData.volumeMultiplier}.`,
     });
-    setSubscribeDialogOpen(false);
     
     setTimeout(() => {
       navigate('/premium-bots');
@@ -554,77 +510,16 @@ const PremiumBotDetail = () => {
         </div>
       </div>
 
-      <Dialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Đăng ký sử dụng {bot.name}</DialogTitle>
-            <DialogDescription>
-              Chọn tài khoản mà bạn muốn kết nối với premium bot này
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Chọn tài khoản
-              </label>
-              <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn tài khoản cần kết nối" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockAccounts.map((account) => (
-                    <SelectItem 
-                      key={account.id} 
-                      value={account.id}
-                      disabled={account.status !== "Connected"}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span>{account.name}</span>
-                        {account.status !== "Connected" && (
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            Chưa kết nối
-                          </Badge>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-zinc-800 p-4 rounded-lg border border-slate-200 dark:border-zinc-700">
-              <h4 className="font-medium text-slate-800 dark:text-white flex items-center mb-2">
-                <CircleDollarSign className="h-4 w-4 mr-1" /> Chi phí sử dụng
-              </h4>
-              <div className="flex justify-between items-center mb-2 text-sm">
-                <span className="text-slate-600 dark:text-slate-300">Phí đăng ký:</span>
-                <span className="font-medium text-slate-800 dark:text-white">Free</span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Hiện tại bot này được cung cấp miễn phí trong giai đoạn thử nghiệm.
-              </p>
-            </div>
-            
-            {!selectedAccount && (
-              <div className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                <span>Bạn cần chọn tài khoản đã kết nối để tiếp tục</span>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSubscribeDialogOpen(false)}>
-              Hủy
-            </Button>
-            <Button onClick={confirmSubscription} disabled={!selectedAccount}>
-              Xác nhận đăng ký
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SubscribePremiumBotDialog
+        open={subscribeDialogOpen}
+        onOpenChange={setSubscribeDialogOpen}
+        botId={bot.id}
+        botName={bot.name}
+        onSubscribe={confirmSubscription}
+      />
     </MainLayout>
   );
 };
 
 export default PremiumBotDetail;
+

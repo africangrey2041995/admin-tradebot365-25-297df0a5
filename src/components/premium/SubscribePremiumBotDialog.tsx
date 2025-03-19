@@ -1,33 +1,37 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { toast } from 'sonner';
+import { CircleDollarSign } from 'lucide-react';
 
 const formSchema = z.object({
-  userAccount: z.string({ required_error: "Please select a user account" }),
-  apiKey: z.string({ required_error: "Please select an API key" }),
-  tradingAccount: z.string({ required_error: "Please select a trading account" }),
+  userAccount: z.string({ required_error: "Vui lòng chọn tài khoản người dùng" }),
+  apiKey: z.string({ required_error: "Vui lòng chọn API key" }),
+  tradingAccount: z.string({ required_error: "Vui lòng chọn tài khoản giao dịch" }),
   volumeMultiplier: z.string().default("1"),
 });
 
-interface AddAccountDialogProps {
+interface SubscribePremiumBotDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   botId: string;
-  onAddAccount: (accountData: z.infer<typeof formSchema>) => void;
+  botName: string;
+  onSubscribe: (subscriptionData: z.infer<typeof formSchema>) => void;
 }
 
-const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ 
+const SubscribePremiumBotDialog: React.FC<SubscribePremiumBotDialogProps> = ({ 
   open, 
   onOpenChange, 
   botId,
-  onAddAccount 
+  botName,
+  onSubscribe 
 }) => {
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [apis, setApis] = useState<{ id: string; name: string; userId: string }[]>([]);
@@ -78,8 +82,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onAddAccount(values);
-    toast.success("Account added successfully");
+    onSubscribe(values);
     onOpenChange(false);
     resetFormState();
   };
@@ -111,7 +114,10 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add Account to Bot {botId}</DialogTitle>
+          <DialogTitle>Đăng ký sử dụng {botName}</DialogTitle>
+          <DialogDescription>
+            Chọn tài khoản mà bạn muốn kết nối với premium bot này
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
@@ -121,7 +127,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               name="userAccount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Profile</FormLabel>
+                  <FormLabel>Tài khoản người dùng</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -133,7 +139,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select account profile" />
+                        <SelectValue placeholder="Chọn tài khoản người dùng" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -154,7 +160,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               name="apiKey"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>API</FormLabel>
+                  <FormLabel>API Key</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -166,7 +172,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select API" />
+                        <SelectValue placeholder="Chọn API Key" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -187,7 +193,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               name="tradingAccount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Trading</FormLabel>
+                  <FormLabel>Tài khoản giao dịch</FormLabel>
                   <Select 
                     onValueChange={field.onChange}
                     value={field.value}
@@ -195,7 +201,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select trading account" />
+                        <SelectValue placeholder="Chọn tài khoản giao dịch" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -216,14 +222,14 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               name="volumeMultiplier"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Volume Multiplier</FormLabel>
+                  <FormLabel>Khối lượng giao dịch</FormLabel>
                   <Select 
                     onValueChange={field.onChange}
                     value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select volume multiplier" />
+                        <SelectValue placeholder="Chọn bội số khối lượng" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -236,11 +242,30 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   </Select>
                   <FormMessage />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Multiplier for trade volume relative to original signal
+                    Hệ số nhân khối lượng giao dịch so với tín hiệu gốc
                   </p>
                 </FormItem>
               )}
             />
+
+            <div className="bg-slate-50 dark:bg-zinc-800 p-4 rounded-lg border border-slate-200 dark:border-zinc-700">
+              <h4 className="font-medium text-slate-800 dark:text-white flex items-center mb-2">
+                <CircleDollarSign className="h-4 w-4 mr-1" /> Chi phí sử dụng
+              </h4>
+              <div className="flex justify-between items-center mb-2 text-sm">
+                <span className="text-slate-600 dark:text-slate-300">Phí đăng ký:</span>
+                <span className="font-medium text-slate-800 dark:text-white">Free</span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Hiện tại bot này được cung cấp miễn phí trong giai đoạn thử nghiệm.
+              </p>
+            </div>
+            
+            {!form.watch("tradingAccount") && (
+              <div className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                <span>Bạn cần chọn đầy đủ thông tin tài khoản để tiếp tục</span>
+              </div>
+            )}
 
             <DialogFooter className="pt-4">
               <Button 
@@ -248,9 +273,14 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                 type="button" 
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
-              <Button type="submit">Add Account</Button>
+              <Button 
+                type="submit" 
+                disabled={!form.watch("tradingAccount")}
+              >
+                Xác nhận đăng ký
+              </Button>
             </DialogFooter>
           </form>
         </Form>
@@ -259,4 +289,4 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   );
 };
 
-export default AddAccountDialog;
+export default SubscribePremiumBotDialog;
