@@ -35,12 +35,12 @@ const SidebarNav = () => {
   return (
     <Sidebar className="border-r-0">
       <SidebarContent className="bg-[#111111] text-white h-full">
-        {/* Logo */}
-        <div className="py-5 px-6">
+        {/* Logo - Updated size and centering */}
+        <div className="py-6 px-4 flex justify-center">
           <img 
             src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
             alt="Trade Bot 365" 
-            className="h-12 w-auto" 
+            className="h-16 w-auto" 
           />
         </div>
         
