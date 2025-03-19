@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CircuitBoard, Users, Link2, Radio, Settings, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, CircuitBoard, Users, Link2, Radio, Settings, Menu, X, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -39,6 +39,7 @@ const Navigation = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -48,6 +49,10 @@ const Navigation = () => {
     setMobileMenuOpen(false);
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   const Logo = () => (
     <div className="flex items-center space-x-2">
       <img 
@@ -55,7 +60,9 @@ const Navigation = () => {
         alt="Trade Bot 365 Logo" 
         className="h-8 w-8" 
       />
-      <span className="text-xl font-bold text-white">Trade Bot <span className="text-tradebot">365</span></span>
+      {!isCollapsed && (
+        <span className="text-xl font-bold text-white">Trade Bot <span className="text-tradebot">365</span></span>
+      )}
     </div>
   );
 
@@ -66,17 +73,26 @@ const Navigation = () => {
           key={route.path}
           to={route.path}
           className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-base",
+            "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm",
             location.pathname === route.path
-              ? "bg-primary text-primary-foreground"
-              : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+              ? "bg-primary/10 text-primary"
+              : "text-sidebar-foreground hover:bg-primary/5 hover:text-primary"
           )}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
-          {route.icon}
-          <span>{route.label}</span>
-          {location.pathname === route.path && (
-            <ChevronRight className="ml-auto h-5 w-5" />
+          <div className={cn(
+            "flex items-center justify-center w-9 h-9 rounded-lg",
+            location.pathname === route.path ? "bg-primary text-white" : "text-slate-400 bg-slate-800/30"
+          )}>
+            {route.icon}
+          </div>
+          {(!isCollapsed || isMobile) && (
+            <span>{route.label}</span>
+          )}
+          {location.pathname === route.path && !isCollapsed && !isMobile && (
+            <div className="ml-auto">
+              <ChevronDown className="h-4 w-4" />
+            </div>
           )}
         </Link>
       ))}
@@ -87,7 +103,7 @@ const Navigation = () => {
     <>
       {isMobile ? (
         <>
-          <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-background border-b">
+          <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-800 border-b shadow-sm">
             <div className="flex items-center">
               <Logo />
             </div>
@@ -103,7 +119,7 @@ const Navigation = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="fixed top-[60px] left-0 right-0 z-30 bg-zinc-900 p-4 border-b flex flex-col gap-2"
+                className="fixed top-[60px] left-0 right-0 z-30 bg-white dark:bg-zinc-900 p-4 border-b shadow-md flex flex-col gap-2"
               >
                 <NavLinks />
               </motion.div>
@@ -113,22 +129,72 @@ const Navigation = () => {
           <div className="h-[60px]"></div> {/* Spacer for fixed header */}
         </>
       ) : (
-        <aside className="fixed inset-y-0 left-0 z-30 w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
-          <div className="p-6">
-            <Logo />
-          </div>
+        <>
+          <aside className={cn(
+            "fixed inset-y-0 left-0 z-30 border-r border-slate-200 dark:border-zinc-700 flex flex-col shadow-md transition-all duration-300 ease-in-out bg-white dark:bg-zinc-900",
+            isCollapsed ? "w-[70px]" : "w-64"
+          )}>
+            <div className="p-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+              <Logo />
+              {!isCollapsed && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-slate-500" 
+                  onClick={toggleSidebar}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              )}
+              {isCollapsed && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-[-12px] top-6 bg-primary text-white rounded-full border-2 border-white dark:border-zinc-900 w-6 h-6" 
+                  onClick={toggleSidebar}
+                >
+                  <ChevronDown className={cn("h-3 w-3 transition-all duration-300", isCollapsed && "rotate-90")} />
+                </Button>
+              )}
+            </div>
+            
+            <div className={cn(
+              "px-3 py-4 flex-1 overflow-auto flex flex-col gap-1",
+              isCollapsed && "px-2"
+            )}>
+              <NavLinks />
+            </div>
+            
+            <div className="p-3 border-t border-slate-200 dark:border-zinc-700">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className={cn(
+                  "w-full hover:bg-primary hover:text-white text-slate-600 dark:text-slate-200 border-slate-200 dark:border-zinc-700 bg-transparent",
+                  isCollapsed && "p-0 flex justify-center items-center h-10 w-10"
+                )} 
+                onClick={() => {}}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                {!isCollapsed && "Cài Đặt"}
+              </Button>
+            </div>
+          </aside>
           
-          <div className="px-3 py-2 flex-1 overflow-auto flex flex-col gap-1">
-            <NavLinks />
+          <div className={cn(
+            "fixed top-0 right-0 z-20 border-b border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm transition-all duration-300 ease-in-out px-6 py-3",
+            isCollapsed ? "left-[70px]" : "left-64"
+          )}>
+            <div className="flex items-center justify-between h-12">
+              <div className="text-lg font-medium text-slate-800 dark:text-white">
+                {routes.find(route => route.path === location.pathname)?.label || "Bảng Điều Khiển"}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Add user profile or other header items here */}
+              </div>
+            </div>
           </div>
-          
-          <div className="p-4 border-t border-zinc-800">
-            <Button variant="outline" size="sm" className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200" onClick={() => {}}>
-              <Settings className="h-4 w-4 mr-2" />
-              Cài Đặt
-            </Button>
-          </div>
-        </aside>
+        </>
       )}
     </>
   );

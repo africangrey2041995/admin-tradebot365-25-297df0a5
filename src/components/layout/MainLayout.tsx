@@ -3,6 +3,7 @@ import React from 'react';
 import Navigation from './Navigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -13,30 +14,36 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
       <Navigation />
       
-      <main className={isMobile ? "px-4 pb-6" : "pl-64 p-6"}>
-        {title && (
-          <header className="py-6">
+      <main className={cn(
+        isMobile 
+          ? "px-4 pb-6 pt-4" 
+          : "ml-64 transition-all duration-300 ease-in-out",
+        !isMobile && "pt-20" // For the top header
+      )}>
+        <div className="container mx-auto max-w-7xl px-4 py-6">
+          {title && !isMobile && (
             <motion.h1 
-              className="text-3xl font-bold"
+              className="text-2xl font-semibold mb-6 text-slate-800 dark:text-white"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
               {title}
             </motion.h1>
-          </header>
-        )}
-        
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-        >
-          {children}
-        </motion.div>
+          )}
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-zinc-700"
+          >
+            {children}
+          </motion.div>
+        </div>
       </main>
     </div>
   );
