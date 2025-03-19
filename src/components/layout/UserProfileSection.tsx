@@ -12,11 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Settings, User } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const UserProfileSection = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   
   // Mock user data
   const mockUser = {
@@ -55,16 +53,16 @@ const UserProfileSection = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
-          <span>{t('My Profile')}</span>
+          <span>My Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>{t('Settings')}</span>
+          <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-red-500 dark:text-red-400">
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t('Log out')}</span>
+          <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

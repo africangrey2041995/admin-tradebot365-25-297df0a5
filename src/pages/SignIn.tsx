@@ -13,7 +13,6 @@ import {
   KeyIcon, 
   Loader2
 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const SignIn = () => {
   const [emailAddress, setEmailAddress] = useState('');
@@ -21,7 +20,6 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   // Handle mock sign in for demonstration
   const handleMockSignIn = (e: React.FormEvent) => {
@@ -32,13 +30,13 @@ const SignIn = () => {
     // Simulate API call
     setTimeout(() => {
       if (emailAddress && password) {
-        toast.success(t('Login successful'), {
-          description: t('Welcome back'),
+        toast.success('Login successful', {
+          description: 'Welcome back',
         });
         navigate('/');
       } else {
-        toast.error(t('Login failed'), {
-          description: t('Please check your login information'),
+        toast.error('Login failed', {
+          description: 'Please check your login information',
         });
       }
       setIsLoading(false);
@@ -51,8 +49,8 @@ const SignIn = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast.success(t('Login successful'), {
-        description: t('Logged in with Google'),
+      toast.success('Login successful', {
+        description: 'Logged in with Google',
       });
       navigate('/');
       setIsGoogleLoading(false);
@@ -74,7 +72,7 @@ const SignIn = () => {
       <div className="absolute top-8 right-8">
         <Link to="/sign-up">
           <Button variant="outline" className="border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white">
-            {t('Sign up')}
+            Sign up
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -88,9 +86,9 @@ const SignIn = () => {
       >
         <Card className="border-zinc-700 bg-zinc-900/80 backdrop-blur-lg shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-white">{t('Login')}</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">Login</CardTitle>
             <CardDescription className="text-zinc-400">
-              {t('Login to access the trading bot management system')}
+              Login to access the trading bot management system
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -123,7 +121,7 @@ const SignIn = () => {
                     />
                   </svg>
                 )}
-                {t('Login with Google')}
+                Login with Google
               </Button>
             </div>
             
@@ -133,14 +131,14 @@ const SignIn = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-zinc-900 px-2 text-zinc-500">
-                  {t('Or login with')}
+                  Or login with
                 </span>
               </div>
             </div>
             
             <form onSubmit={handleMockSignIn} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-zinc-400">{t('Email')}</Label>
+                <Label htmlFor="email" className="text-zinc-400">Email</Label>
                 <div className="relative">
                   <MailIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                   <Input
@@ -157,18 +155,18 @@ const SignIn = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-zinc-400">{t('Password')}</Label>
+                  <Label htmlFor="password" className="text-zinc-400">Password</Label>
                   <Link 
                     to="#" 
                     className="text-xs text-tradebot hover:underline"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast(t('Feature in development'), {
-                        description: t('The forgot password feature is under development')
+                      toast('Feature in development', {
+                        description: 'The forgot password feature is under development'
                       });
                     }}
                   >
-                    {t('Forgot password?')}
+                    Forgot password?
                   </Link>
                 </div>
                 <div className="relative">
@@ -195,7 +193,7 @@ const SignIn = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    {t('Login')}
+                    Login
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -204,9 +202,9 @@ const SignIn = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800 pt-4">
             <p className="text-center text-sm text-zinc-500">
-              {t('Don\'t have an account?')}{" "}
+              Don't have an account?{" "}
               <Link to="/sign-up" className="text-tradebot hover:underline">
-                {t('Sign up now')}
+                Sign up now
               </Link>
             </p>
           </CardFooter>

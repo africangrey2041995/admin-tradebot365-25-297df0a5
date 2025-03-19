@@ -23,37 +23,34 @@ import IntegratedPremiumBotDetail from './pages/IntegratedPremiumBotDetail';
 import IntegratedPropBots from './pages/IntegratedPropBots';
 import IntegratedPropBotDetail from './pages/IntegratedPropBotDetail';
 import { Toaster } from './components/ui/sonner';
-import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
-    <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/bots" element={<Bots />} />
-          <Route path="/bots/:id" element={<BotProfile />} />
-          <Route path="/accounts" element={<Accounts />} />
-          <Route path="/accounts/:id" element={<AccountProfile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/connections" element={<Connections />} />
-          <Route path="/signals" element={<Signals />} />
-          <Route path="/premium-bots" element={<PremiumBots />} />
-          <Route path="/premium-bots/:id" element={<PremiumBotDetail />} />
-          <Route path="/prop-trading" element={<PropTradingBots />} />
-          <Route path="/prop-trading/:id" element={<PropTradingBotDetail />} />
-          <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
-          <Route path="/integrated-premium-bots/:id" element={<IntegratedPremiumBotDetail />} />
-          <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
-          <Route path="/integrated-prop-bots/:id" element={<IntegratedPropBotDetail />} />
-          <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-      </Router>
-    </LanguageProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/bots" element={<Bots />} />
+        <Route path="/bots/:id" element={<BotProfile />} />
+        <Route path="/accounts" element={<Accounts />} />
+        <Route path="/accounts/:id" element={<AccountProfile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/connections" element={<Connections />} />
+        <Route path="/signals" element={<Signals />} />
+        <Route path="/premium-bots" element={<PremiumBots />} />
+        <Route path="/premium-bots/:id" element={<PremiumBotDetail />} />
+        <Route path="/prop-trading" element={<PropTradingBots />} />
+        <Route path="/prop-trading/:id" element={<PropTradingBotDetail />} />
+        <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+        <Route path="/integrated-premium-bots/:id" element={<IntegratedPremiumBotDetail />} />
+        <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+        <Route path="/integrated-prop-bots/:id" element={<IntegratedPropBotDetail />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Toaster />
+    </Router>
   );
 }
 
