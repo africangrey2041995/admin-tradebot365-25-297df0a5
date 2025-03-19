@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { User, Id, Phone, Mail } from "lucide-react";
+import { User, Fingerprint, Phone, Mail } from "lucide-react";
 
 const PersonalDataForm = () => {
   const { user } = useUser();
@@ -70,7 +70,7 @@ const PersonalDataForm = () => {
         <div className="grid gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="userId" className="flex items-center gap-2">
-              <Id className="h-4 w-4 text-muted-foreground" />
+              <Fingerprint className="h-4 w-4 text-muted-foreground" />
               ID
             </Label>
           </div>
