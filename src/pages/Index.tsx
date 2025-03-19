@@ -3,9 +3,10 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles, ArrowRight, Zap, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,6 +41,105 @@ const Index = () => {
 
   return (
     <MainLayout title="Bảng Điều Khiển">
+      {/* Prop Trading Promotion - New attractive section */}
+      <motion.div
+        className="mb-8"
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0 }
+        }}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.5 }}
+      >
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 shadow-xl">
+          <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,rgba(255,255,255,0.5),rgba(255,255,255,0.5))]"></div>
+          <div className="relative px-6 py-8 sm:px-8 md:py-10 overflow-hidden">
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              <div className="text-center md:text-left">
+                <Badge className="mb-4 bg-white/20 text-white hover:bg-white/30 transition-colors">Mới Ra Mắt</Badge>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Prop Trading Bots</h2>
+                <p className="text-white/80 mb-6 md:max-w-md">
+                  Vượt qua các vòng thử thách Prop Trading với bộ Bot đặc biệt được thiết kế để tối ưu 
+                  hiệu suất và giảm thiểu rủi ro. Khởi đầu sự nghiệp Prop Trader của bạn với Trade Bot 365.
+                </p>
+                <ul className="text-white/90 text-sm md:text-base mb-6 text-left">
+                  <li className="flex items-center gap-2 mb-2">
+                    <span className="bg-white/20 p-1 rounded-full">
+                      <Zap className="h-4 w-4" />
+                    </span>
+                    <span>Tỷ lệ thành công 80% trong các bài kiểm tra</span>
+                  </li>
+                  <li className="flex items-center gap-2 mb-2">
+                    <span className="bg-white/20 p-1 rounded-full">
+                      <Trophy className="h-4 w-4" />
+                    </span>
+                    <span>Được 130+ trader tin dùng</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="bg-white/20 p-1 rounded-full">
+                      <Sparkles className="h-4 w-4" />
+                    </span>
+                    <span>Hỗ trợ kỹ thuật trực tiếp từ đội ngũ chuyên gia</span>
+                  </li>
+                </ul>
+                <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                  <Button 
+                    size="lg"
+                    className="bg-white hover:bg-white/90 text-blue-700 font-medium"
+                    onClick={() => navigate('/premium-bots')}
+                  >
+                    Khám phá ngay
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-white/50 text-white hover:bg-white/10"
+                    onClick={() => navigate('/accounts')}
+                  >
+                    Kết nối tài khoản
+                  </Button>
+                </div>
+              </div>
+              <div className="hidden md:block relative">
+                <div className="absolute -inset-0.5 rounded-xl bg-white/20 blur-sm"></div>
+                <div className="relative bg-zinc-900/80 p-5 rounded-xl border border-white/20">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-medium">Hiệu suất Prop Master</span>
+                      <Badge className="bg-green-500">+11.2%</Badge>
+                    </div>
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: '65%' }}></div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/70">Drawdown: 4.8%</span>
+                      <span className="text-white/70">Mục tiêu: 10%</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-medium">Tỷ lệ thành công</span>
+                      <Badge className="bg-blue-500">80%+</Badge>
+                    </div>
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: '80%' }}></div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/70">Trader sử dụng: 130+</span>
+                      <span className="text-white/70">Đang online: 42</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute -left-24 -top-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+          </div>
+        </div>
+      </motion.div>
+
       <div className="mb-8">
         <h4 className="text-xl font-medium text-slate-800 dark:text-white mb-4">Tổng Quan Hoạt Động</h4>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
