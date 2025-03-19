@@ -54,14 +54,14 @@ const Navigation = () => {
   };
 
   const Logo = () => (
-    <div className="flex items-center justify-center">
+    <div className={cn(
+      "flex items-center justify-center",
+      isCollapsed ? "w-10" : "w-full"
+    )}>
       <img 
         src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
         alt="Trade Bot 365 Logo" 
-        className={cn(
-          "transition-all duration-300",
-          isCollapsed ? "h-10 w-10" : "h-12 w-12"
-        )} 
+        className="h-12 w-auto object-contain" 
       />
     </div>
   );
