@@ -67,11 +67,11 @@ const BotCard = ({
 }: BotCardProps) => {
   
   const colorClasses = {
-    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-red-100/20',
-    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-blue-100/20',
-    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-green-100/20',
-    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-purple-100/20',
-    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-slate-100/20'
+    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-red-100/30',
+    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-blue-100/30',
+    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-green-100/30',
+    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-purple-100/30',
+    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200 hover:shadow-slate-100/30'
   };
   
   const avatarBgColors = {
@@ -82,102 +82,113 @@ const BotCard = ({
     default: 'bg-slate-100 text-slate-600'
   };
 
-  const buttonBgColors = {
-    red: 'bg-white/70 hover:bg-white text-red-600 border-red-200',
-    blue: 'bg-white/70 hover:bg-white text-blue-600 border-blue-200',
-    green: 'bg-white/70 hover:bg-white text-green-600 border-green-200',
-    purple: 'bg-white/70 hover:bg-white text-purple-600 border-purple-200',
-    default: 'bg-white/70 hover:bg-white text-slate-600 border-slate-200'
+  const buttonColors = {
+    red: 'bg-white hover:bg-white/90 text-red-600 border-red-200',
+    blue: 'bg-white hover:bg-white/90 text-blue-600 border-blue-200',
+    green: 'bg-white hover:bg-white/90 text-green-600 border-green-200',
+    purple: 'bg-white hover:bg-white/90 text-purple-600 border-purple-200',
+    default: 'bg-white hover:bg-white/90 text-slate-600 border-slate-200'
+  };
+
+  const viewButtonColors = {
+    red: 'text-red-600',
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    purple: 'text-purple-600',
+    default: 'text-slate-600'
   };
   
   return (
-    <div className={`relative rounded-xl border shadow p-5 transition-all duration-300 hover:shadow-lg ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
-      <div className="flex justify-between items-start mb-5">
-        <div className="flex items-center">
-          <Avatar className={`mr-4 h-14 w-14 ${avatarBgColors[colorScheme]} border-2 border-white shadow-md`}>
-            {avatarSrc ? (
-              <AvatarImage src={avatarSrc} alt={title} />
-            ) : (
-              <AvatarFallback>
-                {avatarIcon || <Bot className="h-6 w-6" />}
-              </AvatarFallback>
-            )}
-          </Avatar>
-          <div>
+    <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-3">
             <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
-            {subtitle && <p className="text-sm text-muted-foreground mt-1.5 leading-snug max-w-xs">{subtitle}</p>}
+            <button 
+              onClick={onFavorite}
+              className="text-yellow-400 hover:text-yellow-500 transition-colors"
+              aria-label="Toggle favorite"
+            >
+              <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+            </button>
           </div>
+          {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-snug max-w-xs">{subtitle}</p>}
         </div>
-        <div className="flex space-x-2">
-          <button 
-            onClick={onFavorite}
-            className="text-yellow-400 hover:text-yellow-500 transition-colors bg-white/60 hover:bg-white p-1.5 rounded-full"
-          >
-            <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
-          </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-muted-foreground hover:text-foreground transition-colors bg-white/60 hover:bg-white p-1.5 rounded-full">
-                <MoreHorizontal className="h-5 w-5" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <Eye className="h-4 w-4 mr-2" />
-                Xem Chi Tiết
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm Tài Khoản
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive cursor-pointer">
-                Xoá Bot
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-black/5">
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer" onClick={onViewBot}>
+              <Eye className="h-4 w-4 mr-2" />
+              Xem Chi Tiết
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" onClick={onAddAccount}>
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm Tài Khoản
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive cursor-pointer">
+              Xoá Bot
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       
-      <div className="flex items-center justify-between py-3 px-4 mb-5 rounded-lg bg-white/50 backdrop-blur-sm border border-slate-200/70">
+      <div className="flex items-center mt-4">
+        <Avatar className={`mr-3 h-11 w-11 ${avatarBgColors[colorScheme]} border border-white shadow-sm`}>
+          {avatarSrc ? (
+            <AvatarImage src={avatarSrc} alt={title} />
+          ) : (
+            <AvatarFallback>
+              {avatarIcon || <Bot className="h-5 w-5" />}
+            </AvatarFallback>
+          )}
+        </Avatar>
+      </div>
+      
+      <div className="flex items-center justify-between py-2.5 px-3 mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100">
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-2 text-slate-500">ID:</p>
-          <div className="text-sm font-bold tracking-wide text-slate-700">{botId}</div>
+          <p className="text-xs font-medium mr-1.5 text-slate-500">ID:</p>
+          <div className="text-sm font-medium tracking-wide text-slate-700">{botId}</div>
         </div>
         
         {lastUpdated && (
           <div className="flex items-center text-xs font-medium text-slate-500">
-            <Calendar className="h-3 w-3 mr-1.5" />
+            <Calendar className="h-3 w-3 mr-1" />
             {lastUpdated}
           </div>
         )}
       </div>
       
-      <div className="flex justify-between items-center px-4 py-3 rounded-lg bg-white/50 backdrop-blur-sm border border-slate-200/70 mb-5">
-        <div className="flex items-center">
-          <p className="text-sm text-slate-500 mr-2">Accounts: </p>
-          <div className="text-sm font-bold mr-3 text-slate-700">{accountCount}</div>
-          <button 
-            onClick={onAddAccount}
-            className="h-7 w-7 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600 shadow-sm"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
+      <div className="flex justify-between items-center px-3 py-2.5 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100 mb-4">
+        <div className="flex items-center gap-1.5">
+          <p className="text-xs text-slate-500">Accounts:</p>
+          <div className="text-sm font-medium text-slate-700">{accountCount}</div>
         </div>
+        
+        <button 
+          onClick={onAddAccount}
+          className="h-6 w-6 rounded-full bg-white hover:bg-slate-50 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600"
+          aria-label="Add account"
+        >
+          <Plus className="h-3 w-3" />
+        </button>
       </div>
       
-      <div className="mt-auto">
-        <Button 
-          variant="outline" 
-          onClick={onViewBot} 
-          className={`w-full py-5 ${buttonBgColors[colorScheme]} shadow-sm font-medium`}
-        >
-          <Eye className="h-4 w-4 mr-2" />
-          View Bot
-        </Button>
-      </div>
+      <Button 
+        variant="outline" 
+        onClick={onViewBot} 
+        className={`w-full py-2 h-auto ${buttonColors[colorScheme]} shadow-sm font-medium mt-auto flex gap-2 justify-center items-center`}
+      >
+        <Eye className={`h-4 w-4 ${viewButtonColors[colorScheme]}`} />
+        <span>View Bot</span>
+      </Button>
     </div>
   );
 };
@@ -191,12 +202,12 @@ const Bots = () => {
 
   // Icon set for bots
   const botIcons = [
-    <Bot className="h-6 w-6" />,
-    <Cpu className="h-6 w-6" />,
-    <Server className="h-6 w-6" />,
-    <Terminal className="h-6 w-6" />,
-    <CircuitBoard className="h-6 w-6" />,
-    <Gem className="h-6 w-6" />
+    <Bot className="h-5 w-5" />,
+    <Cpu className="h-5 w-5" />,
+    <Server className="h-5 w-5" />,
+    <Terminal className="h-5 w-5" />,
+    <CircuitBoard className="h-5 w-5" />,
+    <Gem className="h-5 w-5" />
   ];
 
   // Mock data for demonstration
@@ -304,32 +315,32 @@ const Bots = () => {
   return (
     <MainLayout title="Quản Lý Bot">
       <div className="flex flex-col">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
-            <Button variant="outline" className="mr-2 border-slate-300 shadow-sm font-semibold">
+            <Button variant="outline" className="border-slate-200 shadow-sm font-medium px-4 py-2 h-10">
               <Bookmark className="h-4 w-4 mr-2" />
               BOT LIST
             </Button>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="relative w-72">
+          <div className="flex items-center space-x-3">
+            <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search..." 
-                className="pl-10 border-slate-300 shadow-sm focus:ring-2 focus:ring-slate-300"
+                className="pl-9 border-slate-200 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button onClick={handleAddBot} className="shadow-sm font-medium px-5">
+            <Button onClick={handleAddBot} className="bg-primary hover:bg-primary/90 shadow-sm font-medium h-10 px-4">
               <Plus className="h-4 w-4 mr-2" />
               Add New BOT
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
           {filteredBots.map((bot, index) => (
             <BotCard 
               key={index} 
@@ -342,7 +353,7 @@ const Bots = () => {
           ))}
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
