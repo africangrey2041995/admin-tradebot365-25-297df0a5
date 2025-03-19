@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -35,6 +34,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { Bot as BotType } from '@/types';
+import { AddBotDialog } from '@/components/bots/AddBotDialog';
 
 interface BotCardProps {
   title: string;
@@ -66,7 +66,6 @@ const BotCard = ({
   avatarIcon
 }: BotCardProps) => {
   
-  // Truncate subtitle to ensure it fits in two lines
   const truncateText = (text: string, maxLength: number) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
@@ -111,7 +110,6 @@ const BotCard = ({
     <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex-grow">
-          {/* Avatar at the top */}
           <div className="flex justify-center mb-3">
             <Avatar className={`h-16 w-16 ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
               {avatarSrc ? (
@@ -161,7 +159,6 @@ const BotCard = ({
             <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
           </button>
         </div>
-        {/* Fixed height subtitle area with consistent 2 lines */}
         <div className="h-10 flex items-center justify-center">
           <p className="text-sm text-muted-foreground leading-tight mx-auto line-clamp-2">
             {formattedSubtitle || "—"}
@@ -216,8 +213,78 @@ const Bots = () => {
     '1': true,
     '3': true
   });
+  const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
+  const [bots, setBots] = useState<BotCardProps[]>([
+    {
+      title: 'Ultra 2in1',
+      subtitle: 'Bot for combined strategy trading with dual market analysis',
+      botId: 'BOT7459',
+      accountCount: '18/42',
+      lastUpdated: '10 Jul, 2023',
+      colorScheme: 'red',
+      avatarIcon: <Bot className="h-5 w-5" />
+    },
+    {
+      title: 'Long Master',
+      subtitle: 'Specialized in long-term position trading strategies',
+      botId: 'BOT8932',
+      accountCount: '22/56',
+      lastUpdated: '18 May, 2023',
+      colorScheme: 'blue',
+      avatarIcon: <Cpu className="h-5 w-5" />
+    },
+    {
+      title: 'Gold Trading',
+      subtitle: 'Precious metals focused algorithmic trading system',
+      botId: 'BOT2734',
+      accountCount: '14/20',
+      lastUpdated: '21 Feb, 2023',
+      colorScheme: 'green',
+      avatarIcon: <Server className="h-5 w-5" />
+    },
+    {
+      title: 'Bitcoin Trading',
+      subtitle: 'Cryptocurrency trading bot with focus on Bitcoin markets',
+      botId: 'BOT5128',
+      accountCount: '20/34',
+      lastUpdated: '03 Aug, 2023',
+      colorScheme: 'purple',
+      avatarIcon: <Terminal className="h-5 w-5" />
+    },
+    {
+      title: 'Forex Master',
+      subtitle: 'Multi-currency trading system for forex markets',
+      botId: 'BOT1267',
+      accountCount: '15/25',
+      lastUpdated: '15 May, 2023',
+      avatarIcon: <CircuitBoard className="h-5 w-5" />
+    },
+    {
+      title: 'Scalping Pro',
+      subtitle: 'High-frequency short term trading bot',
+      botId: 'BOT9381',
+      accountCount: '8/12',
+      lastUpdated: '21 Feb, 2023',
+      avatarIcon: <Gem className="h-5 w-5" />
+    },
+    {
+      title: 'Swing Trader',
+      subtitle: 'Medium-term market swing analyzer and trader',
+      botId: 'BOT6452',
+      accountCount: '12/20',
+      lastUpdated: '05 Aug, 2023',
+      avatarIcon: <Bot className="h-5 w-5" />
+    },
+    {
+      title: 'ETF Strategy',
+      subtitle: 'Diversified ETF portfolio management system',
+      botId: 'BOT3815',
+      accountCount: '10/15',
+      lastUpdated: '10 Jul, 2023',
+      avatarIcon: <Cpu className="h-5 w-5" />
+    },
+  ]);
 
-  // Icon set for bots
   const botIcons = [
     <Bot className="h-5 w-5" />,
     <Cpu className="h-5 w-5" />,
@@ -227,87 +294,41 @@ const Bots = () => {
     <Gem className="h-5 w-5" />
   ];
 
-  // Mock data for demonstration
-  const mockBots: BotCardProps[] = [
-    {
-      title: 'Ultra 2in1',
-      subtitle: 'Bot for combined strategy trading with dual market analysis',
-      botId: 'BOT7459',
-      accountCount: '18/42',
-      lastUpdated: '10 Jul, 2023',
-      colorScheme: 'red',
-      avatarIcon: botIcons[0]
-    },
-    {
-      title: 'Long Master',
-      subtitle: 'Specialized in long-term position trading strategies',
-      botId: 'BOT8932',
-      accountCount: '22/56',
-      lastUpdated: '18 May, 2023',
-      colorScheme: 'blue',
-      avatarIcon: botIcons[1]
-    },
-    {
-      title: 'Gold Trading',
-      subtitle: 'Precious metals focused algorithmic trading system',
-      botId: 'BOT2734',
-      accountCount: '14/20',
-      lastUpdated: '21 Feb, 2023',
-      colorScheme: 'green',
-      avatarIcon: botIcons[2]
-    },
-    {
-      title: 'Bitcoin Trading',
-      subtitle: 'Cryptocurrency trading bot with focus on Bitcoin markets',
-      botId: 'BOT5128',
-      accountCount: '20/34',
-      lastUpdated: '03 Aug, 2023',
-      colorScheme: 'purple',
-      avatarIcon: botIcons[3]
-    },
-    {
-      title: 'Forex Master',
-      subtitle: 'Multi-currency trading system for forex markets',
-      botId: 'BOT1267',
-      accountCount: '15/25',
-      lastUpdated: '15 May, 2023',
-      avatarIcon: botIcons[4]
-    },
-    {
-      title: 'Scalping Pro',
-      subtitle: 'High-frequency short term trading bot',
-      botId: 'BOT9381',
-      accountCount: '8/12',
-      lastUpdated: '21 Feb, 2023',
-      avatarIcon: botIcons[5]
-    },
-    {
-      title: 'Swing Trader',
-      subtitle: 'Medium-term market swing analyzer and trader',
-      botId: 'BOT6452',
-      accountCount: '12/20',
-      lastUpdated: '05 Aug, 2023',
-      avatarIcon: botIcons[0]
-    },
-    {
-      title: 'ETF Strategy',
-      subtitle: 'Diversified ETF portfolio management system',
-      botId: 'BOT3815',
-      accountCount: '10/15',
-      lastUpdated: '10 Jul, 2023',
-      avatarIcon: botIcons[1]
-    },
-  ];
+  const getBotIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'bot': return botIcons[0];
+      case 'cpu': return botIcons[1];
+      case 'server': return botIcons[2];
+      case 'terminal': return botIcons[3];
+      case 'circuit': return botIcons[4];
+      case 'gem': return botIcons[5];
+      default: return botIcons[0];
+    }
+  };
 
-  const filteredBots = mockBots.filter(bot => 
+  const filteredBots = bots.filter(bot => 
     bot.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (bot.subtitle && bot.subtitle.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleAddBot = () => {
-    toast('Thêm Bot mới', {
-      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
-    });
+    setIsAddBotDialogOpen(true);
+  };
+
+  const handleAddNewBot = (values: any) => {
+    const newBotId = 'BOT' + Math.floor(1000 + Math.random() * 9000);
+    
+    const newBot: BotCardProps = {
+      title: values.title,
+      subtitle: values.subtitle || '',
+      botId: newBotId,
+      accountCount: '0/0',
+      lastUpdated: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, ''),
+      colorScheme: values.colorScheme,
+      avatarIcon: getBotIcon(values.icon)
+    };
+    
+    setBots(prevBots => [newBot, ...prevBots]);
   };
 
   const toggleFavorite = (index: number) => {
@@ -388,8 +409,15 @@ const Bots = () => {
           </Pagination>
         </div>
       </div>
+      
+      <AddBotDialog 
+        open={isAddBotDialogOpen}
+        onOpenChange={setIsAddBotDialogOpen}
+        onAddBot={handleAddNewBot}
+      />
     </MainLayout>
   );
 };
 
 export default Bots;
+
