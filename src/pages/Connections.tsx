@@ -32,7 +32,7 @@ const Connections = () => {
       connectionStatus: 'Disconnected',
       lastConnectionTime: '2023-06-15T09:30:00Z',
       lastDisconnectionTime: '2023-06-22T11:20:00Z',
-      errorMessage: 'Authentication failed. Invalid access token.',
+      errorMessage: 'Xác thực thất bại. Mã truy cập không hợp lệ.',
     },
     {
       accountId: 'client789',
@@ -50,24 +50,24 @@ const Connections = () => {
   };
 
   const handleReconnect = (accountId: string) => {
-    toast(`Reconnecting account ${accountId}`, {
-      description: 'Attempting to reconnect to Coinstrat.pro...',
+    toast(`Đang kết nối lại tài khoản ${accountId}`, {
+      description: 'Đang thử kết nối lại với Coinstrat.pro...',
     });
   };
 
   const handleDisconnect = (accountId: string) => {
-    toast(`Disconnecting account ${accountId}`, {
-      description: 'Disconnecting from Coinstrat.pro...',
+    toast(`Ngắt kết nối tài khoản ${accountId}`, {
+      description: 'Đang ngắt kết nối với Coinstrat.pro...',
     });
   };
 
   return (
-    <MainLayout title="Connection Status">
+    <MainLayout title="Trạng Thái Kết Nối">
       <div className="flex items-center justify-between mb-6">
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search connections..." 
+            placeholder="Tìm kiếm kết nối..." 
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -80,12 +80,12 @@ const Connections = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Account ID</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Connection</TableHead>
-                <TableHead>Last Disconnection</TableHead>
-                <TableHead>Error Message</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>ID Tài Khoản</TableHead>
+                <TableHead>Trạng Thái</TableHead>
+                <TableHead>Kết Nối Cuối</TableHead>
+                <TableHead>Ngắt Kết Nối Cuối</TableHead>
+                <TableHead>Thông Báo Lỗi</TableHead>
+                <TableHead className="text-right">Thao Tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,7 +126,7 @@ const Connections = () => {
                           onClick={() => handleReconnect(connection.accountId)}
                         >
                           <RefreshCw className="h-4 w-4 mr-2" />
-                          Reconnect
+                          Kết Nối Lại
                         </Button>
                       ) : connection.connectionStatus === 'Connected' ? (
                         <Button 
@@ -135,7 +135,7 @@ const Connections = () => {
                           onClick={() => handleDisconnect(connection.accountId)}
                         >
                           <Link2Off className="h-4 w-4 mr-2" />
-                          Disconnect
+                          Ngắt Kết Nối
                         </Button>
                       ) : (
                         <Button 
@@ -143,7 +143,7 @@ const Connections = () => {
                           variant="outline" 
                           disabled
                         >
-                          Pending...
+                          Đang Xử Lý...
                         </Button>
                       )}
                     </TableCell>
@@ -152,7 +152,7 @@ const Connections = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    No connections found. Please try a different search.
+                    Không tìm thấy kết nối nào. Vui lòng thử tìm kiếm khác.
                   </TableCell>
                 </TableRow>
               )}

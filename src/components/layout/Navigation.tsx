@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -10,27 +9,27 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const routes = [
   {
     path: '/',
-    label: 'Dashboard',
+    label: 'Bảng Điều Khiển',
     icon: <LayoutDashboard className="h-5 w-5" />
   },
   {
     path: '/bots',
-    label: 'Bot Management',
+    label: 'Quản Lý Bot',
     icon: <CircuitBoard className="h-5 w-5" />
   },
   {
     path: '/accounts',
-    label: 'Accounts',
+    label: 'Tài Khoản',
     icon: <Users className="h-5 w-5" />
   },
   {
     path: '/connections',
-    label: 'Connections',
+    label: 'Kết Nối',
     icon: <Link2 className="h-5 w-5" />
   },
   {
     path: '/signals',
-    label: 'Signal Log',
+    label: 'Nhật Ký Tín Hiệu',
     icon: <Radio className="h-5 w-5" />
   }
 ];
@@ -125,7 +124,7 @@ const Navigation = () => {
           <div className="p-4 border-t border-zinc-800">
             <Button variant="outline" size="sm" className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200" onClick={() => {}}>
               <Settings className="h-4 w-4 mr-2" />
-              Settings
+              Cài Đặt
             </Button>
           </div>
         </aside>

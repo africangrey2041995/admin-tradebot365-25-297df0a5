@@ -69,30 +69,30 @@ const Bots = () => {
   };
 
   const handleAddBot = () => {
-    toast('This feature will be implemented in the next version', {
-      description: 'You\'ll be able to add and manage bots here.',
+    toast('Tính năng này sẽ được triển khai trong phiên bản tiếp theo', {
+      description: 'Bạn sẽ có thể thêm và quản lý bot tại đây.',
     });
   };
 
   const handleEditBot = (botId: string) => {
-    toast(`Edit bot ${botId}`, {
-      description: 'This feature will be implemented in the next version.',
+    toast(`Chỉnh sửa bot ${botId}`, {
+      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
 
   const handleDeleteBot = (botId: string) => {
-    toast(`Delete bot ${botId}`, {
-      description: 'This feature will be implemented in the next version.',
+    toast(`Xóa bot ${botId}`, {
+      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
 
   return (
-    <MainLayout title="Bot Management">
+    <MainLayout title="Quản Lý Bot">
       <div className="flex items-center justify-between mb-6">
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search bots..." 
+            placeholder="Tìm kiếm bot..." 
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -100,7 +100,7 @@ const Bots = () => {
         </div>
         <Button onClick={handleAddBot}>
           <PlusCircle className="h-4 w-4 mr-2" />
-          Add Bot
+          Thêm Bot
         </Button>
       </div>
 
@@ -109,12 +109,12 @@ const Bots = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Bot Name</TableHead>
-                <TableHead>Signal Token</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Tên Bot</TableHead>
+                <TableHead>Mã Tín Hiệu</TableHead>
+                <TableHead>Trạng Thái</TableHead>
+                <TableHead>Ngày Tạo</TableHead>
+                <TableHead>Cập Nhật Lần Cuối</TableHead>
+                <TableHead className="text-right">Thao Tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,7 +131,7 @@ const Bots = () => {
                     <TableCell>
                       <Badge variant={bot.status === 'Active' ? 'default' : 'secondary'} 
                              className={bot.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}>
-                        {bot.status}
+                        {bot.status === 'Active' ? 'Đang Hoạt Động' : 'Không Hoạt Động'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">{formatDate(bot.createdDate)}</TableCell>
@@ -144,14 +144,14 @@ const Bots = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleEditBot(bot.botId)}>Edit Bot</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditBot(bot.botId)}>Chỉnh Sửa Bot</DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => handleDeleteBot(bot.botId)}
                             className="text-destructive focus:text-destructive"
                           >
-                            Delete Bot
+                            Xóa Bot
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -161,7 +161,7 @@ const Bots = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    No bots found. Please try a different search or add a new bot.
+                    Không tìm thấy bot nào. Vui lòng thử tìm kiếm khác hoặc thêm bot mới.
                   </TableCell>
                 </TableRow>
               )}

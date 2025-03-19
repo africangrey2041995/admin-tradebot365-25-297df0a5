@@ -36,7 +36,7 @@ const Index = () => {
   };
 
   return (
-    <MainLayout title="Dashboard">
+    <MainLayout title="Bảng Điều Khiển">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <motion.div
           custom={0}
@@ -45,8 +45,8 @@ const Index = () => {
           animate="visible"
         >
           <DashboardCard 
-            title="Bot Management" 
-            description={`${dashboardStats.activeBots} active bots of ${dashboardStats.totalBots} total`}
+            title="Quản Lý Bot" 
+            description={`${dashboardStats.activeBots} bot đang hoạt động trong tổng số ${dashboardStats.totalBots}`}
             onClick={() => navigate('/bots')}
             className="h-full"
           >
@@ -64,8 +64,8 @@ const Index = () => {
           animate="visible"
         >
           <DashboardCard 
-            title="Account Management" 
-            description="Monitor your CTrader accounts"
+            title="Quản Lý Tài Khoản" 
+            description="Theo dõi tài khoản CTrader của bạn"
             onClick={() => navigate('/accounts')}
             className="h-full"
           >
@@ -83,8 +83,8 @@ const Index = () => {
           animate="visible"
         >
           <DashboardCard 
-            title="Connection Status" 
-            description="Monitor connection status"
+            title="Trạng Thái Kết Nối" 
+            description="Theo dõi trạng thái kết nối"
             onClick={() => navigate('/connections')}
             className="h-full"
           >
@@ -115,8 +115,8 @@ const Index = () => {
           animate="visible"
         >
           <DashboardCard 
-            title="Signal Activity" 
-            description="Monitor trading signals"
+            title="Hoạt Động Tín Hiệu" 
+            description="Theo dõi tín hiệu giao dịch"
             onClick={() => navigate('/signals')}
             className="h-full"
           >
@@ -125,7 +125,7 @@ const Index = () => {
               <div className="text-3xl font-bold">{dashboardStats.tradingViewSignals}</div>
             </div>
             <div className="mt-2 text-right text-sm text-muted-foreground">
-              {dashboardStats.processedSignals} processed
+              {dashboardStats.processedSignals} đã xử lý
             </div>
           </DashboardCard>
         </motion.div>
@@ -141,19 +141,19 @@ const Index = () => {
         animate="visible"
         transition={{ delay: 0.5, duration: 0.5 }}
       >
-        <DashboardCard title="System Overview">
+        <DashboardCard title="Tổng Quan Hệ Thống">
           <div className="prose max-w-none">
             <p className="text-muted-foreground">
-              Welcome to Trade Bot 365. This platform helps you manage your CTrader connections through the Open API, 
-              monitor signal processing, and ensure seamless communication with Coinstrat.pro.
+              Chào mừng bạn đến với Trade Bot 365. Nền tảng này giúp bạn quản lý kết nối CTrader thông qua Open API, 
+              theo dõi xử lý tín hiệu và đảm bảo giao tiếp liền mạch với Coinstrat.pro.
             </p>
             <div className="mt-4 space-y-2">
-              <h3 className="text-lg font-medium">Quick Start</h3>
+              <h3 className="text-lg font-medium">Bắt Đầu Nhanh</h3>
               <ul className="list-disc pl-5 text-muted-foreground">
-                <li>Add your bots in the <span className="font-medium">Bot Management</span> section</li>
-                <li>Configure your accounts in the <span className="font-medium">Account Management</span> section</li>
-                <li>Monitor connection status in the <span className="font-medium">Connection Status</span> section</li>
-                <li>Track signal activity in the <span className="font-medium">Signal Log</span> section</li>
+                <li>Thêm bot của bạn trong phần <span className="font-medium">Quản Lý Bot</span></li>
+                <li>Cấu hình tài khoản của bạn trong phần <span className="font-medium">Quản Lý Tài Khoản</span></li>
+                <li>Theo dõi trạng thái kết nối trong phần <span className="font-medium">Trạng Thái Kết Nối</span></li>
+                <li>Theo dõi hoạt động tín hiệu trong phần <span className="font-medium">Nhật Ký Tín Hiệu</span></li>
               </ul>
             </div>
           </div>

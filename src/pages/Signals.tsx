@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
@@ -69,7 +68,7 @@ const Signals = () => {
       investmentType: 'contract',
       amount: '0.01',
       status: 'Failed',
-      errorMessage: 'Invalid instrument symbol',
+      errorMessage: 'Ký hiệu công cụ không hợp lệ',
     }
   ];
 
@@ -88,7 +87,7 @@ const Signals = () => {
       processedAccounts: [
         {
           accountId: 'client123',
-          name: 'BTC Trading Account',
+          name: 'Tài Khoản Giao Dịch BTC',
           timestamp: '2023-06-20T14:45:15Z'
         }
       ],
@@ -108,7 +107,7 @@ const Signals = () => {
       processedAccounts: [
         {
           accountId: 'client123',
-          name: 'BTC Trading Account',
+          name: 'Tài Khoản Giao Dịch BTC',
           timestamp: '2023-06-22T10:30:15Z'
         }
       ],
@@ -143,12 +142,12 @@ const Signals = () => {
       failedAccounts: [
         {
           accountId: 'client789',
-          name: 'Gold Trading Account',
+          name: 'Tài Khoản Giao Dịch Vàng',
           timestamp: '2023-06-23T09:45:15Z',
-          reason: 'Invalid instrument symbol'
+          reason: 'Ký hiệu công cụ không hợp lệ'
         }
       ],
-      errorMessage: 'Invalid instrument symbol'
+      errorMessage: 'Ký hiệu công cụ không hợp lệ'
     }
   ];
 
@@ -179,28 +178,41 @@ const Signals = () => {
     }
   };
 
+  const getActionLabel = (action: SignalAction) => {
+    switch (action) {
+      case 'ENTER_LONG':
+        return 'MUA VÀO';
+      case 'EXIT_LONG':
+        return 'ĐÓNG MUA';
+      case 'ENTER_SHORT':
+        return 'BÁN RA';
+      case 'EXIT_SHORT':
+        return 'ĐÓNG BÁN';
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Processed':
-        return <Badge variant="outline" className="bg-success/10 text-success border-success/20">Processed</Badge>;
+        return <Badge variant="outline" className="bg-success/10 text-success border-success/20">Đã Xử Lý</Badge>;
       case 'Pending':
-        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Pending</Badge>;
+        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Đang Xử Lý</Badge>;
       case 'Sent':
-        return <Badge variant="outline" className="bg-info/10 text-info border-info/20">Sent</Badge>;
+        return <Badge variant="outline" className="bg-info/10 text-info border-info/20">Đã Gửi</Badge>;
       case 'Failed':
-        return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">Failed</Badge>;
+        return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">Thất Bại</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   return (
-    <MainLayout title="Signal Log">
+    <MainLayout title="Nhật Ký Tín Hiệu">
       <div className="flex items-center justify-between mb-6">
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search signals..." 
+            placeholder="Tìm kiếm tín hiệu..." 
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -210,26 +222,26 @@ const Signals = () => {
 
       <Tabs defaultValue="tradingview" className="w-full">
         <TabsList className="mb-6">
-          <TabsTrigger value="tradingview">TradingView Signals</TabsTrigger>
-          <TabsTrigger value="coinstrat">Coinstrat Signals</TabsTrigger>
+          <TabsTrigger value="tradingview">Tín Hiệu TradingView</TabsTrigger>
+          <TabsTrigger value="coinstrat">Tín Hiệu Coinstrat</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tradingview">
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="pb-0">
-              <CardTitle className="text-lg">TradingView Signals</CardTitle>
+              <CardTitle className="text-lg">Tín Hiệu TradingView</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Instrument</TableHead>
-                    <TableHead>Bot Token</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Error</TableHead>
+                    <TableHead>Hành Động</TableHead>
+                    <TableHead>Công Cụ</TableHead>
+                    <TableHead>Bot</TableHead>
+                    <TableHead>Khối Lượng</TableHead>
+                    <TableHead>Trạng Thái</TableHead>
+                    <TableHead>Thời Gian</TableHead>
+                    <TableHead>Lỗi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -239,7 +251,7 @@ const Signals = () => {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getActionIcon(signal.action)}
-                            <span>{signal.action}</span>
+                            <span>{getActionLabel(signal.action)}</span>
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">{signal.instrument}</TableCell>
@@ -260,7 +272,7 @@ const Signals = () => {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                        No signals found. Please try a different search.
+                        Không tìm thấy tín hiệu nào. Vui lòng thử tìm kiếm khác.
                       </TableCell>
                     </TableRow>
                   )}
@@ -273,19 +285,19 @@ const Signals = () => {
         <TabsContent value="coinstrat">
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="pb-0">
-              <CardTitle className="text-lg">Coinstrat.pro Signals</CardTitle>
+              <CardTitle className="text-lg">Tín Hiệu Coinstrat.pro</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Instrument</TableHead>
-                    <TableHead>Bot Token</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Processed Accounts</TableHead>
-                    <TableHead>Failed Accounts</TableHead>
-                    <TableHead>Timestamp</TableHead>
+                    <TableHead>Hành Động</TableHead>
+                    <TableHead>Công Cụ</TableHead>
+                    <TableHead>Bot</TableHead>
+                    <TableHead>Trạng Thái</TableHead>
+                    <TableHead>Tài Khoản Xử Lý</TableHead>
+                    <TableHead>Tài Khoản Thất Bại</TableHead>
+                    <TableHead>Thời Gian</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -295,7 +307,7 @@ const Signals = () => {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getActionIcon(signal.action)}
-                            <span>{signal.action}</span>
+                            <span>{getActionLabel(signal.action)}</span>
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">{signal.instrument}</TableCell>
@@ -304,19 +316,19 @@ const Signals = () => {
                         <TableCell>
                           {signal.processedAccounts.length > 0 ? (
                             <Badge variant="outline" className="bg-success/10 text-success border-success/20">
-                              {signal.processedAccounts.length} account(s)
+                              {signal.processedAccounts.length} tài khoản
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground text-sm">None</span>
+                            <span className="text-muted-foreground text-sm">Không có</span>
                           )}
                         </TableCell>
                         <TableCell>
                           {signal.failedAccounts.length > 0 ? (
                             <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
-                              {signal.failedAccounts.length} account(s)
+                              {signal.failedAccounts.length} tài khoản
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground text-sm">None</span>
+                            <span className="text-muted-foreground text-sm">Không có</span>
                           )}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">{formatDate(signal.timestamp)}</TableCell>
@@ -325,7 +337,7 @@ const Signals = () => {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                        No signals found. Please try a different search.
+                        Không tìm thấy tín hiệu nào. Vui lòng thử tìm kiếm khác.
                       </TableCell>
                     </TableRow>
                   )}

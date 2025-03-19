@@ -35,7 +35,7 @@ const Accounts = () => {
       secretId: 'secret123',
       accessToken: 'token123',
       ctidTraderAccountId: 'ct123456',
-      name: 'BTC Trading Account',
+      name: 'Tài Khoản Giao Dịch BTC',
       status: 'Connected',
       createdDate: '2023-05-15T10:30:00Z',
       lastUpdated: '2023-06-20T14:45:00Z',
@@ -46,7 +46,7 @@ const Accounts = () => {
       secretId: 'secret456',
       accessToken: 'token456',
       ctidTraderAccountId: 'ct789012',
-      name: 'ETH Trading Account',
+      name: 'Tài Khoản Giao Dịch ETH',
       status: 'Disconnected',
       createdDate: '2023-06-10T08:15:00Z',
       lastUpdated: '2023-06-22T11:20:00Z',
@@ -57,7 +57,7 @@ const Accounts = () => {
       secretId: 'secret789',
       accessToken: 'token789',
       ctidTraderAccountId: 'ct345678',
-      name: 'Gold Trading Account',
+      name: 'Tài Khoản Giao Dịch Vàng',
       status: 'Pending',
       createdDate: '2023-04-22T16:40:00Z',
       lastUpdated: '2023-06-18T09:10:00Z',
@@ -75,36 +75,36 @@ const Accounts = () => {
   };
 
   const handleAddAccount = () => {
-    toast('This feature will be implemented in the next version', {
-      description: 'You\'ll be able to add and manage accounts here.',
+    toast('Tính năng này sẽ được triển khai trong phiên bản tiếp theo', {
+      description: 'Bạn sẽ có thể thêm và quản lý tài khoản tại đây.',
     });
   };
 
   const handleEditAccount = (clientId: string) => {
-    toast(`Edit account ${clientId}`, {
-      description: 'This feature will be implemented in the next version.',
+    toast(`Chỉnh sửa tài khoản ${clientId}`, {
+      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
 
   const handleDeleteAccount = (clientId: string) => {
-    toast(`Delete account ${clientId}`, {
-      description: 'This feature will be implemented in the next version.',
+    toast(`Xóa tài khoản ${clientId}`, {
+      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
 
   const handleReconnect = (clientId: string) => {
-    toast(`Reconnecting account ${clientId}`, {
-      description: 'Attempting to reconnect to Coinstrat.pro...',
+    toast(`Kết nối lại tài khoản ${clientId}`, {
+      description: 'Đang thử kết nối lại với Coinstrat.pro...',
     });
   };
 
   return (
-    <MainLayout title="Account Management">
+    <MainLayout title="Quản Lý Tài Khoản">
       <div className="flex items-center justify-between mb-6">
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search accounts..." 
+            placeholder="Tìm kiếm tài khoản..." 
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,7 +112,7 @@ const Accounts = () => {
         </div>
         <Button onClick={handleAddAccount}>
           <PlusCircle className="h-4 w-4 mr-2" />
-          Add Account
+          Thêm Tài Khoản
         </Button>
       </div>
 
@@ -121,12 +121,12 @@ const Accounts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>CTrader Account ID</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Expires</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Tên</TableHead>
+                <TableHead>ID Tài Khoản CTrader</TableHead>
+                <TableHead>Trạng Thái</TableHead>
+                <TableHead>Ngày Tạo</TableHead>
+                <TableHead>Hết Hạn</TableHead>
+                <TableHead className="text-right">Thao Tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -158,19 +158,19 @@ const Accounts = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleEditAccount(account.clientId)}>Edit Account</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditAccount(account.clientId)}>Chỉnh Sửa Tài Khoản</DropdownMenuItem>
                           {account.status === 'Disconnected' && (
                             <DropdownMenuItem onClick={() => handleReconnect(account.clientId)}>
-                              Reconnect
+                              Kết Nối Lại
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem 
                             onClick={() => handleDeleteAccount(account.clientId)}
                             className="text-destructive focus:text-destructive"
                           >
-                            Delete Account
+                            Xóa Tài Khoản
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -180,7 +180,7 @@ const Accounts = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    No accounts found. Please try a different search or add a new account.
+                    Không tìm thấy tài khoản nào. Vui lòng thử tìm kiếm khác hoặc thêm tài khoản mới.
                   </TableCell>
                 </TableRow>
               )}

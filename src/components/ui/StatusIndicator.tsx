@@ -35,25 +35,25 @@ const StatusIndicator = ({
   const statusConfig = {
     Connected: {
       icon: <CheckCircle className="h-4 w-4 text-success" />,
-      label: 'Connected',
+      label: 'Đã Kết Nối',
       className: 'connected'
     },
     Disconnected: {
       icon: <XCircle className="h-4 w-4 text-destructive" />,
-      label: 'Disconnected',
+      label: 'Mất Kết Nối',
       className: 'disconnected'
     },
     Pending: {
       icon: <AlertCircle className="h-4 w-4 text-warning" />,
-      label: 'Pending',
+      label: 'Đang Xử Lý',
       className: 'pending'
     }
   };
 
   const config = statusConfig[status];
   const tooltipContent = lastUpdated 
-    ? `Status: ${config.label}\nLast updated: ${lastUpdated}`
-    : `Status: ${config.label}`;
+    ? `Trạng thái: ${config.label}\nCập nhật lần cuối: ${lastUpdated}`
+    : `Trạng thái: ${config.label}`;
 
   return (
     <TooltipProvider>
