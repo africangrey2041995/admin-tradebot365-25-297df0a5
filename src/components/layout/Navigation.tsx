@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -6,6 +5,15 @@ import { LayoutDashboard, CircuitBoard, Users, Menu, X, ChevronDown, Settings, S
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 const routes = [
   {
@@ -21,7 +29,17 @@ const routes = [
   {
     path: '/premium-bots',
     label: 'Premium Bots',
-    icon: <Sparkles className="h-5 w-5" />
+    icon: <Sparkles className="h-5 w-5" />,
+    children: [
+      {
+        path: '/premium-bots',
+        label: 'Khám Phá Premium Bots'
+      },
+      {
+        path: '/integrated-premium-bots',
+        label: 'Premium Bots Đã Tích Hợp'
+      }
+    ]
   },
   {
     path: '/accounts',
@@ -61,36 +79,122 @@ const Navigation = () => {
     </div>
   );
 
+  const isRouteActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === path;
+    }
+    
+    const route = routes.find(r => r.path === path);
+    if (route?.children) {
+      return route.children.some(child => location.pathname === child.path);
+    }
+    
+    return location.pathname.startsWith(path);
+  };
+
   const NavLinks = () => (
     <>
-      {routes.map((route) => (
-        <Link
-          key={route.path}
-          to={route.path}
-          className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm",
-            location.pathname === route.path
-              ? "bg-primary/10 text-primary"
-              : "text-white hover:bg-zinc-700/70 hover:text-white"
-          )}
-          onClick={isMobile ? closeMobileMenu : undefined}
-        >
-          <div className={cn(
-            "flex items-center justify-center w-9 h-9 rounded-lg",
-            location.pathname === route.path ? "bg-primary text-white" : "text-white bg-zinc-700/50"
-          )}>
-            {route.icon}
-          </div>
-          {(!isCollapsed || isMobile) && (
-            <span>{route.label}</span>
-          )}
-          {location.pathname === route.path && !isCollapsed && !isMobile && (
-            <div className="ml-auto">
-              <ChevronDown className="h-4 w-4" />
-            </div>
-          )}
-        </Link>
-      ))}
+      {routes.map((route) => {
+        const isActive = isRouteActive(route.path);
+        
+        if (route.children && !isMobile && !isCollapsed) {
+          return (
+            <NavigationMenu key={route.path} className="w-full">
+              <NavigationMenuList className="w-full">
+                <NavigationMenuItem className="w-full">
+                  <Link
+                    to={route.path}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm w-full",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-white hover:bg-zinc-700/70 hover:text-white"
+                    )}
+                  >
+                    <div className={cn(
+                      "flex items-center justify-center w-9 h-9 rounded-lg",
+                      isActive ? "bg-primary text-white" : "text-white bg-zinc-700/50"
+                    )}>
+                      {route.icon}
+                    </div>
+                    <span>{route.label}</span>
+                    {isActive && (
+                      <div className="ml-auto">
+                        <ChevronDown className="h-4 w-4" />
+                      </div>
+                    )}
+                  </Link>
+                  {route.children.map((child) => (
+                    <Link
+                      key={child.path}
+                      to={child.path}
+                      className={cn(
+                        "flex items-center px-4 py-2 rounded-lg ml-12 mt-1 text-sm font-medium transition-colors",
+                        location.pathname === child.path
+                          ? "bg-primary/5 text-primary"
+                          : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
+                      )}
+                      onClick={isMobile ? closeMobileMenu : undefined}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          );
+        }
+        
+        return (
+          <React.Fragment key={route.path}>
+            <Link
+              to={route.path}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm",
+                isActive
+                  ? "bg-primary/10 text-primary"
+                  : "text-white hover:bg-zinc-700/70 hover:text-white"
+              )}
+              onClick={isMobile ? closeMobileMenu : undefined}
+            >
+              <div className={cn(
+                "flex items-center justify-center w-9 h-9 rounded-lg",
+                isActive ? "bg-primary text-white" : "text-white bg-zinc-700/50"
+              )}>
+                {route.icon}
+              </div>
+              {(!isCollapsed || isMobile) && (
+                <span>{route.label}</span>
+              )}
+              {isActive && !isCollapsed && !isMobile && route.children && (
+                <div className="ml-auto">
+                  <ChevronDown className="h-4 w-4" />
+                </div>
+              )}
+            </Link>
+            
+            {isMobile && isActive && route.children && (
+              <div className="ml-12 space-y-1 mt-1">
+                {route.children.map((child) => (
+                  <Link
+                    key={child.path}
+                    to={child.path}
+                    className={cn(
+                      "flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      location.pathname === child.path
+                        ? "bg-primary/5 text-primary"
+                        : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
+                    )}
+                    onClick={closeMobileMenu}
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
     </>
   );
 
@@ -121,7 +225,7 @@ const Navigation = () => {
             )}
           </AnimatePresence>
           
-          <div className="h-[60px]"></div> {/* Spacer for fixed header */}
+          <div className="h-[60px]"></div>
         </>
       ) : (
         <>
@@ -182,7 +286,9 @@ const Navigation = () => {
           )}>
             <div className="flex items-center justify-between h-12">
               <div className="text-lg font-medium text-slate-800 dark:text-white">
-                {routes.find(route => route.path === location.pathname)?.label || "Bảng Điều Khiển"}
+                {routes.find(route => route.path === location.pathname)?.label || 
+                routes.flatMap(route => route.children || []).find(child => child.path === location.pathname)?.label ||
+                "Bảng Điều Khiển"}
               </div>
               <div className="flex items-center gap-2">
                 {/* Add user profile or other header items here */}

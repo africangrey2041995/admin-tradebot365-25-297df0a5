@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
-import { PlusCircle, Filter, ArrowUpDown } from 'lucide-react';
+import { PlusCircle, Filter, ArrowUpDown, ListFilter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PremiumBotCard } from '@/components/bots/PremiumBotCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -147,10 +147,23 @@ const PremiumBots = () => {
               Sử dụng các bot giao dịch chuyên nghiệp được tạo bởi Trade Bot 365
             </p>
           </div>
-          <Button onClick={() => navigate('/accounts')} className="inline-flex items-center whitespace-nowrap">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Kết Nối Tài Khoản</span>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/integrated-premium-bots')}
+              className="inline-flex items-center whitespace-nowrap"
+            >
+              <ListFilter className="mr-2 h-4 w-4" />
+              <span>Integrated Bots</span>
+            </Button>
+            <Button 
+              onClick={() => navigate('/accounts')} 
+              className="inline-flex items-center whitespace-nowrap"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Kết Nối Tài Khoản</span>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

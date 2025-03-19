@@ -83,3 +83,22 @@ export interface FailedAccount {
   timestamp: string;
   reason: string;
 }
+
+export interface PremiumBot {
+  id: string;
+  name: string;
+  description: string;
+  exchange: string;
+  type: string;
+  performanceLastMonth: string;
+  performanceAllTime: string;
+  risk: 'low' | 'medium' | 'high';
+  minCapital: string;
+  status: 'active' | 'inactive';
+  subscribers: number;
+  imageUrl: string | null;
+  colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
+  isIntegrated?: boolean;
+  botId?: string;
+  accounts?: Account[];
+}
