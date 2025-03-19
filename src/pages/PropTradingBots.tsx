@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
 import { PlusCircle, Filter, ArrowUpDown, ListFilter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PremiumBotCard } from '@/components/bots/PremiumBotCard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { 
   Select,
@@ -14,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 
+// Mocking prop trading bot data
 const propTradingBots = [
   {
     id: 'ptb-001',
@@ -62,6 +65,7 @@ const propTradingBots = [
   },
 ];
 
+// Mocking integrated prop trading bots data
 const integratedPropBots = [
   {
     id: 'ptb-001',
@@ -99,6 +103,7 @@ const PropTradingBots = () => {
   const [sortOption, setSortOption] = useState('performance');
   const [viewMode, setViewMode] = useState('available');
 
+  // Filter bots based on search term and risk level
   const getFilteredBots = (botsArray: any[]) => {
     return botsArray.filter(bot => {
       const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,6 +117,7 @@ const PropTradingBots = () => {
   const filteredAvailableBots = getFilteredBots(propTradingBots);
   const filteredIntegratedBots = getFilteredBots(integratedPropBots);
   
+  // Sort bots based on selected sort option
   const sortBots = (botsArray: any[]) => {
     return [...botsArray].sort((a, b) => {
       if (sortOption === 'performance') {
@@ -145,7 +151,7 @@ const PropTradingBots = () => {
     if (viewMode === 'integrated') {
       navigate(`/integrated-prop-bots/${botId}`);
     } else {
-      navigate(`/prop-trading/${botId}`);
+      navigate(`/prop-trading-bots/${botId}`);
     }
   };
 

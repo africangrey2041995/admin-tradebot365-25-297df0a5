@@ -1,58 +1,95 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
-import Index from './pages/Index';
-import NotFound from './pages/NotFound';
-import Bots from './pages/Bots';
-import BotProfile from './pages/BotProfile';
-import Accounts from './pages/Accounts';
-import AccountProfile from './pages/AccountProfile';
-import Settings from './pages/Settings';
-import UserProfile from './pages/UserProfile';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import Signals from './pages/Signals';
-import Connections from './pages/Connections';
-import PremiumBots from './pages/PremiumBots';
-import PremiumBotDetail from './pages/PremiumBotDetail';
-import PropTradingBots from './pages/PropTradingBots';
-import PropTradingBotDetail from './pages/PropTradingBotDetail';
-import IntegratedPremiumBots from './pages/IntegratedPremiumBots';
-import IntegratedPremiumBotDetail from './pages/IntegratedPremiumBotDetail';
-import IntegratedPropBots from './pages/IntegratedPropBots';
-import IntegratedPropBotDetail from './pages/IntegratedPropBotDetail';
-import { Toaster } from './components/ui/sonner';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { ClerkProvider } from "@clerk/clerk-react";
+import Index from "./pages/Index";
+import Bots from "./pages/Bots";
+import BotProfile from "./pages/BotProfile";
+import Accounts from "./pages/Accounts";
+import AccountProfile from "./pages/AccountProfile";
+import PremiumBots from "./pages/PremiumBots";
+import PremiumBotDetail from "./pages/PremiumBotDetail";
+import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
+import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
+import PropTradingBots from "./pages/PropTradingBots";
+import IntegratedPropBots from "./pages/IntegratedPropBots";
+import IntegratedPropBotDetail from "./pages/IntegratedPropBotDetail"; // Add import
+import PropTradingBotDetail from "./pages/PropTradingBotDetail";
+import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import UserProfile from "./pages/UserProfile";
+import Settings from "./pages/Settings"; // Add the new import
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/bots" element={<Bots />} />
-        <Route path="/bots/:id" element={<BotProfile />} />
-        <Route path="/accounts" element={<Accounts />} />
-        <Route path="/accounts/:id" element={<AccountProfile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/connections" element={<Connections />} />
-        <Route path="/signals" element={<Signals />} />
-        <Route path="/premium-bots" element={<PremiumBots />} />
-        <Route path="/premium-bots/:id" element={<PremiumBotDetail />} />
-        <Route path="/prop-trading" element={<PropTradingBots />} />
-        <Route path="/prop-trading/:id" element={<PropTradingBotDetail />} />
-        <Route path="/prop-trading-bots" element={<PropTradingBots />} />
-        <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
-        <Route path="/integrated-premium-bots/:id" element={<IntegratedPremiumBotDetail />} />
-        <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
-        <Route path="/integrated-prop-bots/:id" element={<IntegratedPropBotDetail />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </Router>
-  );
-}
+// Fixed Clerk publishable key - this is your test key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <ClerkProvider 
+    publishableKey={PUBLISHABLE_KEY}
+    appearance={{
+      elements: {
+        formButtonPrimary: 'bg-[#04ce91] hover:bg-[#03b17d]',
+        card: 'bg-[#111111]',
+        formInput: 'bg-[#1a1a1a] text-white',
+        footerActionLink: 'text-[#04ce91] hover:text-[#03b17d]',
+        headerTitle: 'text-white',
+        headerSubtitle: 'text-zinc-400',
+        socialButtonsBlockButton: 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white',
+        dividerLine: 'bg-zinc-700',
+        dividerText: 'text-zinc-500',
+        formFieldLabel: 'text-zinc-400',
+        identityPreviewText: 'text-white',
+        identityPreviewEditButton: 'text-[#04ce91]'
+      },
+      layout: {
+        showOptionalFields: false,
+        socialButtonsVariant: 'iconButton',
+      }
+    }}
+  >
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AnimatePresence mode="wait">
+            <Routes>
+              {/* Main routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/bots" element={<Bots />} />
+              <Route path="/bots/:botId" element={<BotProfile />} />
+              <Route path="/premium-bots" element={<PremiumBots />} />
+              <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+              <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+              <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+              <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+              <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+              <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} /> {/* Add this route */}
+              <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/accounts/:accountId" element={<AccountProfile />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/settings" element={<Settings />} /> {/* Add the new route */}
+              
+              {/* Auth routes */}
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              
+              {/* Not found route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AnimatePresence>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ClerkProvider>
+);
 
 export default App;

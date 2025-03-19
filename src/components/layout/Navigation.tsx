@@ -16,8 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useLanguage, Language } from '@/contexts/LanguageContext';
-import { toast } from "sonner";
 
 const Navigation = () => {
   const isMobile = useIsMobile();
@@ -26,7 +24,6 @@ const Navigation = () => {
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Bot #1 đã hoàn thành giao dịch', read: false },
   ]);
-  const { language, setLanguage, t } = useLanguage();
 
   // Count unread notifications
   const unreadCount = notifications.filter(notification => !notification.read).length;
@@ -44,12 +41,6 @@ const Navigation = () => {
     setHasNotifications(false);
   };
 
-  // Handle language change
-  const handleLanguageChange = (value: string) => {
-    setLanguage(value as Language);
-    toast.success(`${value === 'vi' ? 'Đã chuyển sang Tiếng Việt' : value === 'en' ? 'Switched to English' : '已切换到中文'}`);
-  };
-
   return (
     <header className="h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 shadow-sm">
       <div className="h-full flex items-center justify-between px-4">
@@ -65,22 +56,22 @@ const Navigation = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" />
             <Input 
-              placeholder={t('Search...')}
+              placeholder="Tìm kiếm..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
           </div>
           
-          <Select value={language} onValueChange={handleLanguageChange}>
+          <Select defaultValue="vi">
             <SelectTrigger className="w-[110px] h-9 flex gap-1">
               <Globe className="h-4 w-4" />
-              <SelectValue placeholder={t('Language')} />
+              <SelectValue placeholder="Ngôn ngữ" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="vi">Tiếng Việt</SelectItem>
               <SelectItem value="en">English</SelectItem>
-              <SelectItem value="zh">中文</SelectItem>
+              <SelectItem value="ja">日本語</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -107,16 +98,16 @@ const Navigation = () => {
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0 max-h-[400px] overflow-y-auto">
               <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="font-semibold">{t('Notifications')}</h3>
+                <h3 className="font-semibold">Thông báo</h3>
                 {unreadCount > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearAllNotifications} className="text-xs">
-                    {t('Mark all as read')}
+                    Đánh dấu tất cả đã đọc
                   </Button>
                 )}
               </div>
               {notifications.length === 0 ? (
                 <div className="p-4 text-center text-muted-foreground">
-                  {t('No notifications')}
+                  Không có thông báo
                 </div>
               ) : (
                 <div>
@@ -167,16 +158,16 @@ const Navigation = () => {
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0 max-h-[400px] overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
-                  <h3 className="font-semibold">{t('Notifications')}</h3>
+                  <h3 className="font-semibold">Thông báo</h3>
                   {unreadCount > 0 && (
                     <Button variant="ghost" size="sm" onClick={clearAllNotifications} className="text-xs">
-                      {t('Mark all as read')}
+                      Đánh dấu tất cả đã đọc
                     </Button>
                   )}
                 </div>
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-muted-foreground">
-                    {t('No notifications')}
+                    Không có thông báo
                   </div>
                 ) : (
                   <div>
@@ -213,21 +204,21 @@ const Navigation = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" />
             <Input 
-              placeholder={t('Search...')}
+              placeholder="Tìm kiếm..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
           </div>
-          <Select value={language} onValueChange={handleLanguageChange}>
+          <Select defaultValue="vi">
             <SelectTrigger className="w-[100px] h-9">
               <Globe className="h-4 w-4 mr-1" />
-              <SelectValue placeholder={t('Language')} />
+              <SelectValue placeholder="Ngôn ngữ" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="vi">Tiếng Việt</SelectItem>
               <SelectItem value="en">English</SelectItem>
-              <SelectItem value="zh">中文</SelectItem>
+              <SelectItem value="ja">日本語</SelectItem>
             </SelectContent>
           </Select>
         </div>

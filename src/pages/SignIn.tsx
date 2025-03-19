@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
+import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -15,13 +16,25 @@ import {
 } from 'lucide-react';
 
 const SignIn = () => {
+  const { isLoaded, signIn, setActive } = useSignIn();
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Handle mock sign in for demonstration
+  // Show a proper loading state rather than infinite spinner
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
+        <Loader2 className="h-12 w-12 animate-spin text-white/50 mb-4" />
+        <p className="text-white/70">Đang tải ứng dụng...</p>
+      </div>
+    );
+  }
+
+  // Handle mock sign in for demonstration without Clerk credentials
   const handleMockSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -30,13 +43,16 @@ const SignIn = () => {
     // Simulate API call
     setTimeout(() => {
       if (emailAddress && password) {
-        toast.success('Login successful', {
-          description: 'Welcome back',
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay trở lại",
         });
         navigate('/');
       } else {
-        toast.error('Login failed', {
-          description: 'Please check your login information',
+        toast({
+          variant: "destructive",
+          title: "Đăng nhập thất bại",
+          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
         });
       }
       setIsLoading(false);
@@ -49,13 +65,77 @@ const SignIn = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast.success('Login successful', {
-        description: 'Logged in with Google',
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Đã đăng nhập với Google",
       });
       navigate('/');
       setIsGoogleLoading(false);
     }, 1500);
   };
+
+  // Real Clerk auth handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+
+    try {
+      setIsLoading(true);
+      const result = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay trở lại",
+        });
+        navigate('/');
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Đăng nhập thất bại",
+          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
+        });
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      toast({
+        variant: "destructive",
+        title: "Lỗi đăng nhập",
+        description: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng nhập",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignInWithGoogle = async () => {
+    if (!isLoaded) return;
+
+    try {
+      setIsGoogleLoading(true);
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/",
+        redirectUrlComplete: "/",
+      });
+    } catch (err: any) {
+      console.error("Google login error:", err);
+      toast({
+        variant: "destructive",
+        title: "Lỗi đăng nhập với Google",
+        description: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng nhập với Google",
+      });
+      setIsGoogleLoading(false);
+    }
+  };
+
+  // Use mock handlers if Clerk setup has issues
+  const onSubmit = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSubmit : handleMockSignIn;
+  const onGoogleSignIn = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSignInWithGoogle : handleMockGoogleSignIn;
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
@@ -72,7 +152,7 @@ const SignIn = () => {
       <div className="absolute top-8 right-8">
         <Link to="/sign-up">
           <Button variant="outline" className="border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white">
-            Sign up
+            Đăng ký
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -86,9 +166,9 @@ const SignIn = () => {
       >
         <Card className="border-zinc-700 bg-zinc-900/80 backdrop-blur-lg shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-white">Login</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">Đăng Nhập</CardTitle>
             <CardDescription className="text-zinc-400">
-              Login to access the trading bot management system
+              Đăng nhập để truy cập hệ thống quản lý bot giao dịch
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -96,7 +176,7 @@ const SignIn = () => {
               <Button 
                 variant="outline" 
                 className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
-                onClick={handleMockGoogleSignIn}
+                onClick={onGoogleSignIn}
                 disabled={isGoogleLoading}
               >
                 {isGoogleLoading ? (
@@ -121,7 +201,7 @@ const SignIn = () => {
                     />
                   </svg>
                 )}
-                Login with Google
+                Đăng nhập với Google
               </Button>
             </div>
             
@@ -131,12 +211,12 @@ const SignIn = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-zinc-900 px-2 text-zinc-500">
-                  Or login with
+                  Hoặc đăng nhập với
                 </span>
               </div>
             </div>
             
-            <form onSubmit={handleMockSignIn} className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-zinc-400">Email</Label>
                 <div className="relative">
@@ -155,18 +235,19 @@ const SignIn = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-zinc-400">Password</Label>
+                  <Label htmlFor="password" className="text-zinc-400">Mật khẩu</Label>
                   <Link 
                     to="#" 
                     className="text-xs text-tradebot hover:underline"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast('Feature in development', {
-                        description: 'The forgot password feature is under development'
+                      toast({
+                        title: "Chức năng đang phát triển",
+                        description: "Tính năng quên mật khẩu đang được phát triển"
                       });
                     }}
                   >
-                    Forgot password?
+                    Quên mật khẩu?
                   </Link>
                 </div>
                 <div className="relative">
@@ -185,15 +266,15 @@ const SignIn = () => {
               
               <Button
                 type="submit"
-                variant="default"
-                className="w-full bg-tradebot hover:bg-tradebot/90"
+                variant="tradebot"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    Login
+                    Đăng Nhập
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -202,9 +283,9 @@ const SignIn = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800 pt-4">
             <p className="text-center text-sm text-zinc-500">
-              Don't have an account?{" "}
+              Chưa có tài khoản?{" "}
               <Link to="/sign-up" className="text-tradebot hover:underline">
-                Sign up now
+                Đăng ký ngay
               </Link>
             </p>
           </CardFooter>

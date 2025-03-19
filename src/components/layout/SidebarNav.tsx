@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -101,10 +102,10 @@ const SidebarNav = () => {
             />
             
             <CollapsibleNavItem
-              path="/prop-trading"
+              path="/prop-trading-bots"
               label="Bot Prop Trading"
               icon={TrendingUp}
-              isActive={isActive('/prop-trading') || isActive('/prop-trading-bots')}
+              isActive={isActive('/prop-trading-bots')}
               isOpen={propTradingOpen}
               onToggle={() => setPropTradingOpen(!propTradingOpen)}
               subItems={[

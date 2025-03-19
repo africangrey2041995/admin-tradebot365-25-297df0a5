@@ -23,7 +23,7 @@ const Index = () => {
   };
 
   return (
-    <MainLayout title="Dashboard">
+    <MainLayout title="Bảng Điều Khiển">
       <PropTradingPromo />
       <PremiumBotsPromo />
       <ActivityOverview dashboardStats={dashboardStats} />
