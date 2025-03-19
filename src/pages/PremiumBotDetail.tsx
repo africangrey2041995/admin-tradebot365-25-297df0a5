@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { 
@@ -17,7 +17,9 @@ import {
   Calendar,
   ArrowRight,
   ChevronLeft,
-  CircleDollarSign
+  CircleDollarSign,
+  Activity,
+  PieChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,8 +30,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from 'framer-motion';
 import { Account } from '@/types';
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Bar,
+  ComposedChart,
+  Legend
+} from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-// Mocking premium bot data
 const premiumBots = [
   {
     id: 'pb-001',
@@ -86,7 +100,6 @@ Bot này phù hợp cho các nhà đầu tư muốn tận dụng các xu hướn
   // ... other premium bots
 ];
 
-// Mock accounts for subscription
 const mockAccounts: Account[] = [
   {
     id: "acc1",
@@ -125,6 +138,7 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -163,8 +177,6 @@ const PremiumBotDetail = () => {
     });
     setSubscribeDialogOpen(false);
     
-    // In a real app, we would make an API call to register the subscription
-    // For now, we'll just simulate success and redirect
     setTimeout(() => {
       navigate('/premium-bots');
     }, 500);
@@ -198,6 +210,49 @@ const PremiumBotDetail = () => {
       default: return type;
     }
   };
+
+  const generateChartData = () => {
+    if (selectedChartPeriod === "month") {
+      return bot?.monthlyPerformance || [];
+    } else if (selectedChartPeriod === "week") {
+      return [
+        { day: 'Mon', value: 5.7 },
+        { day: 'Tue', value: 7.3 },
+        { day: 'Wed', value: -2.1 },
+        { day: 'Thu', value: 4.2 },
+        { day: 'Fri', value: 8.5 },
+        { day: 'Sat', value: 2.1 },
+        { day: 'Sun', value: 3.8 }
+      ];
+    } else {
+      return [
+        { year: '2020', value: 28.5 },
+        { year: '2021', value: 42.3 },
+        { year: '2022', value: 37.8 },
+        { year: '2023', value: 125.4 }
+      ];
+    }
+  };
+
+  const tradePerformanceData = [
+    { name: 'Jan', profit: 12.5, trades: 24 },
+    { name: 'Feb', profit: 8.3, trades: 18 },
+    { name: 'Mar', profit: -2.1, trades: 15 },
+    { name: 'Apr', profit: 5.7, trades: 17 },
+    { name: 'May', profit: 15.2, trades: 29 },
+    { name: 'Jun', profit: 10.1, trades: 22 },
+    { name: 'Jul', profit: 5.5, trades: 20 },
+    { name: 'Aug', profit: -3.2, trades: 16 },
+    { name: 'Sep', profit: 9.8, trades: 21 },
+    { name: 'Oct', profit: 18.5, trades: 28 },
+  ];
+
+  const statisticsData = [
+    { name: 'Win Rate', value: '65%', icon: <Activity className="h-4 w-4 text-green-500" /> },
+    { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
+    { name: 'Max Drawdown', value: '8.5%', icon: <ChartLine className="h-4 w-4 text-red-500" /> },
+    { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
+  ];
 
   return (
     <MainLayout title={bot.name}>
@@ -250,6 +305,145 @@ const PremiumBotDetail = () => {
             </Card>
 
             <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle>Biểu đồ hiệu suất</CardTitle>
+                <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
+                  <TabsList>
+                    <TabsTrigger value="week">Tuần</TabsTrigger>
+                    <TabsTrigger value="month">Tháng</TabsTrigger>
+                    <TabsTrigger value="year">Năm</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[350px] w-full">
+                  <ChartContainer
+                    config={{
+                      profit: {
+                        label: "Profit",
+                        theme: {
+                          light: "#10b981",
+                          dark: "#34d399"
+                        }
+                      },
+                      loss: {
+                        label: "Loss",
+                        theme: {
+                          light: "#ef4444",
+                          dark: "#f87171"
+                        }
+                      },
+                      line: {
+                        label: "Performance Line",
+                        theme: {
+                          light: "#60a5fa",
+                          dark: "#3b82f6"
+                        }
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={generateChartData()}
+                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                        <XAxis 
+                          dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
+                          className="text-xs font-medium" 
+                        />
+                        <YAxis className="text-xs font-medium" />
+                        <ChartTooltip 
+                          content={
+                            <ChartTooltipContent 
+                              formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
+                            />
+                          } 
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke="#10b981" 
+                          fillOpacity={1} 
+                          fill="url(#colorPositive)" 
+                          activeDot={{ r: 6 }} 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Chi tiết giao dịch</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[350px]">
+                  <ChartContainer
+                    config={{
+                      profit: {
+                        label: "Profit",
+                        theme: {
+                          light: "#10b981",
+                          dark: "#34d399"
+                        }
+                      },
+                      trades: {
+                        label: "Trades",
+                        theme: {
+                          light: "#60a5fa",
+                          dark: "#3b82f6"
+                        }
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart
+                        data={tradePerformanceData}
+                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      >
+                        <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
+                        <XAxis dataKey="name" scale="band" />
+                        <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
+                        <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
+                        <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                  {statisticsData.map((stat, index) => (
+                    <div key={index} className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg flex flex-col items-center">
+                      <div className="flex items-center gap-2 mb-2">
+                        {stat.icon}
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{stat.name}</span>
+                      </div>
+                      <div className="text-xl font-semibold text-slate-900 dark:text-white">
+                        {stat.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
               <CardHeader>
                 <CardTitle>Tính năng</CardTitle>
               </CardHeader>
@@ -261,19 +455,6 @@ const PremiumBotDetail = () => {
                       <span className="text-slate-700 dark:text-slate-300">{feature}</span>
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Biểu đồ hiệu suất</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center">
-                  <p className="text-slate-500">
-                    [Biểu đồ hiệu suất sẽ được hiển thị ở đây]
-                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -445,3 +626,4 @@ const PremiumBotDetail = () => {
 };
 
 export default PremiumBotDetail;
+
