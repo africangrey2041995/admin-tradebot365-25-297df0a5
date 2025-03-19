@@ -139,7 +139,18 @@ const botForms = [
   { name: 'Market Making', value: 'market_making', disabled: true },
   { name: 'Arbitrage', value: 'arbitrage', disabled: true },
   { name: 'Sentiment Analysis', value: 'sentiment', disabled: true },
-  { name: 'Trading View', value: 'trading_view', disabled: false },
+  { 
+    name: 'Trading View', 
+    value: 'trading_view', 
+    disabled: false, 
+    logo: (
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black text-white">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.4 7L17.1 9H15.65L17.45 6H15.65L13.85 9H12.3L14.1 6H12.3L10.5 9H9L10.8 6H4V18H20V7H18.4Z" fill="currentColor"/>
+        </svg>
+      </div>
+    )
+  },
 ];
 
 const getBotIcon = (iconName: string) => {
@@ -185,6 +196,17 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
         </div>
       )}
       <span>{exchange.name}</span>
+    </div>
+  );
+
+  const renderBotFormContent = (botForm: typeof botForms[0]) => (
+    <div className="flex items-center gap-2">
+      {botForm.logo || (
+        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+          <Terminal className="h-3 w-3 text-slate-500" />
+        </div>
+      )}
+      <span>{botForm.name}</span>
     </div>
   );
 
@@ -270,7 +292,11 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select bot form" />
+                          <SelectValue placeholder="Select bot form">
+                            {field.value && renderBotFormContent(
+                              botForms.find(b => b.value === field.value) || botForms[6]
+                            )}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -281,7 +307,7 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                             disabled={form.disabled}
                             className={form.disabled ? "text-muted-foreground cursor-not-allowed" : ""}
                           >
-                            {form.name}
+                            {renderBotFormContent(form)}
                           </SelectItem>
                         ))}
                       </SelectContent>
