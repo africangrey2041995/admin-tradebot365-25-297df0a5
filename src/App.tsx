@@ -41,6 +41,7 @@ function App() {
         <Route path="/premium-bots/:id" element={<PremiumBotDetail />} />
         <Route path="/prop-trading" element={<PropTradingBots />} />
         <Route path="/prop-trading/:id" element={<PropTradingBotDetail />} />
+        <Route path="/prop-trading-bots" element={<PropTradingBots />} />
         <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
         <Route path="/integrated-premium-bots/:id" element={<IntegratedPremiumBotDetail />} />
         <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
