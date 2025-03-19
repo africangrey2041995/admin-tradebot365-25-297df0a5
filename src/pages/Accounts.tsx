@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +40,6 @@ const Accounts = () => {
     designation: '',
   });
 
-  // Mock data for demonstration
   const mockAccounts: Account[] = [
     {
       clientId: 'client123',
@@ -93,12 +90,10 @@ const Accounts = () => {
   };
 
   const handleSaveAccount = () => {
-    // In a real app, you'd save this to your database
     toast('Tài khoản đã được thêm thành công', {
       description: `Tên: ${newAccount.name}, Email: ${newAccount.designation}`,
     });
     setIsAddDialogOpen(false);
-    // Reset form
     setNewAccount({ name: '', designation: '' });
   };
 
@@ -211,72 +206,64 @@ const Accounts = () => {
         </CardContent>
       </Card>
 
-      {/* Add Account Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-md p-0">
-          <div className="relative h-32 bg-gradient-to-r from-blue-600 to-cyan-600 flex items-center justify-center">
-            <img 
-              src="/lovable-uploads/ae37eee6-8a7d-4956-9884-b975704fc9e5.png" 
-              alt="Cover"
-              className="absolute inset-0 h-full w-full object-cover opacity-40"
-            />
-            <X 
-              className="absolute top-2 right-2 h-5 w-5 text-white cursor-pointer hover:opacity-80" 
-              onClick={() => setIsAddDialogOpen(false)}
-            />
-            <div className="relative z-10 mt-10">
-              <Avatar className="h-20 w-20 border-4 border-white bg-white">
-                <AvatarImage src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" alt="Trade Bot 365" />
-                <AvatarFallback>TB</AvatarFallback>
-              </Avatar>
+        <DialogContent className="max-w-md">
+          <div className="relative mb-6">
+            <div className="absolute right-0 top-0">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsAddDialogOpen(false)}
+                className="h-8 w-8 p-0 rounded-full"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </div>
+            <div className="w-full flex justify-center mb-4">
+              <div className="h-16 w-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                <User className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl font-medium">Thêm Tài Khoản Mới</DialogTitle>
+            </DialogHeader>
+          </div>
+          
+          <div className="space-y-4 px-1">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">Name Account</Label>
+              <Input 
+                id="name" 
+                placeholder="Enter name account" 
+                value={newAccount.name}
+                onChange={(e) => setNewAccount({...newAccount, name: e.target.value})}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="designation" className="text-sm font-medium">Email Account</Label>
+              <Input 
+                id="designation" 
+                placeholder="Enter email account" 
+                value={newAccount.designation}
+                onChange={(e) => setNewAccount({...newAccount, designation: e.target.value})}
+              />
             </div>
           </div>
           
-          <div className="p-6 pt-16">
-            <DialogHeader>
-              <DialogTitle className="text-center text-xl font-medium mb-4">Thêm Tài Khoản Mới</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">Name</Label>
-                <div className="relative">
-                  <Input 
-                    id="name" 
-                    placeholder="Enter name" 
-                    value={newAccount.name}
-                    onChange={(e) => setNewAccount({...newAccount, name: e.target.value})}
-                  />
-                </div>
-                <div className="text-xs text-muted-foreground">Name = Name Account</div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="designation" className="text-sm font-medium">Designation</Label>
-                <div className="relative">
-                  <Input 
-                    id="designation" 
-                    placeholder="Enter designation" 
-                    value={newAccount.designation}
-                    onChange={(e) => setNewAccount({...newAccount, designation: e.target.value})}
-                  />
-                </div>
-                <div className="text-xs text-muted-foreground">Designation = Email Account</div>
-              </div>
-            </div>
-            
-            <DialogFooter className="mt-6 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Close
-              </Button>
-              <Button 
-                onClick={handleSaveAccount} 
-                disabled={!newAccount.name || !newAccount.designation}
-                className="bg-green-500 hover:bg-green-600"
-              >
-                Add Member
-              </Button>
-            </DialogFooter>
-          </div>
+          <DialogFooter className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              Close
+            </Button>
+            <Button 
+              onClick={handleSaveAccount} 
+              disabled={!newAccount.name || !newAccount.designation}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              Add Member
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </MainLayout>
