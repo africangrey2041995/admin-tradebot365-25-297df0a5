@@ -47,7 +47,7 @@ const SidebarNav = () => {
     <Sidebar>
       <SidebarContent>
         <img 
-          src="/lovable-uploads/9f331074-6636-4b62-80b0-4718b1f3628f.png" 
+          src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
           alt="Trade Bot 365" 
           className="h-12 w-auto mx-auto my-4" 
         />
