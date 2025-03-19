@@ -23,7 +23,9 @@ export default function SSOCallback() {
         if (searchParams.has('__clerk_status')) {
           // For sign-in with OAuth, we need to complete the OAuth flow without additional parameters
           // The Clerk SDK will automatically use the current URL to complete the OAuth flow
-          await signIn.attemptFirstFactor();
+          await signIn.attemptFirstFactor({
+            code: searchParams.get('__clerk_status') || ''
+          });
           
           navigate('/');
           return;
