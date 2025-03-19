@@ -22,7 +22,10 @@ import {
   Sparkles,
   Layers,
   TrendingUp,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const SidebarNav = () => {
   const location = useLocation();
@@ -34,14 +37,22 @@ const SidebarNav = () => {
     { icon: Users, label: 'Quản Lý Tài Khoản', path: '/accounts' },
   ];
   
+  // State for collapsible sections
+  const [premiumOpen, setPremiumOpen] = useState(false);
+  const [propTradingOpen, setPropTradingOpen] = useState(false);
+  
   // Premium features navigation items
   const premiumItems = [
     { 
       icon: Sparkles, 
       label: 'Premium Bots', 
       path: '/premium-bots',
+      isCollapsible: true,
+      isOpen: premiumOpen,
+      setOpen: setPremiumOpen,
       subItems: [
         { 
+          icon: Layers,
           label: 'Đã Tích Hợp', 
           path: '/integrated-premium-bots' 
         }
@@ -51,8 +62,12 @@ const SidebarNav = () => {
       icon: TrendingUp, 
       label: 'Prop Trading Bots', 
       path: '/prop-trading-bots',
+      isCollapsible: true,
+      isOpen: propTradingOpen,
+      setOpen: setPropTradingOpen,
       subItems: [
         { 
+          icon: Layers,
           label: 'Đã Tích Hợp', 
           path: '/integrated-prop-bots' 
         }
@@ -106,35 +121,46 @@ const SidebarNav = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {premiumItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.path)}
-                    tooltip={item.label}
+                <SidebarMenuItem key={item.path} className="flex flex-col">
+                  <Collapsible 
+                    open={item.isOpen} 
+                    onOpenChange={item.setOpen}
+                    className="w-full"
                   >
-                    <Link to={item.path}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  
-                  {item.subItems && item.subItems.length > 0 && (
-                    <SidebarMenuSub>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton 
+                        className="justify-between group" 
+                        isActive={isActive(item.path)}
+                        tooltip={item.label}
+                      >
+                        <div className="flex items-center">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.label}</span>
+                        </div>
+                        <ChevronDown 
+                          className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" 
+                        />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-1">
                       {item.subItems.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.path}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive(subItem.path)}
-                          >
-                            <Link to={subItem.path}>
-                              <Layers className="h-3 w-3" />
-                              <span>{subItem.label}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
+                        <Link 
+                          key={subItem.path} 
+                          to={subItem.path}
+                          className={`
+                            flex items-center py-1.5 px-6 text-sm rounded-md ml-4
+                            ${isActive(subItem.path) 
+                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
+                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                            }
+                          `}
+                        >
+                          <Layers className="h-3.5 w-3.5 mr-2" />
+                          <span>{subItem.label}</span>
+                        </Link>
                       ))}
-                    </SidebarMenuSub>
-                  )}
+                    </CollapsibleContent>
+                  </Collapsible>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
