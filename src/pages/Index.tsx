@@ -26,9 +26,9 @@ const Index = () => {
   return (
     <MainLayout title="Bảng Điều Khiển">
       <PropTradingPromo />
+      <PremiumBotsPromo />
       <ActivityOverview dashboardStats={dashboardStats} />
       <SystemStats dashboardStats={dashboardStats} />
-      <PremiumBotsPromo />
       <SystemOverview />
     </MainLayout>
   );

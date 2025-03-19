@@ -22,7 +22,7 @@ const PremiumBotsPromo = () => {
     >
       <DashboardCard 
         title="Premium Bots" 
-        icon={<Sparkles className="h-5 w-5" />}
+        icon={<Sparkles className="h-5 w-5 text-yellow-400" />}
         color="warning"
       >
         <div className="p-4">
@@ -34,7 +34,7 @@ const PremiumBotsPromo = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <Button 
-              className="gap-2" 
+              className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white" 
               onClick={() => navigate('/premium-bots')}
             >
               <Sparkles className="h-4 w-4" />
