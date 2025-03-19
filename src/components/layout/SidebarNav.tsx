@@ -11,60 +11,18 @@ import {
   CircuitBoard, 
   Users, 
   Sparkles,
-  Layers,
   TrendingUp,
+  ChevronDown,
 } from 'lucide-react';
-import NavGroup from './sidebar/NavGroup';
-import NavMenuItem from './sidebar/NavMenuItem';
-import CollapsibleMenuItem from './sidebar/CollapsibleMenuItem';
+import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const SidebarNav = () => {
   const location = useLocation();
   
-  // Main navigation items
-  const mainNavItems = [
-    { icon: Home, label: 'Bảng Điều Khiển', path: '/' },
-    { icon: CircuitBoard, label: 'Quản Lý Bot', path: '/bots' },
-    { icon: Users, label: 'Quản Lý Tài Khoản', path: '/accounts' },
-  ];
-  
   // State for collapsible sections
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [propTradingOpen, setPropTradingOpen] = useState(false);
-  
-  // Premium features navigation items
-  const premiumItems = [
-    { 
-      icon: Sparkles, 
-      label: 'Premium Bots', 
-      path: '/premium-bots',
-      isCollapsible: true,
-      isOpen: premiumOpen,
-      setOpen: setPremiumOpen,
-      subItems: [
-        { 
-          icon: Layers,
-          label: 'Đã Tích Hợp', 
-          path: '/integrated-premium-bots' 
-        }
-      ]
-    },
-    { 
-      icon: TrendingUp, 
-      label: 'Prop Trading Bots', 
-      path: '/prop-trading-bots',
-      isCollapsible: true,
-      isOpen: propTradingOpen,
-      setOpen: setPropTradingOpen,
-      subItems: [
-        { 
-          icon: Layers,
-          label: 'Đã Tích Hợp', 
-          path: '/integrated-prop-bots' 
-        }
-      ]
-    },
-  ];
   
   // Check if a path is active
   const isActive = (path: string) => {
@@ -75,45 +33,190 @@ const SidebarNav = () => {
   };
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <img 
-          src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
-          alt="Trade Bot 365" 
-          className="h-16 w-auto mx-auto my-4" 
-        />
+    <Sidebar className="border-r-0">
+      <SidebarContent className="bg-[#111111] text-white h-full">
+        {/* Logo */}
+        <div className="py-5 px-6">
+          <img 
+            src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
+            alt="Trade Bot 365" 
+            className="h-12 w-auto" 
+          />
+        </div>
         
-        <SidebarSeparator />
+        <SidebarSeparator className="bg-zinc-800" />
         
-        <NavGroup label="Tổng Quan">
-          {mainNavItems.map((item) => (
-            <NavMenuItem
-              key={item.path}
-              icon={item.icon}
-              label={item.label}
-              path={item.path}
-              isActive={isActive(item.path)}
+        {/* Main Navigation */}
+        <div className="mt-4">
+          <div className="px-4 mb-2">
+            <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+              Tổng Quan
+            </span>
+          </div>
+          
+          <div className="space-y-1 px-2">
+            <NavItem 
+              path="/" 
+              label="Bảng Điều Khiển" 
+              icon={Home} 
+              isActive={isActive('/')} 
             />
-          ))}
-        </NavGroup>
-
-        <NavGroup label="Premium" noSpacing={true}>
-          {premiumItems.map((item) => (
-            <CollapsibleMenuItem
-              key={item.path}
-              icon={item.icon}
-              label={item.label}
-              path={item.path}
-              isActive={isActive(item.path)}
-              isOpen={item.isOpen}
-              setOpen={item.setOpen}
-              subItems={item.subItems}
-              isActiveSubItem={isActive}
+            <NavItem 
+              path="/bots" 
+              label="Quản Lý Bot" 
+              icon={CircuitBoard} 
+              isActive={isActive('/bots')} 
             />
-          ))}
-        </NavGroup>
+            <NavItem 
+              path="/accounts" 
+              label="Quản Lý Tài Khoản" 
+              icon={Users} 
+              isActive={isActive('/accounts')} 
+            />
+          </div>
+        </div>
+        
+        {/* Premium Section */}
+        <div className="mt-6">
+          <div className="px-4 mb-2">
+            <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+              Premium
+            </span>
+          </div>
+          
+          <div className="space-y-1 px-2">
+            <CollapsibleNavItem
+              path="/premium-bots"
+              label="Premium Bots"
+              icon={Sparkles}
+              isActive={isActive('/premium-bots')}
+              isOpen={premiumOpen}
+              onToggle={() => setPremiumOpen(!premiumOpen)}
+              subItems={[
+                { 
+                  path: "/integrated-premium-bots", 
+                  label: "Đã Tích Hợp" 
+                }
+              ]}
+              currentPath={location.pathname}
+            />
+            
+            <CollapsibleNavItem
+              path="/prop-trading-bots"
+              label="Prop Trading Bots"
+              icon={TrendingUp}
+              isActive={isActive('/prop-trading-bots')}
+              isOpen={propTradingOpen}
+              onToggle={() => setPropTradingOpen(!propTradingOpen)}
+              subItems={[
+                { 
+                  path: "/integrated-prop-bots", 
+                  label: "Đã Tích Hợp" 
+                }
+              ]}
+              currentPath={location.pathname}
+            />
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
+  );
+};
+
+interface NavItemProps {
+  path: string;
+  label: string;
+  icon: React.ElementType;
+  isActive: boolean;
+}
+
+const NavItem = ({ path, label, icon: Icon, isActive }: NavItemProps) => {
+  return (
+    <Link
+      to={path}
+      className={cn(
+        "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+        isActive 
+          ? "bg-zinc-800 text-white" 
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+      )}
+    >
+      <Icon className="h-5 w-5 mr-3" />
+      <span>{label}</span>
+    </Link>
+  );
+};
+
+interface SubItem {
+  path: string;
+  label: string;
+}
+
+interface CollapsibleNavItemProps extends NavItemProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  subItems: SubItem[];
+  currentPath: string;
+}
+
+const CollapsibleNavItem = ({ 
+  path, 
+  label, 
+  icon: Icon, 
+  isActive,
+  isOpen,
+  onToggle,
+  subItems,
+  currentPath
+}: CollapsibleNavItemProps) => {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center">
+        <Link
+          to={path}
+          className={cn(
+            "flex flex-1 items-center px-3 py-2 text-sm rounded-md transition-colors",
+            isActive 
+              ? "bg-zinc-800 text-white" 
+              : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+          )}
+        >
+          <Icon className="h-5 w-5 mr-3" />
+          <span>{label}</span>
+        </Link>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            onToggle();
+          }}
+          className="px-2 py-2 text-zinc-400 hover:text-white"
+        >
+          <ChevronDown className={cn(
+            "h-4 w-4 transition-transform",
+            isOpen ? "transform rotate-180" : ""
+          )} />
+        </button>
+      </div>
+      
+      {isOpen && (
+        <div className="pl-10 space-y-1">
+          {subItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "block px-3 py-2 text-sm rounded-md transition-colors",
+                currentPath === item.path
+                  ? "bg-zinc-800 text-white" 
+                  : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
