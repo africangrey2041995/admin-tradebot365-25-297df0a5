@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -40,7 +39,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-// Mock data for API keys
 interface ApiKey {
   id: string;
   name: string;
@@ -54,7 +52,6 @@ interface ApiKey {
 }
 
 const generateMockApiKeys = (accountId: string): ApiKey[] => {
-  // Array of diverse account trading values
   const accountTradingValues = [
     '554466|Live|5000',
     '778899|Demo|10000',
@@ -71,12 +68,11 @@ const generateMockApiKeys = (accountId: string): ApiKey[] => {
     accessToken: '*********************',
     accountTrading: accountTradingValues[index],
     createdAt: new Date().toISOString(),
-    expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
+    expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
     status: Math.random() > 0.3 ? 'ACTIVE' : 'BLOCK',
   }));
 };
 
-// Mock data for trading accounts
 const mockTradingAccounts = [
   { id: '554466', type: 'Live', balance: '5000' },
   { id: '778899', type: 'Demo', balance: '10000' },
@@ -85,7 +81,6 @@ const mockTradingAccounts = [
   { id: '990011', type: 'Demo', balance: '15000' },
 ];
 
-// Mock available users for the account
 const mockUsers = [
   { id: 'user1', name: 'John Doe', email: 'john@example.com' },
   { id: 'user2', name: 'Jane Smith', email: 'jane@example.com' },
@@ -99,8 +94,8 @@ const AccountProfile = () => {
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isAddKeyDialogOpen, setIsAddKeyDialogOpen] = useState(false);
   
-  // Form state for new API key
   const [selectedUser, setSelectedUser] = useState('');
+  const [newApiName, setNewApiName] = useState('');
   const [newClientId, setNewClientId] = useState('');
   const [newSecret, setNewSecret] = useState('');
   const [newAccessToken, setNewAccessToken] = useState('');
@@ -109,10 +104,8 @@ const AccountProfile = () => {
   const [isTestSuccessful, setIsTestSuccessful] = useState(false);
   const [availableTradingAccounts, setAvailableTradingAccounts] = useState(mockTradingAccounts);
 
-  // Mock account data based on accountId
   const accountName = `Account ${accountId?.slice(-3)}`;
-  
-  // Toggle show/hide secrets
+
   const toggleShowSecret = (keyId: string) => {
     setShowSecrets(prev => ({
       ...prev,
@@ -120,7 +113,6 @@ const AccountProfile = () => {
     }));
   };
 
-  // Copy values to clipboard
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
       .then(() => {
@@ -131,15 +123,14 @@ const AccountProfile = () => {
       });
   };
 
-  // Open the add key dialog
   const handleAddKey = () => {
     resetFormFields();
     setIsAddKeyDialogOpen(true);
   };
 
-  // Reset form fields
   const resetFormFields = () => {
     setSelectedUser('');
+    setNewApiName('');
     setNewClientId('');
     setNewSecret('');
     setNewAccessToken('');
@@ -147,7 +138,6 @@ const AccountProfile = () => {
     setIsTestSuccessful(false);
   };
 
-  // Test access token connection
   const handleTestConnection = () => {
     if (!newAccessToken.trim()) {
       toast.error('Please enter an access token');
@@ -156,13 +146,10 @@ const AccountProfile = () => {
 
     setIsTesting(true);
 
-    // Simulate API call
     setTimeout(() => {
       setIsTesting(false);
       setIsTestSuccessful(true);
       
-      // Simulate fetching trading accounts based on the access token
-      // In a real app, this would be an actual API call
       const randomAccounts = [...mockTradingAccounts].sort(() => Math.random() - 0.5).slice(0, 3);
       setAvailableTradingAccounts(randomAccounts);
       
@@ -170,11 +157,14 @@ const AccountProfile = () => {
     }, 1500);
   };
 
-  // Save new API key
   const handleSaveNewKey = () => {
-    // Validate form fields
     if (!selectedUser) {
       toast.error('Please select a user account');
+      return;
+    }
+    
+    if (!newApiName.trim()) {
+      toast.error('Please enter an API name');
       return;
     }
     
@@ -203,7 +193,6 @@ const AccountProfile = () => {
       return;
     }
     
-    // Find the selected account details
     const selectedAccount = availableTradingAccounts.find(acc => acc.id === selectedTradingAccount);
     
     if (!selectedAccount) {
@@ -213,12 +202,11 @@ const AccountProfile = () => {
     
     const accountTradingValue = `${selectedAccount.id}|${selectedAccount.type}|${selectedAccount.balance}`;
     
-    // Find selected user
     const user = mockUsers.find(u => u.id === selectedUser);
     
     const newKey: ApiKey = {
       id: `key-${Date.now()}`,
-      name: user?.name || 'Unknown User',
+      name: newApiName,
       clientId: newClientId,
       secretKey: newSecret,
       accessToken: newAccessToken,
@@ -261,7 +249,6 @@ const AccountProfile = () => {
     toast.success('Access token updated successfully');
   };
 
-  // Parse account trading info
   const parseAccountTrading = (accountTradingStr: string) => {
     const parts = accountTradingStr.split('|');
     return {
@@ -421,8 +408,7 @@ const AccountProfile = () => {
                             <span className={cn(
                               "ml-1 px-1.5 py-0.5 rounded-full text-xs",
                               account.type.toLowerCase() === 'live' 
-                                ? "bg-success/10 text-success" 
-                                : "bg-warning/10 text-warning"
+                                ? "bg-success" : "bg-warning"
                             )}>
                               {account.type}
                             </span>
@@ -500,7 +486,6 @@ const AccountProfile = () => {
         </Card>
       </div>
 
-      {/* Add API Key Dialog */}
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -511,7 +496,6 @@ const AccountProfile = () => {
           </DialogHeader>
           
           <div className="space-y-5 py-4">
-            {/* User Account Selection */}
             <div className="space-y-2">
               <Label htmlFor="userAccount" className="text-sm font-medium flex items-center">
                 User Account <span className="text-red-500 ml-1">*</span>
@@ -543,7 +527,24 @@ const AccountProfile = () => {
               </div>
             </div>
 
-            {/* Client ID */}
+            <div className="space-y-2">
+              <Label htmlFor="apiName" className="text-sm font-medium flex items-center">
+                API Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  API Name
+                </Label>
+                <Input 
+                  id="apiName" 
+                  placeholder="Enter API name"
+                  value={newApiName}
+                  onChange={(e) => setNewApiName(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="clientId" className="text-sm font-medium flex items-center">
                 Client ID <span className="text-red-500 ml-1">*</span>
@@ -562,7 +563,6 @@ const AccountProfile = () => {
               </div>
             </div>
 
-            {/* Secret */}
             <div className="space-y-2">
               <Label htmlFor="secret" className="text-sm font-medium flex items-center">
                 Secret <span className="text-red-500 ml-1">*</span>
@@ -582,7 +582,6 @@ const AccountProfile = () => {
               </div>
             </div>
 
-            {/* Access Token with Test button */}
             <div className="space-y-2">
               <Label htmlFor="accessToken" className="text-sm font-medium flex items-center">
                 Access Token <span className="text-red-500 ml-1">*</span>
@@ -627,7 +626,6 @@ const AccountProfile = () => {
               </div>
             </div>
 
-            {/* Account Trading Selection - Only visible after successful test */}
             {isTestSuccessful && (
               <div className="space-y-2">
                 <Label htmlFor="tradingAccount" className="text-sm font-medium flex items-center">
@@ -684,7 +682,7 @@ const AccountProfile = () => {
             <Button 
               onClick={handleSaveNewKey} 
               className="flex-1 sm:flex-initial bg-primary hover:bg-primary/90"
-              disabled={!selectedUser || !newClientId.trim() || !newSecret.trim() || 
+              disabled={!selectedUser || !newApiName.trim() || !newClientId.trim() || !newSecret.trim() || 
                 !isTestSuccessful || !selectedTradingAccount}
             >
               Create API
