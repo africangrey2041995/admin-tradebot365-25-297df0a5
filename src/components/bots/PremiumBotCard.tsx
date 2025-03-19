@@ -46,7 +46,7 @@ export const PremiumBotCard = ({
   const getRiskLabel = (risk: string) => {
     switch (risk) {
       case 'low': return 'Thấp';
-      case 'medium': return 'Trung bình';
+      case 'medium': return 'Trung';
       case 'high': return 'Cao';
       default: return risk;
     }
