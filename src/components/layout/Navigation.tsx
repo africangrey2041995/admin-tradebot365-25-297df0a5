@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -255,46 +254,48 @@ const Navigation = () => {
   const UserMenu = () => (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-3">
-        <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white">
+        <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full">
           <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 min-w-[18px] min-h-[18px] flex items-center justify-center bg-orange-500 text-white text-[10px]">
+          <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 min-w-[18px] min-h-[18px] flex items-center justify-center bg-primary text-white text-[10px] border-[1.5px] border-zinc-800">
             3
           </Badge>
         </Button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2 hover:bg-zinc-800 px-2 rounded-full">
-              <Avatar className="h-8 w-8 border-2 border-primary/20">
-                <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
-                <AvatarFallback>TB</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-sm font-medium text-white">Admin</span>
-                <span className="text-xs text-zinc-400">Founder</span>
+            <Button variant="ghost" className="flex items-center space-x-2 hover:bg-zinc-800/70 px-3 py-2 rounded-full border border-zinc-700/30">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8 border-2 border-primary/30 ring-2 ring-primary/10">
+                  <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+                  <AvatarFallback>TB</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col items-start text-left">
+                  <span className="text-sm font-semibold text-white">Founder</span>
+                  <span className="text-xs text-zinc-400">Admin</span>
+                </div>
               </div>
-              <ChevronDown className="h-4 w-4 text-zinc-400" />
+              <ChevronDown className="h-4 w-4 text-zinc-400 ml-1" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-700">
-            <DropdownMenuLabel className="text-zinc-400">My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-700 p-1 rounded-xl shadow-lg shadow-black/20">
+            <DropdownMenuLabel className="text-zinc-400 px-3 py-2">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-zinc-700" />
-            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
-              <UserCircle className="mr-2 h-4 w-4 text-zinc-400" />
+            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2 rounded-lg">
+              <UserCircle className="mr-2 h-4 w-4 text-primary" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
-              <Settings className="mr-2 h-4 w-4 text-zinc-400" />
+            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2 rounded-lg">
+              <Settings className="mr-2 h-4 w-4 text-primary" />
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-700" />
             <DropdownMenuItem 
-              className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white"
+              className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2 rounded-lg"
               onClick={() => {
                 window.location.href = '/sign-in';
               }}
             >
-              <LogOut className="mr-2 h-4 w-4 text-zinc-400" />
+              <LogOut className="mr-2 h-4 w-4 text-primary" />
               <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -378,11 +379,11 @@ const Navigation = () => {
           </aside>
           
           <div className={cn(
-            "fixed top-0 right-0 z-20 border-b border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm transition-all duration-300 ease-in-out px-6 py-3",
+            "fixed top-0 right-0 z-20 border-b border-zinc-700/30 bg-zinc-800/50 shadow-sm transition-all duration-300 ease-in-out px-6 py-3 backdrop-blur-md",
             isCollapsed ? "left-[70px]" : "left-64"
           )}>
             <div className="flex items-center justify-between h-12">
-              <div className="text-lg font-medium text-slate-800 dark:text-white">
+              <div className="text-lg font-medium text-white">
                 {routes.find(route => route.path === location.pathname)?.label || 
                 routes.flatMap(route => route.children || []).find(child => child.path === location.pathname)?.label ||
                 "Bảng Điều Khiển"}
