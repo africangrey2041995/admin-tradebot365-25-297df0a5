@@ -165,6 +165,8 @@ const IntegratedPremiumBotDetail = () => {
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastSynced, setLastSynced] = useState<string | null>(null);
 
   const bot = integratedPremiumBots.find(b => b.id === botId);
 
@@ -258,6 +260,29 @@ const IntegratedPremiumBotDetail = () => {
     toast.success('Chuyển đến trang quản lý bot');
   };
 
+  const syncData = () => {
+    setIsLoading(true);
+    // Simulate API call with a timer
+    setTimeout(() => {
+      setIsLoading(false);
+      setLastSynced(new Date().toLocaleTimeString());
+      toast.success('Dữ liệu đã được đồng bộ thành công!');
+    }, 1500);
+  };
+
+  const refreshTabData = () => {
+    setIsLoading(true);
+    // Simulate API call with a timer
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success(`Đã làm mới dữ liệu tab ${
+        activeTab === "overview" ? "Tổng quan" : 
+        activeTab === "accounts" ? "Tài khoản" : 
+        activeTab === "trading-logs" ? "TB365 Logs" : "Coinstrat Logs"
+      }`);
+    }, 1000);
+  };
+
   return (
     <MainLayout title={`${bot.name} - Chi tiết Bot Tích hợp`}>
       <div className="space-y-6">
@@ -284,6 +309,14 @@ const IntegratedPremiumBotDetail = () => {
             </Badge>
           </div>
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={syncData} 
+              disabled={isLoading}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              {isLoading ? 'Đang đồng bộ...' : 'Đồng bộ dữ liệu'}
+            </Button>
             <Button variant="outline" onClick={handleManageBot}>
               <Settings className="mr-2 h-4 w-4" />
               Quản lý Bot
@@ -294,6 +327,12 @@ const IntegratedPremiumBotDetail = () => {
             </Button>
           </div>
         </div>
+        
+        {lastSynced && (
+          <div className="text-xs text-muted-foreground">
+            Cập nhật lần cuối: {lastSynced}
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
@@ -309,13 +348,24 @@ const IntegratedPremiumBotDetail = () => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Biểu đồ hiệu suất</CardTitle>
-                    <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
-                      <TabsList>
-                        <TabsTrigger value="week">Tuần</TabsTrigger>
-                        <TabsTrigger value="month">Tháng</TabsTrigger>
-                        <TabsTrigger value="year">Năm</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={refreshTabData} 
+                        disabled={isLoading}
+                        className="h-8 w-8"
+                      >
+                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
+                        <TabsList>
+                          <TabsTrigger value="week">Tuần</TabsTrigger>
+                          <TabsTrigger value="month">Tháng</TabsTrigger>
+                          <TabsTrigger value="year">Năm</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px] w-full">
@@ -388,8 +438,17 @@ const IntegratedPremiumBotDetail = () => {
                 </Card>
 
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Chi tiết giao dịch</CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={refreshTabData} 
+                      disabled={isLoading}
+                      className="h-8 w-8"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px]">
@@ -450,8 +509,17 @@ const IntegratedPremiumBotDetail = () => {
 
               <div className="space-y-6">
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Thông tin chung</CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={refreshTabData} 
+                      disabled={isLoading}
+                      className="h-8 w-8"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
@@ -497,8 +565,17 @@ const IntegratedPremiumBotDetail = () => {
                 </Card>
 
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Hiệu suất</CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={refreshTabData} 
+                      disabled={isLoading}
+                      className="h-8 w-8"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
@@ -556,9 +633,15 @@ const IntegratedPremiumBotDetail = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Tài khoản đã tích hợp với {bot.name}</CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                    <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                    Làm mới
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={refreshTabData} 
+                    disabled={isLoading} 
+                    className="h-8"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                    {isLoading ? 'Đang làm mới...' : 'Làm mới'}
                   </Button>
                   <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)} className="h-8">
                     <Plus className="h-3.5 w-3.5 mr-1" />
@@ -637,9 +720,15 @@ const IntegratedPremiumBotDetail = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>TB365 Signal Logs ({bot.botId})</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                  <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                  Làm mới
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={refreshTabData} 
+                  disabled={isLoading} 
+                  className="h-8"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                  {isLoading ? 'Đang làm mới...' : 'Làm mới'}
                 </Button>
               </CardHeader>
               <CardContent>
@@ -652,9 +741,15 @@ const IntegratedPremiumBotDetail = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Coinstrat Pro Logs</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                  <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                  Làm mới
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={refreshTabData} 
+                  disabled={isLoading} 
+                  className="h-8"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                  {isLoading ? 'Đang làm mới...' : 'Làm mới'}
                 </Button>
               </CardHeader>
               <CardContent>
