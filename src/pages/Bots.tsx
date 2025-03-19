@@ -100,19 +100,20 @@ const BotCard = ({
   
   return (
     <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
-      <div className="flex justify-between items-start">
-        <div>
-          <div className="flex items-center gap-3">
-            <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
-            <button 
-              onClick={onFavorite}
-              className="text-yellow-400 hover:text-yellow-500 transition-colors"
-              aria-label="Toggle favorite"
-            >
-              <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
-            </button>
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex-grow">
+          {/* Moved Avatar to the top */}
+          <div className="flex justify-center mb-3">
+            <Avatar className={`h-16 w-16 ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
+              {avatarSrc ? (
+                <AvatarImage src={avatarSrc} alt={title} />
+              ) : (
+                <AvatarFallback className="text-xl">
+                  {avatarIcon || <Bot className="h-7 w-7" />}
+                </AvatarFallback>
+              )}
+            </Avatar>
           </div>
-          {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-snug max-w-xs">{subtitle}</p>}
         </div>
         
         <DropdownMenu>
@@ -140,16 +141,18 @@ const BotCard = ({
         </DropdownMenu>
       </div>
       
-      <div className="flex items-center mt-4">
-        <Avatar className={`mr-3 h-11 w-11 ${avatarBgColors[colorScheme]} border border-white shadow-sm`}>
-          {avatarSrc ? (
-            <AvatarImage src={avatarSrc} alt={title} />
-          ) : (
-            <AvatarFallback>
-              {avatarIcon || <Bot className="h-5 w-5" />}
-            </AvatarFallback>
-          )}
-        </Avatar>
+      <div className="text-center mb-3">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
+          <button 
+            onClick={onFavorite}
+            className="text-yellow-400 hover:text-yellow-500 transition-colors"
+            aria-label="Toggle favorite"
+          >
+            <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+          </button>
+        </div>
+        {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-snug mx-auto">{subtitle}</p>}
       </div>
       
       <div className="flex items-center justify-between py-2.5 px-3 mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100">
