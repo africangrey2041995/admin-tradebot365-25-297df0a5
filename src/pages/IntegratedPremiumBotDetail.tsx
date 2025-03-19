@@ -67,7 +67,7 @@ const integratedPremiumBots: PremiumBot[] = [
     imageUrl: null,
     colorScheme: 'green',
     isIntegrated: true,
-    botId: 'BOT7459',
+    botId: 'PRE7459',
     accounts: [
       {
         id: 'acc-001',
@@ -112,7 +112,7 @@ const integratedPremiumBots: PremiumBot[] = [
     imageUrl: null,
     colorScheme: 'purple',
     isIntegrated: true,
-    botId: 'BOT8932',
+    botId: 'PRE8932',
     accounts: [
       {
         id: 'acc-003',
@@ -166,7 +166,6 @@ const IntegratedPremiumBotDetail = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
   const [isLoading, setIsLoading] = useState(false);
-  const [lastSynced, setLastSynced] = useState<string | null>(null);
 
   const bot = integratedPremiumBots.find(b => b.id === botId);
 
@@ -260,16 +259,6 @@ const IntegratedPremiumBotDetail = () => {
     toast.success('Chuyển đến trang quản lý bot');
   };
 
-  const syncData = () => {
-    setIsLoading(true);
-    // Simulate API call with a timer
-    setTimeout(() => {
-      setIsLoading(false);
-      setLastSynced(new Date().toLocaleTimeString());
-      toast.success('Dữ liệu đã được đồng bộ thành công!');
-    }, 1500);
-  };
-
   const refreshTabData = () => {
     setIsLoading(true);
     // Simulate API call with a timer
@@ -309,14 +298,6 @@ const IntegratedPremiumBotDetail = () => {
             </Badge>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={syncData} 
-              disabled={isLoading}
-            >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              {isLoading ? 'Đang đồng bộ...' : 'Đồng bộ dữ liệu'}
-            </Button>
             <Button variant="outline" onClick={handleManageBot}>
               <Settings className="mr-2 h-4 w-4" />
               Quản lý Bot
@@ -327,12 +308,6 @@ const IntegratedPremiumBotDetail = () => {
             </Button>
           </div>
         </div>
-        
-        {lastSynced && (
-          <div className="text-xs text-muted-foreground">
-            Cập nhật lần cuối: {lastSynced}
-          </div>
-        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
