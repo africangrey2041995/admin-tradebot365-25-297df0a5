@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 
@@ -46,7 +47,7 @@ const generateMockApiKeys = (accountId: string): ApiKey[] => {
   return Array(5).fill(null).map((_, index) => ({
     id: `key-${index}`,
     name: `Streamlab`,
-    clientId: `${accountId}-client-${index}`.padEnd(20, '*'),
+    clientId: `${accountId}-client-${index}`,
     secretKey: '*********************',
     accessToken: '*********************',
     accountTrading: Math.random() > 0.5 ? '554466|Live|5000' : '10',
@@ -97,7 +98,7 @@ const AccountProfile = () => {
     const newKey: ApiKey = {
       id: `key-${Date.now()}`,
       name: newKeyName,
-      clientId: `${accountId}-client-new`.padEnd(20, '*'),
+      clientId: `${accountId}-client-new`,
       secretKey: '*********************',
       accessToken: '*********************',
       accountTrading: Math.random() > 0.5 ? '554466|Live|5000' : '10',
@@ -176,44 +177,44 @@ const AccountProfile = () => {
           </Button>
         </div>
         
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px]">Name</TableHead>
-                <TableHead>Client ID</TableHead>
-                <TableHead>Secret</TableHead>
-                <TableHead>Access Token</TableHead>
-                <TableHead>Account Trading</TableHead>
-                <TableHead>Expiry Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
+                <TableHead className="w-[120px]">Name</TableHead>
+                <TableHead className="w-[150px]">Client ID</TableHead>
+                <TableHead className="w-[150px]">Secret</TableHead>
+                <TableHead className="w-[150px]">Access Token</TableHead>
+                <TableHead className="w-[150px]">Account Trading</TableHead>
+                <TableHead className="w-[150px]">Expiry Date</TableHead>
+                <TableHead className="w-[100px]">Status</TableHead>
+                <TableHead className="w-[80px] text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {apiKeys.map((key) => (
                 <TableRow key={key.id}>
                   <TableCell className="font-medium">{key.name}</TableCell>
-                  <TableCell className="relative w-32 max-w-[150px] truncate">
-                    <div className="flex items-center gap-1">
-                      <span>{key.clientId}</span>
+                  <TableCell>
+                    <div className="flex items-center space-x-1 w-full">
+                      <span className="truncate max-w-[100px]">{key.clientId}</span>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 flex-shrink-0"
                         onClick={() => copyToClipboard(key.clientId, 'Client ID')}
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell className="relative w-32 max-w-[150px] truncate">
-                    <div className="flex items-center gap-1">
-                      <span>{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
+                  <TableCell>
+                    <div className="flex items-center space-x-1 w-full">
+                      <span className="truncate max-w-[80px]">{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 flex-shrink-0"
                         onClick={() => toggleShowSecret(key.id)}
                       >
                         {showSecrets[key.id] ? 
@@ -224,20 +225,20 @@ const AccountProfile = () => {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 flex-shrink-0"
                         onClick={() => copyToClipboard(showSecrets[key.id] ? '1234-5678-9012-3456' : 'Your secret key is hidden', 'Secret Key')}
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell className="relative w-32 max-w-[150px] truncate">
-                    <div className="flex items-center gap-1">
-                      <span>{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
+                  <TableCell>
+                    <div className="flex items-center space-x-1 w-full">
+                      <span className="truncate max-w-[80px]">{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 flex-shrink-0"
                         onClick={() => toggleShowSecret(key.id)}
                       >
                         {showSecrets[key.id] ? 
@@ -248,16 +249,18 @@ const AccountProfile = () => {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 w-6 p-0"
+                        className="h-6 w-6 p-0 flex-shrink-0"
                         onClick={() => copyToClipboard(showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' : 'Your access token is hidden', 'Access Token')}
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>{key.accountTrading}</TableCell>
                   <TableCell>
-                    <span className="text-sm text-orange-500">
+                    <span className="whitespace-nowrap">{key.accountTrading}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="whitespace-nowrap text-sm text-orange-500">
                       {new Date(key.expiryDate).toLocaleDateString()} ({Math.floor((new Date(key.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days)
                     </span>
                   </TableCell>
@@ -313,6 +316,9 @@ const AccountProfile = () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Add New API Key</DialogTitle>
+            <DialogDescription>
+              Create a new API key for this account to enable connections.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-3">
