@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -120,9 +121,9 @@ const IntegratedPremiumBots = () => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Integrated Premium Bots</h1>
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Premium Bots Đã Tích Hợp</h1>
               <p className="text-slate-500 dark:text-slate-400 mt-1">
-                Premium bots that you have integrated with your accounts
+                Các Premium Bot bạn đã tích hợp với tài khoản của mình
               </p>
             </div>
           </div>
@@ -133,7 +134,7 @@ const IntegratedPremiumBots = () => {
               className="inline-flex items-center whitespace-nowrap"
             >
               <Plus className="mr-2 h-4 w-4" />
-              <span>Add New Premium Bot</span>
+              <span>Thêm Premium Bot Mới</span>
             </Button>
             <Button 
               variant="outline" 
@@ -141,7 +142,7 @@ const IntegratedPremiumBots = () => {
               className="inline-flex items-center"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
-              <span>Refresh</span>
+              <span>Làm mới</span>
             </Button>
           </div>
         </div>
@@ -192,6 +193,7 @@ const IntegratedPremiumBots = () => {
                   subscribers={bot.subscribers}
                   imageUrl={bot.imageUrl}
                   colorScheme={bot.colorScheme}
+                  isIntegrated={true}
                   accountCount={bot.accounts?.length.toString() || "0"}
                   botId={bot.botId}
                 />
