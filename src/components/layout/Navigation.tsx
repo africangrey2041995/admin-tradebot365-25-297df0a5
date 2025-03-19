@@ -57,8 +57,8 @@ const Navigation = () => {
           className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-base",
             location.pathname === route.path
-              ? "bg-sidebar-primary text-sidebar-primary-foreground"
-              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              ? "bg-primary text-primary-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
           )}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
@@ -92,7 +92,7 @@ const Navigation = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="fixed top-[60px] left-0 right-0 z-30 bg-sidebar-background p-4 border-b flex flex-col gap-2"
+                className="fixed top-[60px] left-0 right-0 z-30 bg-zinc-900 p-4 border-b flex flex-col gap-2"
               >
                 <NavLinks />
               </motion.div>
@@ -102,17 +102,17 @@ const Navigation = () => {
           <div className="h-[60px]"></div> {/* Spacer for fixed header */}
         </>
       ) : (
-        <aside className="fixed inset-y-0 left-0 z-30 w-64 bg-sidebar-background border-r flex flex-col">
+        <aside className="fixed inset-y-0 left-0 z-30 w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
           <div className="p-6">
-            <h1 className="text-xl font-bold text-sidebar-foreground">CTrader Connect</h1>
+            <h1 className="text-xl font-bold text-white">CTrader Connect</h1>
           </div>
           
           <div className="px-3 py-2 flex-1 overflow-auto flex flex-col gap-1">
             <NavLinks />
           </div>
           
-          <div className="p-4 border-t">
-            <Button variant="outline" size="sm" className="w-full" onClick={() => {}}>
+          <div className="p-4 border-t border-zinc-800">
+            <Button variant="outline" size="sm" className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200" onClick={() => {}}>
               <Settings className="h-4 w-4 mr-2" />
               Settings
             </Button>
