@@ -17,19 +17,37 @@ export default function SSOCallback() {
       try {
         const searchParams = new URLSearchParams(window.location.search);
         
-        // Handle sign in
+        // Handle sign in - for OAuth we don't need to pass parameters to attemptFirstFactor
         if (searchParams.has('__clerk_status') && searchParams.get('__clerk_status') === 'running') {
-          await signIn.attemptFirstFactor({});
-          navigate('/');
+          // First factor verification is being handled automatically by Clerk
+          // Just complete the sign-in process
+          const result = await signIn.create({
+            strategy: "oauth_callback",
+            redirectUrl: '/sso-callback',
+          });
+          
+          if (result.status === "complete") {
+            navigate('/');
+          } else {
+            navigate('/sign-in');
+          }
           return;
         }
         
         // Handle sign up
         const firstParam = window.location.search.substring(1).split('&')[0];
         if (firstParam.startsWith('__clerk_ticket')) {
-          // Handle sign-up OAuth callback
-          await signUp.attemptEmailAddressVerification({});
-          navigate('/');
+          // For OAuth sign up, we also use a different approach
+          const result = await signUp.create({
+            strategy: "oauth_callback",
+            redirectUrl: '/sso-callback',
+          });
+          
+          if (result.status === "complete") {
+            navigate('/');
+          } else {
+            navigate('/sign-up');
+          }
           return;
         }
         
