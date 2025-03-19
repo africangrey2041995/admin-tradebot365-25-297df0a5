@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Navigation from './Navigation';
+import FixedNavigation from './FixedNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
       <div className="fixed top-0 z-50 w-full">
-        <Navigation />
+        <FixedNavigation />
       </div>
       
       <main className={cn(
