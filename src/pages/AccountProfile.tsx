@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -35,6 +36,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 // Mock data for API keys
 interface ApiKey {
@@ -72,13 +75,28 @@ const generateMockApiKeys = (accountId: string): ApiKey[] => {
   }));
 };
 
+// Mock data for trading accounts
+const mockTradingAccounts = [
+  { id: '554466', type: 'Live', balance: '5000' },
+  { id: '778899', type: 'Demo', balance: '10000' },
+  { id: '112233', type: 'Live', balance: '2500' },
+  { id: '445566', type: 'Live', balance: '7500' },
+  { id: '990011', type: 'Demo', balance: '15000' },
+];
+
 const AccountProfile = () => {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(generateMockApiKeys(accountId || ''));
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isAddKeyDialogOpen, setIsAddKeyDialogOpen] = useState(false);
+  
+  // Form state for new API key
   const [newKeyName, setNewKeyName] = useState('');
+  const [newClientId, setNewClientId] = useState('');
+  const [newSecret, setNewSecret] = useState('');
+  const [newAccessToken, setNewAccessToken] = useState('');
+  const [selectedTradingAccount, setSelectedTradingAccount] = useState('');
 
   // Mock account data based on accountId
   const accountName = `Account ${accountId?.slice(-3)}`;
@@ -101,29 +119,54 @@ const AccountProfile = () => {
   };
 
   const handleAddKey = () => {
+    resetFormFields();
     setIsAddKeyDialogOpen(true);
   };
 
+  const resetFormFields = () => {
+    setNewKeyName('');
+    setNewClientId('');
+    setNewSecret('');
+    setNewAccessToken('');
+    setSelectedTradingAccount('');
+  };
+
   const handleSaveNewKey = () => {
+    // Validate form fields
     if (!newKeyName.trim()) {
       toast.error('Please enter a key name');
       return;
     }
     
+    if (!selectedTradingAccount) {
+      toast.error('Please select a trading account');
+      return;
+    }
+    
+    // Find the selected account details
+    const selectedAccount = mockTradingAccounts.find(acc => acc.id === selectedTradingAccount);
+    
+    if (!selectedAccount) {
+      toast.error('Invalid trading account selected');
+      return;
+    }
+    
+    const accountTradingValue = `${selectedAccount.id}|${selectedAccount.type}|${selectedAccount.balance}`;
+    
     const newKey: ApiKey = {
       id: `key-${Date.now()}`,
       name: newKeyName,
-      clientId: `${accountId}-client-new`,
-      secretKey: '*********************',
-      accessToken: '*********************',
-      accountTrading: Math.random() > 0.5 ? '554466|Live|5000' : '10',
+      clientId: newClientId || `${accountId}-client-new`,
+      secretKey: newSecret || '*********************',
+      accessToken: newAccessToken || '*********************',
+      accountTrading: accountTradingValue,
       createdAt: new Date().toISOString(),
       expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
       status: 'ACTIVE',
     };
     
     setApiKeys(prev => [...prev, newKey]);
-    setNewKeyName('');
+    resetFormFields();
     setIsAddKeyDialogOpen(false);
     
     toast.success('New API key added successfully');
@@ -396,32 +439,144 @@ const AccountProfile = () => {
 
       {/* Add API Key Dialog */}
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add New API Key</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Create API Key</DialogTitle>
             <DialogDescription>
-              Create a new API key for this account to enable connections.
+              Add a new API key to connect your account to external services.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-3">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label htmlFor="keyName">Key Name</Label>
-              <Input 
-                id="keyName" 
-                placeholder="Enter a name for this API key"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
-              />
+              <Label htmlFor="keyName" className="text-sm font-medium flex items-center">
+                API Key Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Select User Account (chọn sẵn account đang ở trong Profile)
+                </Label>
+                <Input 
+                  id="keyName" 
+                  placeholder="Enter api key name"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="clientId" className="text-sm font-medium flex items-center">
+                API Key Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Client ID
+                </Label>
+                <Input 
+                  id="clientId" 
+                  placeholder="Enter api key name"
+                  value={newClientId}
+                  onChange={(e) => setNewClientId(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="secret" className="text-sm font-medium flex items-center">
+                API Key Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Secret
+                </Label>
+                <Input 
+                  id="secret" 
+                  placeholder="Enter api key name"
+                  value={newSecret}
+                  onChange={(e) => setNewSecret(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="accessToken" className="text-sm font-medium flex items-center">
+                API Key Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Access Token
+                </Label>
+                <Input 
+                  id="accessToken" 
+                  placeholder="Enter api key name"
+                  value={newAccessToken}
+                  onChange={(e) => setNewAccessToken(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tradingAccount" className="text-sm font-medium flex items-center">
+                API Key Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Select Account Trading
+                </Label>
+                <Select 
+                  value={selectedTradingAccount} 
+                  onValueChange={setSelectedTradingAccount}
+                >
+                  <SelectTrigger className="w-full border-primary/30 focus-visible:ring-primary">
+                    <SelectValue placeholder="Select a trading account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockTradingAccounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        <div className="flex items-center space-x-2">
+                          <CircleDot 
+                            className={cn(
+                              "h-3 w-3",
+                              account.type === 'Live' ? "text-success" : "text-warning"
+                            )} 
+                            fill={account.type === 'Live' ? "#04ce91" : "#f59e0b"}
+                            strokeWidth={0}
+                          />
+                          <span>
+                            {account.id} - 
+                            <span className={account.type === 'Live' ? "text-success" : "text-warning"}>
+                              {account.type}
+                            </span> 
+                            - ${account.balance}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddKeyDialogOpen(false)}>
-              Cancel
+          <DialogFooter className="flex justify-between items-center gap-2 sm:gap-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAddKeyDialogOpen(false)}
+              className="flex-1 sm:flex-initial"
+            >
+              Close
             </Button>
-            <Button onClick={handleSaveNewKey} disabled={!newKeyName.trim()}>
-              Generate Key
+            <Button 
+              onClick={handleSaveNewKey} 
+              className="flex-1 sm:flex-initial bg-primary hover:bg-primary/90"
+              disabled={!newKeyName.trim() || !selectedTradingAccount}
+            >
+              Create API
             </Button>
           </DialogFooter>
         </DialogContent>
