@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Key, MoreHorizontal, Copy, RefreshCw, Eye, EyeOff, 
-  ChevronLeft, Plus, Pencil, Trash, Link2, Power
+  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,13 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
 // Mock data for API keys
@@ -140,175 +147,216 @@ const AccountProfile = () => {
     toast.success('Access token updated successfully');
   };
 
+  // Calculate days remaining until expiry
+  const daysRemaining = (expiryDate: string) => {
+    return Math.floor((new Date(expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <MainLayout title={accountName}>
-      <div className="mb-6">
+      <div className="mb-6 space-y-4">
         <Button 
           variant="ghost" 
           onClick={() => navigate('/accounts')}
-          className="mb-4"
+          className="mb-2"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Back to Accounts
         </Button>
         
-        <div className="flex items-center gap-4 mb-6">
-          <Avatar className="h-16 w-16 bg-blue-100 text-blue-600">
-            <AvatarFallback>
-              {accountName.split(' ').map(w => w[0]).join('').toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-2xl font-semibold">{accountName}</h2>
-            <p className="text-muted-foreground flex items-center">
-              <Key className="h-4 w-4 mr-1" />
-              API Keys and Connections
-            </p>
-          </div>
-        </div>
+        <Card className="border border-border/50 shadow-sm">
+          <CardHeader className="flex flex-row items-center space-y-0 gap-4 pb-2">
+            <Avatar className="h-16 w-16 bg-primary/10 text-primary">
+              <AvatarFallback>
+                {accountName.split(' ').map(w => w[0]).join('').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-2xl font-semibold">{accountName}</CardTitle>
+              <CardDescription className="flex items-center text-muted-foreground">
+                <Key className="h-4 w-4 mr-1" />
+                API Keys and Connections
+              </CardDescription>
+            </div>
+          </CardHeader>
+        </Card>
       </div>
       
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">API Keys</h3>
-          <Button onClick={handleAddKey}>
+          <h3 className="text-lg font-medium flex items-center">
+            <Key className="h-5 w-5 mr-2 text-primary" />
+            API Keys
+          </h3>
+          <Button onClick={handleAddKey} className="shadow-sm">
             <Plus className="h-4 w-4 mr-2" />
             Add API Key
           </Button>
         </div>
         
-        <div className="border rounded-lg overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">Name</TableHead>
-                <TableHead className="w-[150px]">Client ID</TableHead>
-                <TableHead className="w-[150px]">Secret</TableHead>
-                <TableHead className="w-[150px]">Access Token</TableHead>
-                <TableHead className="w-[150px]">Account Trading</TableHead>
-                <TableHead className="w-[150px]">Expiry Date</TableHead>
-                <TableHead className="w-[100px]">Status</TableHead>
-                <TableHead className="w-[80px] text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {apiKeys.map((key) => (
-                <TableRow key={key.id}>
-                  <TableCell className="font-medium">{key.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1 w-full">
-                      <span className="truncate max-w-[100px]">{key.clientId}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => copyToClipboard(key.clientId, 'Client ID')}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1 w-full">
-                      <span className="truncate max-w-[80px]">{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => toggleShowSecret(key.id)}
-                      >
-                        {showSecrets[key.id] ? 
-                          <EyeOff className="h-3.5 w-3.5" /> : 
-                          <Eye className="h-3.5 w-3.5" />
-                        }
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => copyToClipboard(showSecrets[key.id] ? '1234-5678-9012-3456' : 'Your secret key is hidden', 'Secret Key')}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1 w-full">
-                      <span className="truncate max-w-[80px]">{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => toggleShowSecret(key.id)}
-                      >
-                        {showSecrets[key.id] ? 
-                          <EyeOff className="h-3.5 w-3.5" /> : 
-                          <Eye className="h-3.5 w-3.5" />
-                        }
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => copyToClipboard(showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' : 'Your access token is hidden', 'Access Token')}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="whitespace-nowrap">{key.accountTrading}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="whitespace-nowrap text-sm text-orange-500">
-                      {new Date(key.expiryDate).toLocaleDateString()} ({Math.floor((new Date(key.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days)
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn(
-                      "text-xs font-medium",
-                      key.status === 'ACTIVE' 
-                        ? "bg-green-100 text-green-800 hover:bg-green-100" 
-                        : "bg-red-100 text-red-800 hover:bg-red-100"
-                    )}>
-                      {key.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleRegenerateKey(key.id)}>
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                          Regenerate Key
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
-                          <Power className="h-4 w-4 mr-2" />
-                          {key.status === 'ACTIVE' ? 'Disable' : 'Enable'}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleUpdateToken(key.id)}>
-                          <Link2 className="h-4 w-4 mr-2" />
-                          Update Access Token
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeleteKey(key.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+        <Card className="border-0 shadow-sm overflow-hidden">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="w-[120px] rounded-tl-lg">Name</TableHead>
+                  <TableHead className="w-[150px]">Client ID</TableHead>
+                  <TableHead className="w-[150px]">Secret</TableHead>
+                  <TableHead className="w-[150px]">Access Token</TableHead>
+                  <TableHead className="w-[150px]">Account Trading</TableHead>
+                  <TableHead className="w-[150px]">Expiry</TableHead>
+                  <TableHead className="w-[100px]">Status</TableHead>
+                  <TableHead className="w-[80px] text-right rounded-tr-lg">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {apiKeys.map((key) => (
+                  <TableRow key={key.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 rounded-full mr-2 bg-primary"></div>
+                        {key.name}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1 w-full">
+                        <span className="truncate max-w-[100px]">{key.clientId}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => copyToClipboard(key.clientId, 'Client ID')}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1 w-full">
+                        <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => toggleShowSecret(key.id)}
+                        >
+                          {showSecrets[key.id] ? 
+                            <EyeOff className="h-3.5 w-3.5" /> : 
+                            <Eye className="h-3.5 w-3.5" />
+                          }
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => copyToClipboard(showSecrets[key.id] ? '1234-5678-9012-3456' : 'Your secret key is hidden', 'Secret Key')}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1 w-full">
+                        <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => toggleShowSecret(key.id)}
+                        >
+                          {showSecrets[key.id] ? 
+                            <EyeOff className="h-3.5 w-3.5" /> : 
+                            <Eye className="h-3.5 w-3.5" />
+                          }
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => copyToClipboard(showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' : 'Your access token is hidden', 'Access Token')}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <div className={cn(
+                          "w-2 h-2 rounded-full", 
+                          key.accountTrading.includes('Live') ? "bg-success" : "bg-warning"
+                        )}></div>
+                        <span className="whitespace-nowrap font-mono text-xs">
+                          {key.accountTrading}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Clock className="h-3.5 w-3.5 mr-1.5 text-orange-500" />
+                        <span className="whitespace-nowrap text-xs">
+                          {new Date(key.expiryDate).toLocaleDateString()} 
+                          <span className={cn(
+                            "ml-1 px-1.5 py-0.5 rounded-full text-xs",
+                            daysRemaining(key.expiryDate) < 7 ? "bg-orange-100 text-orange-800" : "bg-green-100 text-green-800"
+                          )}>
+                            {daysRemaining(key.expiryDate)} days
+                          </span>
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        {key.status === 'ACTIVE' ? (
+                          <Shield className="h-3.5 w-3.5 mr-1.5 text-green-500" />
+                        ) : (
+                          <ShieldAlert className="h-3.5 w-3.5 mr-1.5 text-red-500" />
+                        )}
+                        <Badge className={cn(
+                          "text-xs font-medium px-2 py-0.5",
+                          key.status === 'ACTIVE' 
+                            ? "bg-green-100 text-green-800 hover:bg-green-100" 
+                            : "bg-red-100 text-red-800 hover:bg-red-100"
+                        )}>
+                          {key.status}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-primary/10">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleRegenerateKey(key.id)}>
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Regenerate Key
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
+                            <Power className="h-4 w-4 mr-2" />
+                            {key.status === 'ACTIVE' ? 'Disable' : 'Enable'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUpdateToken(key.id)}>
+                            <Link2 className="h-4 w-4 mr-2" />
+                            Update Access Token
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDeleteKey(key.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Add API Key Dialog */}
