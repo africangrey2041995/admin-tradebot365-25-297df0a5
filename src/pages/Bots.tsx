@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import {
   Pagination,
   PaginationContent,
@@ -26,7 +25,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Bot } from '@/types';
 
@@ -34,9 +32,6 @@ interface BotCardProps {
   title: string;
   subtitle?: string;
   botId: string;
-  deadline: string;
-  progress: number;
-  status: string;
   accountCount?: string;
   lastUpdated?: string;
   onFavorite?: () => void;
@@ -49,9 +44,6 @@ const BotCard = ({
   title,
   subtitle,
   botId,
-  deadline,
-  progress,
-  status,
   accountCount,
   lastUpdated,
   onFavorite,
@@ -66,12 +58,6 @@ const BotCard = ({
     green: 'bg-green-50 border-green-100',
     purple: 'bg-purple-50 border-purple-100',
     default: 'bg-white border-slate-200'
-  };
-  
-  const statusColors = {
-    'In Progress': 'bg-yellow-100 text-yellow-800',
-    'Completed': 'bg-green-100 text-green-800',
-    'Pending': 'bg-blue-100 text-blue-800',
   };
   
   return (
@@ -107,32 +93,11 @@ const BotCard = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 my-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Status</p>
-          <Badge className={`mt-1 ${statusColors[status as keyof typeof statusColors] || 'bg-slate-100 text-slate-800'}`}>
-            {status}
-          </Badge>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Deadline</p>
-          <p className="mt-1 text-sm font-medium">{deadline}</p>
-        </div>
-      </div>
-      
       <div className="flex items-center mb-4 border-t border-b py-2 border-slate-200">
         <div className="flex-1">
           <p className="text-sm font-medium">ID</p>
         </div>
         <div className="text-sm font-medium">{botId}</div>
-      </div>
-      
-      <div className="space-y-2 mb-4">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Progress</span>
-          <span className="text-sm font-medium">{progress}%</span>
-        </div>
-        <Progress value={progress} className="h-2" />
       </div>
       
       <div className="flex justify-between items-center pt-2">
@@ -171,9 +136,6 @@ const Bots = () => {
       title: 'Ultra 2in1',
       subtitle: 'Bot for combined strategy trading with dual market analysis',
       botId: 'BOT7459',
-      deadline: '18 Sep, 2023',
-      progress: 50,
-      status: 'In Progress',
       accountCount: '18/42',
       lastUpdated: '10 Jul, 2023',
       colorScheme: 'red'
@@ -182,9 +144,6 @@ const Bots = () => {
       title: 'Long Master',
       subtitle: 'Specialized in long-term position trading strategies',
       botId: 'BOT8932',
-      deadline: '10 Jun, 2023',
-      progress: 95,
-      status: 'Completed',
       accountCount: '22/56',
       lastUpdated: '18 May, 2023',
       colorScheme: 'blue'
@@ -193,9 +152,6 @@ const Bots = () => {
       title: 'Gold Trading',
       subtitle: 'Precious metals focused algorithmic trading system',
       botId: 'BOT2734',
-      deadline: '08 Apr, 2023',
-      progress: 41,
-      status: 'In Progress',
       accountCount: '14/20',
       lastUpdated: '21 Feb, 2023',
       colorScheme: 'green'
@@ -204,9 +160,6 @@ const Bots = () => {
       title: 'Bitcoin Trading',
       subtitle: 'Cryptocurrency trading bot with focus on Bitcoin markets',
       botId: 'BOT5128',
-      deadline: '22 Nov, 2023',
-      progress: 35,
-      status: 'In Progress',
       accountCount: '20/34',
       lastUpdated: '03 Aug, 2023',
       colorScheme: 'purple'
@@ -215,9 +168,6 @@ const Bots = () => {
       title: 'Forex Master',
       subtitle: 'Multi-currency trading system for forex markets',
       botId: 'BOT1267',
-      deadline: '10 Jun, 2023',
-      progress: 95,
-      status: 'Completed',
       accountCount: '15/25',
       lastUpdated: '15 May, 2023',
     },
@@ -225,9 +175,6 @@ const Bots = () => {
       title: 'Scalping Pro',
       subtitle: 'High-frequency short term trading bot',
       botId: 'BOT9381',
-      deadline: '08 Apr, 2023',
-      progress: 41,
-      status: 'In Progress',
       accountCount: '8/12',
       lastUpdated: '21 Feb, 2023',
     },
@@ -235,9 +182,6 @@ const Bots = () => {
       title: 'Swing Trader',
       subtitle: 'Medium-term market swing analyzer and trader',
       botId: 'BOT6452',
-      deadline: '22 Nov, 2023',
-      progress: 35,
-      status: 'In Progress',
       accountCount: '12/20',
       lastUpdated: '05 Aug, 2023',
     },
@@ -245,9 +189,6 @@ const Bots = () => {
       title: 'ETF Strategy',
       subtitle: 'Diversified ETF portfolio management system',
       botId: 'BOT3815',
-      deadline: '18 Sep, 2023',
-      progress: 50,
-      status: 'In Progress',
       accountCount: '10/15',
       lastUpdated: '10 Jul, 2023',
     },
@@ -286,7 +227,6 @@ const Bots = () => {
               <Bookmark className="h-4 w-4 mr-2" />
               BOT LIST
             </Button>
-            <h2 className="text-xl font-bold text-primary">BOT Trading</h2>
           </div>
           
           <div className="flex items-center space-x-3">
