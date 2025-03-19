@@ -4,10 +4,17 @@ import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import { ArrowRight, MailIcon, KeyIcon, Loader2 } from 'lucide-react';
+import { 
+  ArrowRight, 
+  MailIcon, 
+  KeyIcon, 
+  Loader2,
+  CheckCircle2
+} from 'lucide-react';
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -61,7 +68,7 @@ const SignIn = () => {
       setIsGoogleLoading(true);
       await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
-        redirectUrl: "/sso-callback",
+        redirectUrl: "/",
         redirectUrlComplete: "/",
       });
     } catch (err: any) {
@@ -75,40 +82,51 @@ const SignIn = () => {
   };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
+    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
       <div className="absolute top-8 left-8">
-        <img 
-          src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
-          alt="Trade Bot 365 Logo" 
-          className="h-12 w-auto object-contain" 
-        />
+        <Link to="/">
+          <img 
+            src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
+            alt="Trade Bot 365 Logo" 
+            className="h-16 w-auto object-contain" 
+          />
+        </Link>
+      </div>
+      
+      <div className="absolute top-8 right-8">
+        <Link to="/sign-up">
+          <Button variant="outline" className="border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white">
+            Đăng ký
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
       </div>
       
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="border-zinc-800 bg-zinc-950/60 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl text-white">Đăng Nhập</CardTitle>
-            <CardDescription>
-              Đăng nhập vào tài khoản để truy cập hệ thống quản lý bot giao dịch
+        <Card className="border-zinc-700 bg-zinc-900/80 backdrop-blur-lg shadow-xl">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-white">Đăng Nhập</CardTitle>
+            <CardDescription className="text-zinc-400">
+              Đăng nhập để truy cập hệ thống quản lý bot giao dịch
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="mb-4">
+          <CardContent className="space-y-4">
+            <div className="flex flex-col space-y-3">
               <Button 
                 variant="outline" 
-                className="w-full font-medium border-zinc-700 hover:bg-zinc-800"
+                className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
                 onClick={handleSignInWithGoogle}
                 disabled={isGoogleLoading}
               >
                 {isGoogleLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                  <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                       fill="#4285F4"
@@ -131,12 +149,12 @@ const SignIn = () => {
               </Button>
             </div>
             
-            <div className="relative my-6">
+            <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-zinc-700" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-zinc-950 px-2 text-zinc-500">
+                <span className="bg-zinc-900 px-2 text-zinc-500">
                   Hoặc đăng nhập với
                 </span>
               </div>
@@ -144,28 +162,47 @@ const SignIn = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="email" className="text-zinc-400">Email</Label>
                 <div className="relative">
                   <MailIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                   <Input
+                    id="email"
                     type="email"
-                    placeholder="Email"
+                    placeholder="your@email.com"
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
-                    className="pl-10 border-zinc-700 bg-zinc-900 text-white"
+                    className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
                     required
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-zinc-400">Mật khẩu</Label>
+                  <Link 
+                    to="#" 
+                    className="text-xs text-tradebot hover:underline"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast({
+                        title: "Chức năng đang phát triển",
+                        description: "Tính năng quên mật khẩu đang được phát triển"
+                      });
+                    }}
+                  >
+                    Quên mật khẩu?
+                  </Link>
+                </div>
                 <div className="relative">
                   <KeyIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                   <Input
+                    id="password"
                     type="password"
-                    placeholder="Mật khẩu"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 border-zinc-700 bg-zinc-900 text-white"
+                    className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
                     required
                   />
                 </div>
@@ -173,6 +210,7 @@ const SignIn = () => {
               
               <Button
                 type="submit"
+                variant="tradebot"
                 className="w-full"
                 disabled={isLoading}
               >
@@ -190,13 +228,17 @@ const SignIn = () => {
           <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800 pt-4">
             <p className="text-center text-sm text-zinc-500">
               Chưa có tài khoản?{" "}
-              <Link to="/sign-up" className="text-primary hover:underline">
+              <Link to="/sign-up" className="text-tradebot hover:underline">
                 Đăng ký ngay
               </Link>
             </p>
           </CardFooter>
         </Card>
       </motion.div>
+      
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-zinc-500 text-xs">
+        © 2024 Trade Bot 365. All rights reserved.
+      </div>
     </div>
   );
 };
