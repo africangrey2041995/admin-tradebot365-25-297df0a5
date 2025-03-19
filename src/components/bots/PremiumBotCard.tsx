@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
@@ -19,6 +20,9 @@ interface PremiumBotCardProps {
   subscribers: number;
   imageUrl: string | null;
   colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
+  isIntegrated?: boolean;
+  accountCount?: string;
+  botId?: string;
 }
 
 export const PremiumBotCard = ({
@@ -34,6 +38,9 @@ export const PremiumBotCard = ({
   subscribers,
   imageUrl,
   colorScheme = 'default',
+  isIntegrated = false,
+  accountCount,
+  botId,
 }: PremiumBotCardProps) => {
   const navigate = useNavigate();
 
@@ -148,6 +155,12 @@ export const PremiumBotCard = ({
                 <span className="text-xs text-slate-500">{exchange}</span>
                 <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
                 <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
+                {botId && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                    <span className="text-xs text-slate-500">{botId}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -189,21 +202,40 @@ export const PremiumBotCard = ({
             <span className="text-[10px]">Vốn tối thiểu:</span>
             <span className="text-xs font-semibold">{minCapital}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-            <span className="text-xs font-semibold">{subscribers}</span>
-          </div>
+          {isIntegrated && accountCount ? (
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px]">Tài khoản:</span>
+              <span className="text-xs font-semibold">{accountCount}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-xs font-semibold">{subscribers}</span>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="p-3 pt-0 gap-1 flex-col">
-        <Button 
-          variant="default" 
-          size="sm"
-          className="w-full text-xs h-8" 
-          onClick={handleSubscribe}
-        >
-          Đăng Ký Sử Dụng
-        </Button>
+        {isIntegrated ? (
+          <Button 
+            variant="default" 
+            size="sm"
+            className="w-full text-xs h-8" 
+            onClick={() => navigate(`/premium-bots/${id}`)}
+          >
+            Quản Lý Bot
+          </Button>
+        ) : (
+          <Button 
+            variant="default" 
+            size="sm"
+            className="w-full text-xs h-8" 
+            onClick={handleSubscribe}
+          >
+            Đăng Ký Sử Dụng
+          </Button>
+        )}
         <Button 
           variant="outline" 
           size="sm"

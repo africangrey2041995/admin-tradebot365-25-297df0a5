@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Filter, Refresh, Plus } from 'lucide-react';
+import { ArrowLeft, Filter, RefreshCw, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PremiumBotCard } from '@/components/bots/PremiumBotCard';
 import { Input } from '@/components/ui/input';
@@ -16,7 +15,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { PremiumBot } from '@/types';
 
-// Mocking integrated premium bots data
 const integratedPremiumBots: PremiumBot[] = [
   {
     id: 'pb-001',
@@ -87,7 +85,6 @@ const IntegratedPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [riskFilter, setRiskFilter] = useState('all');
 
-  // Filter bots based on search term and risk level
   const filteredBots = integratedPremiumBots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         bot.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -143,7 +140,7 @@ const IntegratedPremiumBots = () => {
               onClick={() => {}} 
               className="inline-flex items-center"
             >
-              <Refresh className="mr-2 h-4 w-4" />
+              <RefreshCw className="mr-2 h-4 w-4" />
               <span>Refresh</span>
             </Button>
           </div>
@@ -195,7 +192,6 @@ const IntegratedPremiumBots = () => {
                   subscribers={bot.subscribers}
                   imageUrl={bot.imageUrl}
                   colorScheme={bot.colorScheme}
-                  isIntegrated={true}
                   accountCount={bot.accounts?.length.toString() || "0"}
                   botId={bot.botId}
                 />
