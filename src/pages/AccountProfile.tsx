@@ -504,7 +504,7 @@ const AccountProfile = () => {
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Create API Key</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Add API Key</DialogTitle>
             <DialogDescription>
               Add a new API key to connect your account to external services.
             </DialogDescription>
