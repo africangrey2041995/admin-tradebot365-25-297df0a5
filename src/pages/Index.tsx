@@ -1,10 +1,9 @@
-
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, Link2, Radio, TrendingUp, BarChart3, Wallet, DollarSign } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Wallet, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Index = () => {
@@ -18,8 +17,6 @@ const Index = () => {
     connectedAccounts: 8,
     disconnectedAccounts: 3,
     pendingAccounts: 1,
-    tradingViewSignals: 24,
-    processedSignals: 22,
     totalRevenue: '$18,426.96',
     todaySignals: 8,
     weeklyGrowth: '16.24%',
@@ -100,7 +97,7 @@ const Index = () => {
             <DashboardCard 
               title="Tổng Lệnh" 
               description="Tháng này"
-              onClick={() => navigate('/connections')}
+              onClick={() => navigate('/accounts')}
               icon={<BarChart3 className="h-5 w-5" />}
               color="warning"
             >
@@ -124,8 +121,8 @@ const Index = () => {
             <DashboardCard 
               title="Tín Hiệu Mới" 
               description="Hôm nay"
-              onClick={() => navigate('/signals')}
-              icon={<Radio className="h-5 w-5" />}
+              onClick={() => navigate('/accounts')}
+              icon={<BarChart3 className="h-5 w-5" />}
               color="info"
             >
               <div className="mt-4">

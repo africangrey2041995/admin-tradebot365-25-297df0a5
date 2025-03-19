@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CircuitBoard, Users, Link2, Radio, Settings, Menu, X, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, CircuitBoard, Users, Menu, X, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,16 +21,6 @@ const routes = [
     path: '/accounts',
     label: 'Tài Khoản',
     icon: <Users className="h-5 w-5" />
-  },
-  {
-    path: '/connections',
-    label: 'Kết Nối',
-    icon: <Link2 className="h-5 w-5" />
-  },
-  {
-    path: '/signals',
-    label: 'Nhật Ký Tín Hiệu',
-    icon: <Radio className="h-5 w-5" />
   }
 ];
 

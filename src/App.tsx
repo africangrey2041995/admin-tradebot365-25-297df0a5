@@ -10,8 +10,6 @@ import Bots from "./pages/Bots";
 import BotProfile from "./pages/BotProfile";
 import Accounts from "./pages/Accounts";
 import AccountProfile from "./pages/AccountProfile";
-import Connections from "./pages/Connections";
-import Signals from "./pages/Signals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,8 +27,6 @@ const App = () => (
             <Route path="/bots/:botId" element={<BotProfile />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/accounts/:accountId" element={<AccountProfile />} />
-            <Route path="/connections" element={<Connections />} />
-            <Route path="/signals" element={<Signals />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
