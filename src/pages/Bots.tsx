@@ -67,97 +67,112 @@ const BotCard = ({
 }: BotCardProps) => {
   
   const colorClasses = {
-    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200',
-    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
-    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
-    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
-    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
+    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-red-100/20',
+    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-blue-100/20',
+    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-green-100/20',
+    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-purple-100/20',
+    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-slate-100/20'
   };
   
   const avatarBgColors = {
-    red: 'bg-red-100',
-    blue: 'bg-blue-100',
-    green: 'bg-green-100',
-    purple: 'bg-purple-100',
-    default: 'bg-slate-100'
+    red: 'bg-red-100 text-red-600',
+    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 text-green-600',
+    purple: 'bg-purple-100 text-purple-600',
+    default: 'bg-slate-100 text-slate-600'
+  };
+
+  const buttonBgColors = {
+    red: 'bg-white/70 hover:bg-white text-red-600 border-red-200',
+    blue: 'bg-white/70 hover:bg-white text-blue-600 border-blue-200',
+    green: 'bg-white/70 hover:bg-white text-green-600 border-green-200',
+    purple: 'bg-white/70 hover:bg-white text-purple-600 border-purple-200',
+    default: 'bg-white/70 hover:bg-white text-slate-600 border-slate-200'
   };
   
   return (
-    <div className={`relative rounded-lg border shadow-sm p-5 transition-all duration-200 hover:shadow-md ${colorClasses[colorScheme]}`}>
-      <div className="flex justify-between items-start mb-4">
+    <div className={`relative rounded-xl border shadow p-5 transition-all duration-300 hover:shadow-lg ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
+      <div className="flex justify-between items-start mb-5">
         <div className="flex items-center">
-          <Avatar className={`mr-3 h-12 w-12 ${avatarBgColors[colorScheme]} border border-slate-200 shadow-sm`}>
+          <Avatar className={`mr-4 h-14 w-14 ${avatarBgColors[colorScheme]} border-2 border-white shadow-md`}>
             {avatarSrc ? (
               <AvatarImage src={avatarSrc} alt={title} />
             ) : (
-              <AvatarFallback className="text-slate-500">
+              <AvatarFallback>
                 {avatarIcon || <Bot className="h-6 w-6" />}
               </AvatarFallback>
             )}
           </Avatar>
           <div>
-            <h3 className="font-semibold text-lg">{title}</h3>
-            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+            <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
+            {subtitle && <p className="text-sm text-muted-foreground mt-1.5 leading-snug max-w-xs">{subtitle}</p>}
           </div>
         </div>
         <div className="flex space-x-2">
           <button 
             onClick={onFavorite}
-            className="text-yellow-400 hover:text-yellow-500 transition-colors"
+            className="text-yellow-400 hover:text-yellow-500 transition-colors bg-white/60 hover:bg-white p-1.5 rounded-full"
           >
             <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="text-muted-foreground hover:text-foreground transition-colors">
+              <button className="text-muted-foreground hover:text-foreground transition-colors bg-white/60 hover:bg-white p-1.5 rounded-full">
                 <MoreHorizontal className="h-5 w-5" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Chỉnh Sửa Bot</DropdownMenuItem>
-              <DropdownMenuItem>Xem Chi Tiết</DropdownMenuItem>
-              <DropdownMenuItem>Thêm Tài Khoản</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <Eye className="h-4 w-4 mr-2" />
+                Xem Chi Tiết
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <Plus className="h-4 w-4 mr-2" />
+                Thêm Tài Khoản
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">Xoá Bot</DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive cursor-pointer">
+                Xoá Bot
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
       
-      <div className="flex items-center justify-between mb-4 border-t border-b py-2.5 border-slate-200/70">
+      <div className="flex items-center justify-between py-3 px-4 mb-5 rounded-lg bg-white/50 backdrop-blur-sm border border-slate-200/70">
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-2 text-muted-foreground">ID</p>
-          <div className="text-sm font-medium">{botId}</div>
+          <p className="text-sm font-medium mr-2 text-slate-500">ID:</p>
+          <div className="text-sm font-bold tracking-wide text-slate-700">{botId}</div>
         </div>
         
         {lastUpdated && (
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3 mr-1" />
+          <div className="flex items-center text-xs font-medium text-slate-500">
+            <Calendar className="h-3 w-3 mr-1.5" />
             {lastUpdated}
           </div>
         )}
       </div>
       
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-4 py-3 rounded-lg bg-white/50 backdrop-blur-sm border border-slate-200/70 mb-5">
         <div className="flex items-center">
-          <p className="text-sm text-muted-foreground mr-2">Accounts: </p>
-          <div className="text-sm font-medium mr-3">{accountCount}</div>
+          <p className="text-sm text-slate-500 mr-2">Accounts: </p>
+          <div className="text-sm font-bold mr-3 text-slate-700">{accountCount}</div>
           <button 
             onClick={onAddAccount}
-            className="h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors"
+            className="h-7 w-7 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600 shadow-sm"
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
       
-      <div className="mt-4 pt-3 border-t border-slate-200/70">
+      <div className="mt-auto">
         <Button 
           variant="outline" 
           onClick={onViewBot} 
-          className="w-full bg-white hover:bg-slate-50 transition-colors"
+          className={`w-full py-5 ${buttonBgColors[colorScheme]} shadow-sm font-medium`}
         >
           <Eye className="h-4 w-4 mr-2" />
           View Bot
@@ -289,32 +304,32 @@ const Bots = () => {
   return (
     <MainLayout title="Quản Lý Bot">
       <div className="flex flex-col">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <div className="flex items-center">
-            <Button variant="outline" className="mr-2 border-slate-300 shadow-sm">
+            <Button variant="outline" className="mr-2 border-slate-300 shadow-sm font-semibold">
               <Bookmark className="h-4 w-4 mr-2" />
               BOT LIST
             </Button>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="relative w-64">
+          <div className="flex items-center space-x-4">
+            <div className="relative w-72">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search..." 
-                className="pl-10 border-slate-300"
+                className="pl-10 border-slate-300 shadow-sm focus:ring-2 focus:ring-slate-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button onClick={handleAddBot} className="shadow-sm">
+            <Button onClick={handleAddBot} className="shadow-sm font-medium px-5">
               <Plus className="h-4 w-4 mr-2" />
               Add New BOT
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
           {filteredBots.map((bot, index) => (
             <BotCard 
               key={index} 
@@ -327,19 +342,19 @@ const Bots = () => {
           ))}
         </div>
 
-        <div className="mt-8">
+        <div className="mt-10 flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationLink href="#" isActive>
+                <PaginationLink href="#" isActive className="bg-primary text-white font-medium">
                   1
                 </PaginationLink>
               </PaginationItem>
               <PaginationItem>
-                <PaginationLink href="#">2</PaginationLink>
+                <PaginationLink href="#" className="font-medium">2</PaginationLink>
               </PaginationItem>
               <PaginationItem>
-                <PaginationLink href="#">3</PaginationLink>
+                <PaginationLink href="#" className="font-medium">3</PaginationLink>
               </PaginationItem>
             </PaginationContent>
           </Pagination>
