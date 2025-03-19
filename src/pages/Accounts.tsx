@@ -27,6 +27,7 @@ const Accounts = () => {
 
   const mockAccounts: Account[] = [
     {
+      id: 'acc001', // Added the required id property
       clientId: 'client123',
       secretId: 'secret123',
       accessToken: 'token123',
@@ -38,6 +39,7 @@ const Accounts = () => {
       expireDate: '2024-06-20T14:45:00Z',
     },
     {
+      id: 'acc002', // Added the required id property
       clientId: 'client456',
       secretId: 'secret456',
       accessToken: 'token456',
@@ -49,6 +51,7 @@ const Accounts = () => {
       expireDate: '2024-06-22T11:20:00Z',
     },
     {
+      id: 'acc003', // Added the required id property
       clientId: 'client789',
       secretId: 'secret789',
       accessToken: 'token789',
