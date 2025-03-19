@@ -46,13 +46,11 @@ const SidebarNav = () => {
   return (
     <Sidebar>
       <SidebarContent>
-        <div className="flex justify-center pt-4 pb-2">
-          <img 
-            src="/lovable-uploads/9f331074-6636-4b62-80b0-4718b1f3628f.png" 
-            alt="Trade Bot 365" 
-            className="h-12 w-auto" 
-          />
-        </div>
+        <img 
+          src="/lovable-uploads/9f331074-6636-4b62-80b0-4718b1f3628f.png" 
+          alt="Trade Bot 365" 
+          className="h-12 w-auto mx-auto my-4" 
+        />
         
         <SidebarGroup>
           <SidebarGroupLabel>Tổng Quan</SidebarGroupLabel>
