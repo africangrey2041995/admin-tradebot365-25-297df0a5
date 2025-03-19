@@ -94,6 +94,10 @@ const IntegratedPremiumBots = () => {
     return matchesSearch && matchesRisk;
   });
 
+  const handleBotClick = (botId: string) => {
+    navigate(`/integrated-premium-bots/${botId}`);
+  };
+
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
@@ -179,6 +183,8 @@ const IntegratedPremiumBots = () => {
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
+                onClick={() => handleBotClick(bot.id)}
+                className="cursor-pointer"
               >
                 <PremiumBotCard 
                   id={bot.id}
