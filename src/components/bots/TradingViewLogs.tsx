@@ -27,7 +27,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '100%',
+            amount: '1.5',
             status: 'Processed',
           },
           {
@@ -38,7 +38,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '50%',
+            amount: '2.3',
             status: 'Processed',
           },
           {
@@ -49,7 +49,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '25%',
+            amount: '3.7',
             status: 'Failed',
             errorMessage: 'Invalid account configuration',
           },
