@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -93,7 +92,7 @@ const BotProfile = () => {
     toast.success(`${type} copied to clipboard`);
   };
 
-  // To render the correct avatar icon
+  // Fixed getBotIcon function that doesn't try to access type property on ReactNode
   const getBotIcon = (iconName: string = 'bot') => {
     switch (iconName) {
       case 'bot': return <Bot className="h-7 w-7" />;
@@ -171,7 +170,7 @@ const BotProfile = () => {
                 <div className="flex flex-col items-center mb-6">
                   <Avatar className={`h-24 w-24 mb-4 ${colorClasses[bot.colorScheme as keyof typeof colorClasses]} border-2 border-white shadow-sm`}>
                     <AvatarFallback className="text-2xl">
-                      {getBotIcon(bot.avatarIcon?.type?.name?.toLowerCase() || 'bot')}
+                      {getBotIcon('bot')}
                     </AvatarFallback>
                   </Avatar>
                   <h2 className="text-2xl font-bold text-center">{bot.title}</h2>
