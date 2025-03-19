@@ -74,7 +74,7 @@ const SidebarNav = () => {
         <img 
           src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
           alt="Trade Bot 365" 
-          className="h-12 w-auto mx-auto my-4" 
+          className="h-16 w-auto mx-auto my-4" 
         />
         
         <SidebarSeparator />
