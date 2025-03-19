@@ -80,23 +80,23 @@ const botIcons = [
 ];
 
 const exchanges = [
-  { name: 'Binance', value: 'binance' },
-  { name: 'Coinbase', value: 'coinbase' },
-  { name: 'Kraken', value: 'kraken' },
-  { name: 'Bybit', value: 'bybit' },
-  { name: 'KuCoin', value: 'kucoin' },
-  { name: 'OKX', value: 'okx' },
-  { name: 'Coinstart Pro', value: 'coinstart_pro' },
+  { name: 'Binance', value: 'binance', disabled: true },
+  { name: 'Coinbase', value: 'coinbase', disabled: true },
+  { name: 'Kraken', value: 'kraken', disabled: true },
+  { name: 'Bybit', value: 'bybit', disabled: true },
+  { name: 'KuCoin', value: 'kucoin', disabled: true },
+  { name: 'OKX', value: 'okx', disabled: true },
+  { name: 'Coinstart Pro', value: 'coinstart_pro', disabled: false },
 ];
 
 const botForms = [
-  { name: 'Technical Analysis', value: 'technical' },
-  { name: 'Grid Trading', value: 'grid' },
-  { name: 'DCA (Dollar-Cost Averaging)', value: 'dca' },
-  { name: 'Market Making', value: 'market_making' },
-  { name: 'Arbitrage', value: 'arbitrage' },
-  { name: 'Sentiment Analysis', value: 'sentiment' },
-  { name: 'Trading View', value: 'trading_view' },
+  { name: 'Technical Analysis', value: 'technical', disabled: true },
+  { name: 'Grid Trading', value: 'grid', disabled: true },
+  { name: 'DCA (Dollar-Cost Averaging)', value: 'dca', disabled: true },
+  { name: 'Market Making', value: 'market_making', disabled: true },
+  { name: 'Arbitrage', value: 'arbitrage', disabled: true },
+  { name: 'Sentiment Analysis', value: 'sentiment', disabled: true },
+  { name: 'Trading View', value: 'trading_view', disabled: false },
 ];
 
 const getBotIcon = (iconName: string) => {
@@ -177,12 +177,20 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                       </FormControl>
                       <SelectContent>
                         {exchanges.map((exchange) => (
-                          <SelectItem key={exchange.value} value={exchange.value}>
+                          <SelectItem 
+                            key={exchange.value} 
+                            value={exchange.value} 
+                            disabled={exchange.disabled}
+                            className={exchange.disabled ? "text-muted-foreground cursor-not-allowed" : ""}
+                          >
                             {exchange.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription>
+                      Only Coinstart Pro is available in this version.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -202,12 +210,20 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                       </FormControl>
                       <SelectContent>
                         {botForms.map((form) => (
-                          <SelectItem key={form.value} value={form.value}>
+                          <SelectItem 
+                            key={form.value} 
+                            value={form.value}
+                            disabled={form.disabled}
+                            className={form.disabled ? "text-muted-foreground cursor-not-allowed" : ""}
+                          >
                             {form.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription>
+                      Only Trading View is available in this version.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
