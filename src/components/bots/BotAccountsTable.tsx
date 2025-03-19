@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, TrashIcon } from 'lucide-react';
+import { Eye, Trash2, PencilIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Account, ConnectionStatus } from '@/types';
 
@@ -23,37 +23,43 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
       setTimeout(() => {
         const mockAccounts: Account[] = [
           {
-            clientId: 'CL001',
-            secretId: 'SE001',
-            accessToken: 'TOKEN001',
-            ctidTraderAccountId: 'CTID001',
-            name: 'Main Trading Account',
+            id: '1',
+            userAccount: 'Tài Khoản 1',
+            userEmail: 'dbtcompany17@gmail.com',
+            apiName: 'API 1',
+            apiId: 'API001',
+            tradingAccount: '4056629',
+            tradingAccountType: 'Live',
+            tradingAccountBalance: '$500',
             status: 'Connected',
             createdDate: new Date(2023, 5, 15).toISOString(),
             lastUpdated: new Date(2023, 11, 20).toISOString(),
-            expireDate: new Date(2024, 11, 20).toISOString(),
           },
           {
-            clientId: 'CL002',
-            secretId: 'SE002',
-            accessToken: 'TOKEN002',
-            ctidTraderAccountId: 'CTID002',
-            name: 'Bitcoin Trading',
+            id: '2',
+            userAccount: 'Tài Khoản 1',
+            userEmail: 'dbtcompany17@gmail.com',
+            apiName: 'API 1',
+            apiId: 'API001',
+            tradingAccount: '4056789',
+            tradingAccountType: 'Live',
+            tradingAccountBalance: '$1000',
             status: 'Connected',
             createdDate: new Date(2023, 6, 22).toISOString(),
             lastUpdated: new Date(2023, 10, 5).toISOString(),
-            expireDate: new Date(2024, 10, 5).toISOString(),
           },
           {
-            clientId: 'CL003',
-            secretId: 'SE003',
-            accessToken: 'TOKEN003',
-            ctidTraderAccountId: 'CTID003',
-            name: 'Altcoins Portfolio',
+            id: '3',
+            userAccount: 'Tài Khoản 1',
+            userEmail: 'dbtcompany17@gmail.com',
+            apiName: 'API 1',
+            apiId: 'API001',
+            tradingAccount: '4044856',
+            tradingAccountType: 'Demo',
+            tradingAccountBalance: '$10000',
             status: 'Disconnected',
             createdDate: new Date(2023, 7, 10).toISOString(),
             lastUpdated: new Date(2023, 9, 18).toISOString(),
-            expireDate: new Date(2024, 9, 18).toISOString(),
           },
         ];
         setAccounts(mockAccounts);
@@ -98,25 +104,28 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Account Name</TableHead>
-          <TableHead>CTID</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Updated</TableHead>
+          <TableHead>Account Profile</TableHead>
+          <TableHead>Api</TableHead>
+          <TableHead>Account Trading</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {accounts.map((account) => (
-          <TableRow key={account.ctidTraderAccountId}>
-            <TableCell className="font-medium">{account.name}</TableCell>
-            <TableCell>{account.ctidTraderAccountId}</TableCell>
-            <TableCell>{getStatusBadge(account.status)}</TableCell>
+          <TableRow key={account.id}>
             <TableCell>
-              {new Date(account.lastUpdated).toLocaleDateString('en-US', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-              })}
+              <div>
+                <div className="font-medium">{account.userAccount}</div>
+                <div className="text-xs text-muted-foreground">{account.userEmail}</div>
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="font-medium">{account.apiName}</div>
+            </TableCell>
+            <TableCell>
+              <div className="font-medium">
+                {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
+              </div>
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
@@ -124,16 +133,23 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
                   size="sm" 
                   variant="ghost" 
                   className="h-8 w-8 p-0"
-                  onClick={() => handleViewAccount(account.ctidTraderAccountId)}
+                  onClick={() => handleViewAccount(account.id)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 
                   variant="ghost" 
+                  className="h-8 w-8 p-0"
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
                   className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
-                  <TrashIcon className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </TableCell>

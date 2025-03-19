@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -16,7 +17,8 @@ import {
   Trash,
   RefreshCw,
   Power,
-  Info
+  Info,
+  Plus
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -34,12 +36,15 @@ import { toast } from 'sonner';
 import { BotCardProps } from '@/components/bots/BotCard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
+import TradingViewLogs from '@/components/bots/TradingViewLogs';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 
 const BotProfile = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
   // Mock webhook and token data
   const [webhookUrl] = useState(`https://api.coinstart.pro/webhook/${botId?.toLowerCase()}`);
@@ -108,6 +113,12 @@ const BotProfile = () => {
     green: 'bg-green-100 text-green-600',
     purple: 'bg-purple-100 text-purple-600',
     default: 'bg-slate-100 text-slate-600'
+  };
+
+  const handleAddAccount = (accountData: any) => {
+    // In a real app, this would be an API call to add the account
+    console.log('Adding account:', accountData, 'to bot:', botId);
+    toast.success('Account added successfully!');
   };
 
   if (isLoading) {
@@ -300,7 +311,10 @@ const BotProfile = () => {
                   <div className="bg-amber-50 border border-amber-200 p-4 rounded-md">
                     <h4 className="font-medium text-amber-800 mb-2">Example TradingView Alert Message</h4>
                     <pre className="bg-white border border-amber-100 p-3 rounded text-xs overflow-auto text-slate-700">
-{`{
+{`{{strategy.order.alert_message}}
+
+Example format:
+{
   "token": "${signalToken}",
   "action": "ENTER_LONG",
   "instrument": "BTCUSDT",
@@ -318,6 +332,7 @@ const BotProfile = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
             <TabsTrigger value="signals">Signal History</TabsTrigger>
+            <TabsTrigger value="logs">Logs From Trading View</TabsTrigger>
           </TabsList>
           
           <TabsContent value="accounts">
@@ -328,7 +343,13 @@ const BotProfile = () => {
                     <CardTitle>Connected Accounts</CardTitle>
                     <CardDescription>Manage accounts connected to this bot</CardDescription>
                   </div>
-                  <Button className="bg-primary hover:bg-primary/90">Add Account</Button>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={() => setIsAddAccountDialogOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Account
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -398,8 +419,32 @@ const BotProfile = () => {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          <TabsContent value="logs">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Logs From Trading View</CardTitle>
+                    <CardDescription>Recent webhook messages received from TradingView</CardDescription>
+                  </div>
+                  <Button variant="outline">Refresh</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <TradingViewLogs botId={bot.botId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
+      
+      <AddAccountDialog 
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={bot.botId}
+        onAddAccount={handleAddAccount}
+      />
     </MainLayout>
   );
 };

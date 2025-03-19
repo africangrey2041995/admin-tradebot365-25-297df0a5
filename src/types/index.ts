@@ -10,15 +10,23 @@ export interface Bot {
 }
 
 export interface Account {
-  clientId: string;
-  secretId: string;
-  accessToken: string;
-  ctidTraderAccountId: string;
-  name: string;
+  id: string;
+  clientId?: string;
+  secretId?: string;
+  accessToken?: string;
+  ctidTraderAccountId?: string;
+  userAccount?: string;
+  userEmail?: string;
+  apiName?: string;
+  apiId?: string;
+  tradingAccount?: string;
+  tradingAccountType?: string;
+  tradingAccountBalance?: string;
+  name?: string;
   status: ConnectionStatus;
   createdDate: string;
   lastUpdated: string;
-  expireDate: string;
+  expireDate?: string;
 }
 
 export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Pending';
