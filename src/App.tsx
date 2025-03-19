@@ -21,7 +21,8 @@ import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import UserProfile from "./pages/UserProfile"; // Add the new import
+import UserProfile from "./pages/UserProfile";
+import Settings from "./pages/Settings"; // Add the new import
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -72,7 +73,8 @@ const App = () => (
               <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
               <Route path="/accounts" element={<Accounts />} />
               <Route path="/accounts/:accountId" element={<AccountProfile />} />
-              <Route path="/profile" element={<UserProfile />} /> {/* Add the new route */}
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/settings" element={<Settings />} /> {/* Add the new route */}
               
               {/* Auth routes */}
               <Route path="/sign-in" element={<SignIn />} />
