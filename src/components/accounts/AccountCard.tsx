@@ -15,6 +15,7 @@ import {
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { Account } from '@/types';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface AccountCardProps {
   account: Account;
@@ -29,6 +30,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onDelete,
   onReconnect,
 }) => {
+  const navigate = useNavigate();
+
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
     return name
@@ -65,6 +68,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
   const getAccountCount = () => {
     // This would come from actual data in production
     return Math.floor(Math.random() * 3) + 1;
+  };
+
+  const handleViewProfile = () => {
+    navigate(`/accounts/${account.clientId}`);
   };
 
   return (
@@ -136,7 +143,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       
       <div className="mt-4 flex justify-between items-center">
         <StatusIndicator status={account.status} showLabel />
-        <Button variant="outline" size="sm" className="text-sm">
+        <Button variant="outline" size="sm" className="text-sm" onClick={handleViewProfile}>
           View Profile
         </Button>
       </div>

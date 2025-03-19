@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import Bots from "./pages/Bots";
 import Accounts from "./pages/Accounts";
+import AccountProfile from "./pages/AccountProfile";
 import Connections from "./pages/Connections";
 import Signals from "./pages/Signals";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/bots" element={<Bots />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/accounts/:accountId" element={<AccountProfile />} />
             <Route path="/connections" element={<Connections />} />
             <Route path="/signals" element={<Signals />} />
             <Route path="*" element={<NotFound />} />
