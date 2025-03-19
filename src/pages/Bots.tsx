@@ -284,7 +284,7 @@ const Bots = () => {
           <div className="flex items-center">
             <Button variant="outline" className="mr-2">
               <Bookmark className="h-4 w-4 mr-2" />
-              PROJECT LIST
+              BOT LIST
             </Button>
             <h2 className="text-xl font-bold text-primary">BOT Trading</h2>
           </div>
