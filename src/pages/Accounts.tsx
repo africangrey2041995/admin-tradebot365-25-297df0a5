@@ -1,25 +1,9 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { PlusCircle, Search, User, MoreHorizontal, Key, X } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { PlusCircle, Search, User, X } from 'lucide-react';
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { toast } from 'sonner';
 import { Account } from '@/types';
@@ -31,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import AccountCard from '@/components/accounts/AccountCard';
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -81,10 +66,6 @@ const Accounts = () => {
     account.ctidTraderAccountId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
-
   const handleAddAccount = () => {
     setIsAddDialogOpen(true);
   };
@@ -133,78 +114,29 @@ const Accounts = () => {
         </Button>
       </div>
 
-      <Card className="shadow-sm overflow-hidden">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tên</TableHead>
-                <TableHead>ID Tài Khoản CTrader</TableHead>
-                <TableHead>Trạng Thái</TableHead>
-                <TableHead>Ngày Tạo</TableHead>
-                <TableHead>Hết Hạn</TableHead>
-                <TableHead className="text-right">Thao Tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAccounts.length > 0 ? (
-                filteredAccounts.map((account) => (
-                  <TableRow key={account.clientId} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        <User className="h-4 w-4 mr-2 text-primary" />
-                        {account.name}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      <div className="flex items-center">
-                        <Key className="h-3 w-3 mr-2 text-muted-foreground" />
-                        {account.ctidTraderAccountId}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusIndicator status={account.status} showLabel />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{formatDate(account.createdDate)}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{formatDate(account.expireDate)}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleEditAccount(account.clientId)}>Chỉnh Sửa Tài Khoản</DropdownMenuItem>
-                          {account.status === 'Disconnected' && (
-                            <DropdownMenuItem onClick={() => handleReconnect(account.clientId)}>
-                              Kết Nối Lại
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteAccount(account.clientId)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            Xóa Tài Khoản
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    Không tìm thấy tài khoản nào. Vui lòng thử tìm kiếm khác hoặc thêm tài khoản mới.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {filteredAccounts.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredAccounts.map((account) => (
+            <AccountCard
+              key={account.clientId}
+              account={account}
+              onEdit={handleEditAccount}
+              onDelete={handleDeleteAccount}
+              onReconnect={handleReconnect}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center p-12 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <div className="mx-auto w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center mb-4">
+            <Search className="h-6 w-6 text-slate-500 dark:text-slate-400" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">Không tìm thấy tài khoản</h3>
+          <p className="text-muted-foreground">
+            Không tìm thấy tài khoản nào. Vui lòng thử tìm kiếm khác hoặc thêm tài khoản mới.
+          </p>
+        </div>
+      )}
 
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-md">
