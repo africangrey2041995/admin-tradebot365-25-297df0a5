@@ -4,7 +4,6 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import DashboardCard from '@/components/dashboard/DashboardCard';
 import {
   Pagination,
   PaginationContent,
@@ -12,13 +11,11 @@ import {
   PaginationLink,
 } from '@/components/ui/pagination';
 import {
-  CircuitBoard, 
   Search, 
   Plus, 
   Calendar, 
   Star, 
   MoreHorizontal, 
-  Users,
   Bookmark
 } from 'lucide-react';
 import {
@@ -36,29 +33,31 @@ import { Bot } from '@/types';
 interface BotCardProps {
   title: string;
   subtitle?: string;
+  botId: string;
   deadline: string;
   progress: number;
   status: string;
-  taskCount?: string;
-  teamMembers?: string[];
+  accountCount?: string;
   lastUpdated?: string;
   onFavorite?: () => void;
   isFavorite?: boolean;
   colorScheme?: 'red' | 'blue' | 'green' | 'purple' | 'default';
+  onAddAccount?: () => void;
 }
 
 const BotCard = ({
   title,
   subtitle,
+  botId,
   deadline,
   progress,
   status,
-  taskCount,
-  teamMembers = [],
+  accountCount,
   lastUpdated,
   onFavorite,
   isFavorite = false,
-  colorScheme = 'default'
+  colorScheme = 'default',
+  onAddAccount
 }: BotCardProps) => {
   
   const colorClasses = {
@@ -121,14 +120,12 @@ const BotCard = ({
         </div>
       </div>
       
-      {taskCount && (
-        <div className="flex items-center mb-4 border-t border-b py-2 border-slate-200">
-          <div className="flex-1">
-            <p className="text-sm font-medium">Tasks</p>
-          </div>
-          <div className="text-sm font-medium">{taskCount}</div>
+      <div className="flex items-center mb-4 border-t border-b py-2 border-slate-200">
+        <div className="flex-1">
+          <p className="text-sm font-medium">ID</p>
         </div>
-      )}
+        <div className="text-sm font-medium">{botId}</div>
+      </div>
       
       <div className="space-y-2 mb-4">
         <div className="flex justify-between items-center">
@@ -140,20 +137,14 @@ const BotCard = ({
       
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center">
-          <p className="text-sm text-muted-foreground mr-2">Team: </p>
-          <div className="flex -space-x-2">
-            {teamMembers.map((member, idx) => (
-              <div 
-                key={idx} 
-                className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium border-2 border-white"
-              >
-                {member.charAt(0).toUpperCase()}
-              </div>
-            ))}
-            <button className="h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xs font-medium border-2 border-white">
-              <Plus className="h-3 w-3" />
-            </button>
-          </div>
+          <p className="text-sm text-muted-foreground mr-2">Accounts: </p>
+          <div className="text-sm font-medium mr-3">{accountCount}</div>
+          <button 
+            onClick={onAddAccount}
+            className="h-6 w-6 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xs font-medium border-2 border-white"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
         </div>
         
         {lastUpdated && (
@@ -177,76 +168,88 @@ const Bots = () => {
   // Mock data for demonstration
   const mockBots: BotCardProps[] = [
     {
-      title: 'ID BOT',
-      subtitle: 'Slack brand logo design for a fintech watch',
-      deadline: '18 Sep, 2021',
+      title: 'Ultra 2in1',
+      subtitle: 'Bot for combined strategy trading with dual market analysis',
+      botId: 'BOT7459',
+      deadline: '18 Sep, 2023',
       progress: 50,
       status: 'In Progress',
-      taskCount: '18/42',
-      teamMembers: ['A', 'B', 'C'],
-      lastUpdated: '10 Jul, 2021',
+      accountCount: '18/42',
+      lastUpdated: '10 Jul, 2023',
       colorScheme: 'red'
     },
     {
-      title: 'TÊN BOT',
-      subtitle: 'Redesign - Landing page',
-      deadline: '10 Jun, 2021',
+      title: 'Long Master',
+      subtitle: 'Specialized in long-term position trading strategies',
+      botId: 'BOT8932',
+      deadline: '10 Jun, 2023',
       progress: 95,
       status: 'Completed',
-      taskCount: '22/56',
-      teamMembers: ['B', 'C'],
-      lastUpdated: '18 May, 2021',
+      accountCount: '22/56',
+      lastUpdated: '18 May, 2023',
       colorScheme: 'blue'
     },
     {
-      title: 'MÃ TÀI VỀ BOT',
-      subtitle: 'Chat Application',
-      deadline: '08 Apr, 2021',
+      title: 'Gold Trading',
+      subtitle: 'Precious metals focused algorithmic trading system',
+      botId: 'BOT2734',
+      deadline: '08 Apr, 2023',
       progress: 41,
       status: 'In Progress',
-      taskCount: '14/20',
-      teamMembers: ['C'],
-      lastUpdated: '21 Feb, 2021',
+      accountCount: '14/20',
+      lastUpdated: '21 Feb, 2023',
       colorScheme: 'green'
     },
     {
-      title: 'Project App',
-      subtitle: 'Create a project application for a project management and task management',
-      deadline: '22 Nov, 2021',
+      title: 'Bitcoin Trading',
+      subtitle: 'Cryptocurrency trading bot with focus on Bitcoin markets',
+      botId: 'BOT5128',
+      deadline: '22 Nov, 2023',
       progress: 35,
       status: 'In Progress',
-      taskCount: '20/34',
-      teamMembers: ['A', 'B', 'C'],
-      lastUpdated: '03 Aug, 2021',
+      accountCount: '20/34',
+      lastUpdated: '03 Aug, 2023',
       colorScheme: 'purple'
     },
     {
-      title: 'Dashboard UI',
-      deadline: '10 Jun, 2021',
+      title: 'Forex Master',
+      subtitle: 'Multi-currency trading system for forex markets',
+      botId: 'BOT1267',
+      deadline: '10 Jun, 2023',
       progress: 95,
       status: 'Completed',
-      teamMembers: ['A', 'B'],
+      accountCount: '15/25',
+      lastUpdated: '15 May, 2023',
     },
     {
-      title: 'Vector Images',
-      deadline: '08 Apr, 2021',
+      title: 'Scalping Pro',
+      subtitle: 'High-frequency short term trading bot',
+      botId: 'BOT9381',
+      deadline: '08 Apr, 2023',
       progress: 41,
       status: 'In Progress',
-      teamMembers: ['C'],
+      accountCount: '8/12',
+      lastUpdated: '21 Feb, 2023',
     },
     {
-      title: 'Authentication',
-      deadline: '22 Nov, 2021',
+      title: 'Swing Trader',
+      subtitle: 'Medium-term market swing analyzer and trader',
+      botId: 'BOT6452',
+      deadline: '22 Nov, 2023',
       progress: 35,
       status: 'In Progress',
-      teamMembers: ['A'],
+      accountCount: '12/20',
+      lastUpdated: '05 Aug, 2023',
     },
     {
-      title: 'Multipurpose landing template',
-      deadline: '18 Sep, 2021',
+      title: 'ETF Strategy',
+      subtitle: 'Diversified ETF portfolio management system',
+      botId: 'BOT3815',
+      deadline: '18 Sep, 2023',
       progress: 50,
       status: 'In Progress',
-      teamMembers: ['A', 'B', 'C'],
+      accountCount: '10/15',
+      lastUpdated: '10 Jul, 2023',
     },
   ];
 
@@ -269,8 +272,8 @@ const Bots = () => {
   };
 
   const handleAddAccount = () => {
-    toast('Thêm nhanh Account', {
-      description: 'Tính năng thêm tài khoản nhanh sẽ được triển khai trong phiên bản tiếp theo.',
+    toast('Thêm Tài Khoản', {
+      description: 'Tính năng thêm tài khoản sẽ được triển khai trong phiên bản tiếp theo.',
     });
   };
 
@@ -304,35 +307,13 @@ const Bots = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-          {filteredBots.slice(0, 4).map((bot, index) => (
+          {filteredBots.map((bot, index) => (
             <BotCard 
               key={index} 
               {...bot} 
               isFavorite={favorites[index] || false}
               onFavorite={() => toggleFavorite(index)}
-            />
-          ))}
-        </div>
-
-        <div className="flex items-center mb-6">
-          <h3 className="text-lg font-semibold">Add nhanh Account</h3>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="ml-3 bg-primary/10"
-            onClick={handleAddAccount}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-          {filteredBots.slice(4).map((bot, index) => (
-            <BotCard 
-              key={index + 4} 
-              {...bot} 
-              isFavorite={favorites[index + 4] || false}
-              onFavorite={() => toggleFavorite(index + 4)}
+              onAddAccount={handleAddAccount}
             />
           ))}
         </div>
