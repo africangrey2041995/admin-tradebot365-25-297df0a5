@@ -21,10 +21,12 @@ export default function SSOCallback() {
         
         // Check for sign-in flow
         if (searchParams.has('__clerk_status')) {
-          // For sign-in with OAuth, we need to handle the verification
+          // For sign-in with OAuth, we need to complete the OAuth flow
           const redirectUrl = window.location.href;
+          
+          // Use the correct method without specifying a strategy
+          // The clerk_status parameter indicates we're in an OAuth flow
           await signIn.attemptFirstFactor({
-            strategy: "oauth",
             redirectUrl
           });
           
