@@ -22,7 +22,7 @@ export default function SSOCallback() {
           // First factor verification is being handled automatically by Clerk
           // Just complete the sign-in process
           const result = await signIn.create({
-            strategy: "oauth_callback",
+            strategy: "oauth",
             redirectUrl: '/sso-callback',
           });
           
@@ -39,7 +39,7 @@ export default function SSOCallback() {
         if (firstParam.startsWith('__clerk_ticket')) {
           // For OAuth sign up, we also use a different approach
           const result = await signUp.create({
-            strategy: "oauth_callback",
+            strategy: "ticket",
             redirectUrl: '/sso-callback',
           });
           
