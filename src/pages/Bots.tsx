@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import {
@@ -12,7 +11,6 @@ import {
 import { toast } from 'sonner';
 import BotCard, { BotCardProps } from '@/components/bots/BotCard';
 import { AddBotDialog } from '@/components/bots/AddBotDialog';
-import BotSearch from '@/components/bots/BotSearch';
 import BotListing from '@/components/bots/BotListing';
 import BotsHeader from '@/components/bots/BotsHeader';
 import BotsPagination from '@/components/bots/BotsPagination';
@@ -116,11 +114,10 @@ const Bots = () => {
 
   return (
     <MainLayout title="Quản Lý Bot">
-      <BotsHeader onAddBot={() => setIsAddBotDialogOpen(true)} />
-      
-      <BotSearch 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
+      <BotsHeader 
+        onAddBot={() => setIsAddBotDialogOpen(true)} 
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
       />
       
       <BotListing 
