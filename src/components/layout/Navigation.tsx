@@ -9,17 +9,28 @@ import {
   X, 
   ChevronDown, 
   Settings, 
-  Sparkles
+  Sparkles,
+  Bell,
+  LogOut
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 const routes = [
   {
@@ -239,6 +250,57 @@ const Navigation = () => {
     </div>
   );
 
+  const UserMenu = () => (
+    <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3">
+        <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white">
+          <Bell className="h-5 w-5" />
+          <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 min-w-[18px] min-h-[18px] flex items-center justify-center bg-orange-500 text-white text-[10px]">
+            3
+          </Badge>
+        </Button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center space-x-2 hover:bg-zinc-800 px-2 rounded-full">
+              <Avatar className="h-8 w-8 border-2 border-primary/20">
+                <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+                <AvatarFallback>TB</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col items-start text-left">
+                <span className="text-sm font-medium text-white">Admin</span>
+                <span className="text-xs text-zinc-400">Founder</span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-zinc-400" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-700">
+            <DropdownMenuLabel className="text-zinc-400">My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-zinc-700" />
+            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
+              <User className="mr-2 h-4 w-4 text-zinc-400" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
+              <Settings className="mr-2 h-4 w-4 text-zinc-400" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-zinc-700" />
+            <DropdownMenuItem 
+              className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white"
+              onClick={() => {
+                window.location.href = '/sign-in';
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4 text-zinc-400" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {isMobile ? (
@@ -252,9 +314,7 @@ const Navigation = () => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>TB</AvatarFallback>
-              </Avatar>
+              <UserMenu />
               <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
@@ -313,39 +373,6 @@ const Navigation = () => {
             )}>
               <NavLinks />
             </div>
-            
-            <div className="p-3 border-t border-zinc-700/50">
-              <div className="flex items-center justify-between mb-3">
-                {!isCollapsed && (
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>TB</AvatarFallback>
-                    </Avatar>
-                    <div className="text-sm font-medium text-white overflow-hidden text-ellipsis">
-                      Admin
-                    </div>
-                  </div>
-                )}
-                {isCollapsed && (
-                  <Avatar className="h-8 w-8 mx-auto">
-                    <AvatarFallback>TB</AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className={cn(
-                    "flex-1 hover:bg-primary hover:text-white text-white border-zinc-700/50 bg-transparent",
-                    isCollapsed && "p-0 flex justify-center items-center h-10 w-10"
-                  )} 
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  {!isCollapsed && "Cài Đặt"}
-                </Button>
-              </div>
-            </div>
           </aside>
           
           <div className={cn(
@@ -358,6 +385,8 @@ const Navigation = () => {
                 routes.flatMap(route => route.children || []).find(child => child.path === location.pathname)?.label ||
                 "Bảng Điều Khiển"}
               </div>
+              
+              <UserMenu />
             </div>
           </div>
         </>
