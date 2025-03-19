@@ -54,15 +54,15 @@ const Navigation = () => {
   };
 
   const Logo = () => (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center justify-center">
       <img 
         src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
         alt="Trade Bot 365 Logo" 
-        className="h-8 w-8" 
+        className={cn(
+          "transition-all duration-300",
+          isCollapsed ? "h-10 w-10" : "h-12 w-12"
+        )} 
       />
-      {!isCollapsed && (
-        <span className="text-xl font-bold text-white">Trade Bot <span className="text-tradebot">365</span></span>
-      )}
     </div>
   );
 
@@ -76,13 +76,13 @@ const Navigation = () => {
             "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm",
             location.pathname === route.path
               ? "bg-primary/10 text-primary"
-              : "text-sidebar-foreground hover:bg-primary/5 hover:text-primary"
+              : "text-white hover:bg-zinc-700/70 hover:text-white"
           )}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
           <div className={cn(
             "flex items-center justify-center w-9 h-9 rounded-lg",
-            location.pathname === route.path ? "bg-primary text-white" : "text-slate-400 bg-slate-800/30"
+            location.pathname === route.path ? "bg-primary text-white" : "text-white bg-zinc-700/50"
           )}>
             {route.icon}
           </div>
@@ -131,16 +131,16 @@ const Navigation = () => {
       ) : (
         <>
           <aside className={cn(
-            "fixed inset-y-0 left-0 z-30 border-r border-slate-200 dark:border-zinc-700 flex flex-col shadow-md transition-all duration-300 ease-in-out bg-white dark:bg-zinc-900",
+            "fixed inset-y-0 left-0 z-30 border-r border-zinc-700/50 flex flex-col shadow-md transition-all duration-300 ease-in-out bg-zinc-900",
             isCollapsed ? "w-[70px]" : "w-64"
           )}>
-            <div className="p-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+            <div className="p-4 border-b border-zinc-700/50 flex items-center justify-between">
               <Logo />
               {!isCollapsed && (
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="text-slate-500" 
+                  className="text-white" 
                   onClick={toggleSidebar}
                 >
                   <Menu className="h-5 w-5" />
@@ -150,7 +150,7 @@ const Navigation = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="absolute right-[-12px] top-6 bg-primary text-white rounded-full border-2 border-white dark:border-zinc-900 w-6 h-6" 
+                  className="absolute right-[-12px] top-6 bg-primary text-white rounded-full border-2 border-zinc-900 w-6 h-6" 
                   onClick={toggleSidebar}
                 >
                   <ChevronDown className={cn("h-3 w-3 transition-all duration-300", isCollapsed && "rotate-90")} />
@@ -165,12 +165,12 @@ const Navigation = () => {
               <NavLinks />
             </div>
             
-            <div className="p-3 border-t border-slate-200 dark:border-zinc-700">
+            <div className="p-3 border-t border-zinc-700/50">
               <Button 
                 variant="outline" 
                 size="sm" 
                 className={cn(
-                  "w-full hover:bg-primary hover:text-white text-slate-600 dark:text-slate-200 border-slate-200 dark:border-zinc-700 bg-transparent",
+                  "w-full hover:bg-primary hover:text-white text-white border-zinc-700/50 bg-transparent",
                   isCollapsed && "p-0 flex justify-center items-center h-10 w-10"
                 )} 
                 onClick={() => {}}
