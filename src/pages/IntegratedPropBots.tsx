@@ -133,7 +133,7 @@ const IntegratedPropBots = () => {
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
               <SelectItem value="low">Thấp</SelectItem>
-              <SelectItem value="medium">Trung bình</SelectItem>
+              <SelectItem value="medium">Trung</SelectItem>
               <SelectItem value="high">Cao</SelectItem>
             </SelectContent>
           </Select>
