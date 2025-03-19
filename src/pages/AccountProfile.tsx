@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -13,8 +14,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
-  Key, MoreHorizontal, Copy, RefreshCw, Eye, EyeOff, 
-  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot,
+  Key, MoreHorizontal, Copy, Pencil, Eye, EyeOff, 
+  ChevronLeft, Plus, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot,
   User, Link, ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -93,7 +94,10 @@ const AccountProfile = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(generateMockApiKeys(accountId || ''));
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isAddKeyDialogOpen, setIsAddKeyDialogOpen] = useState(false);
+  const [isEditKeyDialogOpen, setIsEditKeyDialogOpen] = useState(false);
+  const [isUpdateTokenDialogOpen, setIsUpdateTokenDialogOpen] = useState(false);
   
+  // State for add/edit API key
   const [selectedUser, setSelectedUser] = useState('');
   const [newApiName, setNewApiName] = useState('');
   const [newClientId, setNewClientId] = useState('');
@@ -104,6 +108,10 @@ const AccountProfile = () => {
   const [isTestSuccessful, setIsTestSuccessful] = useState(false);
   const [availableTradingAccounts, setAvailableTradingAccounts] = useState(mockTradingAccounts);
 
+  // State for editing
+  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
+  const [isEditingAccessTokenOnly, setIsEditingAccessTokenOnly] = useState(false);
+  
   const accountName = `Account ${accountId?.slice(-3)}`;
 
   const toggleShowSecret = (keyId: string) => {
@@ -128,6 +136,27 @@ const AccountProfile = () => {
     setIsAddKeyDialogOpen(true);
   };
 
+  const handleEditKey = (key: ApiKey) => {
+    setEditingKeyId(key.id);
+    setSelectedUser('');
+    setNewApiName(key.name);
+    setNewClientId(key.clientId);
+    setNewSecret('');
+    setNewAccessToken('');
+    setSelectedTradingAccount(parseAccountTrading(key.accountTrading).accountId);
+    setIsTestSuccessful(false);
+    setIsEditingAccessTokenOnly(false);
+    setIsEditKeyDialogOpen(true);
+  };
+
+  const handleUpdateAccessToken = (key: ApiKey) => {
+    setEditingKeyId(key.id);
+    setNewAccessToken('');
+    setIsTestSuccessful(false);
+    setIsEditingAccessTokenOnly(true);
+    setIsUpdateTokenDialogOpen(true);
+  };
+
   const resetFormFields = () => {
     setSelectedUser('');
     setNewApiName('');
@@ -136,6 +165,8 @@ const AccountProfile = () => {
     setNewAccessToken('');
     setSelectedTradingAccount('');
     setIsTestSuccessful(false);
+    setEditingKeyId(null);
+    setIsEditingAccessTokenOnly(false);
   };
 
   const handleTestConnection = () => {
@@ -158,7 +189,7 @@ const AccountProfile = () => {
   };
 
   const handleSaveNewKey = () => {
-    if (!selectedUser) {
+    if (!selectedUser && !editingKeyId) {
       toast.error('Please select a user account');
       return;
     }
@@ -173,11 +204,81 @@ const AccountProfile = () => {
       return;
     }
 
-    if (!newSecret.trim()) {
+    if (!editingKeyId && !newSecret.trim()) {
       toast.error('Please enter a secret key');
       return;
     }
+    
+    if (!isEditingAccessTokenOnly && !selectedTradingAccount) {
+      toast.error('Please select a trading account');
+      return;
+    }
+    
+    const selectedAccount = availableTradingAccounts.find(acc => acc.id === selectedTradingAccount);
+    
+    if (!isEditingAccessTokenOnly && !selectedAccount) {
+      toast.error('Invalid trading account selected');
+      return;
+    }
+    
+    if (editingKeyId) {
+      // Update existing key
+      setApiKeys(prev => prev.map(key => {
+        if (key.id === editingKeyId) {
+          const updatedKey = { ...key };
+          
+          if (!isEditingAccessTokenOnly) {
+            updatedKey.name = newApiName;
+            updatedKey.clientId = newClientId;
+            if (newSecret.trim()) {
+              updatedKey.secretKey = newSecret;
+            }
+            
+            if (selectedAccount) {
+              const accountTradingValue = `${selectedAccount.id}|${selectedAccount.type}|${selectedAccount.balance}`;
+              updatedKey.accountTrading = accountTradingValue;
+            }
+          }
+          
+          if (isTestSuccessful && newAccessToken.trim()) {
+            updatedKey.accessToken = newAccessToken;
+          }
+          
+          return updatedKey;
+        }
+        return key;
+      }));
+      
+      toast.success(isEditingAccessTokenOnly ? 'Access token updated successfully' : 'API key updated successfully');
+    } else {
+      // Add new key
+      const user = mockUsers.find(u => u.id === selectedUser);
+      
+      const accountTradingValue = `${selectedAccount?.id}|${selectedAccount?.type}|${selectedAccount?.balance}`;
+      
+      const newKey: ApiKey = {
+        id: `key-${Date.now()}`,
+        name: newApiName,
+        clientId: newClientId,
+        secretKey: newSecret,
+        accessToken: newAccessToken,
+        accountTrading: accountTradingValue,
+        createdAt: new Date().toISOString(),
+        expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+        status: 'ACTIVE',
+      };
+      
+      setApiKeys(prev => [...prev, newKey]);
+      toast.success('New API key added successfully');
+    }
+    
+    resetFormFields();
+    setIsAddKeyDialogOpen(false);
+    setIsEditKeyDialogOpen(false);
+    setIsUpdateTokenDialogOpen(false);
+  };
 
+  const handleSaveUpdatedToken = () => {
     if (!newAccessToken.trim()) {
       toast.error('Please enter an access token');
       return;
@@ -188,43 +289,19 @@ const AccountProfile = () => {
       return;
     }
     
-    if (!selectedTradingAccount) {
-      toast.error('Please select a trading account');
-      return;
-    }
+    setApiKeys(prev => prev.map(key => {
+      if (key.id === editingKeyId) {
+        return {
+          ...key,
+          accessToken: newAccessToken
+        };
+      }
+      return key;
+    }));
     
-    const selectedAccount = availableTradingAccounts.find(acc => acc.id === selectedTradingAccount);
-    
-    if (!selectedAccount) {
-      toast.error('Invalid trading account selected');
-      return;
-    }
-    
-    const accountTradingValue = `${selectedAccount.id}|${selectedAccount.type}|${selectedAccount.balance}`;
-    
-    const user = mockUsers.find(u => u.id === selectedUser);
-    
-    const newKey: ApiKey = {
-      id: `key-${Date.now()}`,
-      name: newApiName,
-      clientId: newClientId,
-      secretKey: newSecret,
-      accessToken: newAccessToken,
-      accountTrading: accountTradingValue,
-      createdAt: new Date().toISOString(),
-      expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
-      status: 'ACTIVE',
-    };
-    
-    setApiKeys(prev => [...prev, newKey]);
     resetFormFields();
-    setIsAddKeyDialogOpen(false);
-    
-    toast.success('New API key added successfully');
-  };
-
-  const handleRegenerateKey = (keyId: string) => {
-    toast.success(`API Key regenerated successfully`);
+    setIsUpdateTokenDialogOpen(false);
+    toast.success('Access token updated successfully');
   };
 
   const handleDeleteKey = (keyId: string) => {
@@ -243,10 +320,6 @@ const AccountProfile = () => {
     const newStatus = targetKey?.status === 'ACTIVE' ? 'blocked' : 'activated';
     
     toast.success(`API Key ${newStatus} successfully`);
-  };
-
-  const handleUpdateToken = (keyId: string) => {
-    toast.success('Access token updated successfully');
   };
 
   const parseAccountTrading = (accountTradingStr: string) => {
@@ -455,15 +528,15 @@ const AccountProfile = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => handleRegenerateKey(key.id)}>
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              Regenerate Key
+                            <DropdownMenuItem onClick={() => handleEditKey(key)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
                               <Power className="h-4 w-4 mr-2" />
                               {key.status === 'ACTIVE' ? 'Disable' : 'Enable'}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateToken(key.id)}>
+                            <DropdownMenuItem onClick={() => handleUpdateAccessToken(key)}>
                               <Link2 className="h-4 w-4 mr-2" />
                               Update Access Token
                             </DropdownMenuItem>
@@ -486,6 +559,7 @@ const AccountProfile = () => {
         </Card>
       </div>
 
+      {/* Add New API Key Dialog */}
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -606,7 +680,7 @@ const AccountProfile = () => {
                   >
                     {isTesting ? (
                       <span className="flex items-center">
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        <Pencil className="h-4 w-4 mr-2 animate-spin" />
                         Testing...
                       </span>
                     ) : (
@@ -686,6 +760,255 @@ const AccountProfile = () => {
                 !isTestSuccessful || !selectedTradingAccount}
             >
               Create API
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit API Key Dialog */}
+      <Dialog open={isEditKeyDialogOpen} onOpenChange={setIsEditKeyDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">Edit API Key</DialogTitle>
+            <DialogDescription>
+              Modify the settings for this API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-5 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="apiName" className="text-sm font-medium flex items-center">
+                API Name <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  API Name
+                </Label>
+                <Input 
+                  id="apiName" 
+                  placeholder="Enter API name"
+                  value={newApiName}
+                  onChange={(e) => setNewApiName(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="clientId" className="text-sm font-medium flex items-center">
+                Client ID <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Client ID
+                </Label>
+                <Input 
+                  id="clientId" 
+                  placeholder="Enter client ID"
+                  value={newClientId}
+                  onChange={(e) => setNewClientId(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="secret" className="text-sm font-medium flex items-center">
+                Secret <span className="text-muted-foreground ml-1">(leave blank to keep current)</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Secret
+                </Label>
+                <Input 
+                  id="secret" 
+                  placeholder="Enter new secret key (optional)"
+                  value={newSecret}
+                  onChange={(e) => setNewSecret(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                  type="password"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="accessToken" className="text-sm font-medium flex items-center">
+                Access Token <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Access Token
+                </Label>
+                <div className="flex gap-2">
+                  <Input 
+                    id="accessToken" 
+                    placeholder="Enter access token"
+                    value={newAccessToken}
+                    onChange={(e) => setNewAccessToken(e.target.value)}
+                    className="border-primary/30 focus-visible:ring-primary flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleTestConnection}
+                    disabled={isTesting || !newAccessToken.trim()}
+                    className="whitespace-nowrap"
+                  >
+                    {isTesting ? (
+                      <span className="flex items-center">
+                        <Pencil className="h-4 w-4 mr-2 animate-spin" />
+                        Testing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Test
+                      </span>
+                    )}
+                  </Button>
+                </div>
+                {isTestSuccessful && (
+                  <p className="text-xs text-green-600 mt-1 flex items-center">
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Connection successful!
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {isTestSuccessful && (
+              <div className="space-y-2">
+                <Label htmlFor="tradingAccount" className="text-sm font-medium flex items-center">
+                  Account Trading <span className="text-red-500 ml-1">*</span>
+                </Label>
+                <div className="relative">
+                  <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                    Select Account Trading
+                  </Label>
+                  <Select 
+                    value={selectedTradingAccount} 
+                    onValueChange={setSelectedTradingAccount}
+                  >
+                    <SelectTrigger className="w-full border-primary/30 focus-visible:ring-primary">
+                      <SelectValue placeholder="Select a trading account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTradingAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          <div className="flex items-center space-x-2">
+                            <CircleDot 
+                              className={cn(
+                                "h-3 w-3",
+                                account.type === 'Live' ? "text-success" : "text-warning"
+                              )} 
+                              fill={account.type === 'Live' ? "#04ce91" : "#f59e0b"}
+                              strokeWidth={0}
+                            />
+                            <span>
+                              {account.id} - 
+                              <span className={account.type === 'Live' ? "text-success" : "text-warning"}>
+                                {account.type}
+                              </span> 
+                              - ${account.balance}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter className="flex justify-between items-center gap-2 sm:gap-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditKeyDialogOpen(false)}
+              className="flex-1 sm:flex-initial"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNewKey} 
+              className="flex-1 sm:flex-initial bg-primary hover:bg-primary/90"
+              disabled={!newApiName.trim() || !newClientId.trim() || !selectedTradingAccount}
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Access Token Dialog */}
+      <Dialog open={isUpdateTokenDialogOpen} onOpenChange={setIsUpdateTokenDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">Update Access Token</DialogTitle>
+            <DialogDescription>
+              Update the access token for this API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-5 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="newAccessToken" className="text-sm font-medium flex items-center">
+                New Access Token <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Access Token
+                </Label>
+                <div className="flex gap-2">
+                  <Input 
+                    id="newAccessToken" 
+                    placeholder="Enter new access token"
+                    value={newAccessToken}
+                    onChange={(e) => setNewAccessToken(e.target.value)}
+                    className="border-primary/30 focus-visible:ring-primary flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleTestConnection}
+                    disabled={isTesting || !newAccessToken.trim()}
+                    className="whitespace-nowrap"
+                  >
+                    {isTesting ? (
+                      <span className="flex items-center">
+                        <Pencil className="h-4 w-4 mr-2 animate-spin" />
+                        Testing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Test
+                      </span>
+                    )}
+                  </Button>
+                </div>
+                {isTestSuccessful && (
+                  <p className="text-xs text-green-600 mt-1 flex items-center">
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Connection successful!
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex justify-between items-center gap-2 sm:gap-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsUpdateTokenDialogOpen(false)}
+              className="flex-1 sm:flex-initial"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveUpdatedToken}
+              className="flex-1 sm:flex-initial bg-primary hover:bg-primary/90"
+              disabled={!isTestSuccessful || !newAccessToken.trim()}
+            >
+              Update Token
             </Button>
           </DialogFooter>
         </DialogContent>
