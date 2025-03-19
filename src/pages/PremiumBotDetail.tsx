@@ -427,14 +427,16 @@ const PremiumBotDetail = () => {
                   </ChartContainer>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
                   {statisticsData.map((stat, index) => (
-                    <div key={index} className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg flex flex-col items-center">
-                      <div className="flex items-center gap-2 mb-2">
+                    <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                      <div className="flex items-center gap-2 mb-1">
                         {stat.icon}
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{stat.name}</span>
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                          {stat.name}
+                        </span>
                       </div>
-                      <div className="text-xl font-semibold text-slate-900 dark:text-white">
+                      <div className="text-2xl font-bold text-slate-900 dark:text-white">
                         {stat.value}
                       </div>
                     </div>
@@ -626,4 +628,3 @@ const PremiumBotDetail = () => {
 };
 
 export default PremiumBotDetail;
-
