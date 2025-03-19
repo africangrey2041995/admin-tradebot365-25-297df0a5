@@ -15,13 +15,15 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
-      <Navigation />
+      <div className="fixed top-0 z-50 w-full">
+        <Navigation />
+      </div>
       
       <main className={cn(
         isMobile 
-          ? "px-4 pb-6 pt-4" 
-          : "ml-64 transition-all duration-300 ease-in-out",
-        !isMobile && "pt-20" // For the top header
+          ? "px-4 pb-6 pt-20" // Added padding top for fixed navbar 
+          : "ml-64 pt-20",    // Set a fixed padding top for the navbar height
+        "transition-all duration-300 ease-in-out"
       )}>
         <div className="container mx-auto max-w-7xl px-4 py-6">
           {title && !isMobile && (
