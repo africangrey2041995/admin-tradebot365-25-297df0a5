@@ -3,7 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types';
-import { Check, X, Info } from 'lucide-react';
+import { Check, X, Info, Eye, List } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface CoinstratLogsProps {
   botId: string;
@@ -12,6 +20,8 @@ interface CoinstratLogsProps {
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLog, setSelectedLog] = useState<CoinstratSignal | null>(null);
+  const [accountsDialogOpen, setAccountsDialogOpen] = useState(false);
 
   useEffect(() => {
     // Mock data loading
@@ -138,6 +148,11 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
     }
   };
 
+  const showAccountsDialog = (log: CoinstratSignal) => {
+    setSelectedLog(log);
+    setAccountsDialogOpen(true);
+  };
+
   if (loading) {
     return <div className="py-8 text-center text-muted-foreground">Loading logs...</div>;
   }
@@ -163,6 +178,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             <TableHead>Quantity</TableHead>
             <TableHead>Action</TableHead>
             <TableHead>Accounts</TableHead>
+            <TableHead>Note</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -186,16 +202,133 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
               <TableCell>{log.amount}</TableCell>
               <TableCell>{getActionBadge(log.action)}</TableCell>
               <TableCell>
-                <div className="flex items-center space-x-1">
-                  <span className="text-green-600 font-medium">{log.processedAccounts.length}</span>
-                  <span>/</span>
-                  <span className="text-red-600 font-medium">{log.failedAccounts.length}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-green-600 font-medium">{log.processedAccounts.length}</span>
+                    <span>/</span>
+                    <span className="text-red-600 font-medium">{log.failedAccounts.length}</span>
+                  </div>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button 
+                          onClick={() => showAccountsDialog(log)}
+                          className="ml-1 p-1 hover:bg-slate-100 rounded-full"
+                        >
+                          <Eye className="h-4 w-4 text-slate-500" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View accounts</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
+              </TableCell>
+              <TableCell>
+                {log.errorMessage && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="inline-flex items-center justify-center rounded-full border p-1 text-red-600 hover:bg-red-50">
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Error Details</h4>
+                        <p className="text-sm text-red-600">{log.errorMessage}</p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Dialog open={accountsDialogOpen} onOpenChange={setAccountsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Accounts for Signal {selectedLog?.id}</DialogTitle>
+          </DialogHeader>
+          
+          {selectedLog && (
+            <div className="space-y-4">
+              {selectedLog.processedAccounts.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-green-600 mb-2 flex items-center">
+                    <Check className="h-4 w-4 mr-1" /> 
+                    Processed Accounts ({selectedLog.processedAccounts.length})
+                  </h3>
+                  <div className="border rounded-md overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Time</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedLog.processedAccounts.map((account) => (
+                          <TableRow key={account.accountId}>
+                            <TableCell className="font-medium">{account.name}</TableCell>
+                            <TableCell>
+                              {new Date(account.timestamp).toLocaleString('en-US', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+              
+              {selectedLog.failedAccounts.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-red-600 mb-2 flex items-center">
+                    <X className="h-4 w-4 mr-1" />
+                    Failed Accounts ({selectedLog.failedAccounts.length})
+                  </h3>
+                  <div className="border rounded-md overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Reason</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedLog.failedAccounts.map((account) => (
+                          <TableRow key={account.accountId}>
+                            <TableCell className="font-medium">{account.name}</TableCell>
+                            <TableCell>
+                              {new Date(account.timestamp).toLocaleString('en-US', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </TableCell>
+                            <TableCell className="text-red-600">{account.reason}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
