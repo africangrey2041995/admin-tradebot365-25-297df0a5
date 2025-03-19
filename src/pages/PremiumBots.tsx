@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -231,139 +232,325 @@ const PremiumBots = () => {
             <TabsTrigger value="premium" className="flex-grow md:flex-grow-0">Premium Bots</TabsTrigger>
             <TabsTrigger value="prop" className="flex-grow md:flex-grow-0">Prop Trading Bots</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="premium" className="mt-0 space-y-6">
+            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
+                <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
+                <TabsTrigger value="momentum" className="flex-grow md:flex-grow-0">Momentum</TabsTrigger>
+                <TabsTrigger value="scalping" className="flex-grow md:flex-grow-0">Scalping</TabsTrigger>
+                <TabsTrigger value="swing" className="flex-grow md:flex-grow-0">Swing</TabsTrigger>
+                <TabsTrigger value="grid" className="flex-grow md:flex-grow-0">Grid</TabsTrigger>
+                <TabsTrigger value="trend" className="flex-grow md:flex-grow-0">Trend</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="mt-6">
+                {sortedPremiumBots.length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="momentum" className="mt-6">
+                {sortedPremiumBots.filter(bot => bot.type === 'momentum').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.filter(bot => bot.type === 'momentum').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="scalping" className="mt-6">
+                {sortedPremiumBots.filter(bot => bot.type === 'scalping').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.filter(bot => bot.type === 'scalping').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="swing" className="mt-6">
+                {sortedPremiumBots.filter(bot => bot.type === 'swing').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.filter(bot => bot.type === 'swing').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="grid" className="mt-6">
+                {sortedPremiumBots.filter(bot => bot.type === 'grid').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.filter(bot => bot.type === 'grid').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="trend" className="mt-6">
+                {sortedPremiumBots.filter(bot => bot.type === 'trend').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPremiumBots.filter(bot => bot.type === 'trend').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="prop" className="mt-0 space-y-6">
+            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
+                <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
+                <TabsTrigger value="prop" className="flex-grow md:flex-grow-0">Prop Trading</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="mt-6">
+                {sortedPropTradingBots.length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPropTradingBots.map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="prop" className="mt-6">
+                {sortedPropTradingBots.filter(bot => bot.type === 'prop').length > 0 ? (
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {sortedPropTradingBots.filter(bot => bot.type === 'prop').map((bot, index) => (
+                      <motion.div
+                        key={bot.id}
+                        custom={index}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        <PremiumBotCard 
+                          id={bot.id}
+                          name={bot.name}
+                          description={bot.description}
+                          exchange={bot.exchange}
+                          type={bot.type}
+                          performanceLastMonth={bot.performanceLastMonth}
+                          performanceAllTime={bot.performanceAllTime}
+                          risk={bot.risk}
+                          minCapital={bot.minCapital}
+                          subscribers={bot.subscribers}
+                          imageUrl={bot.imageUrl}
+                          colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                    <p className="text-lg text-slate-500 dark:text-slate-400">
+                      Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
         </Tabs>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
-            <Input
-              placeholder="Tìm kiếm bot giao dịch..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Select value={riskFilter} onValueChange={setRiskFilter}>
-              <SelectTrigger>
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Mức độ rủi ro" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="low">Thấp</SelectItem>
-                <SelectItem value="medium">Trung bình</SelectItem>
-                <SelectItem value="high">Cao</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger>
-                <ArrowUpDown className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sắp xếp theo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="performance">Hiệu suất</SelectItem>
-                <SelectItem value="popularity">Phổ biến</SelectItem>
-                <SelectItem value="name">Tên</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <TabsContent value="premium" className="mt-0 space-y-6">
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
-              <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
-              <TabsTrigger value="momentum" className="flex-grow md:flex-grow-0">Momentum</TabsTrigger>
-              <TabsTrigger value="scalping" className="flex-grow md:flex-grow-0">Scalping</TabsTrigger>
-              <TabsTrigger value="swing" className="flex-grow md:flex-grow-0">Swing</TabsTrigger>
-              <TabsTrigger value="grid" className="flex-grow md:flex-grow-0">Grid</TabsTrigger>
-              <TabsTrigger value="trend" className="flex-grow md:flex-grow-0">Trend</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value={activeTab} className="mt-6">
-              {sortedPremiumBots.length > 0 ? (
-                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  {sortedPremiumBots.map((bot, index) => (
-                    <motion.div
-                      key={bot.id}
-                      custom={index}
-                      variants={cardVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      <PremiumBotCard 
-                        id={bot.id}
-                        name={bot.name}
-                        description={bot.description}
-                        exchange={bot.exchange}
-                        type={bot.type}
-                        performanceLastMonth={bot.performanceLastMonth}
-                        performanceAllTime={bot.performanceAllTime}
-                        risk={bot.risk}
-                        minCapital={bot.minCapital}
-                        subscribers={bot.subscribers}
-                        imageUrl={bot.imageUrl}
-                        colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
-                  <p className="text-lg text-slate-500 dark:text-slate-400">
-                    Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-
-        <TabsContent value="prop" className="mt-0 space-y-6">
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
-              <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
-              <TabsTrigger value="prop" className="flex-grow md:flex-grow-0">Prop Trading</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value={activeTab} className="mt-6">
-              {sortedPropTradingBots.length > 0 ? (
-                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  {sortedPropTradingBots.map((bot, index) => (
-                    <motion.div
-                      key={bot.id}
-                      custom={index}
-                      variants={cardVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      <PremiumBotCard 
-                        id={bot.id}
-                        name={bot.name}
-                        description={bot.description}
-                        exchange={bot.exchange}
-                        type={bot.type}
-                        performanceLastMonth={bot.performanceLastMonth}
-                        performanceAllTime={bot.performanceAllTime}
-                        risk={bot.risk}
-                        minCapital={bot.minCapital}
-                        subscribers={bot.subscribers}
-                        imageUrl={bot.imageUrl}
-                        colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
-                  <p className="text-lg text-slate-500 dark:text-slate-400">
-                    Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
       </div>
     </MainLayout>
   );
