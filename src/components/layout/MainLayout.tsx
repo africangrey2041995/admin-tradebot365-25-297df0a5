@@ -4,7 +4,7 @@ import FixedNavigation from './FixedNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import SidebarNav from './SidebarNav';
 
 interface MainLayoutProps {
@@ -22,18 +22,16 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
         <SidebarNav />
         
         <div className="flex-1 flex flex-col">
-          {/* Fixed Navigation at top */}
-          <div className="fixed top-0 z-50 w-full">
-            <FixedNavigation />
-          </div>
+          {/* Navigation at top */}
+          <FixedNavigation />
           
           <main className={cn(
             isMobile 
-              ? "px-4 pb-6 pt-20" // Added padding top for fixed navbar 
-              : "pt-20",    // Set a fixed padding top for the navbar height
+              ? "px-4 pb-6 pt-4" 
+              : "px-6 py-6",
             "transition-all duration-300 ease-in-out"
           )}>
-            <div className="container mx-auto max-w-7xl px-4 py-6">
+            <div className="container mx-auto max-w-7xl">
               {title && !isMobile && (
                 <motion.h1 
                   className="text-2xl font-semibold mb-6 text-slate-800 dark:text-white"
