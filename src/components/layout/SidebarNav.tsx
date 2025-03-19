@@ -146,11 +146,10 @@ const SidebarNav = () => {
                     <CollapsibleTrigger asChild>
                       <button
                         className={`
-                          flex items-center justify-between py-1 px-3 text-sm rounded-md w-full
+                          flex items-center justify-end py-1 px-3 text-sm rounded-md w-full
                           text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
                         `}
                       >
-                        <span className="text-xs">Subcategories</span>
                         <ChevronDown 
                           className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" 
                         />
