@@ -119,14 +119,14 @@ const SidebarNav = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Premium</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="flex flex-col space-y-0">
               {premiumItems.map((item) => (
-                <SidebarMenuItem key={item.path} className="flex flex-col">
+                <SidebarMenuItem key={item.path} className="flex flex-col mb-0">
                   {/* Main item link */}
                   <Link 
                     to={item.path}
                     className={`
-                      flex items-center py-2 px-3 text-sm rounded-md w-full mb-1
+                      flex items-center py-2 px-3 text-sm rounded-md w-full mb-0
                       ${isActive(item.path) && !item.isOpen
                         ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
                         : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
@@ -146,7 +146,7 @@ const SidebarNav = () => {
                     <CollapsibleTrigger asChild>
                       <button
                         className={`
-                          flex items-center justify-end py-1 px-3 text-sm rounded-md w-full
+                          flex items-center justify-end py-0.5 px-3 text-sm rounded-md w-full
                           text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
                         `}
                       >
@@ -155,7 +155,7 @@ const SidebarNav = () => {
                         />
                       </button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-1">
+                    <CollapsibleContent className="pt-0.5">
                       {item.subItems.map((subItem) => (
                         <Link 
                           key={subItem.path} 
