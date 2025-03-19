@@ -122,25 +122,39 @@ const SidebarNav = () => {
             <SidebarMenu>
               {premiumItems.map((item) => (
                 <SidebarMenuItem key={item.path} className="flex flex-col">
+                  {/* Main item link */}
+                  <Link 
+                    to={item.path}
+                    className={`
+                      flex items-center py-2 px-3 text-sm rounded-md w-full mb-1
+                      ${isActive(item.path) && !item.isOpen
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
+                        : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
+                      }
+                    `}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    <span>{item.label}</span>
+                  </Link>
+                  
+                  {/* Collapsible sub-items */}
                   <Collapsible 
                     open={item.isOpen} 
                     onOpenChange={item.setOpen}
                     className="w-full"
                   >
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton 
-                        className="justify-between group" 
-                        isActive={isActive(item.path)}
-                        tooltip={item.label}
+                      <button
+                        className={`
+                          flex items-center justify-between py-1 px-3 text-sm rounded-md w-full
+                          text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
+                        `}
                       >
-                        <div className="flex items-center">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.label}</span>
-                        </div>
+                        <span className="text-xs">Subcategories</span>
                         <ChevronDown 
-                          className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" 
+                          className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" 
                         />
-                      </SidebarMenuButton>
+                      </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-1">
                       {item.subItems.map((subItem) => (
@@ -151,11 +165,11 @@ const SidebarNav = () => {
                             flex items-center py-1.5 px-6 text-sm rounded-md ml-4
                             ${isActive(subItem.path) 
                               ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
-                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                              : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
                             }
                           `}
                         >
-                          <Layers className="h-3.5 w-3.5 mr-2" />
+                          <subItem.icon className="h-3.5 w-3.5 mr-2" />
                           <span>{subItem.label}</span>
                         </Link>
                       ))}
