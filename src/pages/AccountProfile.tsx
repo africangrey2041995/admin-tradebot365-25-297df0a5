@@ -15,7 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Key, MoreHorizontal, Copy, RefreshCw, Eye, EyeOff, 
-  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot
+  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot,
+  User, Link, ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -84,6 +85,13 @@ const mockTradingAccounts = [
   { id: '990011', type: 'Demo', balance: '15000' },
 ];
 
+// Mock available users for the account
+const mockUsers = [
+  { id: 'user1', name: 'John Doe', email: 'john@example.com' },
+  { id: 'user2', name: 'Jane Smith', email: 'jane@example.com' },
+  { id: 'user3', name: 'Michael Johnson', email: 'michael@example.com' },
+];
+
 const AccountProfile = () => {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
@@ -92,15 +100,19 @@ const AccountProfile = () => {
   const [isAddKeyDialogOpen, setIsAddKeyDialogOpen] = useState(false);
   
   // Form state for new API key
-  const [newKeyName, setNewKeyName] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
   const [newClientId, setNewClientId] = useState('');
   const [newSecret, setNewSecret] = useState('');
   const [newAccessToken, setNewAccessToken] = useState('');
   const [selectedTradingAccount, setSelectedTradingAccount] = useState('');
+  const [isTesting, setIsTesting] = useState(false);
+  const [isTestSuccessful, setIsTestSuccessful] = useState(false);
+  const [availableTradingAccounts, setAvailableTradingAccounts] = useState(mockTradingAccounts);
 
   // Mock account data based on accountId
   const accountName = `Account ${accountId?.slice(-3)}`;
   
+  // Toggle show/hide secrets
   const toggleShowSecret = (keyId: string) => {
     setShowSecrets(prev => ({
       ...prev,
@@ -108,6 +120,7 @@ const AccountProfile = () => {
     }));
   };
 
+  // Copy values to clipboard
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
       .then(() => {
@@ -118,23 +131,70 @@ const AccountProfile = () => {
       });
   };
 
+  // Open the add key dialog
   const handleAddKey = () => {
     resetFormFields();
     setIsAddKeyDialogOpen(true);
   };
 
+  // Reset form fields
   const resetFormFields = () => {
-    setNewKeyName('');
+    setSelectedUser('');
     setNewClientId('');
     setNewSecret('');
     setNewAccessToken('');
     setSelectedTradingAccount('');
+    setIsTestSuccessful(false);
   };
 
+  // Test access token connection
+  const handleTestConnection = () => {
+    if (!newAccessToken.trim()) {
+      toast.error('Please enter an access token');
+      return;
+    }
+
+    setIsTesting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsTesting(false);
+      setIsTestSuccessful(true);
+      
+      // Simulate fetching trading accounts based on the access token
+      // In a real app, this would be an actual API call
+      const randomAccounts = [...mockTradingAccounts].sort(() => Math.random() - 0.5).slice(0, 3);
+      setAvailableTradingAccounts(randomAccounts);
+      
+      toast.success('Connection test successful!');
+    }, 1500);
+  };
+
+  // Save new API key
   const handleSaveNewKey = () => {
     // Validate form fields
-    if (!newKeyName.trim()) {
-      toast.error('Please enter a key name');
+    if (!selectedUser) {
+      toast.error('Please select a user account');
+      return;
+    }
+    
+    if (!newClientId.trim()) {
+      toast.error('Please enter a client ID');
+      return;
+    }
+
+    if (!newSecret.trim()) {
+      toast.error('Please enter a secret key');
+      return;
+    }
+
+    if (!newAccessToken.trim()) {
+      toast.error('Please enter an access token');
+      return;
+    }
+    
+    if (!isTestSuccessful) {
+      toast.error('Please test your connection first');
       return;
     }
     
@@ -144,7 +204,7 @@ const AccountProfile = () => {
     }
     
     // Find the selected account details
-    const selectedAccount = mockTradingAccounts.find(acc => acc.id === selectedTradingAccount);
+    const selectedAccount = availableTradingAccounts.find(acc => acc.id === selectedTradingAccount);
     
     if (!selectedAccount) {
       toast.error('Invalid trading account selected');
@@ -153,12 +213,15 @@ const AccountProfile = () => {
     
     const accountTradingValue = `${selectedAccount.id}|${selectedAccount.type}|${selectedAccount.balance}`;
     
+    // Find selected user
+    const user = mockUsers.find(u => u.id === selectedUser);
+    
     const newKey: ApiKey = {
       id: `key-${Date.now()}`,
-      name: newKeyName,
-      clientId: newClientId || `${accountId}-client-new`,
-      secretKey: newSecret || '*********************',
-      accessToken: newAccessToken || '*********************',
+      name: user?.name || 'Unknown User',
+      clientId: newClientId,
+      secretKey: newSecret,
+      accessToken: newAccessToken,
       accountTrading: accountTradingValue,
       createdAt: new Date().toISOString(),
       expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
@@ -448,111 +511,29 @@ const AccountProfile = () => {
           </DialogHeader>
           
           <div className="space-y-5 py-4">
+            {/* User Account Selection */}
             <div className="space-y-2">
-              <Label htmlFor="keyName" className="text-sm font-medium flex items-center">
-                API Key Name <span className="text-red-500 ml-1">*</span>
+              <Label htmlFor="userAccount" className="text-sm font-medium flex items-center">
+                User Account <span className="text-red-500 ml-1">*</span>
               </Label>
               <div className="relative">
                 <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
-                  Select User Account (chọn sẵn account đang ở trong Profile)
-                </Label>
-                <Input 
-                  id="keyName" 
-                  placeholder="Enter api key name"
-                  value={newKeyName}
-                  onChange={(e) => setNewKeyName(e.target.value)}
-                  className="border-primary/30 focus-visible:ring-primary"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="clientId" className="text-sm font-medium flex items-center">
-                API Key Name <span className="text-red-500 ml-1">*</span>
-              </Label>
-              <div className="relative">
-                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
-                  Client ID
-                </Label>
-                <Input 
-                  id="clientId" 
-                  placeholder="Enter api key name"
-                  value={newClientId}
-                  onChange={(e) => setNewClientId(e.target.value)}
-                  className="border-primary/30 focus-visible:ring-primary"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="secret" className="text-sm font-medium flex items-center">
-                API Key Name <span className="text-red-500 ml-1">*</span>
-              </Label>
-              <div className="relative">
-                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
-                  Secret
-                </Label>
-                <Input 
-                  id="secret" 
-                  placeholder="Enter api key name"
-                  value={newSecret}
-                  onChange={(e) => setNewSecret(e.target.value)}
-                  className="border-primary/30 focus-visible:ring-primary"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="accessToken" className="text-sm font-medium flex items-center">
-                API Key Name <span className="text-red-500 ml-1">*</span>
-              </Label>
-              <div className="relative">
-                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
-                  Access Token
-                </Label>
-                <Input 
-                  id="accessToken" 
-                  placeholder="Enter api key name"
-                  value={newAccessToken}
-                  onChange={(e) => setNewAccessToken(e.target.value)}
-                  className="border-primary/30 focus-visible:ring-primary"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="tradingAccount" className="text-sm font-medium flex items-center">
-                API Key Name <span className="text-red-500 ml-1">*</span>
-              </Label>
-              <div className="relative">
-                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
-                  Select Account Trading
+                  Select User Account
                 </Label>
                 <Select 
-                  value={selectedTradingAccount} 
-                  onValueChange={setSelectedTradingAccount}
+                  value={selectedUser} 
+                  onValueChange={setSelectedUser}
                 >
                   <SelectTrigger className="w-full border-primary/30 focus-visible:ring-primary">
-                    <SelectValue placeholder="Select a trading account" />
+                    <SelectValue placeholder="Select user for this account" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockTradingAccounts.map((account) => (
-                      <SelectItem key={account.id} value={account.id}>
-                        <div className="flex items-center space-x-2">
-                          <CircleDot 
-                            className={cn(
-                              "h-3 w-3",
-                              account.type === 'Live' ? "text-success" : "text-warning"
-                            )} 
-                            fill={account.type === 'Live' ? "#04ce91" : "#f59e0b"}
-                            strokeWidth={0}
-                          />
+                    {mockUsers.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        <div className="flex items-center">
+                          <User className="h-3.5 w-3.5 mr-2 text-primary" />
                           <span>
-                            {account.id} - 
-                            <span className={account.type === 'Live' ? "text-success" : "text-warning"}>
-                              {account.type}
-                            </span> 
-                            - ${account.balance}
+                            {user.name} - {user.email}
                           </span>
                         </div>
                       </SelectItem>
@@ -561,6 +542,135 @@ const AccountProfile = () => {
                 </Select>
               </div>
             </div>
+
+            {/* Client ID */}
+            <div className="space-y-2">
+              <Label htmlFor="clientId" className="text-sm font-medium flex items-center">
+                Client ID <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Client ID
+                </Label>
+                <Input 
+                  id="clientId" 
+                  placeholder="Enter client ID"
+                  value={newClientId}
+                  onChange={(e) => setNewClientId(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                />
+              </div>
+            </div>
+
+            {/* Secret */}
+            <div className="space-y-2">
+              <Label htmlFor="secret" className="text-sm font-medium flex items-center">
+                Secret <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Secret
+                </Label>
+                <Input 
+                  id="secret" 
+                  placeholder="Enter secret key"
+                  value={newSecret}
+                  onChange={(e) => setNewSecret(e.target.value)}
+                  className="border-primary/30 focus-visible:ring-primary"
+                  type="password"
+                />
+              </div>
+            </div>
+
+            {/* Access Token with Test button */}
+            <div className="space-y-2">
+              <Label htmlFor="accessToken" className="text-sm font-medium flex items-center">
+                Access Token <span className="text-red-500 ml-1">*</span>
+              </Label>
+              <div className="relative">
+                <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                  Access Token
+                </Label>
+                <div className="flex gap-2">
+                  <Input 
+                    id="accessToken" 
+                    placeholder="Enter access token"
+                    value={newAccessToken}
+                    onChange={(e) => setNewAccessToken(e.target.value)}
+                    className="border-primary/30 focus-visible:ring-primary flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleTestConnection}
+                    disabled={isTesting || !newAccessToken.trim()}
+                    className="whitespace-nowrap"
+                  >
+                    {isTesting ? (
+                      <span className="flex items-center">
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Testing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Test
+                      </span>
+                    )}
+                  </Button>
+                </div>
+                {isTestSuccessful && (
+                  <p className="text-xs text-green-600 mt-1 flex items-center">
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Connection successful!
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Account Trading Selection - Only visible after successful test */}
+            {isTestSuccessful && (
+              <div className="space-y-2">
+                <Label htmlFor="tradingAccount" className="text-sm font-medium flex items-center">
+                  Account Trading <span className="text-red-500 ml-1">*</span>
+                </Label>
+                <div className="relative">
+                  <Label className="text-xs text-primary absolute -top-2.5 left-3 px-1 bg-background">
+                    Select Account Trading
+                  </Label>
+                  <Select 
+                    value={selectedTradingAccount} 
+                    onValueChange={setSelectedTradingAccount}
+                  >
+                    <SelectTrigger className="w-full border-primary/30 focus-visible:ring-primary">
+                      <SelectValue placeholder="Select a trading account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTradingAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          <div className="flex items-center space-x-2">
+                            <CircleDot 
+                              className={cn(
+                                "h-3 w-3",
+                                account.type === 'Live' ? "text-success" : "text-warning"
+                              )} 
+                              fill={account.type === 'Live' ? "#04ce91" : "#f59e0b"}
+                              strokeWidth={0}
+                            />
+                            <span>
+                              {account.id} - 
+                              <span className={account.type === 'Live' ? "text-success" : "text-warning"}>
+                                {account.type}
+                              </span> 
+                              - ${account.balance}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter className="flex justify-between items-center gap-2 sm:gap-0">
@@ -574,7 +684,8 @@ const AccountProfile = () => {
             <Button 
               onClick={handleSaveNewKey} 
               className="flex-1 sm:flex-initial bg-primary hover:bg-primary/90"
-              disabled={!newKeyName.trim() || !selectedTradingAccount}
+              disabled={!selectedUser || !newClientId.trim() || !newSecret.trim() || 
+                !isTestSuccessful || !selectedTradingAccount}
             >
               Create API
             </Button>
