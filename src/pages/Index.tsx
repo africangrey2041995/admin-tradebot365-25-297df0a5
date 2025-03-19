@@ -86,7 +86,8 @@ const Index = () => {
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                   <Button 
                     size="lg"
-                    className="bg-white hover:bg-white/90 text-blue-700 font-medium"
+                    variant="blue"
+                    className="font-medium"
                     onClick={() => navigate('/premium-bots')}
                   >
                     Khám phá ngay
