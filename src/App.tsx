@@ -20,13 +20,26 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 
-// Your Public Clerk publishable key - you'll need to replace this with your actual key
-const PUBLISHABLE_KEY = "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
+// Fixed Clerk publishable key - this is your test key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+  <ClerkProvider 
+    publishableKey={PUBLISHABLE_KEY}
+    appearance={{
+      baseTheme: "dark",
+      variables: {
+        colorPrimary: '#04ce91',
+        colorBackground: '#111111',
+        colorInputBackground: '#1a1a1a',
+        colorTextOnPrimaryBackground: '#222222',
+        colorText: '#ffffff',
+        colorInputText: '#ffffff'
+      }
+    }}
+  >
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />

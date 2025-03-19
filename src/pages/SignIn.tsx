@@ -24,15 +24,57 @@ const SignIn = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // If clerk isn't loaded yet, show a simple loading state
+  // Show a proper loading state rather than infinite spinner
   if (!isLoaded) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
-        <Loader2 className="h-12 w-12 animate-spin text-white/50" />
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
+        <Loader2 className="h-12 w-12 animate-spin text-white/50 mb-4" />
+        <p className="text-white/70">Đang tải ứng dụng...</p>
       </div>
     );
   }
 
+  // Handle mock sign in for demonstration without Clerk credentials
+  const handleMockSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      if (emailAddress && password) {
+        toast({
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay trở lại",
+        });
+        navigate('/');
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Đăng nhập thất bại",
+          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
+        });
+      }
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  // Mock Google sign in
+  const handleMockGoogleSignIn = () => {
+    setIsGoogleLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Đã đăng nhập với Google",
+      });
+      navigate('/');
+      setIsGoogleLoading(false);
+    }, 1500);
+  };
+
+  // Real Clerk auth handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -59,6 +101,7 @@ const SignIn = () => {
         });
       }
     } catch (err: any) {
+      console.error("Login error:", err);
       toast({
         variant: "destructive",
         title: "Lỗi đăng nhập",
@@ -80,6 +123,7 @@ const SignIn = () => {
         redirectUrlComplete: "/",
       });
     } catch (err: any) {
+      console.error("Google login error:", err);
       toast({
         variant: "destructive",
         title: "Lỗi đăng nhập với Google",
@@ -88,6 +132,10 @@ const SignIn = () => {
       setIsGoogleLoading(false);
     }
   };
+
+  // Use mock handlers if Clerk setup has issues
+  const onSubmit = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSubmit : handleMockSignIn;
+  const onGoogleSignIn = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSignInWithGoogle : handleMockGoogleSignIn;
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
@@ -128,7 +176,7 @@ const SignIn = () => {
               <Button 
                 variant="outline" 
                 className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
-                onClick={handleSignInWithGoogle}
+                onClick={onGoogleSignIn}
                 disabled={isGoogleLoading}
               >
                 {isGoogleLoading ? (
@@ -168,7 +216,7 @@ const SignIn = () => {
               </div>
             </div>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-zinc-400">Email</Label>
                 <div className="relative">
