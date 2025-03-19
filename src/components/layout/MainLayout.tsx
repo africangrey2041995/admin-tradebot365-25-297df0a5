@@ -4,6 +4,8 @@ import FixedNavigation from './FixedNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import SidebarNav from './SidebarNav';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -14,40 +16,48 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
-      <div className="fixed top-0 z-50 w-full">
-        <FixedNavigation />
-      </div>
-      
-      <main className={cn(
-        isMobile 
-          ? "px-4 pb-6 pt-20" // Added padding top for fixed navbar 
-          : "ml-64 pt-20",    // Set a fixed padding top for the navbar height
-        "transition-all duration-300 ease-in-out"
-      )}>
-        <div className="container mx-auto max-w-7xl px-4 py-6">
-          {title && !isMobile && (
-            <motion.h1 
-              className="text-2xl font-semibold mb-6 text-slate-800 dark:text-white"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {title}
-            </motion.h1>
-          )}
+    <SidebarProvider>
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 flex w-full">
+        {/* Sidebar */}
+        <SidebarNav />
+        
+        <div className="flex-1 flex flex-col">
+          {/* Fixed Navigation at top */}
+          <div className="fixed top-0 z-50 w-full">
+            <FixedNavigation />
+          </div>
           
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-zinc-700"
-          >
-            {children}
-          </motion.div>
+          <main className={cn(
+            isMobile 
+              ? "px-4 pb-6 pt-20" // Added padding top for fixed navbar 
+              : "pt-20",    // Set a fixed padding top for the navbar height
+            "transition-all duration-300 ease-in-out"
+          )}>
+            <div className="container mx-auto max-w-7xl px-4 py-6">
+              {title && !isMobile && (
+                <motion.h1 
+                  className="text-2xl font-semibold mb-6 text-slate-800 dark:text-white"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {title}
+                </motion.h1>
+              )}
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-zinc-700"
+              >
+                {children}
+              </motion.div>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
