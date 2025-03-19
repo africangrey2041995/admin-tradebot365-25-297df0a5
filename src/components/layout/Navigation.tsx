@@ -15,7 +15,11 @@ const Navigation = () => {
           {isMobile && <SidebarTrigger />}
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-lg font-bold text-emerald-500">Trade Bot 365</span>
+            <img 
+              src="/lovable-uploads/a57bc727-8802-4d7e-aca8-de799a52c174.png" 
+              alt="Trade Bot 365" 
+              className="h-8 w-auto" 
+            />
           </Link>
         </div>
         
