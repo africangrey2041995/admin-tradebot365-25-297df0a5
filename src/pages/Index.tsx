@@ -86,7 +86,7 @@ const Index = () => {
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                   <Button 
                     size="lg"
-                    variant="blue"
+                    variant="tradebot"
                     className="font-medium"
                     onClick={() => navigate('/premium-bots')}
                   >
