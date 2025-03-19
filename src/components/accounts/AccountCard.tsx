@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MoreHorizontal, Star } from 'lucide-react';
+import { MoreHorizontal, Star, Mail, Link, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -56,10 +56,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
     return colors[index];
   };
 
-  // Extract account ID number for display
-  const getAccountNumber = (id: string) => {
-    const matches = id.match(/\d+/);
-    return matches ? matches[0] : id;
+  // Mock API and Account counts for demo purposes
+  const getApiCount = () => {
+    // This would come from actual data in production
+    return Math.floor(Math.random() * 5) + 1;
+  };
+  
+  const getAccountCount = () => {
+    // This would come from actual data in production
+    return Math.floor(Math.random() * 3) + 1;
   };
 
   return (
@@ -104,8 +109,9 @@ const AccountCard: React.FC<AccountCardProps> = ({
                 </DropdownMenu>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              <span>API {getAccountNumber(account.ctidTraderAccountId)}</span>
+            <div className="text-sm text-muted-foreground mt-1 flex items-center">
+              <Mail className="h-3.5 w-3.5 mr-1" />
+              <span>user@coinstratpro.com</span>
             </div>
           </div>
         </div>
@@ -113,12 +119,18 @@ const AccountCard: React.FC<AccountCardProps> = ({
       
       <div className="grid grid-cols-2 gap-4 mt-5">
         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-md text-center">
-          <div className="text-lg font-semibold">{getAccountNumber(account.clientId)}</div>
-          <div className="text-xs text-muted-foreground">Projects</div>
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <Link className="h-4 w-4 text-blue-500" />
+            <span className="text-lg font-semibold">{getApiCount()}</span>
+          </div>
+          <div className="text-xs text-muted-foreground">APIs</div>
         </div>
         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-md text-center">
-          <div className="text-lg font-semibold">{getAccountNumber(account.secretId)}</div>
-          <div className="text-xs text-muted-foreground">Tasks</div>
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <Users className="h-4 w-4 text-green-500" />
+            <span className="text-lg font-semibold">{getAccountCount()}</span>
+          </div>
+          <div className="text-xs text-muted-foreground">Accounts</div>
         </div>
       </div>
       
