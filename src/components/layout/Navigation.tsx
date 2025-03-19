@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -11,7 +12,8 @@ import {
   Settings, 
   Sparkles,
   Bell,
-  LogOut
+  LogOut,
+  UserCircle
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -278,7 +280,7 @@ const Navigation = () => {
             <DropdownMenuLabel className="text-zinc-400">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-zinc-700" />
             <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
-              <User className="mr-2 h-4 w-4 text-zinc-400" />
+              <UserCircle className="mr-2 h-4 w-4 text-zinc-400" />
               <span>Profile</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white">
