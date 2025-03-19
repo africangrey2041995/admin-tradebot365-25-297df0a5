@@ -29,14 +29,15 @@ const App = () => (
   <ClerkProvider 
     publishableKey={PUBLISHABLE_KEY}
     appearance={{
-      baseTheme: "dark",
-      variables: {
-        colorPrimary: '#04ce91',
-        colorBackground: '#111111',
-        colorInputBackground: '#1a1a1a',
-        colorTextOnPrimaryBackground: '#222222',
-        colorText: '#ffffff',
-        colorInputText: '#ffffff'
+      baseTheme: {
+        variables: {
+          colorPrimary: '#04ce91',
+          colorBackground: '#111111',
+          colorInputBackground: '#1a1a1a',
+          colorTextOnPrimaryBackground: '#222222',
+          colorText: '#ffffff',
+          colorInputText: '#ffffff'
+        }
       }
     }}
   >
