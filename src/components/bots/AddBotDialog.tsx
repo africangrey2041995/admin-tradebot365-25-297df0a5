@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -87,6 +86,7 @@ const exchanges = [
   { name: 'Bybit', value: 'bybit' },
   { name: 'KuCoin', value: 'kucoin' },
   { name: 'OKX', value: 'okx' },
+  { name: 'Coinstart Pro', value: 'coinstart_pro' },
 ];
 
 const botForms = [
@@ -96,6 +96,7 @@ const botForms = [
   { name: 'Market Making', value: 'market_making' },
   { name: 'Arbitrage', value: 'arbitrage' },
   { name: 'Sentiment Analysis', value: 'sentiment' },
+  { name: 'Trading View', value: 'trading_view' },
 ];
 
 const getBotIcon = (iconName: string) => {
