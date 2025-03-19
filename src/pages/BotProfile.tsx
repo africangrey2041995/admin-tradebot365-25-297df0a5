@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -37,6 +36,7 @@ import { BotCardProps } from '@/components/bots/BotCard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AddAccountDialog from '@/components/bots/AddAccountDialog';
 
 const BotProfile = () => {
@@ -46,18 +46,14 @@ const BotProfile = () => {
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
-  // Mock webhook and token data
   const [webhookUrl] = useState(`https://api.coinstart.pro/webhook/${botId?.toLowerCase()}`);
   const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
   
   useEffect(() => {
-    // Simulate API call to fetch bot details
     const fetchBotDetails = () => {
       setIsLoading(true);
       
-      // Mock data - in a real app, this would be an API call
       setTimeout(() => {
-        // Simulate finding the bot
         const mockBot: BotCardProps = {
           title: botId === 'BOT7459' ? 'Ultra 2in1' : 
                  botId === 'BOT8932' ? 'Long Master' :
@@ -97,7 +93,6 @@ const BotProfile = () => {
     toast.success(`${type} copied to clipboard`);
   };
 
-  // Fixed getBotIcon function that doesn't try to access type property on ReactNode
   const getBotIcon = (iconName: string = 'bot') => {
     switch (iconName) {
       case 'bot': return <Bot className="h-7 w-7" />;
@@ -116,7 +111,6 @@ const BotProfile = () => {
   };
 
   const handleAddAccount = (accountData: any) => {
-    // In a real app, this would be an API call to add the account
     console.log('Adding account:', accountData, 'to bot:', botId);
     toast.success('Account added successfully!');
   };
@@ -333,6 +327,7 @@ Example format:
             <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
             <TabsTrigger value="signals">Signal History</TabsTrigger>
             <TabsTrigger value="logs">Logs From Trading View</TabsTrigger>
+            <TabsTrigger value="coinstrat">Log to Coinstrat Pro</TabsTrigger>
           </TabsList>
           
           <TabsContent value="accounts">
@@ -433,6 +428,23 @@ Example format:
               </CardHeader>
               <CardContent>
                 <TradingViewLogs botId={bot.botId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="coinstrat">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Log to Coinstrat Pro</CardTitle>
+                    <CardDescription>Signals pushed to connected accounts via Coinstrat Pro</CardDescription>
+                  </div>
+                  <Button variant="outline">Refresh</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CoinstratLogs botId={bot.botId} />
               </CardContent>
             </Card>
           </TabsContent>
