@@ -5,8 +5,11 @@ import PropTradingPromo from '@/components/dashboard/PropTradingPromo';
 import ActivityOverview from '@/components/dashboard/ActivityOverview';
 import SystemStats from '@/components/dashboard/SystemStats';
 import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Index = () => {
+  const { t } = useLanguage();
+  
   // Mock statistics for demonstration
   const dashboardStats = {
     totalBots: 5,
@@ -23,7 +26,7 @@ const Index = () => {
   };
 
   return (
-    <MainLayout title="Bảng Điều Khiển">
+    <MainLayout title={t('Dashboard')}>
       <PropTradingPromo />
       <PremiumBotsPromo />
       <ActivityOverview dashboardStats={dashboardStats} />
