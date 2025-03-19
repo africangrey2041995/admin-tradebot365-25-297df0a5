@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PlusCircle, Search, User, MoreHorizontal, Key } from 'lucide-react';
+import { PlusCircle, Search, User, MoreHorizontal, Key, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,9 +24,23 @@ import {
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { toast } from 'sonner';
 import { Account } from '@/types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newAccount, setNewAccount] = useState({
+    name: '',
+    designation: '',
+  });
 
   // Mock data for demonstration
   const mockAccounts: Account[] = [
@@ -75,9 +89,17 @@ const Accounts = () => {
   };
 
   const handleAddAccount = () => {
-    toast('Tính năng này sẽ được triển khai trong phiên bản tiếp theo', {
-      description: 'Bạn sẽ có thể thêm và quản lý tài khoản tại đây.',
+    setIsAddDialogOpen(true);
+  };
+
+  const handleSaveAccount = () => {
+    // In a real app, you'd save this to your database
+    toast('Tài khoản đã được thêm thành công', {
+      description: `Tên: ${newAccount.name}, Email: ${newAccount.designation}`,
     });
+    setIsAddDialogOpen(false);
+    // Reset form
+    setNewAccount({ name: '', designation: '' });
   };
 
   const handleEditAccount = (clientId: string) => {
@@ -188,6 +210,75 @@ const Accounts = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Add Account Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-md p-0">
+          <div className="relative h-32 bg-gradient-to-r from-blue-600 to-cyan-600 flex items-center justify-center">
+            <img 
+              src="/lovable-uploads/ae37eee6-8a7d-4956-9884-b975704fc9e5.png" 
+              alt="Cover"
+              className="absolute inset-0 h-full w-full object-cover opacity-40"
+            />
+            <X 
+              className="absolute top-2 right-2 h-5 w-5 text-white cursor-pointer hover:opacity-80" 
+              onClick={() => setIsAddDialogOpen(false)}
+            />
+            <div className="relative z-10 mt-10">
+              <Avatar className="h-20 w-20 border-4 border-white bg-white">
+                <AvatarImage src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" alt="Trade Bot 365" />
+                <AvatarFallback>TB</AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
+          
+          <div className="p-6 pt-16">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl font-medium mb-4">Thêm Tài Khoản Mới</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">Name</Label>
+                <div className="relative">
+                  <Input 
+                    id="name" 
+                    placeholder="Enter name" 
+                    value={newAccount.name}
+                    onChange={(e) => setNewAccount({...newAccount, name: e.target.value})}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground">Name = Name Account</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="designation" className="text-sm font-medium">Designation</Label>
+                <div className="relative">
+                  <Input 
+                    id="designation" 
+                    placeholder="Enter designation" 
+                    value={newAccount.designation}
+                    onChange={(e) => setNewAccount({...newAccount, designation: e.target.value})}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground">Designation = Email Account</div>
+              </div>
+            </div>
+            
+            <DialogFooter className="mt-6 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Close
+              </Button>
+              <Button 
+                onClick={handleSaveAccount} 
+                disabled={!newAccount.name || !newAccount.designation}
+                className="bg-green-500 hover:bg-green-600"
+              >
+                Add Member
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
