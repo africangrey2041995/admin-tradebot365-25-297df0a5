@@ -3,8 +3,9 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import { useNavigate } from 'react-router-dom';
-import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock } from 'lucide-react';
+import { CircuitBoard, Users, TrendingUp, BarChart3, Bell, Clock, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -202,6 +203,41 @@ const Index = () => {
       </div>
 
       <motion.div
+        className="mb-8"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1 }
+        }}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        <DashboardCard 
+          title="Premium Bots" 
+          icon={<Sparkles className="h-5 w-5" />}
+          color="warning"
+        >
+          <div className="p-4">
+            <div className="prose max-w-none mb-4">
+              <h3 className="text-lg font-medium text-slate-800 dark:text-white">Bot Giao Dịch Cao Cấp</h3>
+              <p className="text-slate-600 dark:text-slate-300">
+                Trade Bot 365 cung cấp các Premium Bot giao dịch do đội ngũ chuyên gia phát triển với hiệu suất cao và độ ổn định vượt trội.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <Button 
+                className="gap-2" 
+                onClick={() => navigate('/premium-bots')}
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>Khám Phá Premium Bots</span>
+              </Button>
+            </div>
+          </div>
+        </DashboardCard>
+      </motion.div>
+
+      <motion.div
         className="mt-8"
         variants={{
           hidden: { opacity: 0 },
@@ -221,6 +257,7 @@ const Index = () => {
               <h3 className="text-lg font-medium text-slate-800 dark:text-white">Bắt Đầu Nhanh</h3>
               <ul className="list-disc pl-5 text-slate-600 dark:text-slate-300 space-y-2">
                 <li>Thêm bot của bạn trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/bots')}>Quản Lý Bot</span></li>
+                <li>Khám phá và sử dụng <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/premium-bots')}>Premium Bots</span> do Trade Bot 365 phát triển</li>
                 <li>Cấu hình tài khoản của bạn trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/accounts')}>Quản Lý Tài Khoản</span></li>
                 <li>Theo dõi trạng thái kết nối trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/accounts')}>Quản Lý Tài Khoản</span></li>
                 <li>Theo dõi hoạt động tín hiệu trong phần <span className="font-medium text-primary cursor-pointer" onClick={() => navigate('/bots')}>Quản Lý Bot</span></li>

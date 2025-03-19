@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, CircuitBoard, Users, Menu, X, ChevronDown, Settings } from 'lucide-react';
+import { LayoutDashboard, CircuitBoard, Users, Menu, X, ChevronDown, Settings, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,6 +17,11 @@ const routes = [
     path: '/bots',
     label: 'Quản Lý Bot',
     icon: <CircuitBoard className="h-5 w-5" />
+  },
+  {
+    path: '/premium-bots',
+    label: 'Premium Bots',
+    icon: <Sparkles className="h-5 w-5" />
   },
   {
     path: '/accounts',

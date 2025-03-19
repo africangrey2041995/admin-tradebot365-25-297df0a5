@@ -10,6 +10,8 @@ import Bots from "./pages/Bots";
 import BotProfile from "./pages/BotProfile";
 import Accounts from "./pages/Accounts";
 import AccountProfile from "./pages/AccountProfile";
+import PremiumBots from "./pages/PremiumBots";
+import PremiumBotDetail from "./pages/PremiumBotDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/bots" element={<Bots />} />
             <Route path="/bots/:botId" element={<BotProfile />} />
+            <Route path="/premium-bots" element={<PremiumBots />} />
+            <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/accounts/:accountId" element={<AccountProfile />} />
             <Route path="*" element={<NotFound />} />
