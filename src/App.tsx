@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import Bots from "./pages/Bots";
+import BotProfile from "./pages/BotProfile";
 import Accounts from "./pages/Accounts";
 import AccountProfile from "./pages/AccountProfile";
 import Connections from "./pages/Connections";
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/bots" element={<Bots />} />
+            <Route path="/bots/:botId" element={<BotProfile />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/accounts/:accountId" element={<AccountProfile />} />
             <Route path="/connections" element={<Connections />} />

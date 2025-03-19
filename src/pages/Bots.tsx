@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -11,11 +12,7 @@ import {
 import {
   Search, 
   Plus, 
-  Calendar, 
-  Star, 
-  MoreHorizontal, 
   Bookmark,
-  Eye,
   Bot,
   Cpu,
   Server,
@@ -23,189 +20,9 @@ import {
   CircuitBoard,
   Gem
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Bot as BotType } from '@/types';
+import BotCard, { BotCardProps } from '@/components/bots/BotCard';
 import { AddBotDialog } from '@/components/bots/AddBotDialog';
-
-interface BotCardProps {
-  title: string;
-  subtitle?: string;
-  botId: string;
-  accountCount?: string;
-  lastUpdated?: string;
-  onFavorite?: () => void;
-  isFavorite?: boolean;
-  colorScheme?: 'red' | 'blue' | 'green' | 'purple' | 'default';
-  onAddAccount?: () => void;
-  onViewBot?: () => void;
-  avatarSrc?: string;
-  avatarIcon?: React.ReactNode;
-}
-
-const BotCard = ({
-  title,
-  subtitle,
-  botId,
-  accountCount,
-  lastUpdated,
-  onFavorite,
-  isFavorite = false,
-  colorScheme = 'default',
-  onAddAccount,
-  onViewBot,
-  avatarSrc,
-  avatarIcon
-}: BotCardProps) => {
-  
-  const truncateText = (text: string, maxLength: number) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
-  
-  const formattedSubtitle = subtitle ? truncateText(subtitle, 75) : '';
-  
-  const colorClasses = {
-    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-red-100/30',
-    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-blue-100/30',
-    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-green-100/30',
-    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-purple-100/30',
-    default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200 hover:shadow-slate-100/30'
-  };
-  
-  const avatarBgColors = {
-    red: 'bg-red-100 text-red-600',
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    default: 'bg-slate-100 text-slate-600'
-  };
-
-  const buttonColors = {
-    red: 'bg-white hover:bg-white/90 text-red-600 border-red-200',
-    blue: 'bg-white hover:bg-white/90 text-blue-600 border-blue-200',
-    green: 'bg-white hover:bg-white/90 text-green-600 border-green-200',
-    purple: 'bg-white hover:bg-white/90 text-purple-600 border-purple-200',
-    default: 'bg-white hover:bg-white/90 text-slate-600 border-slate-200'
-  };
-
-  const viewButtonColors = {
-    red: 'text-red-600',
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    purple: 'text-purple-600',
-    default: 'text-slate-600'
-  };
-  
-  return (
-    <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex-grow">
-          <div className="flex justify-center mb-3">
-            <Avatar className={`h-16 w-16 ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
-              {avatarSrc ? (
-                <AvatarImage src={avatarSrc} alt={title} />
-              ) : (
-                <AvatarFallback className="text-xl">
-                  {avatarIcon || <Bot className="h-7 w-7" />}
-                </AvatarFallback>
-              )}
-            </Avatar>
-          </div>
-        </div>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-black/5">
-              <MoreHorizontal className="h-5 w-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={onViewBot}>
-              <Eye className="h-4 w-4 mr-2" />
-              Xem Chi Tiết
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={onAddAccount}>
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm Tài Khoản
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive cursor-pointer">
-              Xoá Bot
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      <div className="text-center mb-3">
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
-          <button 
-            onClick={onFavorite}
-            className="text-yellow-400 hover:text-yellow-500 transition-colors"
-            aria-label="Toggle favorite"
-          >
-            <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
-          </button>
-        </div>
-        <div className="h-10 flex items-center justify-center">
-          <p className="text-sm text-muted-foreground leading-tight mx-auto line-clamp-2">
-            {formattedSubtitle || "—"}
-          </p>
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between py-2.5 px-3 mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100">
-        <div className="flex items-center">
-          <p className="text-xs font-medium mr-1.5 text-slate-500">ID:</p>
-          <div className="text-sm font-medium tracking-wide text-slate-700">{botId}</div>
-        </div>
-        
-        {lastUpdated && (
-          <div className="flex items-center text-xs font-medium text-slate-500">
-            <Calendar className="h-3 w-3 mr-1" />
-            {lastUpdated}
-          </div>
-        )}
-      </div>
-      
-      <div className="flex justify-between items-center px-3 py-2.5 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100 mb-4">
-        <div className="flex items-center gap-1.5">
-          <p className="text-xs text-slate-500">Accounts:</p>
-          <div className="text-sm font-medium text-slate-700">{accountCount}</div>
-        </div>
-        
-        <button 
-          onClick={onAddAccount}
-          className="h-6 w-6 rounded-full bg-white hover:bg-slate-50 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600"
-          aria-label="Add account"
-        >
-          <Plus className="h-3 w-3" />
-        </button>
-      </div>
-      
-      <Button 
-        variant="outline" 
-        onClick={onViewBot} 
-        className={`w-full py-2 h-auto ${buttonColors[colorScheme]} shadow-sm font-medium mt-auto flex gap-2 justify-center items-center`}
-      >
-        <Eye className={`h-4 w-4 ${viewButtonColors[colorScheme]}`} />
-        <span>View Bot</span>
-      </Button>
-    </div>
-  );
-};
 
 const Bots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -222,7 +39,8 @@ const Bots = () => {
       accountCount: '18/42',
       lastUpdated: '10 Jul, 2023',
       colorScheme: 'red',
-      avatarIcon: <Bot className="h-5 w-5" />
+      avatarIcon: <Bot className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'Long Master',
@@ -231,7 +49,8 @@ const Bots = () => {
       accountCount: '22/56',
       lastUpdated: '18 May, 2023',
       colorScheme: 'blue',
-      avatarIcon: <Cpu className="h-5 w-5" />
+      avatarIcon: <Cpu className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'Gold Trading',
@@ -240,7 +59,8 @@ const Bots = () => {
       accountCount: '14/20',
       lastUpdated: '21 Feb, 2023',
       colorScheme: 'green',
-      avatarIcon: <Server className="h-5 w-5" />
+      avatarIcon: <Server className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'Bitcoin Trading',
@@ -249,7 +69,8 @@ const Bots = () => {
       accountCount: '20/34',
       lastUpdated: '03 Aug, 2023',
       colorScheme: 'purple',
-      avatarIcon: <Terminal className="h-5 w-5" />
+      avatarIcon: <Terminal className="h-5 w-5" />,
+      status: 'Inactive'
     },
     {
       title: 'Forex Master',
@@ -257,7 +78,8 @@ const Bots = () => {
       botId: 'BOT1267',
       accountCount: '15/25',
       lastUpdated: '15 May, 2023',
-      avatarIcon: <CircuitBoard className="h-5 w-5" />
+      avatarIcon: <CircuitBoard className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'Scalping Pro',
@@ -265,7 +87,8 @@ const Bots = () => {
       botId: 'BOT9381',
       accountCount: '8/12',
       lastUpdated: '21 Feb, 2023',
-      avatarIcon: <Gem className="h-5 w-5" />
+      avatarIcon: <Gem className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'Swing Trader',
@@ -273,7 +96,8 @@ const Bots = () => {
       botId: 'BOT6452',
       accountCount: '12/20',
       lastUpdated: '05 Aug, 2023',
-      avatarIcon: <Bot className="h-5 w-5" />
+      avatarIcon: <Bot className="h-5 w-5" />,
+      status: 'Active'
     },
     {
       title: 'ETF Strategy',
@@ -281,7 +105,8 @@ const Bots = () => {
       botId: 'BOT3815',
       accountCount: '10/15',
       lastUpdated: '10 Jul, 2023',
-      avatarIcon: <Cpu className="h-5 w-5" />
+      avatarIcon: <Cpu className="h-5 w-5" />,
+      status: 'Active'
     },
   ]);
 
@@ -325,7 +150,10 @@ const Bots = () => {
       accountCount: '0/0',
       lastUpdated: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, ''),
       colorScheme: values.colorScheme,
-      avatarIcon: getBotIcon(values.icon)
+      avatarIcon: getBotIcon(values.icon),
+      status: 'Active',
+      exchange: values.exchange,
+      botForm: values.botForm
     };
     
     setBots(prevBots => [newBot, ...prevBots]);
@@ -336,18 +164,6 @@ const Bots = () => {
       ...prev,
       [index]: !prev[index]
     }));
-  };
-
-  const handleAddAccount = () => {
-    toast('Thêm Tài Khoản', {
-      description: 'Tính năng thêm tài khoản sẽ được triển khai trong phiên bản tiếp theo.',
-    });
-  };
-  
-  const handleViewBot = (botId: string) => {
-    toast('Xem Bot', {
-      description: `Xem chi tiết bot ${botId}. Tính năng này sẽ được triển khai trong phiên bản tiếp theo.`,
-    });
   };
 
   return (
@@ -384,9 +200,6 @@ const Bots = () => {
               key={index} 
               {...bot} 
               isFavorite={favorites[index] || false}
-              onFavorite={() => toggleFavorite(index)}
-              onAddAccount={handleAddAccount}
-              onViewBot={() => handleViewBot(bot.botId)}
             />
           ))}
         </div>
@@ -420,4 +233,3 @@ const Bots = () => {
 };
 
 export default Bots;
-
