@@ -19,11 +19,13 @@ import {
   ChevronLeft,
   CircleDollarSign,
   Activity,
-  PieChart
+  PieChart,
+  Plus,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -41,6 +43,10 @@ import {
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 import { Account } from '@/types';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
+import TradingViewLogs from '@/components/bots/TradingViewLogs';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 
 const premiumBots = [
   {
@@ -103,6 +109,7 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -210,8 +217,13 @@ const PremiumBotDetail = () => {
     { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
   ];
 
+  const handleAddAccount = (accountData: any) => {
+    console.log('Adding account:', accountData, 'to premium bot:', botId);
+    toast.success('Account added successfully!');
+  };
+
   return (
-    <MainLayout title={bot.name}>
+    <MainLayout title={bot?.name || "Premium Bot Detail"}>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-2">
@@ -225,11 +237,11 @@ const PremiumBotDetail = () => {
               Quay lại
             </Button>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
-              {bot.name}
+              {bot?.name}
               <Sparkles className="h-5 w-5 text-yellow-500 ml-2" />
             </h1>
-            <Badge className={getRiskColor(bot.risk)}>
-              Rủi ro: {getRiskLabel(bot.risk)}
+            <Badge className={getRiskColor(bot?.risk)}>
+              Rủi ro: {getRiskLabel(bot?.risk)}
             </Badge>
           </div>
           <Button onClick={handleSubscribe}>
@@ -246,13 +258,13 @@ const PremiumBotDetail = () => {
               <CardContent>
                 <div className="prose max-w-none dark:prose-invert">
                   <p className="text-slate-600 dark:text-slate-300 whitespace-pre-line">
-                    {bot.longDescription}
+                    {bot?.longDescription}
                   </p>
                 </div>
                 <div className="mt-6">
                   <h4 className="font-medium text-slate-800 dark:text-white mb-2">Các cặp tiền giao dịch</h4>
                   <div className="flex flex-wrap gap-2">
-                    {bot.pairs.map((pair, index) => (
+                    {bot?.pairs.map((pair, index) => (
                       <Badge key={index} variant="outline">{pair}</Badge>
                     ))}
                   </div>
@@ -407,7 +419,7 @@ const PremiumBotDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {bot.features.map((feature, index) => (
+                  {bot?.features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500" />
                       <span className="text-slate-700 dark:text-slate-300">{feature}</span>
@@ -429,7 +441,7 @@ const PremiumBotDetail = () => {
                     <Bot className="h-4 w-4 text-slate-500" />
                     <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
                   </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot.type)}</span>
+                  <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot?.type)}</span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
@@ -437,7 +449,7 @@ const PremiumBotDetail = () => {
                     <CircuitBoard className="h-4 w-4 text-slate-500" />
                     <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
                   </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot.exchange}</span>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.exchange}</span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
@@ -445,7 +457,7 @@ const PremiumBotDetail = () => {
                     <Wallet className="h-4 w-4 text-slate-500" />
                     <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
                   </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot.minCapital}</span>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.minCapital}</span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
@@ -453,7 +465,7 @@ const PremiumBotDetail = () => {
                     <Users className="h-4 w-4 text-slate-500" />
                     <span className="text-slate-600 dark:text-slate-300">Người dùng</span>
                   </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot.subscribers}</span>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.subscribers}</span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
@@ -461,7 +473,7 @@ const PremiumBotDetail = () => {
                     <Calendar className="h-4 w-4 text-slate-500" />
                     <span className="text-slate-600 dark:text-slate-300">Ngày tạo</span>
                   </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot.createdDate}</span>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.createdDate}</span>
                 </div>
               </CardContent>
             </Card>
@@ -477,7 +489,7 @@ const PremiumBotDetail = () => {
                     <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
                   </div>
                   <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                    {bot.performanceLastMonth}
+                    {bot?.performanceLastMonth}
                   </div>
                 </div>
                 
@@ -487,7 +499,7 @@ const PremiumBotDetail = () => {
                     <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
                   </div>
                   <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                    {bot.performanceAllTime}
+                    {bot?.performanceAllTime}
                   </div>
                 </div>
               </CardContent>
@@ -499,7 +511,7 @@ const PremiumBotDetail = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                  Đăng ký sử dụng {bot.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
+                  Đăng ký sử dụng {bot?.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
                 </p>
                 <Button onClick={handleSubscribe} className="w-full">
                   Đăng Ký Ngay
@@ -509,17 +521,23 @@ const PremiumBotDetail = () => {
           </div>
         </div>
       </div>
-
+      
       <SubscribePremiumBotDialog
         open={subscribeDialogOpen}
         onOpenChange={setSubscribeDialogOpen}
-        botId={bot.id}
-        botName={bot.name}
+        botId={bot?.id || ''}
+        botName={bot?.name || ''}
         onSubscribe={confirmSubscription}
+      />
+      
+      <AddAccountDialog 
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={bot?.id || ''}
+        onAddAccount={handleAddAccount}
       />
     </MainLayout>
   );
 };
 
 export default PremiumBotDetail;
-
