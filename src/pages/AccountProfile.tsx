@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -51,13 +50,22 @@ interface ApiKey {
 }
 
 const generateMockApiKeys = (accountId: string): ApiKey[] => {
+  // Array of diverse account trading values
+  const accountTradingValues = [
+    '554466|Live|5000',
+    '778899|Demo|10000',
+    '112233|Live|2500',
+    '445566|Live|7500',
+    '990011|Demo|15000'
+  ];
+  
   return Array(5).fill(null).map((_, index) => ({
     id: `key-${index}`,
     name: `Streamlab`,
     clientId: `${accountId}-client-${index}`,
     secretKey: '*********************',
     accessToken: '*********************',
-    accountTrading: Math.random() > 0.5 ? '554466|Live|5000' : '10',
+    accountTrading: accountTradingValues[index],
     createdAt: new Date().toISOString(),
     expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
     status: Math.random() > 0.3 ? 'ACTIVE' : 'BLOCK',
