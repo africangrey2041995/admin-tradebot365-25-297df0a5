@@ -17,6 +17,8 @@ createRoot(document.getElementById("root")!).render(
     clerkJSVersion="5.56.0-snapshot.v20250312225817"
     signInUrl="/sign-in"
     signUpUrl="/sign-up"
+    afterSignInUrl="/"
+    afterSignUpUrl="/"
     signInFallbackRedirectUrl="/"
     signUpFallbackRedirectUrl="/"
     signInForceRedirectUrl="/"

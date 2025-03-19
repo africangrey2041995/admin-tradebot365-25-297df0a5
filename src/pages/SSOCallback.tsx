@@ -3,11 +3,13 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SSOCallback() {
   const { isLoaded: isSignInLoaded, signIn } = useSignIn();
   const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isSignInLoaded || !isSignUpLoaded) return;
@@ -17,50 +19,44 @@ export default function SSOCallback() {
       try {
         const searchParams = new URLSearchParams(window.location.search);
         
-        // Handle sign in - for OAuth we don't need to pass parameters to attemptFirstFactor
-        if (searchParams.has('__clerk_status') && searchParams.get('__clerk_status') === 'running') {
-          // First factor verification is being handled automatically by Clerk
-          // Just complete the sign-in process
-          const result = await signIn.create({
-            strategy: "oauth",
-            redirectUrl: '/sso-callback',
-          });
-          
-          if (result.status === "complete") {
-            navigate('/');
-          } else {
-            navigate('/sign-in');
-          }
+        if (searchParams.has('__clerk_status')) {
+          // This is part of the sign-in process
+          // Let Clerk handle the redirect
+          await signIn.attemptFirstFactor({});
+          navigate('/');
           return;
         }
         
-        // Handle sign up
+        // Handle sign-up verification
         const firstParam = window.location.search.substring(1).split('&')[0];
         if (firstParam.startsWith('__clerk_ticket')) {
-          // For OAuth sign up, we also use a different approach
-          const result = await signUp.create({
-            strategy: "ticket",
-            redirectUrl: '/sso-callback',
-          });
-          
-          if (result.status === "complete") {
-            navigate('/');
-          } else {
-            navigate('/sign-up');
-          }
+          // This is part of the sign-up process
+          // Let Clerk handle the redirect
+          await signUp.attemptEmailAddressVerification({ code: '' });
+          navigate('/');
           return;
         }
         
         // If we get here, something went wrong
+        toast({
+          variant: "destructive",
+          title: "Lỗi xác thực",
+          description: "Không thể xác thực đăng nhập. Vui lòng thử lại."
+        });
         navigate('/sign-in');
       } catch (err) {
         console.error('Error during OAuth callback:', err);
+        toast({
+          variant: "destructive",
+          title: "Lỗi xác thực",
+          description: "Đã xảy ra lỗi khi xử lý xác thực."
+        });
         navigate('/sign-in');
       }
     }
 
     handleCallback();
-  }, [isSignInLoaded, isSignUpLoaded, signIn, signUp, navigate]);
+  }, [isSignInLoaded, isSignUpLoaded, signIn, signUp, navigate, toast]);
 
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
