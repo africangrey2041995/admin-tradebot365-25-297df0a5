@@ -14,6 +14,7 @@ import PremiumBots from "./pages/PremiumBots";
 import PremiumBotDetail from "./pages/PremiumBotDetail";
 import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
 import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
+import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/bots/:botId" element={<BotProfile />} />
             <Route path="/premium-bots" element={<PremiumBots />} />
             <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+            <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
             <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
             <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
             <Route path="/accounts" element={<Accounts />} />

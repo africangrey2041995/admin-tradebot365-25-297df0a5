@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -95,34 +94,94 @@ const premiumBots = [
   },
 ];
 
+// Mocking prop trading bot data
+const propTradingBots = [
+  {
+    id: 'ptb-001',
+    name: 'Prop Master',
+    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+11.2%',
+    performanceAllTime: '+45.8%',
+    risk: 'low' as 'medium' | 'low' | 'high',
+    minCapital: '$500',
+    status: 'active',
+    subscribers: 120,
+    imageUrl: null,
+    colorScheme: 'blue'
+  },
+  {
+    id: 'ptb-002',
+    name: 'Risk Manager Pro',
+    description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+8.5%',
+    performanceAllTime: '+38.9%',
+    risk: 'low' as 'medium' | 'low' | 'high',
+    minCapital: '$700',
+    status: 'active',
+    subscribers: 95,
+    imageUrl: null,
+    colorScheme: 'green'
+  },
+  {
+    id: 'ptb-003',
+    name: 'Consistent Trader',
+    description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+9.7%',
+    performanceAllTime: '+42.3%',
+    risk: 'medium' as 'medium' | 'low' | 'high',
+    status: 'active',
+    minCapital: '$600',
+    subscribers: 83,
+    imageUrl: null,
+    colorScheme: 'purple'
+  },
+];
+
 const PremiumBots = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [riskFilter, setRiskFilter] = useState('all');
   const [sortOption, setSortOption] = useState('performance');
   const [activeTab, setActiveTab] = useState('all');
+  const [botCategory, setBotCategory] = useState('premium'); // 'premium' or 'prop'
 
-  // Filter bots based on search term, risk level, and active tab
-  const filteredBots = premiumBots.filter(bot => {
-    const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        bot.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRisk = riskFilter === 'all' || bot.risk === riskFilter;
-    const matchesTab = activeTab === 'all' || bot.type === activeTab;
-    
-    return matchesSearch && matchesRisk && matchesTab;
-  });
+  // Filter bots based on search term, risk level, active tab, and category
+  const getFilteredBots = (botsArray: any[]) => {
+    return botsArray.filter(bot => {
+      const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          bot.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRisk = riskFilter === 'all' || bot.risk === riskFilter;
+      const matchesTab = activeTab === 'all' || bot.type === activeTab;
+      
+      return matchesSearch && matchesRisk && matchesTab;
+    });
+  };
 
+  const filteredPremiumBots = getFilteredBots(premiumBots);
+  const filteredPropTradingBots = getFilteredBots(propTradingBots);
+  
   // Sort bots based on selected sort option
-  const sortedBots = [...filteredBots].sort((a, b) => {
-    if (sortOption === 'performance') {
-      return parseFloat(b.performanceLastMonth.replace('%', '')) - 
-             parseFloat(a.performanceLastMonth.replace('%', ''));
-    } else if (sortOption === 'popularity') {
-      return b.subscribers - a.subscribers;
-    } else {
-      return a.name.localeCompare(b.name);
-    }
-  });
+  const sortBots = (botsArray: any[]) => {
+    return [...botsArray].sort((a, b) => {
+      if (sortOption === 'performance') {
+        return parseFloat(b.performanceLastMonth.replace('%', '')) - 
+               parseFloat(a.performanceLastMonth.replace('%', ''));
+      } else if (sortOption === 'popularity') {
+        return b.subscribers - a.subscribers;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
+  };
+
+  const sortedPremiumBots = sortBots(filteredPremiumBots);
+  const sortedPropTradingBots = sortBots(filteredPropTradingBots);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -166,6 +225,14 @@ const PremiumBots = () => {
           </div>
         </div>
 
+        {/* Category Selector */}
+        <Tabs defaultValue="premium" value={botCategory} onValueChange={setBotCategory} className="w-full">
+          <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg mb-4">
+            <TabsTrigger value="premium" className="flex-grow md:flex-grow-0">Premium Bots</TabsTrigger>
+            <TabsTrigger value="prop" className="flex-grow md:flex-grow-0">Prop Trading Bots</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
             <Input
@@ -202,53 +269,101 @@ const PremiumBots = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
-            <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
-            <TabsTrigger value="momentum" className="flex-grow md:flex-grow-0">Momentum</TabsTrigger>
-            <TabsTrigger value="scalping" className="flex-grow md:flex-grow-0">Scalping</TabsTrigger>
-            <TabsTrigger value="swing" className="flex-grow md:flex-grow-0">Swing</TabsTrigger>
-            <TabsTrigger value="grid" className="flex-grow md:flex-grow-0">Grid</TabsTrigger>
-            <TabsTrigger value="trend" className="flex-grow md:flex-grow-0">Trend</TabsTrigger>
-          </TabsList>
+        <TabsContent value="premium" className="mt-0 space-y-6">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
+              <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
+              <TabsTrigger value="momentum" className="flex-grow md:flex-grow-0">Momentum</TabsTrigger>
+              <TabsTrigger value="scalping" className="flex-grow md:flex-grow-0">Scalping</TabsTrigger>
+              <TabsTrigger value="swing" className="flex-grow md:flex-grow-0">Swing</TabsTrigger>
+              <TabsTrigger value="grid" className="flex-grow md:flex-grow-0">Grid</TabsTrigger>
+              <TabsTrigger value="trend" className="flex-grow md:flex-grow-0">Trend</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value={activeTab} className="mt-6">
-            {sortedBots.length > 0 ? (
-              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {sortedBots.map((bot, index) => (
-                  <motion.div
-                    key={bot.id}
-                    custom={index}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    <PremiumBotCard 
-                      id={bot.id}
-                      name={bot.name}
-                      description={bot.description}
-                      exchange={bot.exchange}
-                      type={bot.type}
-                      performanceLastMonth={bot.performanceLastMonth}
-                      performanceAllTime={bot.performanceAllTime}
-                      risk={bot.risk}
-                      minCapital={bot.minCapital}
-                      subscribers={bot.subscribers}
-                      imageUrl={bot.imageUrl}
-                      colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
-                <p className="text-lg text-slate-500 dark:text-slate-400">
-                  Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
-                </p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value={activeTab} className="mt-6">
+              {sortedPremiumBots.length > 0 ? (
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {sortedPremiumBots.map((bot, index) => (
+                    <motion.div
+                      key={bot.id}
+                      custom={index}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <PremiumBotCard 
+                        id={bot.id}
+                        name={bot.name}
+                        description={bot.description}
+                        exchange={bot.exchange}
+                        type={bot.type}
+                        performanceLastMonth={bot.performanceLastMonth}
+                        performanceAllTime={bot.performanceAllTime}
+                        risk={bot.risk}
+                        minCapital={bot.minCapital}
+                        subscribers={bot.subscribers}
+                        imageUrl={bot.imageUrl}
+                        colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                  <p className="text-lg text-slate-500 dark:text-slate-400">
+                    Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="prop" className="mt-0 space-y-6">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full md:w-auto bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
+              <TabsTrigger value="all" className="flex-grow md:flex-grow-0">Tất cả</TabsTrigger>
+              <TabsTrigger value="prop" className="flex-grow md:flex-grow-0">Prop Trading</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value={activeTab} className="mt-6">
+              {sortedPropTradingBots.length > 0 ? (
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {sortedPropTradingBots.map((bot, index) => (
+                    <motion.div
+                      key={bot.id}
+                      custom={index}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <PremiumBotCard 
+                        id={bot.id}
+                        name={bot.name}
+                        description={bot.description}
+                        exchange={bot.exchange}
+                        type={bot.type}
+                        performanceLastMonth={bot.performanceLastMonth}
+                        performanceAllTime={bot.performanceAllTime}
+                        risk={bot.risk}
+                        minCapital={bot.minCapital}
+                        subscribers={bot.subscribers}
+                        imageUrl={bot.imageUrl}
+                        colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800/50 rounded-lg">
+                  <p className="text-lg text-slate-500 dark:text-slate-400">
+                    Không tìm thấy bot nào phù hợp với tìm kiếm của bạn
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
       </div>
     </MainLayout>
   );
