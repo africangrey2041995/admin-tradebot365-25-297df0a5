@@ -19,10 +19,15 @@ export default function SSOCallback() {
       try {
         const searchParams = new URLSearchParams(window.location.search);
         
+        // Check for sign-in flow
         if (searchParams.has('__clerk_status')) {
-          // This is part of the sign-in process
-          // Let Clerk handle the redirect
-          await signIn.attemptFirstFactor({});
+          // For sign-in with OAuth, we need to handle the verification
+          const redirectUrl = window.location.href;
+          await signIn.attemptFirstFactor({
+            strategy: "oauth",
+            redirectUrl
+          });
+          
           navigate('/');
           return;
         }
@@ -30,9 +35,12 @@ export default function SSOCallback() {
         // Handle sign-up verification
         const firstParam = window.location.search.substring(1).split('&')[0];
         if (firstParam.startsWith('__clerk_ticket')) {
-          // This is part of the sign-up process
-          // Let Clerk handle the redirect
-          await signUp.attemptEmailAddressVerification({ code: '' });
+          // For sign-up with email verification
+          const code = searchParams.get('__clerk_ticket') || '';
+          await signUp.attemptEmailAddressVerification({
+            code
+          });
+          
           navigate('/');
           return;
         }
