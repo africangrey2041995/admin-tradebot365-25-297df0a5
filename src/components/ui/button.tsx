@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        blue: "bg-blue-600 text-white hover:bg-blue-700 border border-blue-700",
+        blue: "bg-blue-600 text-slate-100 hover:bg-blue-700 border border-blue-700 font-semibold shadow-sm",
         tradebot: "bg-tradebot text-tradebot-foreground hover:bg-tradebot/90 shadow-md shadow-tradebot/20 border border-tradebot/80",
       },
       size: {
