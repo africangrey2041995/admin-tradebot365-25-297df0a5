@@ -46,6 +46,12 @@ const formSchema = z.object({
   }).optional(),
   colorScheme: z.enum(['default', 'red', 'blue', 'green', 'purple']),
   icon: z.string(),
+  exchange: z.string({
+    required_error: "Please select an exchange",
+  }),
+  botForm: z.string({
+    required_error: "Please select a bot form",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,6 +61,8 @@ const defaultValues: Partial<FormValues> = {
   subtitle: '',
   colorScheme: 'default',
   icon: 'bot',
+  exchange: '',
+  botForm: '',
 };
 
 interface AddBotDialogProps {
@@ -70,6 +78,24 @@ const botIcons = [
   { icon: <Terminal className="h-5 w-5" />, value: 'terminal' },
   { icon: <CircuitBoard className="h-5 w-5" />, value: 'circuit' },
   { icon: <Gem className="h-5 w-5" />, value: 'gem' },
+];
+
+const exchanges = [
+  { name: 'Binance', value: 'binance' },
+  { name: 'Coinbase', value: 'coinbase' },
+  { name: 'Kraken', value: 'kraken' },
+  { name: 'Bybit', value: 'bybit' },
+  { name: 'KuCoin', value: 'kucoin' },
+  { name: 'OKX', value: 'okx' },
+];
+
+const botForms = [
+  { name: 'Technical Analysis', value: 'technical' },
+  { name: 'Grid Trading', value: 'grid' },
+  { name: 'DCA (Dollar-Cost Averaging)', value: 'dca' },
+  { name: 'Market Making', value: 'market_making' },
+  { name: 'Arbitrage', value: 'arbitrage' },
+  { name: 'Sentiment Analysis', value: 'sentiment' },
 ];
 
 const getBotIcon = (iconName: string) => {
@@ -134,6 +160,58 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                 </FormItem>
               )}
             />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="exchange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Exchange</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select exchange" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {exchanges.map((exchange) => (
+                          <SelectItem key={exchange.value} value={exchange.value}>
+                            {exchange.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="botForm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bot Form</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bot form" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {botForms.map((form) => (
+                          <SelectItem key={form.value} value={form.value}>
+                            {form.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
               <FormField
