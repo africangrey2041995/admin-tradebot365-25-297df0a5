@@ -16,7 +16,7 @@ import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
 import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
 import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
-import SSOCallback from "./pages/SSOCallback";
+// Removed SSOCallback import
 
 const queryClient = new QueryClient();
 
@@ -39,7 +39,7 @@ const App = () => (
             <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/accounts/:accountId" element={<AccountProfile />} />
-            <Route path="/sso-callback" element={<SSOCallback />} />
+            {/* Removed SSOCallback route */}
             
             {/* Not found route */}
             <Route path="*" element={<NotFound />} />

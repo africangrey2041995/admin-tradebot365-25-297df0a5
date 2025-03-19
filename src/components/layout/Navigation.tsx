@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -71,12 +70,15 @@ const Navigation = () => {
   const Logo = () => (
     <div className={cn(
       "flex items-center justify-center",
-      isCollapsed ? "w-10" : "w-full"
+      isCollapsed ? "w-12" : "w-full"
     )}>
       <img 
         src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
         alt="Trade Bot 365 Logo" 
-        className="h-12 w-auto object-contain" 
+        className={cn(
+          "object-contain",
+          isCollapsed ? "h-14 w-auto" : "h-16 w-auto"
+        )} 
       />
     </div>
   );
@@ -202,7 +204,11 @@ const Navigation = () => {
         <>
           <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-800 border-b shadow-sm">
             <div className="flex items-center">
-              <Logo />
+              <img 
+                src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
+                alt="Trade Bot 365 Logo" 
+                className="h-12 w-auto object-contain" 
+              />
             </div>
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
