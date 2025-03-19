@@ -15,6 +15,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const routes = [
   {
@@ -54,6 +59,7 @@ const Navigation = () => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -65,6 +71,14 @@ const Navigation = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const toggleSubmenu = (path: string) => {
+    if (openSubmenu === path) {
+      setOpenSubmenu(null);
+    } else {
+      setOpenSubmenu(path);
+    }
   };
 
   const Logo = () => (
@@ -101,13 +115,65 @@ const Navigation = () => {
       {routes.map((route) => {
         const isActive = isRouteActive(route.path);
         
-        if (route.children && !isMobile && !isCollapsed) {
+        if (route.children && !isCollapsed) {
+          const isSubmenuOpen = openSubmenu === route.path || isActive;
+          
           return (
             <div key={route.path} className="w-full flex flex-col">
+              <Collapsible
+                open={isSubmenuOpen}
+                onOpenChange={() => toggleSubmenu(route.path)}
+                className="w-full"
+              >
+                <CollapsibleTrigger asChild>
+                  <button
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm w-full",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-white hover:bg-zinc-700/70 hover:text-white"
+                    )}
+                  >
+                    <div className={cn(
+                      "flex items-center justify-center w-9 h-9 rounded-lg",
+                      isActive ? "bg-primary text-white" : "text-white bg-zinc-700/50"
+                    )}>
+                      {route.icon}
+                    </div>
+                    <span>{route.label}</span>
+                    <ChevronDown className={cn(
+                      "ml-auto h-4 w-4 transition-transform",
+                      isSubmenuOpen ? "rotate-180" : "rotate-0"
+                    )} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="ml-12 space-y-1 mt-1">
+                  {route.children.map((child) => (
+                    <Link
+                      key={child.path}
+                      to={child.path}
+                      className={cn(
+                        "flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                        location.pathname === child.path
+                          ? "bg-primary/5 text-primary"
+                          : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
+                      )}
+                      onClick={isMobile ? closeMobileMenu : undefined}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+          );
+        } else if (route.children && isCollapsed) {
+          return (
+            <div key={route.path} className="relative group w-full">
               <Link
                 to={route.path}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm w-full",
+                  "flex items-center justify-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm",
                   isActive
                     ? "bg-primary/10 text-primary"
                     : "text-white hover:bg-zinc-700/70 hover:text-white"
@@ -119,28 +185,28 @@ const Navigation = () => {
                 )}>
                   {route.icon}
                 </div>
-                <span>{route.label}</span>
-                {isActive && (
-                  <div className="ml-auto">
-                    <ChevronDown className="h-4 w-4" />
-                  </div>
-                )}
               </Link>
-              {route.children.map((child) => (
-                <Link
-                  key={child.path}
-                  to={child.path}
-                  className={cn(
-                    "flex items-center px-4 py-2 rounded-lg ml-12 mt-1 text-sm font-medium transition-colors",
-                    location.pathname === child.path
-                      ? "bg-primary/5 text-primary"
-                      : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
-                  )}
-                  onClick={isMobile ? closeMobileMenu : undefined}
-                >
-                  {child.label}
-                </Link>
-              ))}
+              <div className="absolute left-full top-0 ml-2 hidden group-hover:block z-50">
+                <div className="bg-zinc-800 py-2 px-3 rounded-lg shadow-lg border border-zinc-700/50 min-w-48">
+                  <div className="font-medium text-white text-sm mb-2">{route.label}</div>
+                  <div className="space-y-1">
+                    {route.children.map((child) => (
+                      <Link
+                        key={child.path}
+                        to={child.path}
+                        className={cn(
+                          "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                          location.pathname === child.path
+                            ? "bg-primary/10 text-primary"
+                            : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           );
         }
@@ -166,32 +232,7 @@ const Navigation = () => {
               {(!isCollapsed || isMobile) && (
                 <span>{route.label}</span>
               )}
-              {isActive && !isCollapsed && !isMobile && route.children && (
-                <div className="ml-auto">
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              )}
             </Link>
-            
-            {isMobile && isActive && route.children && (
-              <div className="ml-12 space-y-1 mt-1">
-                {route.children.map((child) => (
-                  <Link
-                    key={child.path}
-                    to={child.path}
-                    className={cn(
-                      "flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      location.pathname === child.path
-                        ? "bg-primary/5 text-primary"
-                        : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
-                    )}
-                    onClick={closeMobileMenu}
-                  >
-                    {child.label}
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         );
       })}
