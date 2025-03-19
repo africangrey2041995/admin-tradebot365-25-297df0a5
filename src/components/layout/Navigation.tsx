@@ -23,8 +23,6 @@ const Navigation = () => {
   const [hasNotifications, setHasNotifications] = useState(true);
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Bot #1 đã hoàn thành giao dịch', read: false },
-    { id: 2, text: 'Cập nhật mới cho Premium Bots', read: false },
-    { id: 3, text: 'Tài khoản cần được xác minh', read: true },
   ]);
 
   // Count unread notifications
@@ -66,7 +64,7 @@ const Navigation = () => {
           </div>
           
           <Select defaultValue="vi">
-            <SelectTrigger className="w-[100px] h-9 flex gap-1">
+            <SelectTrigger className="w-[110px] h-9 flex gap-1">
               <Globe className="h-4 w-4" />
               <SelectValue placeholder="Ngôn ngữ" />
             </SelectTrigger>
@@ -213,9 +211,9 @@ const Navigation = () => {
             />
           </div>
           <Select defaultValue="vi">
-            <SelectTrigger className="w-[80px] h-9">
+            <SelectTrigger className="w-[100px] h-9">
               <Globe className="h-4 w-4 mr-1" />
-              <SelectValue placeholder="" />
+              <SelectValue placeholder="Ngôn ngữ" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="vi">Tiếng Việt</SelectItem>
