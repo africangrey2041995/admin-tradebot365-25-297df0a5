@@ -12,7 +12,6 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 
 const routes = [
@@ -93,60 +92,56 @@ const Navigation = () => {
   };
 
   const NavLinks = () => (
-    <>
+    <div className="flex flex-col w-full space-y-0.5">
       {routes.map((route) => {
         const isActive = isRouteActive(route.path);
         
         if (route.children && !isMobile && !isCollapsed) {
           return (
-            <NavigationMenu key={route.path} className="w-full">
-              <NavigationMenuList className="w-full">
-                <NavigationMenuItem className="w-full">
-                  <Link
-                    to={route.path}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm w-full",
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-white hover:bg-zinc-700/70 hover:text-white"
-                    )}
-                  >
-                    <div className={cn(
-                      "flex items-center justify-center w-9 h-9 rounded-lg",
-                      isActive ? "bg-primary text-white" : "text-white bg-zinc-700/50"
-                    )}>
-                      {route.icon}
-                    </div>
-                    <span>{route.label}</span>
-                    {isActive && (
-                      <div className="ml-auto">
-                        <ChevronDown className="h-4 w-4" />
-                      </div>
-                    )}
-                  </Link>
-                  {route.children.map((child) => (
-                    <Link
-                      key={child.path}
-                      to={child.path}
-                      className={cn(
-                        "flex items-center px-4 py-2 rounded-lg ml-12 mt-1 text-sm font-medium transition-colors",
-                        location.pathname === child.path
-                          ? "bg-primary/5 text-primary"
-                          : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
-                      )}
-                      onClick={isMobile ? closeMobileMenu : undefined}
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+            <div key={route.path} className="w-full flex flex-col">
+              <Link
+                to={route.path}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm w-full",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-white hover:bg-zinc-700/70 hover:text-white"
+                )}
+              >
+                <div className={cn(
+                  "flex items-center justify-center w-9 h-9 rounded-lg",
+                  isActive ? "bg-primary text-white" : "text-white bg-zinc-700/50"
+                )}>
+                  {route.icon}
+                </div>
+                <span>{route.label}</span>
+                {isActive && (
+                  <div className="ml-auto">
+                    <ChevronDown className="h-4 w-4" />
+                  </div>
+                )}
+              </Link>
+              {route.children.map((child) => (
+                <Link
+                  key={child.path}
+                  to={child.path}
+                  className={cn(
+                    "flex items-center px-4 py-2 rounded-lg ml-12 mt-1 text-sm font-medium transition-colors",
+                    location.pathname === child.path
+                      ? "bg-primary/5 text-primary"
+                      : "text-white/80 hover:bg-zinc-700/50 hover:text-white"
+                  )}
+                  onClick={isMobile ? closeMobileMenu : undefined}
+                >
+                  {child.label}
+                </Link>
+              ))}
+            </div>
           );
         }
         
         return (
-          <div key={route.path}>
+          <div key={route.path} className="w-full">
             <Link
               to={route.path}
               className={cn(
@@ -195,7 +190,7 @@ const Navigation = () => {
           </div>
         );
       })}
-    </>
+    </div>
   );
 
   return (
@@ -258,7 +253,7 @@ const Navigation = () => {
             </div>
             
             <div className={cn(
-              "px-3 py-4 flex-1 overflow-auto flex flex-col gap-1",
+              "px-3 py-4 flex-1 overflow-auto flex flex-col",
               isCollapsed && "px-2"
             )}>
               <NavLinks />
