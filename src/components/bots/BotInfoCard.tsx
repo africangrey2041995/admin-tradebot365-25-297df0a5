@@ -35,11 +35,13 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
     }
   };
 
+  const statusLabel = bot.status === 'Active' ? 'Hoạt Động' : 'Không Hoạt Động';
+
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-2xl font-bold">Bot Information</CardTitle>
-        <CardDescription>Details and configuration for this bot</CardDescription>
+        <CardTitle className="text-2xl font-bold">Thông Tin Bot</CardTitle>
+        <CardDescription>Chi tiết và cấu hình cho bot này</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center mb-6">
@@ -51,7 +53,7 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
           <h2 className="text-2xl font-bold text-center">{bot.title}</h2>
           <p className="text-muted-foreground text-center mt-1 mb-2">{bot.subtitle}</p>
           <Badge variant={bot.status === 'Active' ? 'success' : 'secondary'} className="mt-2">
-            {bot.status}
+            {statusLabel}
           </Badge>
         </div>
         
@@ -64,7 +66,7 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-muted-foreground">Exchange</span>
+            <span className="text-sm font-medium text-muted-foreground">Sàn Giao Dịch</span>
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +80,7 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-muted-foreground">Bot Form</span>
+            <span className="text-sm font-medium text-muted-foreground">Loại Bot</span>
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-5 h-5 rounded-full bg-black text-white">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -90,7 +92,7 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-muted-foreground">Created Date</span>
+            <span className="text-sm font-medium text-muted-foreground">Ngày Tạo</span>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="font-medium">{bot.lastUpdated}</span>
@@ -98,7 +100,7 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-muted-foreground">Connected Accounts</span>
+            <span className="text-sm font-medium text-muted-foreground">Tài Khoản Kết Nối</span>
             <span className="font-medium">{bot.accountCount}</span>
           </div>
         </div>

@@ -38,20 +38,20 @@ import { BotCardProps } from '@/components/bots/BotCard';
 
 const formSchema = z.object({
   title: z.string().min(2, {
-    message: 'Bot name must be at least 2 characters.',
+    message: 'Tên bot phải có ít nhất 2 ký tự.',
   }).max(50, {
-    message: 'Bot name must not exceed 50 characters.',
+    message: 'Tên bot không được vượt quá 50 ký tự.',
   }),
   subtitle: z.string().max(150, {
-    message: 'Description must not exceed 150 characters.',
+    message: 'Mô tả không được vượt quá 150 ký tự.',
   }).optional(),
   colorScheme: z.enum(['default', 'red', 'blue', 'green', 'purple']),
   icon: z.string(),
   exchange: z.string({
-    required_error: "Please select an exchange",
+    required_error: "Vui lòng chọn sàn giao dịch",
   }),
   botForm: z.string({
-    required_error: "Please select a bot form",
+    required_error: "Vui lòng chọn loại bot",
   }),
 });
 
@@ -127,12 +127,12 @@ const exchanges = [
 ];
 
 const botForms = [
-  { name: 'Technical Analysis', value: 'technical', disabled: true },
-  { name: 'Grid Trading', value: 'grid', disabled: true },
-  { name: 'DCA (Dollar-Cost Averaging)', value: 'dca', disabled: true },
-  { name: 'Market Making', value: 'market_making', disabled: true },
-  { name: 'Arbitrage', value: 'arbitrage', disabled: true },
-  { name: 'Sentiment Analysis', value: 'sentiment', disabled: true },
+  { name: 'Phân Tích Kỹ Thuật', value: 'technical', disabled: true },
+  { name: 'Giao Dịch Lưới', value: 'grid', disabled: true },
+  { name: 'DCA (Trung Bình Giá)', value: 'dca', disabled: true },
+  { name: 'Tạo Lập Thị Trường', value: 'market_making', disabled: true },
+  { name: 'Chênh Lệch Giá', value: 'arbitrage', disabled: true },
+  { name: 'Phân Tích Tâm Lý', value: 'sentiment', disabled: true },
   { 
     name: 'Trading View', 
     value: 'trading_view', 
@@ -209,7 +209,7 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
       avatarIcon: getBotIcon(data.icon)
     });
     
-    toast.success('Bot settings updated successfully');
+    toast.success('Cập nhật cài đặt bot thành công');
     onClose();
   };
 
@@ -239,9 +239,9 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Edit Bot</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Chỉnh Sửa Bot</DialogTitle>
           <DialogDescription>
-            Update your trading bot settings. Make changes to the details below.
+            Cập nhật cài đặt bot giao dịch của bạn. Thực hiện các thay đổi bên dưới.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -251,12 +251,12 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bot Name</FormLabel>
+                  <FormLabel>Tên Bot</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter bot name..." {...field} />
+                    <Input placeholder="Nhập tên bot..." {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is how your bot will be identified in the system.
+                    Đây là cách bot của bạn sẽ được nhận dạng trong hệ thống.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -269,11 +269,11 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                 name="exchange"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Exchange</FormLabel>
+                    <FormLabel>Sàn Giao Dịch</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select exchange">
+                          <SelectValue placeholder="Chọn sàn giao dịch">
                             {field.value && renderExchangeContent(
                               exchanges.find(e => e.value === field.value) || exchanges[6]
                             )}
@@ -301,7 +301,7 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Only Coinstart Pro is available in this version.
+                      Chỉ Coinstart Pro khả dụng trong phiên bản này.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -313,11 +313,11 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                 name="botForm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bot Form</FormLabel>
+                    <FormLabel>Loại Bot</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select bot form">
+                          <SelectValue placeholder="Chọn loại bot">
                             {field.value && renderBotFormContent(
                               botForms.find(b => b.value === field.value) || botForms[6]
                             )}
@@ -338,7 +338,7 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Only Trading View is available in this version.
+                      Chỉ Trading View khả dụng trong phiên bản này.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -352,19 +352,19 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                 name="colorScheme"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Color Theme</FormLabel>
+                    <FormLabel>Giao Diện Màu</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a color" />
+                          <SelectValue placeholder="Chọn màu" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="default">Default</SelectItem>
-                        <SelectItem value="red">Red</SelectItem>
-                        <SelectItem value="blue">Blue</SelectItem>
-                        <SelectItem value="green">Green</SelectItem>
-                        <SelectItem value="purple">Purple</SelectItem>
+                        <SelectItem value="default">Mặc Định</SelectItem>
+                        <SelectItem value="red">Đỏ</SelectItem>
+                        <SelectItem value="blue">Xanh Dương</SelectItem>
+                        <SelectItem value="green">Xanh Lá</SelectItem>
+                        <SelectItem value="purple">Tím</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -377,11 +377,11 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                 name="icon"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bot Icon</FormLabel>
+                    <FormLabel>Biểu Tượng Bot</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select an icon">
+                          <SelectValue placeholder="Chọn biểu tượng">
                             {getBotIcon(field.value)}
                           </SelectValue>
                         </SelectTrigger>
@@ -408,16 +408,16 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
               name="subtitle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Mô Tả</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Enter bot description..." 
+                      placeholder="Nhập mô tả bot..." 
                       className="resize-none" 
                       {...field} 
                     />
                   </FormControl>
                   <FormDescription>
-                    Briefly describe what this bot does.
+                    Mô tả ngắn gọn về chức năng của bot này.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -440,9 +440,9 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
                 variant="outline" 
                 onClick={onClose}
               >
-                Cancel
+                Hủy
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">Lưu Thay Đổi</Button>
             </DialogFooter>
           </form>
         </Form>

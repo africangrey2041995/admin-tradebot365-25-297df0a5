@@ -87,7 +87,7 @@ const SidebarNav = () => {
           <div className="space-y-1 px-2">
             <CollapsibleNavItem
               path="/premium-bots"
-              label="Premium Bots"
+              label="Bot Premium"
               icon={Sparkles}
               isActive={isActive('/premium-bots')}
               isOpen={premiumOpen}
@@ -103,7 +103,7 @@ const SidebarNav = () => {
             
             <CollapsibleNavItem
               path="/prop-trading-bots"
-              label="Prop Trading Bots"
+              label="Bot Prop Trading"
               icon={TrendingUp}
               isActive={isActive('/prop-trading-bots')}
               isOpen={propTradingOpen}

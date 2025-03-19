@@ -39,7 +39,7 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
     console.log(`Deleting bot: ${botId}`);
     
     // Show success toast
-    toast.success(`Bot ${botId} has been deleted`);
+    toast.success(`Bot ${botId} đã được xóa`);
     
     // Navigate back to bots page
     navigate('/bots');
@@ -47,14 +47,14 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
 
   const handleSaveBot = (updatedBot: Partial<BotCardProps>) => {
     onUpdateBot(updatedBot);
-    toast.success('Bot settings updated successfully');
+    toast.success('Cài đặt bot đã được cập nhật thành công');
   };
 
   return (
     <div className="flex items-center justify-between mb-6">
       <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
         <ArrowLeft className="h-4 w-4" />
-        Back to Bots
+        Quay Lại Trang Bot
       </Button>
       
       <div className="flex items-center gap-2">
@@ -62,24 +62,24 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
           <AlertDialogTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
               <Trash className="h-4 w-4" />
-              <span>Delete Bot</span>
+              <span>Xóa Bot</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure you want to delete this bot?</AlertDialogTitle>
+              <AlertDialogTitle>Bạn có chắc chắn muốn xóa bot này?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the bot
-                and remove all of its data from our servers.
+                Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn bot
+                và xóa tất cả dữ liệu của nó khỏi máy chủ của chúng tôi.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Hủy</AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleDeleteBot}
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
-                Delete Bot
+                Xóa Bot
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -91,11 +91,11 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
           onClick={() => setIsEditDialogOpen(true)}
         >
           <Settings className="h-4 w-4" />
-          <span>Settings</span>
+          <span>Cài Đặt</span>
         </Button>
         <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
           <Power className="h-4 w-4" />
-          <span>{status === 'Active' ? 'Stop Bot' : 'Start Bot'}</span>
+          <span>{status === 'Active' ? 'Dừng Bot' : 'Khởi Động Bot'}</span>
         </Button>
       </div>
 

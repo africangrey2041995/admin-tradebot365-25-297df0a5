@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import {
@@ -26,156 +27,117 @@ const Bots = () => {
   const [bots, setBots] = useState<BotCardProps[]>([
     {
       title: 'Ultra 2in1',
-      subtitle: 'Bot for combined strategy trading with dual market analysis',
+      subtitle: 'Bot cho giao dịch chiến lược kết hợp với phân tích thị trường kép',
       botId: 'BOT7459',
       accountCount: '18/42',
-      lastUpdated: '10 Jul, 2023',
+      lastUpdated: '10/07/2023',
       colorScheme: 'red',
       avatarIcon: <Bot className="h-5 w-5" />,
       status: 'Active'
     },
     {
       title: 'Long Master',
-      subtitle: 'Specialized in long-term position trading strategies',
+      subtitle: 'Chuyên về chiến lược giao dịch vị thế dài hạn',
       botId: 'BOT8932',
       accountCount: '22/56',
-      lastUpdated: '18 May, 2023',
+      lastUpdated: '18/05/2023',
       colorScheme: 'blue',
       avatarIcon: <Cpu className="h-5 w-5" />,
       status: 'Active'
     },
     {
       title: 'Gold Trading',
-      subtitle: 'Precious metals focused algorithmic trading system',
+      subtitle: 'Hệ thống giao dịch thuật toán tập trung vào kim loại quý',
       botId: 'BOT2734',
       accountCount: '14/20',
-      lastUpdated: '21 Feb, 2023',
+      lastUpdated: '21/02/2023',
       colorScheme: 'green',
       avatarIcon: <Server className="h-5 w-5" />,
       status: 'Active'
     },
     {
       title: 'Bitcoin Trading',
-      subtitle: 'Cryptocurrency trading bot with focus on Bitcoin markets',
+      subtitle: 'Bot giao dịch tiền điện tử tập trung vào thị trường Bitcoin',
       botId: 'BOT5128',
       accountCount: '20/34',
-      lastUpdated: '03 Aug, 2023',
+      lastUpdated: '03/08/2023',
       colorScheme: 'purple',
       avatarIcon: <Terminal className="h-5 w-5" />,
       status: 'Inactive'
     },
     {
       title: 'Forex Master',
-      subtitle: 'Multi-currency trading system for forex markets',
+      subtitle: 'Hệ thống giao dịch đa tiền tệ cho thị trường ngoại hối',
       botId: 'BOT1267',
       accountCount: '15/25',
-      lastUpdated: '15 May, 2023',
+      lastUpdated: '15/05/2023',
       avatarIcon: <CircuitBoard className="h-5 w-5" />,
       status: 'Active'
     },
     {
       title: 'Scalping Pro',
-      subtitle: 'High-frequency short term trading bot',
+      subtitle: 'Bot giao dịch tần suất cao ngắn hạn',
       botId: 'BOT9381',
       accountCount: '8/12',
-      lastUpdated: '21 Feb, 2023',
+      lastUpdated: '21/02/2023',
       avatarIcon: <Gem className="h-5 w-5" />,
       status: 'Active'
     },
     {
       title: 'Swing Trader',
-      subtitle: 'Medium-term market swing analyzer and trader',
+      subtitle: 'Phân tích và giao dịch biến động thị trường trung hạn',
       botId: 'BOT6452',
       accountCount: '12/20',
-      lastUpdated: '05 Aug, 2023',
+      lastUpdated: '05/08/2023',
       avatarIcon: <Bot className="h-5 w-5" />,
       status: 'Active'
-    },
-    {
-      title: 'ETF Strategy',
-      subtitle: 'Diversified ETF portfolio management system',
-      botId: 'BOT3815',
-      accountCount: '10/15',
-      lastUpdated: '10 Jul, 2023',
-      avatarIcon: <Cpu className="h-5 w-5" />,
-      status: 'Active'
-    },
+    }
   ]);
 
-  const botIcons = [
-    <Bot className="h-5 w-5" />,
-    <Cpu className="h-5 w-5" />,
-    <Server className="h-5 w-5" />,
-    <Terminal className="h-5 w-5" />,
-    <CircuitBoard className="h-5 w-5" />,
-    <Gem className="h-5 w-5" />
-  ];
-
-  const getBotIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'bot': return botIcons[0];
-      case 'cpu': return botIcons[1];
-      case 'server': return botIcons[2];
-      case 'terminal': return botIcons[3];
-      case 'circuit': return botIcons[4];
-      case 'gem': return botIcons[5];
-      default: return botIcons[0];
-    }
-  };
-
-  const filteredBots = bots.filter(bot => 
-    bot.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (bot.subtitle && bot.subtitle.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const handleAddBot = () => {
-    setIsAddBotDialogOpen(true);
-  };
-
-  const handleAddNewBot = (values: any) => {
-    const newBotId = 'BOT' + Math.floor(1000 + Math.random() * 9000);
+  const handleAddBot = (newBot: Partial<BotCardProps>) => {
+    const botId = `BOT${Math.floor(1000 + Math.random() * 9000)}`;
     
-    const newBot: BotCardProps = {
-      title: values.title,
-      subtitle: values.subtitle || '',
-      botId: newBotId,
-      accountCount: '0/0',
-      lastUpdated: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, ''),
-      colorScheme: values.colorScheme,
-      avatarIcon: getBotIcon(values.icon),
-      status: 'Active',
-      exchange: values.exchange,
-      botForm: values.botForm
+    const bot: BotCardProps = {
+      title: newBot.title || 'Bot Không Tên',
+      subtitle: newBot.subtitle || 'Chưa có mô tả',
+      botId: botId,
+      accountCount: '0/10',
+      lastUpdated: new Date().toLocaleDateString('vi-VN'),
+      colorScheme: newBot.colorScheme as any || 'default',
+      avatarIcon: newBot.avatarIcon || <Bot className="h-5 w-5" />,
+      exchange: newBot.exchange || 'coinstart_pro',
+      botForm: newBot.botForm || 'trading_view',
+      status: 'Inactive'
     };
     
-    setBots(prevBots => [newBot, ...prevBots]);
-  };
-
-  const toggleFavorite = (index: number) => {
-    setFavorites(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+    setBots([bot, ...bots]);
+    toast.success('Bot mới đã được tạo thành công');
   };
 
   return (
     <MainLayout title="Quản Lý Bot">
-      <div className="flex flex-col">
-        <BotsHeader onAddBot={handleAddBot} />
-
-        <div className="flex items-center justify-end mb-8">
-          <BotSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        </div>
-
-        <BotListing bots={filteredBots} favorites={favorites} />
-
-        <BotsPagination />
-      </div>
+      <BotsHeader onAddBot={() => setIsAddBotDialogOpen(true)} />
+      
+      <BotSearch 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
+      />
+      
+      <BotListing 
+        bots={bots.filter(bot => 
+          bot.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          bot.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          bot.botId.toLowerCase().includes(searchTerm.toLowerCase())
+        )} 
+        favorites={favorites} 
+      />
+      
+      <BotsPagination />
       
       <AddBotDialog 
-        open={isAddBotDialogOpen}
-        onOpenChange={setIsAddBotDialogOpen}
-        onAddBot={handleAddNewBot}
+        isOpen={isAddBotDialogOpen}
+        onClose={() => setIsAddBotDialogOpen(false)}
+        onSubmit={handleAddBot}
       />
     </MainLayout>
   );

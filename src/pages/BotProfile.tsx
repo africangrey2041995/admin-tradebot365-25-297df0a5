@@ -32,13 +32,13 @@ const BotProfile = () => {
                  botId === 'BOT8932' ? 'Long Master' :
                  botId === 'BOT2734' ? 'Gold Trading' :
                  'Bot ' + botId,
-          subtitle: botId === 'BOT7459' ? 'Bot for combined strategy trading with dual market analysis' :
-                    botId === 'BOT8932' ? 'Specialized in long-term position trading strategies' :
-                    botId === 'BOT2734' ? 'Precious metals focused algorithmic trading system' :
-                    'Trading bot for automated strategies',
+          subtitle: botId === 'BOT7459' ? 'Bot cho chiến lược giao dịch kết hợp với phân tích thị trường kép' :
+                    botId === 'BOT8932' ? 'Chuyên về chiến lược giao dịch vị thế dài hạn' :
+                    botId === 'BOT2734' ? 'Hệ thống giao dịch thuật toán tập trung vào kim loại quý' :
+                    'Bot giao dịch cho chiến lược tự động',
           botId: botId || 'Unknown',
           accountCount: '12/30',
-          lastUpdated: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, ''),
+          lastUpdated: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'numeric', year: 'numeric' }),
           colorScheme: botId === 'BOT7459' ? 'red' :
                       botId === 'BOT8932' ? 'blue' :
                       botId === 'BOT2734' ? 'green' :
@@ -59,7 +59,7 @@ const BotProfile = () => {
 
   const handleAddAccount = (accountData: any) => {
     console.log('Adding account:', accountData, 'to bot:', botId);
-    toast.success('Account added successfully!');
+    toast.success('Thêm tài khoản thành công!');
   };
 
   const handleUpdateBot = (updatedBot: Partial<BotCardProps>) => {
@@ -76,7 +76,7 @@ const BotProfile = () => {
       <MainLayout>
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-lg font-medium">Loading bot details...</p>
+          <p className="text-lg font-medium">Đang tải thông tin bot...</p>
         </div>
       </MainLayout>
     );
@@ -87,16 +87,16 @@ const BotProfile = () => {
       <MainLayout>
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <Info className="h-12 w-12 text-orange-500 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Bot Not Found</h2>
-          <p className="text-muted-foreground mb-6">We couldn't find the bot you're looking for.</p>
-          <Button onClick={() => window.location.href = '/bots'}>Back to Bots</Button>
+          <h2 className="text-xl font-bold mb-2">Không Tìm Thấy Bot</h2>
+          <p className="text-muted-foreground mb-6">Chúng tôi không thể tìm thấy bot bạn đang tìm kiếm.</p>
+          <Button onClick={() => window.location.href = '/bots'}>Quay Lại Trang Bot</Button>
         </div>
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout title="Bot Profile">
+    <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
           botId={bot.botId} 
