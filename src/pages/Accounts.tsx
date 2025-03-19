@@ -16,18 +16,21 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import AccountCard from '@/components/accounts/AccountCard';
+import EditAccountDialog from '@/components/accounts/EditAccountDialog';
 
 const Accounts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [newAccount, setNewAccount] = useState({
     name: '',
     designation: '',
   });
 
-  const mockAccounts: Account[] = [
+  const [accounts, setAccounts] = useState<Account[]>([
     {
-      id: 'acc001', // Added the required id property
+      id: 'acc001',
       clientId: 'client123',
       secretId: 'secret123',
       accessToken: 'token123',
@@ -39,7 +42,7 @@ const Accounts = () => {
       expireDate: '2024-06-20T14:45:00Z',
     },
     {
-      id: 'acc002', // Added the required id property
+      id: 'acc002',
       clientId: 'client456',
       secretId: 'secret456',
       accessToken: 'token456',
@@ -51,7 +54,7 @@ const Accounts = () => {
       expireDate: '2024-06-22T11:20:00Z',
     },
     {
-      id: 'acc003', // Added the required id property
+      id: 'acc003',
       clientId: 'client789',
       secretId: 'secret789',
       accessToken: 'token789',
@@ -62,11 +65,11 @@ const Accounts = () => {
       lastUpdated: '2023-06-18T09:10:00Z',
       expireDate: '2024-06-18T09:10:00Z',
     }
-  ];
+  ]);
 
-  const filteredAccounts = mockAccounts.filter(account => 
-    account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    account.ctidTraderAccountId.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAccounts = accounts.filter(account => 
+    account.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    account.ctidTraderAccountId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddAccount = () => {
@@ -74,28 +77,74 @@ const Accounts = () => {
   };
 
   const handleSaveAccount = () => {
+    const newAccountData: Account = {
+      id: `acc${Date.now()}`,
+      clientId: `client${Date.now()}`,
+      name: newAccount.name,
+      userEmail: newAccount.designation,
+      status: 'Pending',
+      createdDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    };
+    
+    setAccounts([...accounts, newAccountData]);
+    
     toast('Tài khoản đã được thêm thành công', {
       description: `Tên: ${newAccount.name}, Email: ${newAccount.designation}`,
     });
+    
     setIsAddDialogOpen(false);
     setNewAccount({ name: '', designation: '' });
   };
 
   const handleEditAccount = (clientId: string) => {
-    toast(`Chỉnh sửa tài khoản ${clientId}`, {
-      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
+    const account = accounts.find(a => a.clientId === clientId);
+    if (account) {
+      setSelectedAccount(account);
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleSaveEditedAccount = (updatedAccount: Partial<Account>) => {
+    if (!selectedAccount) return;
+    
+    const updatedAccounts = accounts.map(account => 
+      account.clientId === selectedAccount.clientId 
+        ? { 
+            ...account, 
+            ...updatedAccount,
+            lastUpdated: new Date().toISOString() 
+          } 
+        : account
+    );
+    
+    setAccounts(updatedAccounts);
+    
+    toast.success('Tài khoản đã được cập nhật thành công', {
+      description: `Đã cập nhật thông tin cho ${updatedAccount.name || selectedAccount.name}`,
     });
   };
 
   const handleDeleteAccount = (clientId: string) => {
-    toast(`Xóa tài khoản ${clientId}`, {
-      description: 'Tính năng này sẽ được triển khai trong phiên bản tiếp theo.',
+    const updatedAccounts = accounts.filter(account => account.clientId !== clientId);
+    setAccounts(updatedAccounts);
+    
+    toast.success('Đã xóa tài khoản thành công', {
+      description: 'Tài khoản đã được xóa khỏi hệ thống',
     });
   };
 
   const handleReconnect = (clientId: string) => {
-    toast(`Kết nối lại tài khoản ${clientId}`, {
-      description: 'Đang thử kết nối lại với Coinstrat.pro...',
+    const updatedAccounts = accounts.map(account => 
+      account.clientId === clientId 
+        ? { ...account, status: 'Connected' as const, lastUpdated: new Date().toISOString() } 
+        : account
+    );
+    
+    setAccounts(updatedAccounts);
+    
+    toast.success('Kết nối lại thành công', {
+      description: 'Tài khoản đã được kết nối lại với hệ thống',
     });
   };
 
@@ -141,6 +190,7 @@ const Accounts = () => {
         </div>
       )}
 
+      {/* Add Account Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-md">
           <div className="relative mb-6">
@@ -201,6 +251,14 @@ const Accounts = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Account Dialog */}
+      <EditAccountDialog 
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        account={selectedAccount}
+        onSave={handleSaveEditedAccount}
+      />
     </MainLayout>
   );
 };

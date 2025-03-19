@@ -34,6 +34,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
+    if (!name) return 'AC';
     return name
       .split(' ')
       .map(word => word[0])
@@ -44,6 +45,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
 
   // Get random pastel color for avatar background
   const getAvatarColor = (name: string) => {
+    if (!name) return 'bg-blue-100 text-blue-600';
+    
     const colors = [
       'bg-blue-100 text-blue-600',
       'bg-green-100 text-green-600', 
@@ -77,8 +80,8 @@ const AccountCard: React.FC<AccountCardProps> = ({
   return (
     <Card className="p-5 rounded-lg border shadow-sm hover:shadow transition-all duration-300">
       <div className="flex items-center gap-4">
-        <Avatar className={cn("h-12 w-12", getAvatarColor(account.name))}>
-          <AvatarFallback>{getInitials(account.name)}</AvatarFallback>
+        <Avatar className={cn("h-12 w-12", getAvatarColor(account.name || ''))}>
+          <AvatarFallback>{getInitials(account.name || '')}</AvatarFallback>
         </Avatar>
         
         <div className="flex-grow">
@@ -98,16 +101,16 @@ const AccountCard: React.FC<AccountCardProps> = ({
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Thao Tác</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onEdit(account.clientId)}>
+                    <DropdownMenuItem onClick={() => onEdit(account.clientId || '')}>
                       Chỉnh Sửa Tài Khoản
                     </DropdownMenuItem>
                     {account.status === 'Disconnected' && (
-                      <DropdownMenuItem onClick={() => onReconnect(account.clientId)}>
+                      <DropdownMenuItem onClick={() => onReconnect(account.clientId || '')}>
                         Kết Nối Lại
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem 
-                      onClick={() => onDelete(account.clientId)}
+                      onClick={() => onDelete(account.clientId || '')}
                       className="text-destructive focus:text-destructive"
                     >
                       Xóa Tài Khoản
@@ -118,7 +121,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
             </div>
             <div className="text-sm text-muted-foreground mt-1 flex items-center">
               <Mail className="h-3.5 w-3.5 mr-1" />
-              <span>user@coinstratpro.com</span>
+              <span>{account.userEmail || 'user@coinstratpro.com'}</span>
             </div>
           </div>
         </div>
