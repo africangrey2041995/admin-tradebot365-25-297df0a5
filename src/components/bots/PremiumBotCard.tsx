@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChartLineUp, Users, Gauge, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
+import { ChartLine, Users, Gauge, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -150,7 +149,7 @@ export const PremiumBotCard = ({
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="bg-white/80 dark:bg-zinc-800/80 p-3 rounded-lg">
             <div className="flex items-center gap-2 mb-1">
-              <ChartLineUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              <ChartLine className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tháng</span>
             </div>
             <div className={`text-lg font-semibold ${getPerformanceColor(performanceLastMonth)}`}>
