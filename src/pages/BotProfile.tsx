@@ -317,7 +317,6 @@ const BotProfile = () => {
         <Tabs defaultValue="accounts" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
-            <TabsTrigger value="signals">Signal History</TabsTrigger>
             <TabsTrigger value="logs">Logs From Trading View</TabsTrigger>
             <TabsTrigger value="coinstrat">Log to Coinstrat Pro</TabsTrigger>
           </TabsList>
@@ -341,68 +340,6 @@ const BotProfile = () => {
               </CardHeader>
               <CardContent>
                 <BotAccountsTable botId={bot.botId} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="signals">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Signal History</CardTitle>
-                    <CardDescription>Recent signals received from TradingView</CardDescription>
-                  </div>
-                  <Button variant="outline">Refresh</Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Action</TableHead>
-                      <TableHead>Instrument</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Today, 15:23</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">ENTER_LONG</Badge>
-                      </TableCell>
-                      <TableCell>BTCUSDT</TableCell>
-                      <TableCell>100%</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200">Processed</Badge>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Today, 14:05</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">EXIT_LONG</Badge>
-                      </TableCell>
-                      <TableCell>ETHUSDT</TableCell>
-                      <TableCell>50%</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200">Processed</Badge>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Yesterday, 09:47</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">ENTER_SHORT</Badge>
-                      </TableCell>
-                      <TableCell>SOLUSDT</TableCell>
-                      <TableCell>25%</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-orange-50 text-orange-700 hover:bg-orange-50 border-orange-200">Pending</Badge>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
               </CardContent>
             </Card>
           </TabsContent>
