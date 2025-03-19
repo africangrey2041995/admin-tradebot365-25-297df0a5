@@ -144,7 +144,7 @@ const Index = () => {
         <DashboardCard title="System Overview">
           <div className="prose max-w-none">
             <p className="text-muted-foreground">
-              Welcome to the CTrader Connection Management System. This platform helps you manage your CTrader connections through the Open API, 
+              Welcome to Trade Bot 365. This platform helps you manage your CTrader connections through the Open API, 
               monitor signal processing, and ensure seamless communication with Coinstrat.pro.
             </p>
             <div className="mt-4 space-y-2">

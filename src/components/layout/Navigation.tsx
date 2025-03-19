@@ -48,6 +48,17 @@ const Navigation = () => {
     setMobileMenuOpen(false);
   };
 
+  const Logo = () => (
+    <div className="flex items-center space-x-2">
+      <img 
+        src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
+        alt="Trade Bot 365 Logo" 
+        className="h-8 w-8" 
+      />
+      <span className="text-xl font-bold text-white">Trade Bot <span className="text-tradebot">365</span></span>
+    </div>
+  );
+
   const NavLinks = () => (
     <>
       {routes.map((route) => (
@@ -78,7 +89,7 @@ const Navigation = () => {
         <>
           <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-background border-b">
             <div className="flex items-center">
-              <h1 className="text-lg font-bold">CTrader Connect</h1>
+              <Logo />
             </div>
             <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -104,7 +115,7 @@ const Navigation = () => {
       ) : (
         <aside className="fixed inset-y-0 left-0 z-30 w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
           <div className="p-6">
-            <h1 className="text-xl font-bold text-white">CTrader Connect</h1>
+            <Logo />
           </div>
           
           <div className="px-3 py-2 flex-1 overflow-auto flex flex-col gap-1">

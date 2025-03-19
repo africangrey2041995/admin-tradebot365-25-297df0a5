@@ -13,8 +13,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 161 96% 41%;  /* Changed to #04ce91 equivalent in HSL */
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 15% 95%;
     --secondary-foreground: 222 47% 11%;
@@ -28,14 +28,14 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 142 72% 29%;
-    --success-foreground: 210 40% 98%;
+    --success: 161 96% 41%;  /* Changed to match our brand color */
+    --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 210 40% 98%;
 
-    --info: 210 100% 50%;
-    --info-foreground: 210 40% 98%;
+    --info: 161 96% 41%;  /* Changed to match our brand color */
+    --info-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
@@ -46,12 +46,12 @@
     /* Sidebar Colors - Updated for better contrast */
     --sidebar-background: 240 5% 10%; /* Darker background */
     --sidebar-foreground: 0 0% 95%; /* Lighter text */
-    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary: 161 96% 41%; /* Changed to match our brand color */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 5% 15%; /* Slightly lighter than background for hover */
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 240 5% 15%;
-    --sidebar-ring: 210 100% 60%;
+    --sidebar-ring: 161 96% 41%; /* Changed to match our brand color */
   }
 
   .dark {
@@ -64,7 +64,7 @@
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 100% 50%;
+    --primary: 161 96% 41%;  /* Changed to #04ce91 equivalent in HSL */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217 33% 17%;
@@ -79,14 +79,14 @@
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 142 72% 29%;
-    --success-foreground: 210 40% 98%;
+    --success: 161 96% 41%;  /* Changed to match our brand color */
+    --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 210 40% 98%;
 
-    --info: 210 90% 70%;
-    --info-foreground: 222 47% 11%;
+    --info: 161 96% 41%;  /* Changed to match our brand color */
+    --info-foreground: 0 0% 100%;
 
     --border: 217 33% 17%;
     --input: 217 33% 17%;
@@ -95,12 +95,12 @@
     /* Sidebar Colors */
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary: 161 96% 41%; /* Changed to match our brand color */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 215 14% 18%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 215 14% 18%;
-    --sidebar-ring: 210 100% 60%;
+    --sidebar-ring: 161 96% 41%; /* Changed to match our brand color */
   }
 }
 
