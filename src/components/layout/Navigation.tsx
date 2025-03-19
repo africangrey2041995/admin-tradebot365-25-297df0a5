@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -15,7 +16,11 @@ import {
   UserCircle,
   Shield,
   Wallet,
-  HelpCircle
+  HelpCircle,
+  Search,
+  Globe,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -35,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 const routes = [
   {
@@ -75,6 +81,7 @@ const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -94,6 +101,10 @@ const Navigation = () => {
     } else {
       setOpenSubmenu(path);
     }
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   const Logo = () => (
@@ -254,104 +265,178 @@ const Navigation = () => {
     </div>
   );
 
+  // Completely redesigned UserMenu based on the reference image
   const UserMenu = () => (
-    <div className="flex items-center space-x-3">
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative text-zinc-400 hover:text-white bg-gradient-to-b from-zinc-800/50 to-zinc-800/90 rounded-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-40"></span>
-            <Badge className="h-5 w-5 rounded-full bg-primary text-[10px] text-white flex items-center justify-center border-none shadow-lg shadow-primary/30">
-              3
-            </Badge>
-          </span>
-        </Button>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="flex items-center space-x-3 hover:bg-gradient-to-b from-zinc-800/50 to-zinc-800/90 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 px-3 py-2.5 rounded-full border border-zinc-700/40 ml-3"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-9 w-9 border-2 border-primary/20 shadow-lg shadow-primary/10">
-                  <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" className="object-cover" />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40 text-white font-semibold">TB</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-sm font-bold text-white">Founder</span>
-                  <span className="text-xs text-zinc-400">Admin</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-zinc-400 ml-1" />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
-            className="w-56 bg-gradient-to-b from-zinc-900 to-zinc-950 border-zinc-700/50 p-1.5 rounded-xl shadow-xl shadow-black/30 backdrop-blur-sm"
-          >
-            <DropdownMenuLabel className="text-primary/90 px-3 py-2 font-bold">My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-700/50" />
-            
-            <div className="p-2 space-y-1">
-              <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200">
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <UserCircle className="h-4 w-4 text-primary" />
-                </div>
-                <span>Profile</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200">
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <Settings className="h-4 w-4 text-primary" />
-                </div>
-                <span>Settings</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200">
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <Shield className="h-4 w-4 text-primary" />
-                </div>
-                <span>Security</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200">
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <Wallet className="h-4 w-4 text-primary" />
-                </div>
-                <span>Billing</span>
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem className="hover:bg-zinc-800 focus:bg-zinc-800 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200">
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <HelpCircle className="h-4 w-4 text-primary" />
-                </div>
-                <span>Help Center</span>
-              </DropdownMenuItem>
-            </div>
-            
-            <DropdownMenuSeparator className="bg-zinc-700/50" />
-            
-            <div className="p-2">
-              <DropdownMenuItem 
-                className="hover:bg-red-500/10 focus:bg-red-500/10 cursor-pointer text-white px-3 py-2.5 rounded-lg group transition-all duration-200"
-                onClick={() => {
-                  window.location.href = '/sign-in';
-                }}
-              >
-                <div className="mr-2 h-8 w-8 rounded-lg bg-gradient-to-br from-red-500/20 to-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
-                  <LogOut className="h-4 w-4 text-red-500" />
-                </div>
-                <span className="text-red-500">Logout</span>
-              </DropdownMenuItem>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className="flex items-center gap-4">
+      {/* Search Bar */}
+      <div className="relative hidden md:flex items-center">
+        <Input 
+          type="text" 
+          placeholder="Search..." 
+          className="w-44 lg:w-56 h-9 pl-9 bg-white/5 border-zinc-700/30 text-white rounded-lg text-sm focus-visible:ring-primary"
+        />
+        <Search className="absolute left-2.5 h-4 w-4 text-zinc-400" />
       </div>
+      
+      {/* Language Switcher */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="rounded-full bg-white/5 border border-zinc-700/30 text-white hover:bg-white/10 hover:text-primary">
+            <Globe className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40 bg-zinc-800 border-zinc-700/50 text-white p-1 rounded-lg">
+          <DropdownMenuItem className="rounded-md hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer">English</DropdownMenuItem>
+          <DropdownMenuItem className="rounded-md hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer">Tiếng Việt</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {/* Theme Toggle */}
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="rounded-full bg-white/5 border border-zinc-700/30 text-white hover:bg-white/10 hover:text-primary"
+        onClick={toggleDarkMode}
+      >
+        {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </Button>
+      
+      {/* Notifications */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative rounded-full bg-white/5 border border-zinc-700/30 text-white hover:bg-white/10 hover:text-primary"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute -top-1 -right-1 flex h-5 w-5">
+              <Badge variant="destructive" className="h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                3
+              </Badge>
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80 bg-zinc-800 border-zinc-700/50 text-white p-2 rounded-lg">
+          <DropdownMenuLabel className="px-2 py-1.5 text-sm">Notifications</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-zinc-700/50" />
+          <div className="max-h-[300px] overflow-auto py-1 space-y-1">
+            <DropdownMenuItem className="px-2 py-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer">
+              <div className="flex gap-2">
+                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <CircuitBoard className="h-4 w-4 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Bot #1 đã hoàn thành giao dịch</p>
+                  <p className="text-xs text-zinc-400">2 phút trước</p>
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="px-2 py-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer">
+              <div className="flex gap-2">
+                <div className="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-4 w-4 text-blue-500" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Tài khoản mới đã được thêm</p>
+                  <p className="text-xs text-zinc-400">10 phút trước</p>
+                </div>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="px-2 py-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 cursor-pointer">
+              <div className="flex gap-2">
+                <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                  <Shield className="h-4 w-4 text-amber-500" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Có một hoạt động đáng ngờ</p>
+                  <p className="text-xs text-zinc-400">30 phút trước</p>
+                </div>
+              </div>
+            </DropdownMenuItem>
+          </div>
+          <DropdownMenuSeparator className="bg-zinc-700/50" />
+          <div className="px-2 py-1 text-center">
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 w-full rounded-md">
+              Xem tất cả thông báo
+            </Button>
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {/* User Profile */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 hover:bg-white/5 rounded-lg p-1.5 pr-3 border border-zinc-700/30"
+          >
+            <Avatar className="h-8 w-8 border border-primary/30">
+              <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+              <AvatarFallback className="bg-primary/20 text-primary font-medium">AD</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col items-start text-left">
+              <span className="text-sm font-medium text-white">Founder</span>
+              <span className="text-xs text-zinc-400">Admin</span>
+            </div>
+            <ChevronDown className="h-4 w-4 text-zinc-400 ml-1" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="end" 
+          className="w-64 bg-zinc-800 border-zinc-700/50 text-white p-2 rounded-lg"
+        >
+          <div className="px-2 py-2 flex items-center gap-3 border-b border-zinc-700/50 mb-1">
+            <Avatar className="h-12 w-12 border-2 border-primary/30">
+              <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+              <AvatarFallback className="bg-primary/20 text-primary font-medium">AD</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-semibold">Founder</span>
+              <span className="text-xs text-zinc-400">founder@tradebot365.com</span>
+            </div>
+          </div>
+          
+          <div className="py-1 space-y-1">
+            <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+              <UserCircle className="h-4 w-4 text-zinc-400" />
+              <span>Hồ sơ của tôi</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+              <Settings className="h-4 w-4 text-zinc-400" />
+              <span>Cài đặt</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+              <Wallet className="h-4 w-4 text-zinc-400" />
+              <span>Thanh toán</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+              <Shield className="h-4 w-4 text-zinc-400" />
+              <span>Bảo mật</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+              <HelpCircle className="h-4 w-4 text-zinc-400" />
+              <span>Trợ giúp & hỗ trợ</span>
+            </DropdownMenuItem>
+          </div>
+          
+          <DropdownMenuSeparator className="bg-zinc-700/50" />
+          
+          <DropdownMenuItem 
+            className="flex items-center gap-2 rounded-md hover:bg-red-500/10 focus:bg-red-500/10 px-2 py-2 text-red-400 cursor-pointer mt-1"
+            onClick={() => {
+              window.location.href = '/sign-in';
+            }}
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Đăng xuất</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 
@@ -368,12 +453,76 @@ const Navigation = () => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <UserMenu />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative rounded-full bg-white/5 border border-zinc-700/30 text-white hover:bg-white/10 hover:text-primary"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                  <Badge variant="destructive" className="h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                    3
+                  </Badge>
+                </span>
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full p-0">
+                    <Avatar className="h-8 w-8 border border-primary/30">
+                      <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+                      <AvatarFallback className="bg-primary/20 text-primary font-medium">AD</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-zinc-800 border-zinc-700/50 text-white p-2 rounded-lg">
+                  <div className="px-2 py-2 flex flex-col items-center gap-2 border-b border-zinc-700/50 mb-1">
+                    <Avatar className="h-14 w-14 border-2 border-primary/30">
+                      <AvatarImage src="/lovable-uploads/533c01d2-dd33-455c-9480-10be9e71e6e3.png" alt="Admin" />
+                      <AvatarFallback className="bg-primary/20 text-primary font-medium">AD</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-center">
+                      <span className="font-semibold">Founder</span>
+                      <span className="text-xs text-zinc-400">Admin</span>
+                    </div>
+                  </div>
+                  
+                  <div className="py-1 space-y-1">
+                    <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+                      <UserCircle className="h-4 w-4 text-zinc-400" />
+                      <span>Hồ sơ</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+                      <Settings className="h-4 w-4 text-zinc-400" />
+                      <span>Cài đặt</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-zinc-700 focus:bg-zinc-700 px-2 py-2 cursor-pointer">
+                      <HelpCircle className="h-4 w-4 text-zinc-400" />
+                      <span>Trợ giúp</span>
+                    </DropdownMenuItem>
+                  </div>
+                  
+                  <DropdownMenuSeparator className="bg-zinc-700/50" />
+                  
+                  <DropdownMenuItem 
+                    className="flex items-center gap-2 rounded-md hover:bg-red-500/10 focus:bg-red-500/10 px-2 py-2 text-red-400 cursor-pointer mt-1"
+                    onClick={() => {
+                      window.location.href = '/sign-in';
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Đăng xuất</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={toggleMobileMenu}
-                className="bg-gradient-to-b from-zinc-800/50 to-zinc-800/90 text-white hover:bg-zinc-700 rounded-lg shadow-md"
+                className="bg-white/5 border border-zinc-700/30 text-white hover:bg-white/10 hover:text-primary rounded-lg shadow-md"
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
@@ -389,6 +538,16 @@ const Navigation = () => {
                 transition={{ duration: 0.2 }}
                 className="fixed top-[60px] left-0 right-0 z-30 bg-zinc-900 p-4 border-b border-zinc-800 shadow-lg flex flex-col gap-2"
               >
+                <div className="pb-4 mb-2 border-b border-zinc-800">
+                  <div className="relative">
+                    <Input 
+                      type="text" 
+                      placeholder="Search..." 
+                      className="w-full h-10 pl-9 bg-zinc-800/70 border-zinc-700/30 text-white rounded-lg"
+                    />
+                    <Search className="absolute top-3 left-3 h-4 w-4 text-zinc-400" />
+                  </div>
+                </div>
                 <NavLinks />
               </motion.div>
             )}
@@ -435,7 +594,7 @@ const Navigation = () => {
           </aside>
           
           <div className={cn(
-            "fixed top-0 right-0 z-20 border-b border-zinc-700/30 bg-gradient-to-r from-zinc-900/70 to-zinc-900/90 shadow-md transition-all duration-300 ease-in-out px-6 py-3 backdrop-blur-md",
+            "fixed top-0 right-0 z-20 border-b border-zinc-700/30 bg-zinc-900 shadow-md transition-all duration-300 ease-in-out px-6 py-3",
             isCollapsed ? "left-[70px]" : "left-64"
           )}>
             <div className="flex items-center justify-between h-12">
