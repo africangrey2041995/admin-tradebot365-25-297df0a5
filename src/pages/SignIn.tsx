@@ -12,8 +12,7 @@ import {
   ArrowRight, 
   MailIcon, 
   KeyIcon, 
-  Loader2,
-  CheckCircle2
+  Loader2
 } from 'lucide-react';
 
 const SignIn = () => {
@@ -24,6 +23,15 @@ const SignIn = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // If clerk isn't loaded yet, show a simple loading state
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
+        <Loader2 className="h-12 w-12 animate-spin text-white/50" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

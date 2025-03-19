@@ -12,24 +12,30 @@ import {
   ArrowRight, 
   MailIcon, 
   KeyIcon, 
-  Loader2, 
-  UserIcon, 
-  PhoneIcon,
-  CheckCircle2 
+  UserIcon,
+  Loader2
 } from 'lucide-react';
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
+  const [fullName, setFullName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // If clerk isn't loaded yet, show a simple loading state
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
+        <Loader2 className="h-12 w-12 animate-spin text-white/50" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,23 +44,21 @@ const SignUp = () => {
     try {
       setIsLoading(true);
       
-      const result = await signUp.create({
+      await signUp.create({
+        firstName: fullName.split(' ')[0],
+        lastName: fullName.split(' ').slice(1).join(' ') || '',
         emailAddress,
         password,
-        username,
-        phoneNumber
       });
 
-      // Send verification email
-      await signUp.prepareEmailAddressVerification({
-        strategy: 'email_code',
-      });
-
+      // Send email verification code
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      
       setPendingVerification(true);
       
       toast({
-        title: "Mã xác nhận đã được gửi",
-        description: "Vui lòng kiểm tra email của bạn để lấy mã xác nhận",
+        title: "Mã xác thực đã được gửi",
+        description: "Vui lòng kiểm tra email của bạn",
       });
     } catch (err: any) {
       toast({
@@ -74,12 +78,12 @@ const SignUp = () => {
     try {
       setIsLoading(true);
       
-      const result = await signUp.attemptEmailAddressVerification({
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
+      
+      if (completeSignUp.status === "complete") {
+        await setActive({ session: completeSignUp.createdSessionId });
         toast({
           title: "Xác thực thành công",
           description: "Chào mừng bạn đến với Trade Bot 365",
@@ -89,7 +93,7 @@ const SignUp = () => {
         toast({
           variant: "destructive",
           title: "Xác thực thất bại",
-          description: "Mã xác nhận không hợp lệ hoặc đã hết hạn",
+          description: "Vui lòng kiểm tra lại mã xác thực",
         });
       }
     } catch (err: any) {
@@ -148,23 +152,53 @@ const SignUp = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md my-10"
+        className="w-full max-w-md"
       >
         <Card className="border-zinc-700 bg-zinc-900/80 backdrop-blur-lg shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-white">
-              {pendingVerification ? "Xác thực email" : "Đăng Ký"}
+              {pendingVerification ? "Xác Thực Email" : "Đăng Ký"}
             </CardTitle>
             <CardDescription className="text-zinc-400">
               {pendingVerification 
-                ? "Vui lòng nhập mã xác nhận đã được gửi đến email của bạn" 
+                ? "Nhập mã xác thực đã được gửi đến email của bạn" 
                 : "Tạo tài khoản để sử dụng hệ thống quản lý bot giao dịch"}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {!pendingVerification ? (
+          <CardContent className="space-y-4">
+            {pendingVerification ? (
+              <form onSubmit={handleVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="code" className="text-zinc-400">Mã xác thực</Label>
+                  <Input
+                    id="code"
+                    type="text"
+                    placeholder="Nhập mã 6 số"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    className="border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="tradebot"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      Xác thực
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            ) : (
               <>
-                <div className="flex flex-col space-y-3 mb-4">
+                <div className="flex flex-col space-y-3">
                   <Button 
                     variant="outline" 
                     className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
@@ -210,6 +244,22 @@ const SignUp = () => {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-zinc-400">Họ và tên</Label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                      <Input
+                        id="fullName"
+                        type="text"
+                        placeholder="Nguyen Van A"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
                     <Label htmlFor="email" className="text-zinc-400">Email</Label>
                     <div className="relative">
                       <MailIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
@@ -239,44 +289,13 @@ const SignUp = () => {
                         required
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="username" className="text-zinc-400">Tên tài khoản</Label>
-                    <div className="relative">
-                      <UserIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                      <Input
-                        id="username"
-                        type="text"
-                        placeholder="Tên của bạn"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-zinc-400">Số điện thoại</Label>
-                    <div className="relative">
-                      <PhoneIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+84 000 000 000"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                        required
-                      />
-                    </div>
+                    <p className="text-xs text-zinc-500">Mật khẩu phải có ít nhất 8 ký tự</p>
                   </div>
                   
                   <Button
                     type="submit"
                     variant="tradebot"
-                    className="w-full mt-2"
+                    className="w-full"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -290,57 +309,13 @@ const SignUp = () => {
                   </Button>
                 </form>
               </>
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-6"
-              >
-                <div className="flex flex-col items-center justify-center text-center space-y-2 py-4">
-                  <CheckCircle2 className="h-12 w-12 text-tradebot mb-2" />
-                  <p className="text-zinc-300">
-                    Một mã xác nhận đã được gửi đến<br/><span className="font-medium text-white">{emailAddress}</span>
-                  </p>
-                </div>
-                
-                <form onSubmit={handleVerify} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="code" className="text-zinc-400">Mã xác nhận</Label>
-                    <Input
-                      id="code"
-                      type="text"
-                      placeholder="000000"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      className="text-center text-lg tracking-widest border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                      required
-                    />
-                  </div>
-                  
-                  <Button
-                    type="submit"
-                    variant="tradebot"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        Xác nhận
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </motion.div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800 pt-4">
             <p className="text-center text-sm text-zinc-500">
               Đã có tài khoản?{" "}
               <Link to="/sign-in" className="text-tradebot hover:underline">
-                Đăng nhập
+                Đăng nhập ngay
               </Link>
             </p>
           </CardFooter>
