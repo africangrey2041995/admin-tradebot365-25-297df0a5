@@ -80,13 +80,56 @@ const botIcons = [
 ];
 
 const exchanges = [
-  { name: 'Binance', value: 'binance', disabled: true },
-  { name: 'Coinbase', value: 'coinbase', disabled: true },
-  { name: 'Kraken', value: 'kraken', disabled: true },
-  { name: 'Bybit', value: 'bybit', disabled: true },
-  { name: 'KuCoin', value: 'kucoin', disabled: true },
-  { name: 'OKX', value: 'okx', disabled: true },
-  { name: 'Coinstart Pro', value: 'coinstart_pro', disabled: false },
+  { 
+    name: 'Binance', 
+    value: 'binance', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'Coinbase', 
+    value: 'coinbase', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'Kraken', 
+    value: 'kraken', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'Bybit', 
+    value: 'bybit', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'KuCoin', 
+    value: 'kucoin', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'OKX', 
+    value: 'okx', 
+    disabled: true, 
+    logo: null 
+  },
+  { 
+    name: 'Coinstart Pro', 
+    value: 'coinstart_pro', 
+    disabled: false, 
+    logo: (
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M7.5 12H16.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 16.5L16.5 12L12 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+    )
+  },
 ];
 
 const botForms = [
@@ -134,6 +177,17 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
     });
   }
 
+  const renderExchangeContent = (exchange: typeof exchanges[0]) => (
+    <div className="flex items-center gap-2">
+      {exchange.logo || (
+        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+          <Server className="h-3 w-3 text-slate-500" />
+        </div>
+      )}
+      <span>{exchange.name}</span>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
@@ -172,7 +226,11 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select exchange" />
+                          <SelectValue placeholder="Select exchange">
+                            {field.value && renderExchangeContent(
+                              exchanges.find(e => e.value === field.value) || exchanges[6]
+                            )}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -183,7 +241,14 @@ export function AddBotDialog({ open, onOpenChange, onAddBot }: AddBotDialogProps
                             disabled={exchange.disabled}
                             className={exchange.disabled ? "text-muted-foreground cursor-not-allowed" : ""}
                           >
-                            {exchange.name}
+                            <div className="flex items-center gap-2">
+                              {exchange.logo || (
+                                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                                  <Server className="h-3 w-3 text-slate-500" />
+                                </div>
+                              )}
+                              <span>{exchange.name}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
