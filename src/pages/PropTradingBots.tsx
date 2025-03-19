@@ -195,29 +195,33 @@ const PropTradingBots = () => {
             />
           </div>
           <div className="flex gap-2">
-            <Select value={riskFilter} onValueChange={setRiskFilter} className="flex-1">
-              <SelectTrigger>
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Mức độ rủi ro" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="low">Thấp</SelectItem>
-                <SelectItem value="medium">Trung bình</SelectItem>
-                <SelectItem value="high">Cao</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortOption} onValueChange={setSortOption} className="flex-1">
-              <SelectTrigger>
-                <ArrowUpDown className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sắp xếp" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="performance">Hiệu suất</SelectItem>
-                <SelectItem value="popularity">Phổ biến</SelectItem>
-                <SelectItem value="name">Tên</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex-1">
+              <Select value={riskFilter} onValueChange={setRiskFilter}>
+                <SelectTrigger>
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Mức độ rủi ro" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  <SelectItem value="low">Thấp</SelectItem>
+                  <SelectItem value="medium">Trung bình</SelectItem>
+                  <SelectItem value="high">Cao</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Select value={sortOption} onValueChange={setSortOption}>
+                <SelectTrigger>
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sắp xếp" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="performance">Hiệu suất</SelectItem>
+                  <SelectItem value="popularity">Phổ biến</SelectItem>
+                  <SelectItem value="name">Tên</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
