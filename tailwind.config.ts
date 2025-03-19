@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -76,7 +77,7 @@ export default {
 				},
 				tradebot: {
 					DEFAULT: '#04ce91',
-					foreground: '#ffffff'
+					foreground: '#222222'
 				}
 			},
 			borderRadius: {

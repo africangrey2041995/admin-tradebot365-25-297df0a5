@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -9,7 +10,6 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
@@ -146,7 +146,7 @@ const Navigation = () => {
         }
         
         return (
-          <React.Fragment key={route.path}>
+          <div key={route.path}>
             <Link
               to={route.path}
               className={cn(
@@ -192,7 +192,7 @@ const Navigation = () => {
                 ))}
               </div>
             )}
-          </React.Fragment>
+          </div>
         );
       })}
     </>
