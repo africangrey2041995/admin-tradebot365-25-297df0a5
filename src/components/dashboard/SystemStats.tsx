@@ -48,7 +48,7 @@ const SystemStats = ({ dashboardStats }: SystemStatsProps) => {
             color="success"
             onClick={() => navigate('/bots')}
           >
-            <div className="text-3xl font-semibold">{dashboardStats.totalBots}</div>
+            <div className="text-3xl font-semibold mt-4">{dashboardStats.totalBots}</div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               {dashboardStats.activeBots} đang hoạt động
             </div>
@@ -67,7 +67,7 @@ const SystemStats = ({ dashboardStats }: SystemStatsProps) => {
             color="primary"
             onClick={() => navigate('/accounts')}
           >
-            <div className="text-3xl font-semibold">{dashboardStats.totalAccounts}</div>
+            <div className="text-3xl font-semibold mt-4">{dashboardStats.totalAccounts}</div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               {dashboardStats.connectedAccounts} đã kết nối
             </div>
@@ -86,7 +86,7 @@ const SystemStats = ({ dashboardStats }: SystemStatsProps) => {
             color="warning"
             onClick={() => navigate('/bots')}
           >
-            <div className="text-3xl font-semibold">{dashboardStats.monthlyOrders}</div>
+            <div className="text-3xl font-semibold mt-4">{dashboardStats.monthlyOrders}</div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               Tháng này
             </div>
@@ -105,7 +105,7 @@ const SystemStats = ({ dashboardStats }: SystemStatsProps) => {
             color="info"
             onClick={() => navigate('/bots')}
           >
-            <div className="text-3xl font-semibold">{dashboardStats.todaySignals}</div>
+            <div className="text-3xl font-semibold mt-4">{dashboardStats.todaySignals}</div>
             <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               Tín hiệu hôm nay
             </div>

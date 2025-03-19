@@ -104,7 +104,7 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
           >
             <div className="mt-4">
               <div className="text-2xl font-semibold">{dashboardStats.todaySignals}</div>
-              <div className="flex items-center justify-between mt-2 text-sm">
+              <div className="flex justify-between mt-2 text-sm">
                 <span className="text-green-500">Đã xử lý: {dashboardStats.processedSignals}</span>
                 <span className="text-yellow-500">Đang chờ: {dashboardStats.pendingSignals}</span>
                 <span className="text-red-500">Lỗi: {dashboardStats.failedSignals}</span>

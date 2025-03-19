@@ -5,7 +5,6 @@ import PropTradingPromo from '@/components/dashboard/PropTradingPromo';
 import ActivityOverview from '@/components/dashboard/ActivityOverview';
 import SystemStats from '@/components/dashboard/SystemStats';
 import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
-import SystemOverview from '@/components/dashboard/SystemOverview';
 
 const Index = () => {
   // Mock statistics for demonstration
@@ -29,7 +28,6 @@ const Index = () => {
       <PremiumBotsPromo />
       <ActivityOverview dashboardStats={dashboardStats} />
       <SystemStats dashboardStats={dashboardStats} />
-      <SystemOverview />
     </MainLayout>
   );
 };
