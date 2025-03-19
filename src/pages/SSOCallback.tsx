@@ -20,7 +20,6 @@ export default function SSOCallback() {
         // Handle sign in
         if (searchParams.has('__clerk_status') && searchParams.get('__clerk_status') === 'running') {
           await signIn.attemptFirstFactor({
-            strategy: 'oauth_callback',
             redirectUrl: '/sso-callback',
           });
           navigate('/');
@@ -32,7 +31,6 @@ export default function SSOCallback() {
         if (firstParam.startsWith('__clerk_ticket')) {
           // Handle sign-up OAuth callback
           await signUp.attemptEmailAddressVerification({
-            strategy: 'oauth_callback',
             redirectUrl: '/sso-callback',
           });
           navigate('/');
