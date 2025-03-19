@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Account } from '@/types';
 
@@ -53,21 +53,15 @@ const EditAccountDialog: React.FC<EditAccountDialogProps> = ({
     onClose();
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <div className="relative mb-6">
-          <div className="absolute right-0 top-0">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onClose}
-              className="h-8 w-8 p-0 rounded-full"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Đóng</span>
-            </Button>
-          </div>
           <div className="w-full flex justify-center mb-4">
             <div className="h-16 w-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
               <User className="h-8 w-8 text-white" />

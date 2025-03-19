@@ -22,6 +22,11 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
     toast.success(`${type} copied to clipboard`);
   };
 
+  const truncateMiddle = (text: string, startChars = 30, endChars = 15) => {
+    if (text.length <= startChars + endChars) return text;
+    return `${text.substring(0, startChars)}...${text.substring(text.length - endChars)}`;
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
@@ -42,7 +47,7 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
             </p>
             <div className="relative">
               <div className="flex items-center border rounded-md bg-slate-50 dark:bg-zinc-900 pl-4 pr-2 py-2">
-                <code className="text-sm flex-grow break-all">{webhookUrl}</code>
+                <code className="text-sm flex-grow break-all">{truncateMiddle(webhookUrl, 30, 15)}</code>
                 <div className="flex gap-1 ml-2">
                   <Button 
                     size="icon" 

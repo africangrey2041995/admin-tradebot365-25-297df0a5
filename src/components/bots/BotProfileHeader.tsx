@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Trash, Power } from 'lucide-react';
 import { toast } from 'sonner';
+import EditBotDialog from './EditBotDialog';
+import { BotCardProps } from './BotCard';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,11 +21,14 @@ import {
 interface BotProfileHeaderProps {
   botId: string;
   status: string;
+  botDetails: BotCardProps;
+  onUpdateBot: (updatedBot: Partial<BotCardProps>) => void;
 }
 
-const BotProfileHeader = ({ botId, status }: BotProfileHeaderProps) => {
+const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfileHeaderProps) => {
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const handleBack = () => {
     navigate('/bots');
@@ -38,6 +43,11 @@ const BotProfileHeader = ({ botId, status }: BotProfileHeaderProps) => {
     
     // Navigate back to bots page
     navigate('/bots');
+  };
+
+  const handleSaveBot = (updatedBot: Partial<BotCardProps>) => {
+    onUpdateBot(updatedBot);
+    toast.success('Bot settings updated successfully');
   };
 
   return (
@@ -75,7 +85,11 @@ const BotProfileHeader = ({ botId, status }: BotProfileHeaderProps) => {
           </AlertDialogContent>
         </AlertDialog>
 
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2"
+          onClick={() => setIsEditDialogOpen(true)}
+        >
           <Settings className="h-4 w-4" />
           <span>Settings</span>
         </Button>
@@ -84,6 +98,13 @@ const BotProfileHeader = ({ botId, status }: BotProfileHeaderProps) => {
           <span>{status === 'Active' ? 'Stop Bot' : 'Start Bot'}</span>
         </Button>
       </div>
+
+      <EditBotDialog 
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        bot={botDetails}
+        onSave={handleSaveBot}
+      />
     </div>
   );
 };

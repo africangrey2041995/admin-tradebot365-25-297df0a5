@@ -62,6 +62,15 @@ const AccountCard: React.FC<AccountCardProps> = ({
     return colors[index];
   };
 
+  // Truncate text with ellipsis in the middle if too long
+  const truncateMiddle = (text: string, maxLength: number) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    
+    const half = Math.floor(maxLength / 2);
+    return `${text.substring(0, half)}...${text.substring(text.length - half)}`;
+  };
+
   // Mock API and Account counts for demo purposes
   const getApiCount = () => {
     // This would come from actual data in production
@@ -121,7 +130,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
             </div>
             <div className="text-sm text-muted-foreground mt-1 flex items-center">
               <Mail className="h-3.5 w-3.5 mr-1" />
-              <span>{account.userEmail || 'user@coinstratpro.com'}</span>
+              <span>{truncateMiddle(account.userEmail || 'user@coinstratpro.com', 24)}</span>
             </div>
           </div>
         </div>

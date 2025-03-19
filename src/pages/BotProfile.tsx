@@ -18,7 +18,8 @@ const BotProfile = () => {
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
-  const [webhookUrl] = useState(`https://api.coinstart.pro/webhook/${botId?.toLowerCase()}`);
+  // Using the new webhook URL format
+  const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
   const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
   
   useEffect(() => {
@@ -61,6 +62,15 @@ const BotProfile = () => {
     toast.success('Account added successfully!');
   };
 
+  const handleUpdateBot = (updatedBot: Partial<BotCardProps>) => {
+    if (bot) {
+      setBot({
+        ...bot,
+        ...updatedBot
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -88,7 +98,12 @@ const BotProfile = () => {
   return (
     <MainLayout title="Bot Profile">
       <div className="flex flex-col">
-        <BotProfileHeader botId={bot.botId} status={bot.status} />
+        <BotProfileHeader 
+          botId={bot.botId} 
+          status={bot.status} 
+          botDetails={bot}
+          onUpdateBot={handleUpdateBot}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
           <div className="lg:col-span-5">
