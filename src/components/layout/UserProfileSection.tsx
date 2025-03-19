@@ -3,20 +3,16 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, LogOut, Moon, Settings, Sun, User } from "lucide-react";
+import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Badge } from "@/components/ui/badge";
 
 const UserProfileSection = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-
-  // Mock notification count
-  const notificationCount = 3;
 
   const handleSignOut = async () => {
     await signOut();
@@ -34,18 +30,6 @@ const UserProfileSection = () => {
 
   return (
     <div className="flex items-center gap-4">
-      {/* Notification bell */}
-      <div className="relative">
-        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors">
-          <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary text-white border-2 border-white dark:border-zinc-800">
-              {notificationCount}
-            </Badge>
-          )}
-        </Button>
-      </div>
-
       {/* Theme toggle */}
       <Button
         variant="ghost"
