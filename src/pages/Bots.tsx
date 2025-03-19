@@ -120,7 +120,7 @@ const Bots = () => {
       
       <BotSearch 
         searchTerm={searchTerm} 
-        onSearchChange={setSearchTerm} 
+        setSearchTerm={setSearchTerm} 
       />
       
       <BotListing 
@@ -135,9 +135,9 @@ const Bots = () => {
       <BotsPagination />
       
       <AddBotDialog 
-        isOpen={isAddBotDialogOpen}
-        onClose={() => setIsAddBotDialogOpen(false)}
-        onSubmit={handleAddBot}
+        open={isAddBotDialogOpen}
+        onOpenChange={setIsAddBotDialogOpen}
+        onAddBot={handleAddBot}
       />
     </MainLayout>
   );

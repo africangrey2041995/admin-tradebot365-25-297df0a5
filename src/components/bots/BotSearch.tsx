@@ -13,7 +13,7 @@ const BotSearch = ({ searchTerm, setSearchTerm }: BotSearchProps) => {
     <div className="relative w-64">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input 
-        placeholder="Search..." 
+        placeholder="Tìm kiếm..." 
         className="pl-9 border-slate-200 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
