@@ -16,7 +16,13 @@ import {
   Star, 
   MoreHorizontal, 
   Bookmark,
-  Eye
+  Eye,
+  Bot,
+  Cpu,
+  Server,
+  Terminal,
+  CircuitBoard,
+  Gem
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -26,8 +32,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Bot } from '@/types';
+import { Bot as BotType } from '@/types';
 
 interface BotCardProps {
   title: string;
@@ -40,6 +47,8 @@ interface BotCardProps {
   colorScheme?: 'red' | 'blue' | 'green' | 'purple' | 'default';
   onAddAccount?: () => void;
   onViewBot?: () => void;
+  avatarSrc?: string;
+  avatarIcon?: React.ReactNode;
 }
 
 const BotCard = ({
@@ -52,7 +61,9 @@ const BotCard = ({
   isFavorite = false,
   colorScheme = 'default',
   onAddAccount,
-  onViewBot
+  onViewBot,
+  avatarSrc,
+  avatarIcon
 }: BotCardProps) => {
   
   const colorClasses = {
@@ -63,12 +74,31 @@ const BotCard = ({
     default: 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
   };
   
+  const avatarBgColors = {
+    red: 'bg-red-100',
+    blue: 'bg-blue-100',
+    green: 'bg-green-100',
+    purple: 'bg-purple-100',
+    default: 'bg-slate-100'
+  };
+  
   return (
     <div className={`relative rounded-lg border shadow-sm p-5 transition-all duration-200 hover:shadow-md ${colorClasses[colorScheme]}`}>
       <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="font-semibold text-lg">{title}</h3>
-          {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+        <div className="flex items-center">
+          <Avatar className={`mr-3 h-12 w-12 ${avatarBgColors[colorScheme]} border border-slate-200 shadow-sm`}>
+            {avatarSrc ? (
+              <AvatarImage src={avatarSrc} alt={title} />
+            ) : (
+              <AvatarFallback className="text-slate-500">
+                {avatarIcon || <Bot className="h-6 w-6" />}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div>
+            <h3 className="font-semibold text-lg">{title}</h3>
+            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+          </div>
         </div>
         <div className="flex space-x-2">
           <button 
@@ -144,6 +174,16 @@ const Bots = () => {
     '3': true
   });
 
+  // Icon set for bots
+  const botIcons = [
+    <Bot className="h-6 w-6" />,
+    <Cpu className="h-6 w-6" />,
+    <Server className="h-6 w-6" />,
+    <Terminal className="h-6 w-6" />,
+    <CircuitBoard className="h-6 w-6" />,
+    <Gem className="h-6 w-6" />
+  ];
+
   // Mock data for demonstration
   const mockBots: BotCardProps[] = [
     {
@@ -152,7 +192,8 @@ const Bots = () => {
       botId: 'BOT7459',
       accountCount: '18/42',
       lastUpdated: '10 Jul, 2023',
-      colorScheme: 'red'
+      colorScheme: 'red',
+      avatarIcon: botIcons[0]
     },
     {
       title: 'Long Master',
@@ -160,7 +201,8 @@ const Bots = () => {
       botId: 'BOT8932',
       accountCount: '22/56',
       lastUpdated: '18 May, 2023',
-      colorScheme: 'blue'
+      colorScheme: 'blue',
+      avatarIcon: botIcons[1]
     },
     {
       title: 'Gold Trading',
@@ -168,7 +210,8 @@ const Bots = () => {
       botId: 'BOT2734',
       accountCount: '14/20',
       lastUpdated: '21 Feb, 2023',
-      colorScheme: 'green'
+      colorScheme: 'green',
+      avatarIcon: botIcons[2]
     },
     {
       title: 'Bitcoin Trading',
@@ -176,7 +219,8 @@ const Bots = () => {
       botId: 'BOT5128',
       accountCount: '20/34',
       lastUpdated: '03 Aug, 2023',
-      colorScheme: 'purple'
+      colorScheme: 'purple',
+      avatarIcon: botIcons[3]
     },
     {
       title: 'Forex Master',
@@ -184,6 +228,7 @@ const Bots = () => {
       botId: 'BOT1267',
       accountCount: '15/25',
       lastUpdated: '15 May, 2023',
+      avatarIcon: botIcons[4]
     },
     {
       title: 'Scalping Pro',
@@ -191,6 +236,7 @@ const Bots = () => {
       botId: 'BOT9381',
       accountCount: '8/12',
       lastUpdated: '21 Feb, 2023',
+      avatarIcon: botIcons[5]
     },
     {
       title: 'Swing Trader',
@@ -198,6 +244,7 @@ const Bots = () => {
       botId: 'BOT6452',
       accountCount: '12/20',
       lastUpdated: '05 Aug, 2023',
+      avatarIcon: botIcons[0]
     },
     {
       title: 'ETF Strategy',
@@ -205,6 +252,7 @@ const Bots = () => {
       botId: 'BOT3815',
       accountCount: '10/15',
       lastUpdated: '10 Jul, 2023',
+      avatarIcon: botIcons[1]
     },
   ];
 
