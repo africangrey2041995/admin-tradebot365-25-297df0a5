@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types';
 import { Check, X, Info, Eye, List } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { 
   Dialog,
   DialogContent,
@@ -39,7 +39,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '100%',
+            amount: '1.5',
             status: 'Processed',
             processedAccounts: [
               { accountId: 'acc001', name: 'Account 1', timestamp: new Date().toISOString() },
@@ -56,7 +56,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '50%',
+            amount: '2.3',
             status: 'Sent',
             processedAccounts: [
               { accountId: 'acc001', name: 'Account 1', timestamp: new Date(Date.now() - 3600000).toISOString() }
@@ -79,7 +79,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '25%',
+            amount: '3.7',
             status: 'Failed',
             processedAccounts: [],
             failedAccounts: [
