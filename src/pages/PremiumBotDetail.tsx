@@ -76,6 +76,7 @@ Bot này phù hợp cho các nhà đầu tư muốn tận dụng các xu hướn
     subscribers: 86,
     imageUrl: null,
     colorScheme: 'green',
+    botId: 'PRE7459', // Updated botId to follow PRE#### format
     monthlyPerformance: [
       { month: 'Jan', value: 12.5 },
       { month: 'Feb', value: 8.3 },
@@ -263,6 +264,10 @@ const PremiumBotDetail = () => {
             </h1>
             <Badge className={getRiskColor(bot?.risk)}>
               Rủi ro: {getRiskLabel(bot?.risk)}
+            </Badge>
+            {/* Add Bot ID badge */}
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
+              {bot.botId}
             </Badge>
           </div>
           <div className="flex gap-2">
@@ -659,4 +664,3 @@ const PremiumBotDetail = () => {
 };
 
 export default PremiumBotDetail;
-
