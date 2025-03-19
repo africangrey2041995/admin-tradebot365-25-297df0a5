@@ -1,21 +1,19 @@
 
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
-import { Cog, Bell, Palette, Languages, Shield, Moon, Sun, Activity } from "lucide-react";
+import { Cog, Bell, Palette, Languages, Shield } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileSection from "@/components/profile/ProfileSection";
 import AppearanceSettings from "@/components/settings/AppearanceSettings";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import LanguageSettings from "@/components/settings/LanguageSettings";
-import TradingSettings from "@/components/settings/TradingSettings";
 import PrivacySettings from "@/components/settings/PrivacySettings";
 
 const settingsTabs = [
   { id: "appearance", label: "Giao diện", icon: <Palette className="h-4 w-4" /> },
   { id: "notifications", label: "Thông báo", icon: <Bell className="h-4 w-4" /> },
   { id: "language", label: "Ngôn ngữ", icon: <Languages className="h-4 w-4" /> },
-  { id: "trading", label: "Giao dịch", icon: <Activity className="h-4 w-4" /> },
   { id: "privacy", label: "Quyền riêng tư", icon: <Shield className="h-4 w-4" /> }
 ];
 
@@ -45,7 +43,7 @@ const Settings = () => {
             onValueChange={setActiveTab}
             className="space-y-6"
           >
-            <TabsList className="grid grid-cols-5 max-w-3xl">
+            <TabsList className="grid grid-cols-4 max-w-3xl">
               {settingsTabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
@@ -85,16 +83,6 @@ const Settings = () => {
                 icon={<Languages className="h-5 w-5" />}
               >
                 <LanguageSettings />
-              </ProfileSection>
-            </TabsContent>
-
-            <TabsContent value="trading" className="space-y-6">
-              <ProfileSection
-                title="Cài đặt giao dịch"
-                description="Tùy chỉnh hành vi và hiển thị giao dịch"
-                icon={<Activity className="h-5 w-5" />}
-              >
-                <TradingSettings />
               </ProfileSection>
             </TabsContent>
 
