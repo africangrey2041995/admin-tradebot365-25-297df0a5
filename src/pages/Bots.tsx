@@ -66,6 +66,15 @@ const BotCard = ({
   avatarIcon
 }: BotCardProps) => {
   
+  // Truncate subtitle to ensure it fits in two lines
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+  
+  const formattedSubtitle = subtitle ? truncateText(subtitle, 75) : '';
+  
   const colorClasses = {
     red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-red-100/30',
     blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-blue-100/30',
@@ -102,7 +111,7 @@ const BotCard = ({
     <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex-grow">
-          {/* Moved Avatar to the top */}
+          {/* Avatar at the top */}
           <div className="flex justify-center mb-3">
             <Avatar className={`h-16 w-16 ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
               {avatarSrc ? (
@@ -152,7 +161,12 @@ const BotCard = ({
             <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
           </button>
         </div>
-        {subtitle && <p className="text-sm text-muted-foreground mt-1 leading-snug mx-auto">{subtitle}</p>}
+        {/* Fixed height subtitle area with consistent 2 lines */}
+        <div className="h-10 flex items-center justify-center">
+          <p className="text-sm text-muted-foreground leading-tight mx-auto line-clamp-2">
+            {formattedSubtitle || "—"}
+          </p>
+        </div>
       </div>
       
       <div className="flex items-center justify-between py-2.5 px-3 mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100">
