@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles } from 'lucide-react';
+import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -59,6 +58,15 @@ export const PremiumBotCard = ({
       case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       default: return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
+    }
+  };
+
+  const getRiskIcon = (risk: string) => {
+    switch (risk) {
+      case 'low': return <ShieldCheck className="h-3 w-3 mr-1" />;
+      case 'medium': return <ShieldHalf className="h-3 w-3 mr-1" />;
+      case 'high': return <ShieldAlert className="h-3 w-3 mr-1" />;
+      default: return null;
     }
   };
 
@@ -164,8 +172,9 @@ export const PremiumBotCard = ({
               </div>
             </div>
           </div>
-          <Badge className={`text-[10px] py-0 px-1.5 ${getRiskColor(risk)}`}>
-            {getRiskLabel(risk)}
+          <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
+            {getRiskIcon(risk)}
+            <span>{getRiskLabel(risk)}</span>
           </Badge>
         </div>
       </CardHeader>
