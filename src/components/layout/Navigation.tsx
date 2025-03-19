@@ -13,13 +13,9 @@ const Navigation = () => {
       <div className="h-full flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
           {isMobile && <SidebarTrigger />}
-          {/* Logo */}
+          {/* Logo removed from here */}
           <Link to="/" className="flex items-center">
-            <img 
-              src="/lovable-uploads/a57bc727-8802-4d7e-aca8-de799a52c174.png" 
-              alt="Trade Bot 365" 
-              className="h-8 w-auto" 
-            />
+            {/* Image removed */}
           </Link>
         </div>
         
