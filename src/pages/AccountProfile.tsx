@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Key, MoreHorizontal, Copy, RefreshCw, Eye, EyeOff, 
-  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert
+  ChevronLeft, Plus, Pencil, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -155,7 +155,16 @@ const AccountProfile = () => {
     toast.success('Access token updated successfully');
   };
 
-  // Calculate days remaining until expiry
+  // Parse account trading info
+  const parseAccountTrading = (accountTradingStr: string) => {
+    const parts = accountTradingStr.split('|');
+    return {
+      accountId: parts[0] || '',
+      type: parts[1] || '',
+      balance: parts[2] || ''
+    };
+  };
+
   const daysRemaining = (expiryDate: string) => {
     return Math.floor((new Date(expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   };
@@ -218,149 +227,167 @@ const AccountProfile = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apiKeys.map((key) => (
-                  <TableRow key={key.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-2 bg-primary"></div>
-                        {key.name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1 w-full">
-                        <span className="truncate max-w-[100px]">{key.clientId}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => copyToClipboard(key.clientId, 'Client ID')}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1 w-full">
-                        <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => toggleShowSecret(key.id)}
-                        >
-                          {showSecrets[key.id] ? 
-                            <EyeOff className="h-3.5 w-3.5" /> : 
-                            <Eye className="h-3.5 w-3.5" />
-                          }
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => copyToClipboard(showSecrets[key.id] ? '1234-5678-9012-3456' : 'Your secret key is hidden', 'Secret Key')}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1 w-full">
-                        <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => toggleShowSecret(key.id)}
-                        >
-                          {showSecrets[key.id] ? 
-                            <EyeOff className="h-3.5 w-3.5" /> : 
-                            <Eye className="h-3.5 w-3.5" />
-                          }
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
-                          onClick={() => copyToClipboard(showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' : 'Your access token is hidden', 'Access Token')}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <div className={cn(
-                          "w-2 h-2 rounded-full", 
-                          key.accountTrading.includes('Live') ? "bg-success" : "bg-warning"
-                        )}></div>
-                        <span className="whitespace-nowrap font-mono text-xs">
-                          {key.accountTrading}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Clock className="h-3.5 w-3.5 mr-1.5 text-orange-500" />
-                        <span className="whitespace-nowrap text-xs">
-                          {new Date(key.expiryDate).toLocaleDateString()} 
-                          <span className={cn(
-                            "ml-1 px-1.5 py-0.5 rounded-full text-xs",
-                            daysRemaining(key.expiryDate) < 7 ? "bg-orange-100 text-orange-800" : "bg-green-100 text-green-800"
-                          )}>
-                            {daysRemaining(key.expiryDate)} days
-                          </span>
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        {key.status === 'ACTIVE' ? (
-                          <Shield className="h-3.5 w-3.5 mr-1.5 text-green-500" />
-                        ) : (
-                          <ShieldAlert className="h-3.5 w-3.5 mr-1.5 text-red-500" />
-                        )}
-                        <Badge className={cn(
-                          "text-xs font-medium px-2 py-0.5",
-                          key.status === 'ACTIVE' 
-                            ? "bg-green-100 text-green-800 hover:bg-green-100" 
-                            : "bg-red-100 text-red-800 hover:bg-red-100"
-                        )}>
-                          {key.status}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-primary/10">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => handleRegenerateKey(key.id)}>
-                            <RefreshCw className="h-4 w-4 mr-2" />
-                            Regenerate Key
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
-                            <Power className="h-4 w-4 mr-2" />
-                            {key.status === 'ACTIVE' ? 'Disable' : 'Enable'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUpdateToken(key.id)}>
-                            <Link2 className="h-4 w-4 mr-2" />
-                            Update Access Token
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteKey(key.id)}
-                            className="text-destructive focus:text-destructive"
+                {apiKeys.map((key) => {
+                  const account = parseAccountTrading(key.accountTrading);
+                  return (
+                    <TableRow key={key.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-2 bg-primary"></div>
+                          {key.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1 w-full">
+                          <span className="truncate max-w-[100px]">{key.clientId}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => copyToClipboard(key.clientId, 'Client ID')}
                           >
-                            <Trash className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1 w-full">
+                          <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? '1234-5678-9012-3456' : key.secretKey}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => toggleShowSecret(key.id)}
+                          >
+                            {showSecrets[key.id] ? 
+                              <EyeOff className="h-3.5 w-3.5" /> : 
+                              <Eye className="h-3.5 w-3.5" />
+                            }
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => copyToClipboard(showSecrets[key.id] ? '1234-5678-9012-3456' : 'Your secret key is hidden', 'Secret Key')}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1 w-full">
+                          <span className="truncate max-w-[80px] font-mono text-xs">{showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsIn...' : key.accessToken}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => toggleShowSecret(key.id)}
+                          >
+                            {showSecrets[key.id] ? 
+                              <EyeOff className="h-3.5 w-3.5" /> : 
+                              <Eye className="h-3.5 w-3.5" />
+                            }
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 flex-shrink-0 hover:bg-primary/10 hover:text-primary"
+                            onClick={() => copyToClipboard(showSecrets[key.id] ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' : 'Your access token is hidden', 'Access Token')}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <div className="flex items-center justify-center">
+                            <CircleDot 
+                              className={cn(
+                                "h-4 w-4 flex-shrink-0",
+                                account.type.toLowerCase() === 'live' ? "text-success" : "text-warning"
+                              )} 
+                              fill={account.type.toLowerCase() === 'live' ? "#04ce91" : "#f59e0b"}
+                              strokeWidth={0}
+                            />
+                          </div>
+                          <span className="whitespace-nowrap font-mono text-xs">
+                            {account.accountId}
+                            <span className={cn(
+                              "ml-1 px-1.5 py-0.5 rounded-full text-xs",
+                              account.type.toLowerCase() === 'live' 
+                                ? "bg-success/10 text-success" 
+                                : "bg-warning/10 text-warning"
+                            )}>
+                              {account.type}
+                            </span>
+                            <span className="ml-1">${account.balance}</span>
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Clock className="h-3.5 w-3.5 mr-1.5 text-orange-500" />
+                          <span className="whitespace-nowrap text-xs">
+                            {new Date(key.expiryDate).toLocaleDateString()} 
+                            <span className={cn(
+                              "ml-1 px-1.5 py-0.5 rounded-full text-xs",
+                              daysRemaining(key.expiryDate) < 7 ? "bg-orange-100 text-orange-800" : "bg-green-100 text-green-800"
+                            )}>
+                              {daysRemaining(key.expiryDate)} days
+                            </span>
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          {key.status === 'ACTIVE' ? (
+                            <Shield className="h-3.5 w-3.5 mr-1.5 text-green-500" />
+                          ) : (
+                            <ShieldAlert className="h-3.5 w-3.5 mr-1.5 text-red-500" />
+                          )}
+                          <Badge className={cn(
+                            "text-xs font-medium px-2 py-0.5",
+                            key.status === 'ACTIVE' 
+                              ? "bg-green-100 text-green-800 hover:bg-green-100" 
+                              : "bg-red-100 text-red-800 hover:bg-red-100"
+                          )}>
+                            {key.status}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-primary/10">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => handleRegenerateKey(key.id)}>
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Regenerate Key
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
+                              <Power className="h-4 w-4 mr-2" />
+                              {key.status === 'ACTIVE' ? 'Disable' : 'Enable'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateToken(key.id)}>
+                              <Link2 className="h-4 w-4 mr-2" />
+                              Update Access Token
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteKey(key.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
