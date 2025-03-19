@@ -3,6 +3,7 @@ import React from 'react';
 import UserProfileSection from './UserProfileSection';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   const isMobile = useIsMobile();
@@ -12,7 +13,10 @@ const Navigation = () => {
       <div className="h-full flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
           {isMobile && <SidebarTrigger />}
-          {/* Logo or other elements */}
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <span className="text-lg font-bold text-emerald-500">Trade Bot 365</span>
+          </Link>
         </div>
         
         {/* User profile section */}

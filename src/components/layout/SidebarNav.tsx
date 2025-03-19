@@ -16,10 +16,8 @@ import {
   CircuitBoard, 
   Users, 
   Sparkles, 
-  LineChart, 
   Settings, 
   BarChart3,
-  Bell
 } from 'lucide-react';
 
 const SidebarNav = () => {
@@ -30,13 +28,11 @@ const SidebarNav = () => {
     { icon: Home, label: 'Bảng Điều Khiển', path: '/' },
     { icon: CircuitBoard, label: 'Quản Lý Bot', path: '/bots' },
     { icon: Users, label: 'Quản Lý Tài Khoản', path: '/accounts' },
-    { icon: Bell, label: 'Tín Hiệu', path: '/signals' },
   ];
   
   // Premium features navigation items
   const premiumItems = [
     { icon: Sparkles, label: 'Premium Bots', path: '/premium-bots' },
-    { icon: LineChart, label: 'Prop Trading Bots', path: '/prop-trading-bots' },
   ];
   
   // Check if a path is active
