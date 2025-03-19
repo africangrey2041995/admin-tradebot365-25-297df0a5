@@ -11,12 +11,16 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarSeparator,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { 
   Home, 
   CircuitBoard, 
   Users, 
   Sparkles,
+  Layers,
 } from 'lucide-react';
 
 const SidebarNav = () => {
@@ -31,7 +35,17 @@ const SidebarNav = () => {
   
   // Premium features navigation items
   const premiumItems = [
-    { icon: Sparkles, label: 'Premium Bots', path: '/premium-bots' },
+    { 
+      icon: Sparkles, 
+      label: 'Premium Bots', 
+      path: '/premium-bots',
+      subItems: [
+        { 
+          label: 'Đã Tích Hợp', 
+          path: '/integrated-premium-bots' 
+        }
+      ]
+    },
   ];
   
   // Check if a path is active
@@ -91,6 +105,24 @@ const SidebarNav = () => {
                       <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
+                  
+                  {item.subItems && item.subItems.length > 0 && (
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.path}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isActive(subItem.path)}
+                          >
+                            <Link to={subItem.path}>
+                              <Layers className="h-3 w-3" />
+                              <span>{subItem.label}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
