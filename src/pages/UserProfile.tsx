@@ -8,6 +8,7 @@ import PersonalDataForm from "@/components/profile/PersonalDataForm";
 import SecuritySettings from "@/components/profile/SecuritySettings";
 import BillingSettings from "@/components/profile/BillingSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const profileTabs = [
   { id: "personal", label: "Thông tin cá nhân", icon: <User className="h-4 w-4" /> },
@@ -17,6 +18,7 @@ const profileTabs = [
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("personal");
+  const isMobile = useIsMobile();
 
   return (
     <MainLayout>
@@ -25,12 +27,12 @@ const UserProfile = () => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="container py-6 max-w-5xl mx-auto"
+        className={`container ${isMobile ? 'py-2' : 'py-6'} max-w-5xl mx-auto`}
       >
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:gap-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Hồ sơ tài khoản</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold tracking-tight`}>Hồ sơ tài khoản</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               Quản lý thông tin cá nhân, bảo mật và thanh toán của bạn.
             </p>
           </div>
@@ -39,14 +41,14 @@ const UserProfile = () => {
             defaultValue="personal" 
             value={activeTab}
             onValueChange={setActiveTab}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             <TabsList className="grid grid-cols-3 max-w-md">
               {profileTabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2"
                 >
                   {tab.icon}
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -54,7 +56,7 @@ const UserProfile = () => {
               ))}
             </TabsList>
 
-            <TabsContent value="personal" className="space-y-6">
+            <TabsContent value="personal" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Thông tin cá nhân"
                 description="Quản lý thông tin cá nhân của bạn"
@@ -64,7 +66,7 @@ const UserProfile = () => {
               </ProfileSection>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-6">
+            <TabsContent value="security" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Bảo mật"
                 description="Quản lý mật khẩu và bảo mật tài khoản"
@@ -74,7 +76,7 @@ const UserProfile = () => {
               </ProfileSection>
             </TabsContent>
 
-            <TabsContent value="billing" className="space-y-6">
+            <TabsContent value="billing" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Thanh toán & Đăng ký"
                 description="Quản lý gói đăng ký và phương thức thanh toán"

@@ -28,9 +28,9 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
           
           <main className={cn(
             isMobile 
-              ? "px-4 pb-6 pt-4" 
+              ? "px-3 pb-4 pt-3" 
               : "px-6 py-6",
-            "transition-all duration-300 ease-in-out"
+            "transition-all duration-300 ease-in-out overflow-x-hidden"
           )}>
             <div className="container mx-auto max-w-7xl">
               {title && !isMobile && (
@@ -51,7 +51,10 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-zinc-700"
+                className={cn(
+                  "bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-700",
+                  isMobile ? "p-3 sm:p-4" : "p-6"
+                )}
               >
                 {children}
               </motion.div>

@@ -10,6 +10,7 @@ import NotificationSettings from "@/components/settings/NotificationSettings";
 import LanguageSettings from "@/components/settings/LanguageSettings";
 import PrivacySettings from "@/components/settings/PrivacySettings";
 import { useTheme } from "next-themes";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const settingsTabs = [
   { id: "appearance", label: "Giao diện", icon: <Palette className="h-4 w-4" /> },
@@ -22,6 +23,7 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("appearance");
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   // Ensure component is mounted before rendering theme-dependent elements
   useEffect(() => {
@@ -32,12 +34,12 @@ const Settings = () => {
   if (!mounted) {
     return (
       <MainLayout>
-        <div className="container py-6 max-w-5xl mx-auto min-h-screen">
+        <div className="container py-2 sm:py-6 max-w-5xl mx-auto min-h-screen">
           <div className="animate-pulse">
-            <div className="h-8 bg-slate-200 dark:bg-zinc-700 rounded w-48 mb-4"></div>
-            <div className="h-4 bg-slate-200 dark:bg-zinc-700 rounded w-96 mb-8"></div>
-            <div className="h-12 bg-slate-200 dark:bg-zinc-700 rounded mb-8"></div>
-            <div className="h-96 bg-slate-200 dark:bg-zinc-700 rounded"></div>
+            <div className="h-6 sm:h-8 bg-slate-200 dark:bg-zinc-700 rounded w-32 sm:w-48 mb-2 sm:mb-4"></div>
+            <div className="h-3 sm:h-4 bg-slate-200 dark:bg-zinc-700 rounded w-64 sm:w-96 mb-4 sm:mb-8"></div>
+            <div className="h-10 sm:h-12 bg-slate-200 dark:bg-zinc-700 rounded mb-4 sm:mb-8"></div>
+            <div className="h-64 sm:h-96 bg-slate-200 dark:bg-zinc-700 rounded"></div>
           </div>
         </div>
       </MainLayout>
@@ -51,12 +53,12 @@ const Settings = () => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="container py-6 max-w-5xl mx-auto"
+        className={`container ${isMobile ? 'py-2' : 'py-6'} max-w-5xl mx-auto`}
       >
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:gap-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Cài đặt</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold tracking-tight`}>Cài đặt</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               Tùy chỉnh ứng dụng Trade Bot 365 theo ý muốn của bạn.
             </p>
           </div>
@@ -65,14 +67,14 @@ const Settings = () => {
             defaultValue="appearance" 
             value={activeTab}
             onValueChange={setActiveTab}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
-            <TabsList className="grid grid-cols-4 max-w-3xl">
+            <TabsList className={`grid grid-cols-4 max-w-full sm:max-w-3xl overflow-x-auto ${isMobile ? 'p-0.5' : ''}`}>
               {settingsTabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2"
                 >
                   {tab.icon}
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -80,7 +82,7 @@ const Settings = () => {
               ))}
             </TabsList>
 
-            <TabsContent value="appearance" className="space-y-6">
+            <TabsContent value="appearance" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Giao diện"
                 description="Tùy chỉnh giao diện và hiển thị của ứng dụng"
@@ -90,7 +92,7 @@ const Settings = () => {
               </ProfileSection>
             </TabsContent>
 
-            <TabsContent value="notifications" className="space-y-6">
+            <TabsContent value="notifications" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Thông báo"
                 description="Quản lý thông báo và cảnh báo"
@@ -100,7 +102,7 @@ const Settings = () => {
               </ProfileSection>
             </TabsContent>
 
-            <TabsContent value="language" className="space-y-6">
+            <TabsContent value="language" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Ngôn ngữ"
                 description="Thay đổi ngôn ngữ và định dạng hiển thị"
@@ -110,7 +112,7 @@ const Settings = () => {
               </ProfileSection>
             </TabsContent>
 
-            <TabsContent value="privacy" className="space-y-6">
+            <TabsContent value="privacy" className="space-y-4 sm:space-y-6">
               <ProfileSection
                 title="Quyền riêng tư"
                 description="Kiểm soát dữ liệu và quyền riêng tư của bạn"

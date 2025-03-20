@@ -14,7 +14,7 @@ const FixedNavigation = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 shadow-sm border-b border-slate-200 dark:border-zinc-800 flex items-center px-4">
+    <div className="sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 shadow-sm border-b border-slate-200 dark:border-zinc-800 flex items-center px-3 sm:px-4">
       {/* Toggle menu button for mobile */}
       <Button
         variant="ghost"
@@ -22,7 +22,7 @@ const FixedNavigation = () => {
         onClick={() => setOpen(!open)}
         className="mr-2 block sm:hidden"
       >
-        {state === "collapsed" ? <Menu /> : <X />}
+        {state === "collapsed" ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
       </Button>
 
       {/* Logo for mobile and title for desktop */}
@@ -30,7 +30,7 @@ const FixedNavigation = () => {
         {isMobile ? (
           <TradeBotLogo size="small" showBetaTag={true} />
         ) : (
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-white hidden md:block">
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-white hidden md:block truncate max-w-[250px] lg:max-w-none">
             {getTitleFromPathname(location.pathname)}
           </h1>
         )}

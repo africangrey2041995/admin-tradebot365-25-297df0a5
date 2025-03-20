@@ -6,8 +6,11 @@ import ActivityOverview from '@/components/dashboard/ActivityOverview';
 import SystemStats from '@/components/dashboard/SystemStats';
 import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
 import BetaTag from '@/components/common/BetaTag';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  
   // Mock statistics for demonstration
   const dashboardStats = {
     totalBots: 5,
@@ -25,10 +28,10 @@ const Index = () => {
 
   return (
     <MainLayout title="Bảng Điều Khiển">
-      <div className="mb-6 flex justify-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+      <div className={`mb-4 ${isMobile ? '' : 'mb-6'} flex justify-center`}>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
           <BetaTag />
-          <span className="text-amber-800 dark:text-amber-400 text-sm">
+          <span className="text-amber-800 dark:text-amber-400 text-xs sm:text-sm">
             Đây là phiên bản beta, một số tính năng có thể chưa hoàn thiện.
           </span>
         </div>
