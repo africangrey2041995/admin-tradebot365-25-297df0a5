@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -139,9 +138,11 @@ const botForms = [
     disabled: false, 
     logo: (
       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black text-white">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18.4 7L17.1 9H15.65L17.45 6H15.65L13.85 9H12.3L14.1 6H12.3L10.5 9H9L10.8 6H4V18H20V7H18.4Z" fill="currentColor"/>
-        </svg>
+        <img 
+          src="/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png" 
+          alt="Trading View" 
+          className="w-6 h-6 rounded-full"
+        />
       </div>
     )
   },
@@ -191,7 +192,7 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
         title: bot.title || '',
         subtitle: bot.subtitle || '',
         colorScheme: bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple' || 'default',
-        icon: 'bot', // Defaulting to 'bot' as the icon may not be available in the bot data
+        icon: 'bot',
         exchange: bot.exchange || 'coinstart_pro',
         botForm: bot.botForm || 'trading_view',
       });
@@ -205,7 +206,6 @@ const EditBotDialog: React.FC<EditBotDialogProps> = ({
       colorScheme: data.colorScheme,
       exchange: data.exchange,
       botForm: data.botForm,
-      // Convert the icon to a React element for consistency
       avatarIcon: getBotIcon(data.icon)
     });
     
