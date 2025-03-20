@@ -24,7 +24,7 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = ({
       alt="Trade Bot 365" 
       className={`w-auto ${height} ${className}`}
       loading="eager" 
-      fetchpriority="high"
+      fetchPriority="high"
       decoding="async"
       // Add width attribute to help browser calculate layout faster 
       width={size === 'small' ? '32' : size === 'medium' ? '48' : '64'}

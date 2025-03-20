@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -11,13 +11,19 @@ import { Card } from "@/components/ui/card";
 const AppearanceSettings = () => {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure the component is mounted to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Ensure the theme value is set correctly when component mounts
   useEffect(() => {
-    if (!theme) {
+    if (!theme && mounted) {
       setTheme('system');
     }
-  }, [theme, setTheme]);
+  }, [theme, setTheme, mounted]);
 
   const handleThemeChange = (value: string) => {
     setTheme(value);
@@ -53,6 +59,19 @@ const AppearanceSettings = () => {
     });
     // Here you would implement actual animations toggle logic
   };
+
+  // If not mounted yet, avoid rendering content that depends on theme
+  if (!mounted) {
+    return (
+      <div className="space-y-8">
+        <div className="animate-pulse">
+          <div className="h-20 bg-slate-200 dark:bg-zinc-800 rounded mb-4"></div>
+          <div className="h-20 bg-slate-200 dark:bg-zinc-800 rounded mb-4"></div>
+          <div className="h-20 bg-slate-200 dark:bg-zinc-800 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ClerkProvider } from "@clerk/clerk-react";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Bots from "./pages/Bots";
 import BotProfile from "./pages/BotProfile";
@@ -54,41 +55,43 @@ const App = () => (
       }
     }}
   >
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatePresence mode="wait">
-            <Routes>
-              {/* Main routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/bots" element={<Bots />} />
-              <Route path="/bots/:botId" element={<BotProfile />} />
-              <Route path="/premium-bots" element={<PremiumBots />} />
-              <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
-              <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
-              <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
-              <Route path="/prop-trading-bots" element={<PropTradingBots />} />
-              <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
-              <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} /> {/* Add this route */}
-              <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
-              <Route path="/accounts" element={<Accounts />} />
-              <Route path="/accounts/:accountId" element={<AccountProfile />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/settings" element={<Settings />} /> {/* Add the new route */}
-              
-              {/* Auth routes */}
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/sign-up" element={<SignUp />} />
-              
-              {/* Not found route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* Main routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/bots" element={<Bots />} />
+                <Route path="/bots/:botId" element={<BotProfile />} />
+                <Route path="/premium-bots" element={<PremiumBots />} />
+                <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+                <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+                <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+                <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+                <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} /> {/* Add this route */}
+                <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/accounts/:accountId" element={<AccountProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/settings" element={<Settings />} /> {/* Add the new route */}
+                
+                {/* Auth routes */}
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
+                
+                {/* Not found route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   </ClerkProvider>
 );
 
