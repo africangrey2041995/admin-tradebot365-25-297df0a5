@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart3, Users, Bot, TrendingUp, Bell, Calendar, ArrowUpRight } from 'lucide-react';
+import { BarChart3, Users, Bot, DollarSign, LifeBuoy, Calendar, ArrowUpRight } from 'lucide-react';
 
 const AdminDashboard = () => {
   return (
@@ -38,18 +38,18 @@ const AdminDashboard = () => {
           icon={<Bot className="h-4 w-4" />}
         />
         <StatsCard 
-          title="Lợi nhuận tháng" 
-          value="14.6%" 
-          change="+3.2%" 
+          title="Doanh thu tháng" 
+          value="$700K" 
+          change="+4.8%" 
           trend="up"
-          icon={<TrendingUp className="h-4 w-4" />}
+          icon={<DollarSign className="h-4 w-4" />}
         />
         <StatsCard 
-          title="Thông báo mới" 
+          title="Hỗ trợ" 
           value="32" 
           change="-5.4%" 
           trend="down"
-          icon={<Bell className="h-4 w-4" />}
+          icon={<LifeBuoy className="h-4 w-4" />}
         />
       </div>
 
