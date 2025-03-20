@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
   SidebarSeparator,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { 
   Home, 
@@ -13,15 +14,21 @@ import {
   Sparkles,
   TrendingUp,
   ChevronDown,
+  Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAdmin } from '@/hooks/use-admin';
+import { useToast } from '@/hooks/use-toast';
 
 const SidebarNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { isAdmin } = useAdmin();
+  const { toast } = useToast();
   
   // State for collapsible sections
   const [premiumOpen, setPremiumOpen] = useState(false);
@@ -33,6 +40,16 @@ const SidebarNav = () => {
       return location.pathname === path;
     }
     return location.pathname.startsWith(path);
+  };
+
+  const navigateToAdmin = () => {
+    navigate("/admin");
+    
+    toast({
+      title: "Chuyển sang bảng điều khiển Admin",
+      description: "Bạn đang sử dụng hệ thống quản trị viên.",
+      duration: 3000,
+    });
   };
 
   return (
@@ -125,6 +142,24 @@ const SidebarNav = () => {
           </div>
         </div>
       </SidebarContent>
+      
+      {/* Admin Navigation Footer - Only visible for admin users */}
+      {isAdmin && (
+        <SidebarFooter className="bg-[#111111] border-t border-zinc-800 p-2">
+          <button
+            onClick={navigateToAdmin}
+            className={cn(
+              "flex w-full items-center px-3 py-2 text-sm rounded-md transition-colors",
+              isActive('/admin') 
+                ? "bg-amber-700/70 text-white" 
+                : "text-amber-400 hover:text-white hover:bg-amber-700/50"
+            )}
+          >
+            <Shield className="h-5 w-5 mr-3" />
+            <span>Chuyển sang Trang Admin</span>
+          </button>
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 };
