@@ -20,7 +20,7 @@ const FixedNavigation = () => {
 
   return (
     <div className="sticky top-0 z-40 h-14 sm:h-16 bg-white dark:bg-zinc-900 shadow-sm border-b border-slate-200 dark:border-zinc-800 flex items-center px-2 sm:px-4">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-1">
         {/* Toggle menu button for mobile */}
         <Button
           variant="ghost"
@@ -38,21 +38,7 @@ const FixedNavigation = () => {
           }
         </Button>
         
-        {/* Move UserProfileSection to the left side */}
-        {!isMobile && <UserProfileSection />}
-      </div>
-
-      {/* Logo centered in the navbar - only visible on mobile */}
-      <div className="flex-1 flex justify-center items-center">
-        {isMobile && (
-          <TradeBotLogo 
-            size="large" 
-            showBetaTag={false} 
-            className="scale-125"
-          />
-        )}
-        
-        {/* Show page title on desktop instead of logo */}
+        {/* Page title moved to the left for desktop */}
         {!isMobile && (
           <h1 className="text-xl font-semibold text-slate-800 dark:text-white truncate max-w-[350px] lg:max-w-none">
             {getTitleFromPathname(location.pathname)}
@@ -60,9 +46,24 @@ const FixedNavigation = () => {
         )}
       </div>
 
-      {/* Spacer and mobile user profile section on the right */}
+      {/* Logo centered in the navbar - only visible on mobile */}
+      <div className={cn("flex justify-center items-center", isMobile ? "flex-1" : "")}>
+        {isMobile && (
+          <TradeBotLogo 
+            size="large" 
+            showBetaTag={false} 
+            className="scale-125"
+          />
+        )}
+      </div>
+
+      {/* UserProfileSection moved to the right for desktop */}
       <div className="flex items-center">
-        {isMobile && <UserProfileSection />}
+        {isMobile ? (
+          <UserProfileSection />
+        ) : (
+          <UserProfileSection />
+        )}
       </div>
     </div>
   );
