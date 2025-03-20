@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface BotCardProps {
   title: string;
@@ -42,6 +43,7 @@ const BotCard = ({
   status = 'Active'
 }: BotCardProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const truncateText = (text: string, maxLength: number) => {
     if (!text) return '';
@@ -49,7 +51,7 @@ const BotCard = ({
     return text.substring(0, maxLength) + '...';
   };
   
-  const formattedSubtitle = subtitle ? truncateText(subtitle, 75) : '';
+  const formattedSubtitle = subtitle ? truncateText(subtitle, isMobile ? 55 : 75) : '';
   
   const colorClasses = {
     red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-red-100/30',
@@ -100,16 +102,16 @@ const BotCard = ({
   };
   
   return (
-    <div className={`relative rounded-xl border shadow-sm p-5 transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group hover:-translate-y-1`}>
+    <div className={`relative rounded-xl border shadow-sm ${isMobile ? 'p-4' : 'p-5'} transition-all duration-300 hover:shadow-md ${colorClasses[colorScheme]} group ${isMobile ? '' : 'hover:-translate-y-1'}`}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex-grow">
           <div className="flex justify-center mb-3">
-            <Avatar className={`h-16 w-16 ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
+            <Avatar className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} ${avatarBgColors[colorScheme]} border-2 border-white shadow-sm`}>
               {avatarSrc ? (
                 <AvatarImage src={avatarSrc} alt={title} />
               ) : (
-                <AvatarFallback className="text-xl">
-                  {avatarIcon || <Bot className="h-7 w-7" />}
+                <AvatarFallback className={isMobile ? "text-lg" : "text-xl"}>
+                  {avatarIcon || <Bot className={isMobile ? "h-6 w-6" : "h-7 w-7"} />}
                 </AvatarFallback>
               )}
             </Avatar>
@@ -143,57 +145,57 @@ const BotCard = ({
       
       <div className="text-center mb-3">
         <div className="flex items-center justify-center gap-2 mb-1">
-          <h3 className="font-bold text-xl tracking-tight text-slate-800">{title}</h3>
+          <h3 className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} tracking-tight text-slate-800`}>{title}</h3>
           <button 
             onClick={toggleFavorite}
             className="text-yellow-400 hover:text-yellow-500 transition-colors"
             aria-label="Toggle favorite"
           >
-            <Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+            <Star className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} fill={isFavorite ? "currentColor" : "none"} />
           </button>
         </div>
-        <div className="h-10 flex items-center justify-center">
-          <p className="text-sm text-muted-foreground leading-tight mx-auto line-clamp-2">
+        <div className={`${isMobile ? 'h-8' : 'h-10'} flex items-center justify-center`}>
+          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground leading-tight mx-auto line-clamp-2`}>
             {formattedSubtitle || "—"}
           </p>
         </div>
       </div>
       
-      <div className="flex items-center justify-between py-2.5 px-3 mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100">
+      <div className={`flex items-center justify-between ${isMobile ? 'py-2 px-2.5' : 'py-2.5 px-3'} mt-4 mb-3 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100`}>
         <div className="flex items-center">
-          <p className="text-xs font-medium mr-1.5 text-slate-500">ID:</p>
-          <div className="text-sm font-medium tracking-wide text-slate-700">{botId}</div>
+          <p className={`${isMobile ? 'text-2xs' : 'text-xs'} font-medium mr-1.5 text-slate-500`}>ID:</p>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium tracking-wide text-slate-700`}>{botId}</div>
         </div>
         
         {lastUpdated && (
-          <div className="flex items-center text-xs font-medium text-slate-500">
-            <Calendar className="h-3 w-3 mr-1" />
+          <div className={`flex items-center ${isMobile ? 'text-2xs' : 'text-xs'} font-medium text-slate-500`}>
+            <Calendar className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'} mr-1`} />
             {lastUpdated}
           </div>
         )}
       </div>
       
-      <div className="flex justify-between items-center px-3 py-2.5 rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100 mb-4">
+      <div className={`flex justify-between items-center ${isMobile ? 'px-2.5 py-2' : 'px-3 py-2.5'} rounded-lg bg-white/70 backdrop-blur-sm border border-slate-100 mb-4`}>
         <div className="flex items-center gap-1.5">
-          <p className="text-xs text-slate-500">Accounts:</p>
-          <div className="text-sm font-medium text-slate-700">{accountCount}</div>
+          <p className={`${isMobile ? 'text-2xs' : 'text-xs'} text-slate-500`}>Accounts:</p>
+          <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-slate-700`}>{accountCount}</div>
         </div>
         
         <button 
           onClick={handleAddAccount}
-          className="h-6 w-6 rounded-full bg-white hover:bg-slate-50 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600"
+          className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} rounded-full bg-white hover:bg-slate-50 flex items-center justify-center text-xs font-medium border border-slate-200 transition-colors text-slate-600`}
           aria-label="Add account"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
         </button>
       </div>
       
       <Button 
         variant="outline" 
         onClick={handleViewBot} 
-        className={`w-full py-2 h-auto ${buttonColors[colorScheme]} shadow-sm font-medium mt-auto flex gap-2 justify-center items-center`}
+        className={`w-full ${isMobile ? 'py-1.5 text-sm' : 'py-2'} h-auto ${buttonColors[colorScheme]} shadow-sm font-medium mt-auto flex gap-2 justify-center items-center`}
       >
-        <Eye className={`h-4 w-4 ${viewButtonColors[colorScheme]}`} />
+        <Eye className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} ${viewButtonColors[colorScheme]}`} />
         <span>View Bot</span>
       </Button>
     </div>

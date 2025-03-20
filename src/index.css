@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -113,6 +114,44 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
+  /* Mobile-specific text sizing */
+  html.is-mobile h1 {
+    @apply text-2xl;
+  }
+
+  html.is-mobile h2 {
+    @apply text-xl;
+  }
+
+  html.is-mobile h3 {
+    @apply text-lg;
+  }
+
+  html.is-mobile p, 
+  html.is-mobile div, 
+  html.is-mobile span {
+    @apply text-sm;
+  }
+
+  /* Add text-2xs for very small text on mobile */
+  .text-2xs {
+    font-size: 0.65rem;
+    line-height: 1rem;
+  }
+
+  /* Scale-related utilities */
+  .scale-70 {
+    transform: scale(0.7);
+  }
+
+  .scale-75 {
+    transform: scale(0.75);
+  }
+
+  .scale-80 {
+    transform: scale(0.8);
   }
 
   /* Modified transition properties to ensure smooth theme change */
@@ -249,6 +288,19 @@
 
   .statusDot.pending::after {
     @apply bg-warning opacity-50;
+  }
+
+  /* Mobile specific components */
+  html.is-mobile .statusDot {
+    @apply w-2 h-2;
+  }
+
+  html.is-mobile .input {
+    @apply text-sm py-1;
+  }
+
+  html.is-mobile .btn-sm {
+    @apply py-1 px-2 text-xs;
   }
 
   /* Dark mode specific utility classes */

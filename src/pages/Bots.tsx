@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import {
@@ -14,6 +15,7 @@ import { AddBotDialog } from '@/components/bots/AddBotDialog';
 import BotListing from '@/components/bots/BotListing';
 import BotsHeader from '@/components/bots/BotsHeader';
 import BotsPagination from '@/components/bots/BotsPagination';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Bots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,6 +24,8 @@ const Bots = () => {
     '3': true
   });
   const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
+  
   const [bots, setBots] = useState<BotCardProps[]>([
     {
       title: 'Ultra 2in1',
@@ -30,7 +34,7 @@ const Bots = () => {
       accountCount: '18/42',
       lastUpdated: '10/07/2023',
       colorScheme: 'red',
-      avatarIcon: <Bot className="h-5 w-5" />,
+      avatarIcon: <Bot className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     },
     {
@@ -40,7 +44,7 @@ const Bots = () => {
       accountCount: '22/56',
       lastUpdated: '18/05/2023',
       colorScheme: 'blue',
-      avatarIcon: <Cpu className="h-5 w-5" />,
+      avatarIcon: <Cpu className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     },
     {
@@ -50,7 +54,7 @@ const Bots = () => {
       accountCount: '14/20',
       lastUpdated: '21/02/2023',
       colorScheme: 'green',
-      avatarIcon: <Server className="h-5 w-5" />,
+      avatarIcon: <Server className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     },
     {
@@ -60,7 +64,7 @@ const Bots = () => {
       accountCount: '20/34',
       lastUpdated: '03/08/2023',
       colorScheme: 'purple',
-      avatarIcon: <Terminal className="h-5 w-5" />,
+      avatarIcon: <Terminal className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Inactive'
     },
     {
@@ -69,7 +73,7 @@ const Bots = () => {
       botId: 'BOT1267',
       accountCount: '15/25',
       lastUpdated: '15/05/2023',
-      avatarIcon: <CircuitBoard className="h-5 w-5" />,
+      avatarIcon: <CircuitBoard className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     },
     {
@@ -78,7 +82,7 @@ const Bots = () => {
       botId: 'BOT9381',
       accountCount: '8/12',
       lastUpdated: '21/02/2023',
-      avatarIcon: <Gem className="h-5 w-5" />,
+      avatarIcon: <Gem className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     },
     {
@@ -87,7 +91,7 @@ const Bots = () => {
       botId: 'BOT6452',
       accountCount: '12/20',
       lastUpdated: '05/08/2023',
-      avatarIcon: <Bot className="h-5 w-5" />,
+      avatarIcon: <Bot className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       status: 'Active'
     }
   ]);
@@ -102,7 +106,7 @@ const Bots = () => {
       accountCount: '0/10',
       lastUpdated: new Date().toLocaleDateString('vi-VN'),
       colorScheme: newBot.colorScheme as any || 'default',
-      avatarIcon: newBot.avatarIcon || <Bot className="h-5 w-5" />,
+      avatarIcon: newBot.avatarIcon || <Bot className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />,
       exchange: newBot.exchange || 'coinstart_pro',
       botForm: newBot.botForm || 'trading_view',
       status: 'Inactive'
