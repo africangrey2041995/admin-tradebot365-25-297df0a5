@@ -7,6 +7,7 @@ import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const UserProfileSection = () => {
   const { user } = useUser();
@@ -28,17 +29,29 @@ const UserProfileSection = () => {
       .substring(0, 2);
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   return (
     <div className="flex items-center gap-4">
-      {/* Theme toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
-      >
-        {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-      </Button>
+      {/* Theme toggle with tooltip */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{theme === "dark" ? "Chuyển chế độ sáng" : "Chuyển chế độ tối"}</p>
+        </TooltipContent>
+      </Tooltip>
 
       {/* User dropdown */}
       <DropdownMenu>

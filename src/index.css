@@ -164,6 +164,20 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
+
+  /* Dark mode transition */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Smooth transitions between light/dark mode */
+  html.transition,
+  html.transition *,
+  html.transition *:before,
+  html.transition *:after {
+    transition: all 200ms !important;
+    transition-delay: 0 !important;
+  }
 }
 
 @layer components {
@@ -202,5 +216,14 @@
 
   .statusDot.pending::after {
     @apply bg-warning opacity-50;
+  }
+
+  /* Dark mode specific utility classes */
+  .dark-card {
+    @apply bg-zinc-800 border-zinc-700;
+  }
+  
+  .dark-hover {
+    @apply hover:bg-zinc-700/50;
   }
 }

@@ -1,15 +1,23 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Card } from "@/components/ui/card";
 
 const AppearanceSettings = () => {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+
+  // Ensure the theme value is set correctly when component mounts
+  useEffect(() => {
+    if (!theme) {
+      setTheme('light');
+    }
+  }, [theme, setTheme]);
 
   const handleThemeChange = (value: string) => {
     setTheme(value);
@@ -38,62 +46,68 @@ const AppearanceSettings = () => {
   return (
     <div className="space-y-8">
       {/* Theme Selection */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Chế độ hiển thị</h3>
-        <RadioGroup 
-          value={theme} 
-          onValueChange={handleThemeChange} 
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-        >
-          <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer">
-            <RadioGroupItem value="light" id="light" />
-            <Label htmlFor="light" className="flex items-center space-x-2 cursor-pointer">
-              <Sun className="h-5 w-5 text-amber-500" />
-              <span>Sáng</span>
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer">
-            <RadioGroupItem value="dark" id="dark" />
-            <Label htmlFor="dark" className="flex items-center space-x-2 cursor-pointer">
-              <Moon className="h-5 w-5 text-blue-500" />
-              <span>Tối</span>
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer">
-            <RadioGroupItem value="system" id="system" />
-            <Label htmlFor="system" className="flex items-center space-x-2 cursor-pointer">
-              <Monitor className="h-5 w-5 text-gray-500" />
-              <span>Hệ thống</span>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
+      <Card className="p-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Chế độ hiển thị</h3>
+          <RadioGroup 
+            value={theme || 'light'} 
+            onValueChange={handleThemeChange} 
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+          >
+            <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer transition-colors dark:border-zinc-700">
+              <RadioGroupItem value="light" id="light" />
+              <Label htmlFor="light" className="flex items-center space-x-2 cursor-pointer">
+                <Sun className="h-5 w-5 text-amber-500" />
+                <span>Sáng</span>
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer transition-colors dark:border-zinc-700">
+              <RadioGroupItem value="dark" id="dark" />
+              <Label htmlFor="dark" className="flex items-center space-x-2 cursor-pointer">
+                <Moon className="h-5 w-5 text-blue-500" />
+                <span>Tối</span>
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-accent cursor-pointer transition-colors dark:border-zinc-700">
+              <RadioGroupItem value="system" id="system" />
+              <Label htmlFor="system" className="flex items-center space-x-2 cursor-pointer">
+                <Monitor className="h-5 w-5 text-gray-500" />
+                <span>Hệ thống</span>
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+      </Card>
 
       {/* Layout Density */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Mật độ hiển thị</h3>
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <p>Giao diện gọn</p>
-            <p className="text-sm text-muted-foreground">Thu nhỏ khoảng cách và kích thước các phần tử.</p>
+      <Card className="p-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Mật độ hiển thị</h3>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <p>Giao diện gọn</p>
+              <p className="text-sm text-muted-foreground">Thu nhỏ khoảng cách và kích thước các phần tử.</p>
+            </div>
+            <Switch onCheckedChange={handleDensityChange} />
           </div>
-          <Switch onCheckedChange={handleDensityChange} />
         </div>
-      </div>
+      </Card>
 
       {/* Animations */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Hiệu ứng</h3>
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <p>Hiệu ứng chuyển động</p>
-            <p className="text-sm text-muted-foreground">Bật/tắt hiệu ứng chuyển động trong ứng dụng.</p>
+      <Card className="p-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Hiệu ứng</h3>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <p>Hiệu ứng chuyển động</p>
+              <p className="text-sm text-muted-foreground">Bật/tắt hiệu ứng chuyển động trong ứng dụng.</p>
+            </div>
+            <Switch defaultChecked onCheckedChange={handleAnimationsToggle} />
           </div>
-          <Switch defaultChecked onCheckedChange={handleAnimationsToggle} />
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

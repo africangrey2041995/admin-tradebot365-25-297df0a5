@@ -20,10 +20,11 @@ const PremiumBotsPromo = () => {
         title="Premium Bots" 
         icon={<Sparkles className="h-5 w-5 text-yellow-400" />}
         color="warning"
+        className="dark:border-zinc-700"
       >
         <div className="p-4">
-          <div className="prose max-w-none mb-4">
-            <h3 className="text-lg font-medium text-slate-800 dark:text-white">Bot Giao Dịch Cao Cấp</h3>
+          <div className="prose max-w-none mb-4 dark:prose-invert">
+            <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100">Bot Giao Dịch Cao Cấp</h3>
             <p className="text-slate-600 dark:text-slate-300">
               Trade Bot 365 cung cấp các Premium Bot giao dịch do đội ngũ chuyên gia phát triển với hiệu suất cao và độ ổn định vượt trội.
             </p>
