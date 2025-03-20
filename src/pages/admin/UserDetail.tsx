@@ -10,7 +10,6 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, User, Bot, CreditCard, ShieldCheck, Search, Eye, ExternalLink } from "lucide-react";
 import { RoleBadge, StatusBadge } from './Users';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
 
 const UserDetail = () => {
   const { userId } = useParams();
@@ -31,7 +30,7 @@ const UserDetail = () => {
     bots: 3,
     joinDate: '15/08/2023',
     phone: '+84 123 456 789',
-    address: 'Hà Nội, Việt Nam',
+    address: '',
     subscription: 'Premium',
     balance: '500,000 VND',
     accountType: 'Verified',
@@ -106,9 +105,15 @@ const UserDetail = () => {
     navigate('/admin/users');
   };
 
-  const handleViewBotDetails = (botId: string) => {
-    // For demonstration, navigate to corresponding bot detail page
-    navigate(`/admin/bots/${botId}`);
+  const handleViewBotDetails = (botId: string, botType: string) => {
+    // Navigate to appropriate bot detail page based on type
+    if (botType === 'custom') {
+      navigate(`/admin/bots/${botId}`);
+    } else if (botType === 'premium') {
+      navigate(`/admin/prebots/${botId}`);
+    } else if (botType === 'prop') {
+      navigate(`/admin/propbots/${botId}`);
+    }
   };
 
   const handleViewAccounts = (botId: string, botType: string) => {
@@ -125,6 +130,12 @@ const UserDetail = () => {
       bot.id.toLowerCase().includes(search.toLowerCase())
     );
   };
+
+  // Counts for the summary cards
+  const customBotCount = user.userBots.length;
+  const premiumBotCount = user.premiumBots.length;
+  const propBotCount = user.propBots.length;
+  const totalBotCount = customBotCount + premiumBotCount + propBotCount;
 
   return (
     <div className="space-y-6">
@@ -250,11 +261,11 @@ const UserDetail = () => {
                   <div className="text-sm text-zinc-400">Loại tài khoản</div>
                   <div>{user.accountType}</div>
                 </div>
-                {/* Future feature placeholder */}
+                {/* Future feature placeholder for Affiliate */}
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Giới thiệu (Affiliate)</div>
                   <div className="flex items-center gap-2">
-                    <span>{user.referredBy || "Chưa có"}</span>
+                    <span>Chưa có</span>
                     <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">Tính năng tương lai</Badge>
                   </div>
                 </div>
@@ -277,11 +288,20 @@ const UserDetail = () => {
           </div>
 
           {/* Bot Counts Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
             <Card className="border-zinc-800 bg-zinc-900 text-white">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{user.userBots.length}</div>
+                  <div className="text-3xl font-bold text-white">{totalBotCount}</div>
+                  <div className="text-sm text-zinc-400">Tổng số Bot</div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-zinc-800 bg-zinc-900 text-white">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{customBotCount}</div>
                   <div className="text-sm text-zinc-400">Bot tùy chỉnh</div>
                 </div>
               </CardContent>
@@ -290,7 +310,7 @@ const UserDetail = () => {
             <Card className="border-zinc-800 bg-zinc-900 text-white">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-500">{user.premiumBots.length}</div>
+                  <div className="text-3xl font-bold text-amber-500">{premiumBotCount}</div>
                   <div className="text-sm text-zinc-400">Premium Bot</div>
                 </div>
               </CardContent>
@@ -299,7 +319,7 @@ const UserDetail = () => {
             <Card className="border-zinc-800 bg-zinc-900 text-white">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-500">{user.propBots.length}</div>
+                  <div className="text-3xl font-bold text-purple-500">{propBotCount}</div>
                   <div className="text-sm text-zinc-400">Prop Trading Bot</div>
                 </div>
               </CardContent>
@@ -345,6 +365,7 @@ const UserDetail = () => {
                                 className="h-8 w-8 p-0"
                                 onClick={() => handleViewAccounts(bot.id, 'custom')}
                                 disabled={bot.accountsCount === 0}
+                                title="Xem tài khoản"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -352,7 +373,8 @@ const UserDetail = () => {
                                 size="sm" 
                                 variant="ghost"
                                 className="h-8 w-8 p-0"
-                                onClick={() => handleViewBotDetails(bot.id)}
+                                onClick={() => handleViewBotDetails(bot.id, 'custom')}
+                                title="Xem chi tiết Bot"
                               >
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
@@ -410,6 +432,7 @@ const UserDetail = () => {
                                 className="h-8 w-8 p-0"
                                 onClick={() => handleViewAccounts(bot.id, 'premium')}
                                 disabled={bot.accountsCount === 0}
+                                title="Xem tài khoản"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -417,7 +440,8 @@ const UserDetail = () => {
                                 size="sm" 
                                 variant="ghost"
                                 className="h-8 w-8 p-0"
-                                onClick={() => handleViewBotDetails(bot.id)}
+                                onClick={() => handleViewBotDetails(bot.id, 'premium')}
+                                title="Xem chi tiết Bot"
                               >
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
@@ -475,6 +499,7 @@ const UserDetail = () => {
                                 className="h-8 w-8 p-0"
                                 onClick={() => handleViewAccounts(bot.id, 'prop')}
                                 disabled={bot.accountsCount === 0}
+                                title="Xem tài khoản"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -482,7 +507,8 @@ const UserDetail = () => {
                                 size="sm" 
                                 variant="ghost"
                                 className="h-8 w-8 p-0"
-                                onClick={() => handleViewBotDetails(bot.id)}
+                                onClick={() => handleViewBotDetails(bot.id, 'prop')}
+                                title="Xem chi tiết Bot"
                               >
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
@@ -612,9 +638,13 @@ const UserDetail = () => {
                         <div className="text-xs text-zinc-400">{account.userEmail}</div>
                       </div>
                     </td>
-                    <td className="py-3">{account.apiName}</td>
                     <td className="py-3">
-                      {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
+                      <div className="font-medium">{account.apiName}</div>
+                      <div className="text-xs text-zinc-400">{account.apiId}</div>
+                    </td>
+                    <td className="py-3">
+                      <div className="font-medium">{account.tradingAccount}</div>
+                      <div className="text-xs text-zinc-400">{account.tradingAccountType} | {account.tradingAccountBalance}</div>
                     </td>
                     <td className="py-3">
                       <div className="flex items-center">

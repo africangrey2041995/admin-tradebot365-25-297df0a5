@@ -20,7 +20,6 @@ import { ShieldCheck } from "lucide-react";
 const AdminUsers = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   
   const users = [
@@ -88,25 +87,16 @@ const AdminUsers = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleFilterClick = () => {
-    // Just toggle between different filter values for this example
-    if (!filterStatus) {
-      setFilterStatus('active');
-    } else if (filterStatus === 'active') {
-      setFilterStatus('inactive');
-    } else if (filterStatus === 'inactive') {
-      setFilterStatus('suspended');
-    } else {
-      setFilterStatus(null);
-    }
+  const handleFilterClick = (status: string | null) => {
+    setFilterStatus(status === filterStatus ? null : status);
   };
 
   const filteredUsers = users
     .filter(user => 
       (searchTerm === '' || 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.id.toLowerCase().includes(searchTerm.toLowerCase()))
+       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       user.id.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(user => 
       (filterStatus === null || user.status === filterStatus)
@@ -130,7 +120,7 @@ const AdminUsers = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
             <div className="relative w-full sm:max-w-[400px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
               <Input 
@@ -140,14 +130,32 @@ const AdminUsers = () => {
                 onChange={handleSearchChange}
               />
             </div>
-            <Button 
-              variant="outline" 
-              className={`border-zinc-700 ${filterStatus ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`}
-              onClick={handleFilterClick}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {filterStatus ? `Lọc: ${filterStatus}` : 'Lọc'}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                className={`border-zinc-700 ${filterStatus === 'active' ? 'bg-green-500/20 text-green-500' : 'text-zinc-400'}`}
+                onClick={() => handleFilterClick('active')}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Hoạt động
+              </Button>
+              <Button 
+                variant="outline" 
+                className={`border-zinc-700 ${filterStatus === 'inactive' ? 'bg-yellow-500/20 text-yellow-500' : 'text-zinc-400'}`}
+                onClick={() => handleFilterClick('inactive')}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Không hoạt động
+              </Button>
+              <Button 
+                variant="outline" 
+                className={`border-zinc-700 ${filterStatus === 'suspended' ? 'bg-red-500/20 text-red-500' : 'text-zinc-400'}`}
+                onClick={() => handleFilterClick('suspended')}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Đã khóa
+              </Button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">

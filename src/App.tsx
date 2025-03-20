@@ -106,8 +106,11 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
+                  <Route path="bots/:botId" element={<AdminUserBots />} />
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
+                  <Route path="prebots/:botId" element={<AdminPremiumBots />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
+                  <Route path="propbots/:botId" element={<AdminPropBots />} />
                   <Route path="user-bots" element={<AdminUserBots />} />
                   <Route path="database" element={<AdminDatabase />} />
                   <Route path="logs" element={<AdminLogs />} />
