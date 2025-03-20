@@ -3,13 +3,14 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
+import { LogOut, Moon, Settings, Sun, User, Shield } from "lucide-react";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAdmin } from "@/hooks/use-admin";
 
 const UserProfileSection = () => {
   const { user } = useUser();
@@ -18,6 +19,7 @@ const UserProfileSection = () => {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { isAdmin } = useAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,8 +46,38 @@ const UserProfileSection = () => {
     });
   };
 
+  const navigateToAdmin = () => {
+    navigate("/admin");
+    
+    toast({
+      title: "Chuyển sang bảng điều khiển Admin",
+      description: "Bạn đang sử dụng hệ thống quản trị viên.",
+      duration: 3000,
+    });
+  };
+
   return (
     <div className="flex items-center gap-2">
+      {/* Admin button with tooltip - only shown for admin users */}
+      {isAdmin && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={navigateToAdmin}
+              className="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 transition-colors h-8 w-8"
+              aria-label="Chuyển sang trang Admin"
+            >
+              <Shield className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Chuyển sang trang Admin</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
+      
       {/* Theme toggle with tooltip */}
       <Tooltip>
         <TooltipTrigger asChild>
@@ -79,6 +111,12 @@ const UserProfileSection = () => {
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{user?.fullName}</p>
               <p className="text-xs leading-none text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
+              {isAdmin && (
+                <span className="text-xs mt-1 text-amber-500 flex items-center gap-1">
+                  <Shield className="h-3 w-3" />
+                  Quản trị viên
+                </span>
+              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -90,6 +128,12 @@ const UserProfileSection = () => {
             <Settings className="mr-2 h-4 w-4" />
             <span>Cài đặt</span>
           </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem onClick={navigateToAdmin}>
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Quản trị</span>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />

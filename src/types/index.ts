@@ -102,3 +102,30 @@ export interface PremiumBot {
   botId?: string;
   accounts?: Account[];
 }
+
+// User role types
+export type UserRole = 'user' | 'admin' | 'superadmin';
+
+// Extended user interface with role
+export interface UserWithRole {
+  id: string;
+  role: UserRole;
+  fullName?: string;
+  email?: string;
+  imageUrl?: string;
+  createdAt: string;
+  lastLogin?: string;
+  status: 'active' | 'suspended' | 'inactive';
+}
+
+// Stats for admin dashboard
+export interface AdminStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalBots: number;
+  activeBots: number;
+  totalAccounts: number;
+  connectedAccounts: number;
+  premiumSubscriptions: number;
+  revenueThisMonth: string;
+}
