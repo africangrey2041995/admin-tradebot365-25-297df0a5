@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf } from 'lucide-react';
@@ -164,8 +165,6 @@ export const PremiumBotCard = ({
               </h3>
               <div className="flex gap-1 mt-1 items-center text-xs">
                 {getExchangeLogo(exchange)}
-                <span className="text-xs text-slate-500">{exchange}</span>
-                <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
                 <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
                 {botId && (
                   <>
