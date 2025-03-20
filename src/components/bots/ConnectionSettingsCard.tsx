@@ -5,10 +5,11 @@ import {
   CardHeader, 
   CardTitle, 
   CardDescription, 
-  CardContent 
+  CardContent,
+  CardFooter
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, ExternalLink, Webhook, Key } from 'lucide-react';
+import { Copy, ExternalLink, Webhook, Key, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ConnectionSettingsCardProps {
@@ -101,6 +102,16 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
           </div>
         </div>
       </CardContent>
+      <CardFooter className="pt-2">
+        <Button 
+          variant="outline" 
+          className="w-full gap-2"
+          onClick={() => window.open('https://www.tradingview.com/', '_blank')}
+        >
+          <Link2 className="h-4 w-4" />
+          Go to TradingView
+        </Button>
+      </CardFooter>
     </Card>
   );
 };
