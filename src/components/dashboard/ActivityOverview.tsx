@@ -59,7 +59,11 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             color="success"
           >
             <div className={`mt-${isMobile ? '2' : '4'}`}>
-              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todayActiveBots} / {dashboardStats.totalBots}</div>
+              <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-semibold flex justify-center items-center`}>
+                <span>{dashboardStats.todayActiveBots}</span>
+                <span className={`mx-2 ${isMobile ? 'text-xl' : 'text-2xl'} text-slate-500 dark:text-slate-400`}>/</span>
+                <span>{dashboardStats.totalBots}</span>
+              </div>
               <div className="flex items-center mt-2">
                 <div className={`w-full bg-slate-200 dark:bg-zinc-700 rounded-full ${isMobile ? 'h-2' : 'h-2.5'} mt-${isMobile ? '1' : '2'}`}>
                   <div className="bg-green-500 h-full rounded-full" style={{ width: `${(dashboardStats.todayActiveBots / dashboardStats.totalBots) * 100}%` }}></div>
@@ -83,7 +87,11 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             color="primary"
           >
             <div className={`mt-${isMobile ? '2' : '4'}`}>
-              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todayConnectedAccounts} / {dashboardStats.totalAccounts}</div>
+              <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-semibold flex justify-center items-center`}>
+                <span>{dashboardStats.todayConnectedAccounts}</span>
+                <span className={`mx-2 ${isMobile ? 'text-xl' : 'text-2xl'} text-slate-500 dark:text-slate-400`}>/</span>
+                <span>{dashboardStats.totalAccounts}</span>
+              </div>
               <div className="flex items-center mt-2">
                 <div className={`w-full bg-slate-200 dark:bg-zinc-700 rounded-full ${isMobile ? 'h-2' : 'h-2.5'} mt-${isMobile ? '1' : '2'}`}>
                   <div className="bg-blue-500 h-full rounded-full" style={{ width: `${(dashboardStats.todayConnectedAccounts / dashboardStats.totalAccounts) * 100}%` }}></div>
@@ -107,8 +115,10 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             color="info"
           >
             <div className={`mt-${isMobile ? '2' : '4'}`}>
-              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todaySignals}</div>
-              <div className={`flex justify-between mt-2 ${isMobile ? 'text-2xs' : 'text-sm'}`}>
+              <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-semibold flex justify-center`}>
+                {dashboardStats.todaySignals}
+              </div>
+              <div className={`flex justify-between mt-2 ${isMobile ? 'text-xs' : 'text-sm'}`}>
                 <span className="text-green-500 truncate">Đã xử lý: {dashboardStats.processedSignals}</span>
                 <span className="text-yellow-500 truncate">Đang chờ: {dashboardStats.pendingSignals}</span>
                 <span className="text-red-500 truncate">Lỗi: {dashboardStats.failedSignals}</span>
