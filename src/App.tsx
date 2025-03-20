@@ -41,6 +41,7 @@ import AdminManagement from "./pages/admin/AdminManagement";
 import AdminPremiumBots from "./pages/admin/PremiumBots";
 import AdminPropBots from "./pages/admin/PropBots";
 import AdminUserBots from "./pages/admin/UserBots";
+import AdminUserBotDetail from "./pages/admin/UserBotDetail";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -106,12 +107,13 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  <Route path="bots/:botId" element={<AdminUserBots />} />
+                  <Route path="bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
-                  <Route path="prebots/:botId" element={<AdminPremiumBots />} />
+                  <Route path="premium-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
-                  <Route path="propbots/:botId" element={<AdminPropBots />} />
+                  <Route path="prop-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="user-bots" element={<AdminUserBots />} />
+                  <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="database" element={<AdminDatabase />} />
                   <Route path="logs" element={<AdminLogs />} />
                   <Route path="notifications" element={<AdminNotifications />} />
