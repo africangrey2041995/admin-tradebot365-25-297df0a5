@@ -1,0 +1,263 @@
+
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, UserPlus, Filter, MoreHorizontal, Check, X, Shield, Star } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+
+const AdminUsers = () => {
+  const users = [
+    { 
+      id: '1', 
+      name: 'Nguyễn Văn A', 
+      email: 'nguyenvana@example.com', 
+      role: 'user', 
+      status: 'active',
+      bots: 3,
+      joinDate: '15/08/2023'
+    },
+    { 
+      id: '2', 
+      name: 'Trần Thị B', 
+      email: 'tranthib@example.com', 
+      role: 'admin', 
+      status: 'active',
+      bots: 1,
+      joinDate: '03/10/2023'
+    },
+    { 
+      id: '3', 
+      name: 'Lê Minh C', 
+      email: 'leminhc@example.com', 
+      role: 'user', 
+      status: 'inactive',
+      bots: 0,
+      joinDate: '22/11/2023'
+    },
+    { 
+      id: '4', 
+      name: 'Phạm Đức D', 
+      email: 'phamducd@example.com', 
+      role: 'user', 
+      status: 'active',
+      bots: 5,
+      joinDate: '05/01/2024'
+    },
+    { 
+      id: '5', 
+      name: 'Hoàng Thị E', 
+      email: 'hoangthie@example.com', 
+      role: 'superadmin', 
+      status: 'active',
+      bots: 2,
+      joinDate: '18/02/2024'
+    },
+    { 
+      id: '6', 
+      name: 'Vũ Văn F', 
+      email: 'vuvanf@example.com', 
+      role: 'user', 
+      status: 'suspended',
+      bots: 0,
+      joinDate: '30/03/2024'
+    },
+    { 
+      id: '7', 
+      name: 'Đỗ Thị G', 
+      email: 'dothig@example.com', 
+      role: 'user', 
+      status: 'active',
+      bots: 1,
+      joinDate: '12/04/2024'
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl font-bold text-white">Quản lý người dùng</h1>
+        <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+          <UserPlus className="h-4 w-4 mr-2" />
+          Thêm người dùng
+        </Button>
+      </div>
+
+      <Card className="border-zinc-800 bg-zinc-900 text-white">
+        <CardHeader>
+          <CardTitle>Danh sách người dùng</CardTitle>
+          <CardDescription className="text-zinc-400">
+            Quản lý tất cả người dùng trong hệ thống Trade Bot 365.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+            <div className="relative w-full sm:max-w-[400px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
+              <Input 
+                placeholder="Tìm kiếm người dùng..." 
+                className="pl-10 bg-zinc-800 border-zinc-700 text-white"
+              />
+            </div>
+            <Button variant="outline" className="border-zinc-700 text-zinc-400">
+              <Filter className="h-4 w-4 mr-2" />
+              Lọc
+            </Button>
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow className="border-zinc-800">
+                <TableHead className="text-zinc-400">Tên</TableHead>
+                <TableHead className="text-zinc-400">Email</TableHead>
+                <TableHead className="text-zinc-400">Vai trò</TableHead>
+                <TableHead className="text-zinc-400">Trạng thái</TableHead>
+                <TableHead className="text-zinc-400 text-right">Bots</TableHead>
+                <TableHead className="text-zinc-400">Ngày tham gia</TableHead>
+                <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} className="border-zinc-800">
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <RoleBadge role={user.role} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={user.status} />
+                  </TableCell>
+                  <TableCell className="text-right">{user.bots}</TableCell>
+                  <TableCell>{user.joinDate}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
+                        <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-zinc-800" />
+                        <DropdownMenuItem className="focus:bg-zinc-800">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Thay đổi vai trò</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="focus:bg-zinc-800">
+                          {user.status === 'active' ? (
+                            <>
+                              <X className="mr-2 h-4 w-4" />
+                              <span>Tạm khóa</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check className="mr-2 h-4 w-4" />
+                              <span>Kích hoạt</span>
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-zinc-800" />
+                        <DropdownMenuItem className="focus:bg-zinc-800 text-red-500 focus:text-red-500">
+                          <span>Xóa tài khoản</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <div className="flex items-center justify-between mt-6">
+            <div className="text-sm text-zinc-400">
+              Hiển thị <span className="font-medium text-white">1-7</span> trong <span className="font-medium text-white">7</span> người dùng
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-400">
+                Trước
+              </Button>
+              <Button variant="outline" size="sm" className="border-zinc-700 bg-zinc-800 text-white">
+                1
+              </Button>
+              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-400">
+                Sau
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Role Badge Component
+const RoleBadge = ({ role }: { role: string }) => {
+  switch(role) {
+    case 'superadmin':
+      return (
+        <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/30 border-0">
+          <Shield className="h-3 w-3 mr-1" />
+          Super Admin
+        </Badge>
+      );
+    case 'admin':
+      return (
+        <Badge className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-0">
+          <Shield className="h-3 w-3 mr-1" />
+          Admin
+        </Badge>
+      );
+    default:
+      return (
+        <Badge className="bg-zinc-800 text-zinc-400 hover:bg-zinc-700 border-0">
+          Người dùng
+        </Badge>
+      );
+  }
+};
+
+// Status Badge Component
+const StatusBadge = ({ status }: { status: string }) => {
+  switch(status) {
+    case 'active':
+      return (
+        <div className="flex items-center">
+          <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+          <span className="text-green-500">Hoạt động</span>
+        </div>
+      );
+    case 'inactive':
+      return (
+        <div className="flex items-center">
+          <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></div>
+          <span className="text-yellow-500">Không hoạt động</span>
+        </div>
+      );
+    case 'suspended':
+      return (
+        <div className="flex items-center">
+          <div className="h-2 w-2 rounded-full bg-red-500 mr-2"></div>
+          <span className="text-red-500">Đã khóa</span>
+        </div>
+      );
+    default:
+      return (
+        <div className="flex items-center">
+          <div className="h-2 w-2 rounded-full bg-zinc-500 mr-2"></div>
+          <span className="text-zinc-500">Không xác định</span>
+        </div>
+      );
+  }
+};
+
+export default AdminUsers;

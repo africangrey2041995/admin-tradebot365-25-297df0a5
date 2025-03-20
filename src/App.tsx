@@ -18,13 +18,24 @@ import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
 import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
 import PropTradingBots from "./pages/PropTradingBots";
 import IntegratedPropBots from "./pages/IntegratedPropBots";
-import IntegratedPropBotDetail from "./pages/IntegratedPropBotDetail"; // Add import
+import IntegratedPropBotDetail from "./pages/IntegratedPropBotDetail";
 import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
-import Settings from "./pages/Settings"; // Add the new import
+import Settings from "./pages/Settings";
+
+// Admin Pages
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminBots from "./pages/admin/Bots";
+import AdminDatabase from "./pages/admin/Database";
+import AdminLogs from "./pages/admin/Logs";
+import AdminNotifications from "./pages/admin/Notifications";
+import AdminEmail from "./pages/admin/Email";
+import AdminSettings from "./pages/admin/Settings";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -73,16 +84,28 @@ const App = () => (
                 <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
                 <Route path="/prop-trading-bots" element={<PropTradingBots />} />
                 <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
-                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} /> {/* Add this route */}
+                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
                 <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
-                <Route path="/settings" element={<Settings />} /> {/* Add the new route */}
+                <Route path="/settings" element={<Settings />} />
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="bots" element={<AdminBots />} />
+                  <Route path="database" element={<AdminDatabase />} />
+                  <Route path="logs" element={<AdminLogs />} />
+                  <Route path="notifications" element={<AdminNotifications />} />
+                  <Route path="email" element={<AdminEmail />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
                 
                 {/* Not found route */}
                 <Route path="*" element={<NotFound />} />
