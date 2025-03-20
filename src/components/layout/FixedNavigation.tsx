@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,23 +42,27 @@ const FixedNavigation = () => {
         {!isMobile && <UserProfileSection />}
       </div>
 
-      {/* Logo centered in the navbar */}
+      {/* Logo centered in the navbar - only visible on mobile */}
       <div className="flex-1 flex justify-center items-center">
-        <TradeBotLogo 
-          size={isMobile ? "large" : "medium"} 
-          showBetaTag={false} 
-          className={isMobile ? "scale-125" : ""}
-        />
+        {isMobile && (
+          <TradeBotLogo 
+            size="large" 
+            showBetaTag={false} 
+            className="scale-125"
+          />
+        )}
+        
+        {/* Show page title on desktop instead of logo */}
+        {!isMobile && (
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-white truncate max-w-[350px] lg:max-w-none">
+            {getTitleFromPathname(location.pathname)}
+          </h1>
+        )}
       </div>
 
       {/* Spacer and mobile user profile section on the right */}
       <div className="flex items-center">
         {isMobile && <UserProfileSection />}
-        {!isMobile && (
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-white hidden md:block truncate max-w-[250px] lg:max-w-none">
-            {getTitleFromPathname(location.pathname)}
-          </h1>
-        )}
       </div>
     </div>
   );
