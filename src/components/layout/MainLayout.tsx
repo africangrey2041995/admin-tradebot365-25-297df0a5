@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import SidebarNav from './SidebarNav';
+import BetaTag from '../common/BetaTag';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -33,14 +34,17 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
           )}>
             <div className="container mx-auto max-w-7xl">
               {title && !isMobile && (
-                <motion.h1 
-                  className="text-2xl font-semibold mb-6 text-slate-800 dark:text-white"
+                <motion.div 
+                  className="flex items-center gap-2 mb-6"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {title}
-                </motion.h1>
+                  <h1 className="text-2xl font-semibold text-slate-800 dark:text-white">
+                    {title}
+                  </h1>
+                  <BetaTag />
+                </motion.div>
               )}
               
               <motion.div

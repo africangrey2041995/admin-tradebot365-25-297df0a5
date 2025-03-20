@@ -5,6 +5,7 @@ import PropTradingPromo from '@/components/dashboard/PropTradingPromo';
 import ActivityOverview from '@/components/dashboard/ActivityOverview';
 import SystemStats from '@/components/dashboard/SystemStats';
 import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
+import BetaTag from '@/components/common/BetaTag';
 
 const Index = () => {
   // Mock statistics for demonstration
@@ -24,6 +25,14 @@ const Index = () => {
 
   return (
     <MainLayout title="Bảng Điều Khiển">
+      <div className="mb-6 flex justify-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+          <BetaTag />
+          <span className="text-amber-800 dark:text-amber-400 text-sm">
+            Đây là phiên bản beta, một số tính năng có thể chưa hoàn thiện.
+          </span>
+        </div>
+      </div>
       <PropTradingPromo />
       <PremiumBotsPromo />
       <ActivityOverview dashboardStats={dashboardStats} />
