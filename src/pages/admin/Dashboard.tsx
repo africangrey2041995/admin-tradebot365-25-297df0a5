@@ -3,7 +3,42 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart3, Users, Bot, DollarSign, LifeBuoy, Calendar, ArrowUpRight } from 'lucide-react';
+import { BarChart3, Users, Bot, DollarSign, LifeBuoy, ArrowUpRight } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
+
+const systemActivityData = [
+  { name: '01/05', value: 12 },
+  { name: '02/05', value: 19 },
+  { name: '03/05', value: 15 },
+  { name: '04/05', value: 22 },
+  { name: '05/05', value: 18 },
+  { name: '06/05', value: 29 },
+  { name: '07/05', value: 31 },
+  { name: '08/05', value: 35 },
+  { name: '09/05', value: 42 },
+  { name: '10/05', value: 38 },
+  { name: '11/05', value: 44 },
+  { name: '12/05', value: 48 },
+  { name: '13/05', value: 52 },
+  { name: '14/05', value: 49 },
+  { name: '15/05', value: 53 },
+];
+
+const recentBots = [
+  { id: 'BOT-24051', name: 'Bot Trading BTC', owner: 'Nguyễn Văn A', createdAt: 'Hôm nay', status: 'Active' },
+  { id: 'BOT-24049', name: 'DCA Bot Pro', owner: 'Trần Thị B', createdAt: 'Hôm nay', status: 'Active' },
+  { id: 'BOT-24048', name: 'ETH Scalping Bot', owner: 'Lê Minh C', createdAt: 'Hôm qua', status: 'Inactive' },
+  { id: 'BOT-24044', name: 'Grid Trading SOL', owner: 'Phạm Đức D', createdAt: 'Hôm qua', status: 'Active' },
+  { id: 'BOT-24038', name: 'Futures Bot', owner: 'Hoàng Thị E', createdAt: '2 ngày trước', status: 'Active' },
+];
 
 const AdminDashboard = () => {
   return (
@@ -73,8 +108,40 @@ const AdminDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center border border-dashed border-zinc-700 rounded-lg">
-                <span className="text-zinc-500">Biểu đồ hoạt động</span>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={systemActivityData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis dataKey="name" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#222', 
+                        border: '1px solid #444',
+                        borderRadius: '4px',
+                        color: '#fff'
+                      }}
+                      labelStyle={{ color: '#fff' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#f59e0b" 
+                      fillOpacity={1} 
+                      fill="url(#colorActivity)" 
+                      activeDot={{ r: 5, stroke: '#fff', strokeWidth: 1 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
             <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
@@ -92,40 +159,47 @@ const AdminDashboard = () => {
             <Card className="border-zinc-800 bg-zinc-900 text-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-amber-500" />
-                  <span>Sự kiện hôm nay</span>
+                  <Bot className="h-5 w-5 text-amber-500" />
+                  <span>Bot mới tạo gần đây</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="px-6">
-                  <EventItem
-                    time="09:00"
-                    title="Bảo trì hệ thống"
-                    description="Nâng cấp cơ sở dữ liệu"
-                  />
-                  <EventItem
-                    time="11:30"
-                    title="Phát hành Bot mới"
-                    description="Bot Premium DCA V2"
-                  />
-                  <EventItem
-                    time="14:00"
-                    title="Họp với đối tác"
-                    description="Tích hợp sàn Binance mới"
-                  />
-                  <EventItem
-                    time="16:30"
-                    title="Đánh giá hiệu suất"
-                    description="Báo cáo tuần"
-                    isLast={true}
-                  />
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-zinc-800">
+                      <TableHead className="text-zinc-400">ID</TableHead>
+                      <TableHead className="text-zinc-400">Tên Bot</TableHead>
+                      <TableHead className="text-zinc-400">Chủ sở hữu</TableHead>
+                      <TableHead className="text-zinc-400">Tạo</TableHead>
+                      <TableHead className="text-zinc-400 text-right">Trạng thái</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentBots.map((bot, i) => (
+                      <TableRow key={i} className="border-zinc-800">
+                        <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
+                        <TableCell>{bot.name}</TableCell>
+                        <TableCell>{bot.owner}</TableCell>
+                        <TableCell>{bot.createdAt}</TableCell>
+                        <TableCell className="text-right">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            bot.status === 'Active' 
+                              ? 'bg-green-500/20 text-green-500' 
+                              : 'bg-zinc-500/20 text-zinc-400'
+                          }`}>
+                            {bot.status}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
               <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
                 <div className="flex justify-between w-full">
-                  <span>4 sự kiện hôm nay</span>
+                  <span>5 bot mới nhất</span>
                   <span className="flex items-center text-amber-500 hover:text-amber-400 cursor-pointer">
-                    <span className="mr-1">Xem lịch đầy đủ</span>
+                    <span className="mr-1">Xem tất cả bot</span>
                     <ArrowUpRight className="h-3 w-3" />
                   </span>
                 </div>
@@ -143,6 +217,7 @@ const AdminDashboard = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-zinc-800">
+                      <TableHead className="text-zinc-400">ID</TableHead>
                       <TableHead className="text-zinc-400">Tên</TableHead>
                       <TableHead className="text-zinc-400">Đăng ký</TableHead>
                       <TableHead className="text-zinc-400 text-right">Bots</TableHead>
@@ -150,13 +225,14 @@ const AdminDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {[
-                      { name: "Nguyễn Văn A", date: "Hôm nay", bots: 2 },
-                      { name: "Trần Thị B", date: "Hôm nay", bots: 0 },
-                      { name: "Lê Minh C", date: "Hôm qua", bots: 1 },
-                      { name: "Phạm Đức D", date: "Hôm qua", bots: 3 },
-                      { name: "Hoàng Thị E", date: "2 ngày trước", bots: 0 }
+                      { id: "USER-2405", name: "Nguyễn Văn A", date: "Hôm nay", bots: 2 },
+                      { id: "USER-2404", name: "Trần Thị B", date: "Hôm nay", bots: 0 },
+                      { id: "USER-2402", name: "Lê Minh C", date: "Hôm qua", bots: 1 },
+                      { id: "USER-2401", name: "Phạm Đức D", date: "Hôm qua", bots: 3 },
+                      { id: "USER-2398", name: "Hoàng Thị E", date: "2 ngày trước", bots: 0 }
                     ].map((user, i) => (
                       <TableRow key={i} className="border-zinc-800">
+                        <TableCell className="font-mono text-xs text-zinc-400">{user.id}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.date}</TableCell>
                         <TableCell className="text-right">{user.bots}</TableCell>
@@ -242,28 +318,6 @@ const StatsCard = ({ title, value, change, trend, icon }: StatsCardProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-};
-
-// Event Item Component
-interface EventItemProps {
-  time: string;
-  title: string;
-  description: string;
-  isLast?: boolean;
-}
-
-const EventItem = ({ time, title, description, isLast = false }: EventItemProps) => {
-  return (
-    <div className={`py-3 ${!isLast ? 'border-b border-zinc-800' : ''}`}>
-      <div className="flex items-start">
-        <div className="min-w-[50px] text-zinc-500 text-sm">{time}</div>
-        <div>
-          <h4 className="font-medium text-white">{title}</h4>
-          <p className="text-zinc-400 text-sm">{description}</p>
-        </div>
-      </div>
-    </div>
   );
 };
 
