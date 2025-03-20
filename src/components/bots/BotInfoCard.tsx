@@ -83,9 +83,11 @@ const BotInfoCard = ({ bot }: BotInfoCardProps) => {
             <span className="text-sm font-medium text-muted-foreground">Loại Bot</span>
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-5 h-5 rounded-full bg-black text-white">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18.4 7L17.1 9H15.65L17.45 6H15.65L13.85 9H12.3L14.1 6H12.3L10.5 9H9L10.8 6H4V18H20V7H18.4Z" fill="currentColor"/>
-                </svg>
+                <img 
+                  src="/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png" 
+                  alt="Trading View" 
+                  className="w-5 h-5 rounded-full"
+                />
               </div>
               <span className="font-medium">Trading View</span>
             </div>

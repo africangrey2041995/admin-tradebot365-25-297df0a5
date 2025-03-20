@@ -222,14 +222,35 @@ const Signals = () => {
 
       <Tabs defaultValue="tradingview" className="w-full">
         <TabsList className="mb-6">
-          <TabsTrigger value="tradingview">Tín Hiệu TradingView</TabsTrigger>
-          <TabsTrigger value="coinstrat">Tín Hiệu Coinstrat</TabsTrigger>
+          <TabsTrigger value="tradingview" className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png" 
+              alt="Trading View" 
+              className="w-4 h-4"
+            />
+            Tín Hiệu TradingView
+          </TabsTrigger>
+          <TabsTrigger value="coinstrat" className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/8107dc0b-de72-421f-b369-5277cc2f8361.png" 
+              alt="Coinstart Pro" 
+              className="w-4 h-4 rounded-full"
+            />
+            Tín Hiệu Coinstrat
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="tradingview">
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="pb-0">
-              <CardTitle className="text-lg">Tín Hiệu TradingView</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <img 
+                  src="/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png" 
+                  alt="Trading View" 
+                  className="w-5 h-5"
+                />
+                Tín Hiệu TradingView
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -285,7 +306,14 @@ const Signals = () => {
         <TabsContent value="coinstrat">
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="pb-0">
-              <CardTitle className="text-lg">Tín Hiệu Coinstrat.pro</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <img 
+                  src="/lovable-uploads/8107dc0b-de72-421f-b369-5277cc2f8361.png" 
+                  alt="Coinstart Pro" 
+                  className="w-5 h-5 rounded-full"
+                />
+                Tín Hiệu Coinstrat.pro
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
