@@ -38,6 +38,9 @@ import AdminNotifications from "./pages/admin/Notifications";
 import AdminEmail from "./pages/admin/Email";
 import AdminSettings from "./pages/admin/Settings";
 import AdminManagement from "./pages/admin/AdminManagement";
+import AdminPremiumBots from "./pages/admin/PremiumBots";
+import AdminPropBots from "./pages/admin/PropBots";
+import AdminUserBots from "./pages/admin/UserBots";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -103,6 +106,9 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
+                  <Route path="premium-bots" element={<AdminPremiumBots />} />
+                  <Route path="prop-bots" element={<AdminPropBots />} />
+                  <Route path="user-bots" element={<AdminUserBots />} />
                   <Route path="database" element={<AdminDatabase />} />
                   <Route path="logs" element={<AdminLogs />} />
                   <Route path="notifications" element={<AdminNotifications />} />

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
@@ -28,7 +29,10 @@ import {
   LogOut,
   ArrowLeft,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  Crown,
+  Briefcase,
+  UserCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -125,27 +129,40 @@ const AdminLayout = () => {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+            
+            <SidebarGroup>
+              <SidebarGroupLabel>Quản lý Bot</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/bots')}>
-                      <Link to="/admin/bots">
-                        <Bot className="h-4 w-4" />
-                        <span>Quản lý Bot</span>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/premium-bots')}>
+                      <Link to="/admin/premium-bots">
+                        <Crown className="h-4 w-4" />
+                        <span>Premium Bots</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   
-                  {/* Super Admin only section */}
-                  {isSuperAdmin && (
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
-                        <Link to="/admin/admin-management">
-                          <ShieldCheck className="h-4 w-4" />
-                          <span>Quản lý Admin</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/prop-bots')}>
+                      <Link to="/admin/prop-bots">
+                        <Briefcase className="h-4 w-4" />
+                        <span>Prop Trading Bots</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/user-bots')}>
+                      <Link to="/admin/user-bots">
+                        <UserCircle className="h-4 w-4" />
+                        <span>Bot người dùng</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -212,6 +229,18 @@ const AdminLayout = () => {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                  
+                  {/* Super Admin only section */}
+                  {isSuperAdmin && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
+                        <Link to="/admin/admin-management">
+                          <ShieldCheck className="h-4 w-4" />
+                          <span>Quản lý Admin</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                   
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={handleSignOut}>

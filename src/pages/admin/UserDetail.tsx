@@ -5,14 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { ArrowLeft, User, Bot, CreditCard, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, User, Bot, CreditCard, ShieldCheck, Search, Eye, ExternalLink } from "lucide-react";
 import { RoleBadge, StatusBadge } from './Users';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
 
 const UserDetail = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBotId, setSelectedBotId] = useState<string | null>(null);
+  const [accountsDialogOpen, setAccountsDialogOpen] = useState(false);
+  const [selectedAccountsList, setSelectedAccountsList] = useState<any[]>([]);
 
   // Mock user data (in a real app, this would be fetched from an API)
   const user = {
@@ -31,17 +38,47 @@ const UserDetail = () => {
     lastLogin: '20/03/2024 15:30',
     referredBy: null,
     userBots: [
-      { id: 'BOT-3201', name: 'BTC Long', type: 'Custom', status: 'active', created: '22/09/2023' },
-      { id: 'BOT-3202', name: 'ETH Signal', type: 'Custom', status: 'active', created: '05/10/2023' },
-      { id: 'BOT-3203', name: 'DOGE Short', type: 'Custom', status: 'inactive', created: '10/11/2023' }
+      { id: 'BOT-3201', name: 'BTC Long', type: 'Custom', status: 'active', created: '22/09/2023', accountsCount: 2 },
+      { id: 'BOT-3202', name: 'ETH Signal', type: 'Custom', status: 'active', created: '05/10/2023', accountsCount: 3 },
+      { id: 'BOT-3203', name: 'DOGE Short', type: 'Custom', status: 'inactive', created: '10/11/2023', accountsCount: 0 }
     ],
     premiumBots: [
-      { id: 'PRE-5101', name: 'Crypto Master', type: 'Premium', status: 'active', activated: '01/01/2024' }
+      { id: 'PRE-5101', name: 'Crypto Master', type: 'Premium', status: 'active', activated: '01/01/2024', accountsCount: 1 }
     ],
     propBots: [
-      { id: 'PROP-7201', name: 'Prop Alpha', type: 'Prop Trading', status: 'active', activated: '15/02/2024' }
+      { id: 'PROP-7201', name: 'Prop Alpha', type: 'Prop Trading', status: 'active', activated: '15/02/2024', accountsCount: 1 }
     ]
   };
+
+  // Mock accounts data for the dialog
+  const mockAccounts = [
+    {
+      id: '1',
+      userAccount: 'Tài Khoản 1',
+      userEmail: 'dbtcompany17@gmail.com',
+      apiName: 'API 1',
+      apiId: 'API001',
+      tradingAccount: '4056629',
+      tradingAccountType: 'Live',
+      tradingAccountBalance: '$500',
+      status: 'Connected',
+      createdDate: new Date(2023, 5, 15).toISOString(),
+      lastUpdated: new Date(2023, 11, 20).toISOString(),
+    },
+    {
+      id: '2',
+      userAccount: 'Tài Khoản 1',
+      userEmail: 'dbtcompany17@gmail.com',
+      apiName: 'API 2',
+      apiId: 'API002',
+      tradingAccount: '4056789',
+      tradingAccountType: 'Live',
+      tradingAccountBalance: '$1000',
+      status: 'Connected',
+      createdDate: new Date(2023, 6, 22).toISOString(),
+      lastUpdated: new Date(2023, 10, 5).toISOString(),
+    }
+  ];
 
   // Subscription tiers with features for reference
   const subscriptionTiers = [
@@ -67,6 +104,26 @@ const UserDetail = () => {
 
   const handleReturn = () => {
     navigate('/admin/users');
+  };
+
+  const handleViewBotDetails = (botId: string) => {
+    // For demonstration, navigate to corresponding bot detail page
+    navigate(`/admin/bots/${botId}`);
+  };
+
+  const handleViewAccounts = (botId: string, botType: string) => {
+    setSelectedBotId(botId);
+    setSelectedAccountsList(mockAccounts);
+    setAccountsDialogOpen(true);
+  };
+
+  const filterBots = (bots: any[], search: string) => {
+    if (!search.trim()) return bots;
+    
+    return bots.filter(bot => 
+      bot.name.toLowerCase().includes(search.toLowerCase()) ||
+      bot.id.toLowerCase().includes(search.toLowerCase())
+    );
   };
 
   return (
@@ -187,15 +244,19 @@ const UserDetail = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Địa chỉ</div>
-                  <div>{user.address}</div>
+                  <div>{user.address || "Chưa cập nhật"}</div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Loại tài khoản</div>
                   <div>{user.accountType}</div>
                 </div>
+                {/* Future feature placeholder */}
                 <div className="space-y-2">
-                  <div className="text-sm text-zinc-400">Người giới thiệu</div>
-                  <div>{user.referredBy || "Không có"}</div>
+                  <div className="text-sm text-zinc-400">Giới thiệu (Affiliate)</div>
+                  <div className="flex items-center gap-2">
+                    <span>{user.referredBy || "Chưa có"}</span>
+                    <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">Tính năng tương lai</Badge>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -204,6 +265,47 @@ const UserDetail = () => {
 
         {/* Bots Tab */}
         <TabsContent value="bots" className="space-y-6">
+          {/* Search Bar for Bots */}
+          <div className="relative w-full max-w-lg mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
+            <Input 
+              placeholder="Tìm kiếm Bot..." 
+              className="pl-10 bg-zinc-800 border-zinc-700 text-white"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Bot Counts Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <Card className="border-zinc-800 bg-zinc-900 text-white">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{user.userBots.length}</div>
+                  <div className="text-sm text-zinc-400">Bot tùy chỉnh</div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-zinc-800 bg-zinc-900 text-white">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-amber-500">{user.premiumBots.length}</div>
+                  <div className="text-sm text-zinc-400">Premium Bot</div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-zinc-800 bg-zinc-900 text-white">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-500">{user.propBots.length}</div>
+                  <div className="text-sm text-zinc-400">Prop Trading Bot</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
               <CardTitle>Bot tùy chỉnh</CardTitle>
@@ -212,7 +314,7 @@ const UserDetail = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {user.userBots.length > 0 ? (
+              {filterBots(user.userBots, searchTerm).length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -221,10 +323,12 @@ const UserDetail = () => {
                         <th className="text-left pb-3 text-zinc-400">Tên Bot</th>
                         <th className="text-left pb-3 text-zinc-400">Trạng thái</th>
                         <th className="text-left pb-3 text-zinc-400">Ngày tạo</th>
+                        <th className="text-left pb-3 text-zinc-400">Tài khoản</th>
+                        <th className="text-right pb-3 text-zinc-400">Tác vụ</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {user.userBots.map(bot => (
+                      {filterBots(user.userBots, searchTerm).map(bot => (
                         <tr key={bot.id} className="border-b border-zinc-800">
                           <td className="py-3 text-sm font-mono text-zinc-400">{bot.id}</td>
                           <td className="py-3">{bot.name}</td>
@@ -232,6 +336,28 @@ const UserDetail = () => {
                             <StatusBadge status={bot.status} />
                           </td>
                           <td className="py-3">{bot.created}</td>
+                          <td className="py-3">{bot.accountsCount}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewAccounts(bot.id, 'custom')}
+                                disabled={bot.accountsCount === 0}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewBotDetails(bot.id)}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -239,7 +365,7 @@ const UserDetail = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-zinc-400">
-                  Người dùng chưa tạo bot nào.
+                  {searchTerm ? "Không tìm thấy bot nào" : "Người dùng chưa tạo bot nào."}
                 </div>
               )}
             </CardContent>
@@ -253,7 +379,7 @@ const UserDetail = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {user.premiumBots.length > 0 ? (
+              {filterBots(user.premiumBots, searchTerm).length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -262,10 +388,12 @@ const UserDetail = () => {
                         <th className="text-left pb-3 text-zinc-400">Tên Bot</th>
                         <th className="text-left pb-3 text-zinc-400">Trạng thái</th>
                         <th className="text-left pb-3 text-zinc-400">Ngày kích hoạt</th>
+                        <th className="text-left pb-3 text-zinc-400">Tài khoản</th>
+                        <th className="text-right pb-3 text-zinc-400">Tác vụ</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {user.premiumBots.map(bot => (
+                      {filterBots(user.premiumBots, searchTerm).map(bot => (
                         <tr key={bot.id} className="border-b border-zinc-800">
                           <td className="py-3 text-sm font-mono text-zinc-400">{bot.id}</td>
                           <td className="py-3">{bot.name}</td>
@@ -273,6 +401,28 @@ const UserDetail = () => {
                             <StatusBadge status={bot.status} />
                           </td>
                           <td className="py-3">{bot.activated}</td>
+                          <td className="py-3">{bot.accountsCount}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewAccounts(bot.id, 'premium')}
+                                disabled={bot.accountsCount === 0}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewBotDetails(bot.id)}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -280,7 +430,7 @@ const UserDetail = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-zinc-400">
-                  Người dùng chưa kích hoạt Premium Bot nào.
+                  {searchTerm ? "Không tìm thấy bot nào" : "Người dùng chưa kích hoạt Premium Bot nào."}
                 </div>
               )}
             </CardContent>
@@ -294,7 +444,7 @@ const UserDetail = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {user.propBots.length > 0 ? (
+              {filterBots(user.propBots, searchTerm).length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -303,10 +453,12 @@ const UserDetail = () => {
                         <th className="text-left pb-3 text-zinc-400">Tên Bot</th>
                         <th className="text-left pb-3 text-zinc-400">Trạng thái</th>
                         <th className="text-left pb-3 text-zinc-400">Ngày kích hoạt</th>
+                        <th className="text-left pb-3 text-zinc-400">Tài khoản</th>
+                        <th className="text-right pb-3 text-zinc-400">Tác vụ</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {user.propBots.map(bot => (
+                      {filterBots(user.propBots, searchTerm).map(bot => (
                         <tr key={bot.id} className="border-b border-zinc-800">
                           <td className="py-3 text-sm font-mono text-zinc-400">{bot.id}</td>
                           <td className="py-3">{bot.name}</td>
@@ -314,6 +466,28 @@ const UserDetail = () => {
                             <StatusBadge status={bot.status} />
                           </td>
                           <td className="py-3">{bot.activated}</td>
+                          <td className="py-3">{bot.accountsCount}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewAccounts(bot.id, 'prop')}
+                                disabled={bot.accountsCount === 0}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewBotDetails(bot.id)}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -321,7 +495,7 @@ const UserDetail = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-zinc-400">
-                  Người dùng chưa kích hoạt Prop Trading Bot nào.
+                  {searchTerm ? "Không tìm thấy bot nào" : "Người dùng chưa kích hoạt Prop Trading Bot nào."}
                 </div>
               )}
             </CardContent>
@@ -408,6 +582,61 @@ const UserDetail = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Accounts Dialog */}
+      <Dialog open={accountsDialogOpen} onOpenChange={setAccountsDialogOpen}>
+        <DialogContent className="bg-zinc-900 text-white border-zinc-800 sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Tài khoản giao dịch cho Bot {selectedBotId}</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Danh sách các tài khoản giao dịch được kết nối với Bot này.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="overflow-x-auto mt-4">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-zinc-800">
+                  <th className="text-left pb-3 text-zinc-400">User Account</th>
+                  <th className="text-left pb-3 text-zinc-400">API Name</th>
+                  <th className="text-left pb-3 text-zinc-400">Trading Account</th>
+                  <th className="text-left pb-3 text-zinc-400">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedAccountsList.map(account => (
+                  <tr key={account.id} className="border-b border-zinc-800">
+                    <td className="py-3">
+                      <div>
+                        <div className="font-medium">{account.userAccount}</div>
+                        <div className="text-xs text-zinc-400">{account.userEmail}</div>
+                      </div>
+                    </td>
+                    <td className="py-3">{account.apiName}</td>
+                    <td className="py-3">
+                      {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center">
+                        <div className={`h-2 w-2 rounded-full ${account.status === 'Connected' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></div>
+                        <span className={account.status === 'Connected' ? 'text-green-500' : 'text-red-500'}>
+                          {account.status}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="flex justify-end mt-4">
+            <Button variant="outline" onClick={() => setAccountsDialogOpen(false)} className="border-zinc-700">
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
