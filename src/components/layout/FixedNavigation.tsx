@@ -10,13 +10,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const FixedNavigation = () => {
-  const { open, setOpen, state } = useSidebar();
+  const { state, setOpenMobile, openMobile } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  // Toggle sidebar function for better UX
+  // Toggle sidebar function for better UX - corrected to use mobile-specific toggle
   const toggleSidebar = () => {
-    setOpen(!open);
+    setOpenMobile(!openMobile);
   };
 
   return (
@@ -33,9 +33,9 @@ const FixedNavigation = () => {
           )}
           aria-label="Toggle sidebar"
         >
-          {state === "collapsed" ? 
-            <Menu className="h-5 w-5" /> : 
-            <X className="h-5 w-5" />
+          {openMobile ? 
+            <X className="h-5 w-5" /> : 
+            <Menu className="h-5 w-5" />
           }
         </Button>
         
