@@ -215,7 +215,7 @@ const AdminUsers = () => {
 };
 
 // Role Badge Component
-const RoleBadge = ({ role }: { role: string }) => {
+export const RoleBadge = ({ role }: { role: string }) => {
   switch(role) {
     case 'superadmin':
       return (
@@ -241,7 +241,7 @@ const RoleBadge = ({ role }: { role: string }) => {
 };
 
 // Status Badge Component
-const StatusBadge = ({ status }: { status: string }) => {
+export const StatusBadge = ({ status }: { status: string }) => {
   switch(status) {
     case 'active':
       return (

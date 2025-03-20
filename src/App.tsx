@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +30,7 @@ import Settings from "./pages/Settings";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
+import AdminUserDetail from "./pages/admin/UserDetail";
 import AdminBots from "./pages/admin/Bots";
 import AdminDatabase from "./pages/admin/Database";
 import AdminLogs from "./pages/admin/Logs";
@@ -99,6 +101,7 @@ const App = () => (
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
                   <Route path="database" element={<AdminDatabase />} />
                   <Route path="logs" element={<AdminLogs />} />
