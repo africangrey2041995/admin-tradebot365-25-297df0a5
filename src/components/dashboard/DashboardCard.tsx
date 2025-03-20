@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardCardProps {
   title: string;
@@ -24,6 +25,8 @@ const DashboardCard = ({
   icon,
   color = 'default'
 }: DashboardCardProps) => {
+  const isMobile = useIsMobile();
+  
   const colorClasses = {
     primary: 'bg-blue-50 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400',
     success: 'bg-green-50 text-green-500 dark:bg-green-900/20 dark:text-green-400',
@@ -42,21 +45,21 @@ const DashboardCard = ({
       )}
       onClick={onClick}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className={`${isMobile ? 'p-3 pb-2' : 'pb-3'}`}>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-lg font-medium text-slate-800 dark:text-white">{title}</CardTitle>
+            <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} font-medium text-slate-800 dark:text-white`}>{title}</CardTitle>
             {description && <CardDescription className="text-slate-500 dark:text-slate-400 mt-1">{description}</CardDescription>}
           </div>
           {icon && (
-            <div className={cn("p-3 rounded-lg", colorClasses[color])}>
+            <div className={cn(`${isMobile ? 'p-2' : 'p-3'} rounded-lg`, colorClasses[color])}>
               {icon}
             </div>
           )}
         </div>
       </CardHeader>
-      <CardContent className="pb-2">{children}</CardContent>
-      {footer && <CardFooter className="pt-3 border-t border-slate-200 dark:border-zinc-700">{footer}</CardFooter>}
+      <CardContent className={`${isMobile ? 'p-0' : 'pb-2'}`}>{children}</CardContent>
+      {footer && <CardFooter className={`${isMobile ? 'p-3 pt-2' : 'pt-3'} border-t border-slate-200 dark:border-zinc-700`}>{footer}</CardFooter>}
     </Card>
   );
 };

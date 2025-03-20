@@ -7,6 +7,7 @@ import SystemStats from '@/components/dashboard/SystemStats';
 import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
 import BetaTag from '@/components/common/BetaTag';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { motion } from 'framer-motion';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -28,18 +29,26 @@ const Index = () => {
 
   return (
     <MainLayout title="Bảng Điều Khiển">
-      <div className={`mb-4 ${isMobile ? '' : 'mb-6'} flex justify-center`}>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+      <motion.div 
+        className={`mb-4 ${isMobile ? 'px-1' : 'mb-6'} flex justify-center`}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className={`inline-flex items-center gap-2 ${isMobile ? 'px-2 py-1' : 'px-3 py-1.5 sm:px-4 sm:py-2'} rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800`}>
           <BetaTag />
-          <span className="text-amber-800 dark:text-amber-400 text-xs sm:text-sm">
+          <span className={`text-amber-800 dark:text-amber-400 ${isMobile ? 'text-xs' : 'text-xs sm:text-sm'}`}>
             Đây là phiên bản beta, một số tính năng có thể chưa hoàn thiện.
           </span>
         </div>
+      </motion.div>
+      
+      <div className={`space-y-${isMobile ? '4' : '6'}`}>
+        <PropTradingPromo />
+        <PremiumBotsPromo />
+        <ActivityOverview dashboardStats={dashboardStats} />
+        <SystemStats dashboardStats={dashboardStats} />
       </div>
-      <PropTradingPromo />
-      <PremiumBotsPromo />
-      <ActivityOverview dashboardStats={dashboardStats} />
-      <SystemStats dashboardStats={dashboardStats} />
     </MainLayout>
   );
 };

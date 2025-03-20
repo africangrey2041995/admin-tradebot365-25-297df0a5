@@ -28,7 +28,7 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
           
           <main className={cn(
             isMobile 
-              ? "px-3 pb-4 pt-3" 
+              ? "px-2 pb-4 pt-2" 
               : "px-6 py-6",
             "transition-all duration-300 ease-in-out overflow-x-hidden"
           )}>
@@ -53,7 +53,7 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
                 transition={{ duration: 0.4, delay: 0.1 }}
                 className={cn(
                   "bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-slate-200 dark:border-zinc-700",
-                  isMobile ? "p-3 sm:p-4" : "p-6"
+                  isMobile ? "p-3" : "p-6"
                 )}
               >
                 {children}

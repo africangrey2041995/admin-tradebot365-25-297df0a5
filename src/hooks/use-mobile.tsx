@@ -10,18 +10,19 @@ export function useIsMobile() {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
     const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      const isMobileView = window.innerWidth < MOBILE_BREAKPOINT
+      setIsMobile(isMobileView)
+      
+      // Handle html class for global styles
+      if (isMobileView) {
+        document.documentElement.classList.add('is-mobile')
+      } else {
+        document.documentElement.classList.remove('is-mobile')
+      }
     }
     
     mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    
-    // Handle initial state - add a class to html element for global styles
-    if (window.innerWidth < MOBILE_BREAKPOINT) {
-      document.documentElement.classList.add('is-mobile')
-    } else {
-      document.documentElement.classList.remove('is-mobile')
-    }
+    onChange() // Call initially to set the state
     
     return () => {
       mql.removeEventListener("change", onChange)
