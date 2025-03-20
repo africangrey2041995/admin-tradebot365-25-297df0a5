@@ -129,18 +129,18 @@ const AdminUserBotDetail = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Webhook URL</h3>
+                    <h3 className="text-sm font-medium text-white mb-1">Webhook URL</h3>
                     <div className="flex items-center gap-2">
-                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono">
+                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
                         https://api.tradebot365.com/webhook/{botId?.toLowerCase()}
                       </div>
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Signal Token <span className="text-xs text-red-400">(Admin Only)</span></h3>
+                    <h3 className="text-sm font-medium text-white mb-1">Signal Token <span className="text-xs text-red-400">(Admin Only)</span></h3>
                     <div className="flex items-center gap-2">
-                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono">
+                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
                         CST{Math.random().toString(36).substring(2, 10).toUpperCase()}{botId?.replace('BOT', '')}
                       </div>
                     </div>
@@ -170,19 +170,19 @@ const AdminUserBotDetail = () => {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b border-zinc-800">
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">ID</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Tài khoản</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">API</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Trạng thái</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Ngày tạo</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">ID</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Tài khoản</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">API</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Trạng thái</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Ngày tạo</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[1, 2, 3, 4, 5].map((i) => (
                           <tr key={i} className="border-b border-zinc-800">
-                            <td className="py-3 px-4 font-mono text-xs">ACC-{1000 + i}</td>
-                            <td className="py-3 px-4">trader{i}@example.com</td>
-                            <td className="py-3 px-4">Coinstart API</td>
+                            <td className="py-3 px-4 font-mono text-xs text-gray-200">ACC-{1000 + i}</td>
+                            <td className="py-3 px-4 text-gray-200">trader{i}@example.com</td>
+                            <td className="py-3 px-4 text-gray-200">Coinstart API</td>
                             <td className="py-3 px-4">
                               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 i % 3 === 0 ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'
@@ -190,7 +190,7 @@ const AdminUserBotDetail = () => {
                                 {i % 3 === 0 ? 'Disconnected' : 'Connected'}
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-zinc-400">
+                            <td className="py-3 px-4 text-gray-300">
                               {new Date(2024, 0, i).toLocaleDateString('vi-VN')}
                             </td>
                           </tr>
@@ -215,17 +215,17 @@ const AdminUserBotDetail = () => {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b border-zinc-800">
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">ID</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Hành động</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Cặp tiền</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Trạng thái</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Thời gian</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">ID</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Hành động</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Cặp tiền</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Trạng thái</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Thời gian</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[1, 2, 3, 4, 5].map((i) => (
                           <tr key={i} className="border-b border-zinc-800">
-                            <td className="py-3 px-4 font-mono text-xs">SIG-{10000 + i}</td>
+                            <td className="py-3 px-4 font-mono text-xs text-gray-200">SIG-{10000 + i}</td>
                             <td className="py-3 px-4">
                               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 i % 2 === 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
@@ -233,7 +233,7 @@ const AdminUserBotDetail = () => {
                                 {i % 2 === 0 ? 'ENTER_LONG' : 'EXIT_LONG'}
                               </div>
                             </td>
-                            <td className="py-3 px-4">BTC/USDT</td>
+                            <td className="py-3 px-4 text-gray-200">BTC/USDT</td>
                             <td className="py-3 px-4">
                               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 i % 4 === 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-blue-500/20 text-blue-500'
@@ -241,7 +241,7 @@ const AdminUserBotDetail = () => {
                                 {i % 4 === 0 ? 'Pending' : 'Processed'}
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-zinc-400">
+                            <td className="py-3 px-4 text-gray-300">
                               {new Date().toLocaleString('vi-VN')}
                             </td>
                           </tr>
@@ -266,18 +266,18 @@ const AdminUserBotDetail = () => {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b border-zinc-800">
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">ID</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Hành động</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Cặp tiền</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Trạng thái</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Tài khoản</th>
-                          <th className="text-left py-3 px-4 font-medium text-zinc-400">Thời gian</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">ID</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Hành động</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Cặp tiền</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Trạng thái</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Tài khoản</th>
+                          <th className="text-left py-3 px-4 font-medium text-white">Thời gian</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[1, 2, 3, 4, 5].map((i) => (
                           <tr key={i} className="border-b border-zinc-800">
-                            <td className="py-3 px-4 font-mono text-xs">CS-{20000 + i}</td>
+                            <td className="py-3 px-4 font-mono text-xs text-gray-200">CS-{20000 + i}</td>
                             <td className="py-3 px-4">
                               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 i % 2 === 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
@@ -285,7 +285,7 @@ const AdminUserBotDetail = () => {
                                 {i % 2 === 0 ? 'ENTER_LONG' : 'EXIT_LONG'}
                               </div>
                             </td>
-                            <td className="py-3 px-4">BTC/USDT</td>
+                            <td className="py-3 px-4 text-gray-200">BTC/USDT</td>
                             <td className="py-3 px-4">
                               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 i % 5 === 0 ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'
@@ -293,8 +293,8 @@ const AdminUserBotDetail = () => {
                                 {i % 5 === 0 ? 'Failed' : 'Processed'}
                               </div>
                             </td>
-                            <td className="py-3 px-4">ACC-{1000 + i}</td>
-                            <td className="py-3 px-4 text-zinc-400">
+                            <td className="py-3 px-4 text-gray-200">ACC-{1000 + i}</td>
+                            <td className="py-3 px-4 text-gray-300">
                               {new Date().toLocaleString('vi-VN')}
                             </td>
                           </tr>
