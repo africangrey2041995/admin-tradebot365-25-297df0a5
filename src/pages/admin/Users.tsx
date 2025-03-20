@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus, Filter, MoreHorizontal, Check, X, Eye } from "lucide-react";
+import { Search, UserPlus, Filter, MoreHorizontal, Check, X, Eye, ShieldCheck } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -220,14 +220,14 @@ const RoleBadge = ({ role }: { role: string }) => {
     case 'superadmin':
       return (
         <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/30 border-0">
-          <Shield className="h-3 w-3 mr-1" />
+          <ShieldCheck className="h-3 w-3 mr-1" />
           Super Admin
         </Badge>
       );
     case 'admin':
       return (
         <Badge className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-0">
-          <Shield className="h-3 w-3 mr-1" />
+          <ShieldCheck className="h-3 w-3 mr-1" />
           Admin
         </Badge>
       );
