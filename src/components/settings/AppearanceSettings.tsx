@@ -9,21 +9,30 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 
 const AppearanceSettings = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
 
   // Ensure the theme value is set correctly when component mounts
   useEffect(() => {
     if (!theme) {
-      setTheme('light');
+      setTheme('system');
     }
   }, [theme, setTheme]);
 
   const handleThemeChange = (value: string) => {
     setTheme(value);
+    
+    // Get readable theme name for toast
+    let themeName = value === 'system' 
+      ? 'hệ thống'
+      : value === 'light' 
+        ? 'sáng' 
+        : 'tối';
+        
     toast({
       title: "Đã thay đổi giao diện",
-      description: `Giao diện đã được chuyển sang chế độ ${value === 'light' ? 'sáng' : value === 'dark' ? 'tối' : 'hệ thống'}.`,
+      description: `Giao diện đã được chuyển sang chế độ ${themeName}.`,
+      duration: 3000,
     });
   };
 
@@ -31,6 +40,7 @@ const AppearanceSettings = () => {
     toast({
       title: "Đã thay đổi mật độ giao diện",
       description: `Giao diện đã được chuyển sang chế độ ${checked ? 'gọn' : 'tiêu chuẩn'}.`,
+      duration: 3000,
     });
     // Here you would implement actual density change logic
   };
@@ -39,6 +49,7 @@ const AppearanceSettings = () => {
     toast({
       title: "Đã thay đổi cài đặt hiệu ứng",
       description: `Hiệu ứng đã được ${checked ? 'bật' : 'tắt'}.`,
+      duration: 3000,
     });
     // Here you would implement actual animations toggle logic
   };
@@ -50,7 +61,7 @@ const AppearanceSettings = () => {
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Chế độ hiển thị</h3>
           <RadioGroup 
-            value={theme || 'light'} 
+            value={theme || 'system'} 
             onValueChange={handleThemeChange} 
             className="grid grid-cols-1 sm:grid-cols-3 gap-4"
           >

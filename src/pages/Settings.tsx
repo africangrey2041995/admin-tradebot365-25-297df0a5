@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Cog, Bell, Palette, Languages, Shield } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
@@ -9,6 +9,7 @@ import AppearanceSettings from "@/components/settings/AppearanceSettings";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import LanguageSettings from "@/components/settings/LanguageSettings";
 import PrivacySettings from "@/components/settings/PrivacySettings";
+import { useTheme } from "next-themes";
 
 const settingsTabs = [
   { id: "appearance", label: "Giao diện", icon: <Palette className="h-4 w-4" /> },
@@ -19,6 +20,29 @@ const settingsTabs = [
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("appearance");
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+
+  // Ensure component is mounted before rendering theme-dependent elements
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // If not mounted yet, render a simple placeholder to avoid theme flashing
+  if (!mounted) {
+    return (
+      <MainLayout>
+        <div className="container py-6 max-w-5xl mx-auto min-h-screen">
+          <div className="animate-pulse">
+            <div className="h-8 bg-slate-200 dark:bg-zinc-700 rounded w-48 mb-4"></div>
+            <div className="h-4 bg-slate-200 dark:bg-zinc-700 rounded w-96 mb-8"></div>
+            <div className="h-12 bg-slate-200 dark:bg-zinc-700 rounded mb-8"></div>
+            <div className="h-96 bg-slate-200 dark:bg-zinc-700 rounded"></div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

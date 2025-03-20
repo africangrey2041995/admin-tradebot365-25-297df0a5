@@ -8,12 +8,14 @@ import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 const UserProfileSection = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
     await signOut();
@@ -30,7 +32,14 @@ const UserProfileSection = () => {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const newTheme = resolvedTheme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    
+    toast({
+      title: "Đã thay đổi giao diện",
+      description: `Giao diện đã được chuyển sang chế độ ${newTheme === 'light' ? 'sáng' : 'tối'}.`,
+      duration: 3000,
+    });
   };
 
   return (
@@ -43,13 +52,13 @@ const UserProfileSection = () => {
             size="icon"
             onClick={toggleTheme}
             className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
-            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
           >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {resolvedTheme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{theme === "dark" ? "Chuyển chế độ sáng" : "Chuyển chế độ tối"}</p>
+          <p>{resolvedTheme === "dark" ? "Chuyển chế độ sáng" : "Chuyển chế độ tối"}</p>
         </TooltipContent>
       </Tooltip>
 

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -114,6 +113,40 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
+  /* Modified transition properties to ensure smooth theme change */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Smooth transitions between light/dark mode */
+  html,
+  body,
+  #root,
+  div,
+  main,
+  header,
+  footer,
+  nav,
+  section,
+  article,
+  aside,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  img,
+  svg {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
   @keyframes appear {
