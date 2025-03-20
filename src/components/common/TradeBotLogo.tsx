@@ -13,20 +13,20 @@ interface TradeBotLogoProps {
   forceLightVersion?: boolean;
 }
 
-// Preload images to prevent flickering
-const lightLogo = "/lovable-uploads/2355f2cc-b849-4578-8662-c64c468d11f4.png";
-const darkLogo = "/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png";
-const whiteLogo = "/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png";
+// Define image paths as constants to avoid string repetition
+const LOGOS = {
+  LIGHT: "/lovable-uploads/2355f2cc-b849-4578-8662-c64c468d11f4.png",
+  DARK: "/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png",
+  WHITE: "/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png"
+};
 
-// Preload the images on component mount
+// Preload all logo images immediately to prevent flickering
 if (typeof window !== 'undefined') {
-  const preloadImage = (src: string) => {
+  // Create and cache all logo images in advance
+  Object.values(LOGOS).forEach(src => {
     const img = new Image();
     img.src = src;
-  };
-  preloadImage(lightLogo);
-  preloadImage(darkLogo);
-  preloadImage(whiteLogo);
+  });
 }
 
 const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({ 
@@ -39,9 +39,8 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({
   const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
   const { openMobile } = useSidebar();
-  const [logoLoaded, setLogoLoaded] = useState(false);
   
-  // Determine height based on size prop - increased for better visibility
+  // Determine height based on size prop
   const height = isMobile 
     ? (size === 'small' ? 'h-9' : size === 'medium' ? 'h-14' : 'h-16') 
     : (size === 'small' ? 'h-8' : size === 'medium' ? 'h-12' : 'h-16');
@@ -50,10 +49,10 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({
   const shouldUseLightLogo = openMobile || forceLightVersion;
   
   const logoSrc = isMobile && resolvedTheme === 'light' && !shouldUseLightLogo
-    ? lightLogo // Colored logo for light mode on mobile
+    ? LOGOS.LIGHT // Colored logo for light mode on mobile
     : shouldUseLightLogo 
-      ? whiteLogo // White logo for dark backgrounds
-      : darkLogo; // Original logo for dark mode and desktop
+      ? LOGOS.WHITE // White logo for dark backgrounds
+      : LOGOS.DARK; // Original logo for dark mode and desktop
   
   // Calculate appropriate width and height attributes
   const widthAttr = isMobile 
@@ -64,21 +63,19 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({
     ? (size === 'small' ? '36' : size === 'medium' ? '56' : '64') 
     : (size === 'small' ? '32' : size === 'medium' ? '48' : '64');
 
-  useEffect(() => {
-    // Set loaded state to true after first render
-    setLogoLoaded(true);
-  }, []);
-
   return (
     <div className={`relative inline-flex items-center justify-center ${className}`}>
+      {/* Using a static approach without opacity transitions which can cause flickering */}
       <img 
         src={logoSrc} 
         alt="Trade Bot 365" 
-        className={`w-auto ${height} transition-opacity duration-200 ${logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`w-auto ${height}`}
         loading="eager" 
         width={widthAttr}
         height={heightAttr}
-        decoding="async"
+        decoding="sync" // Change to sync for immediate decoding
+        importance="high" // Signal high importance
+        style={{ backfaceVisibility: 'hidden' }} // Prevent flickering in some browsers
       />
       {showBetaTag && (
         <div className={`absolute ${isMobile 
