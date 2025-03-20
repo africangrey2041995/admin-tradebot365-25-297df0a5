@@ -46,9 +46,9 @@ const FixedNavigation = () => {
       {/* Logo centered in the navbar */}
       <div className="flex-1 flex justify-center items-center">
         <TradeBotLogo 
-          size={isMobile ? "medium" : "small"} 
+          size={isMobile ? "large" : "medium"} 
           showBetaTag={false} 
-          className={isMobile ? "scale-110" : ""}
+          className={isMobile ? "scale-125" : ""}
         />
       </div>
 

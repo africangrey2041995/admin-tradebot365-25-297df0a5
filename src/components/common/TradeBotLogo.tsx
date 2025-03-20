@@ -3,32 +3,40 @@ import React from 'react';
 import BetaTag from './BetaTag';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebar } from '@/components/ui/sidebar';
 
 interface TradeBotLogoProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
   variant?: 'default' | 'dark' | 'light';
   showBetaTag?: boolean;
+  forceLightVersion?: boolean;
 }
 
 const TradeBotLogo: React.FC<TradeBotLogoProps> = ({ 
   size = 'medium', 
   className = '',
   variant = 'default',
-  showBetaTag = false
+  showBetaTag = false,
+  forceLightVersion = false
 }) => {
   const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
+  const { openMobile } = useSidebar();
   
   // Determine height based on size prop - increased for better visibility
   const height = isMobile 
     ? (size === 'small' ? 'h-9' : size === 'medium' ? 'h-14' : 'h-16') 
     : (size === 'small' ? 'h-8' : size === 'medium' ? 'h-12' : 'h-16');
   
-  // Choose logo based on theme and device
-  const logoSrc = isMobile && resolvedTheme === 'light'
-    ? "/lovable-uploads/2355f2cc-b849-4578-8662-c64c468d11f4.png" // New logo for light mode on mobile
-    : "/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png"; // Original logo for dark mode and desktop
+  // Choose logo based on theme, device, and sidebar state
+  const shouldUseLightLogo = openMobile || forceLightVersion;
+  
+  const logoSrc = isMobile && resolvedTheme === 'light' && !shouldUseLightLogo
+    ? "/lovable-uploads/2355f2cc-b849-4578-8662-c64c468d11f4.png" // Colored logo for light mode on mobile
+    : shouldUseLightLogo 
+      ? "/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" // White logo for dark backgrounds
+      : "/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png"; // Original logo for dark mode and desktop
   
   // Calculate appropriate width and height attributes
   const widthAttr = isMobile 
