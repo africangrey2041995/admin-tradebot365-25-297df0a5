@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const FixedNavigation = () => {
-  const { collapsed, setCollapsed } = useSidebar();
+  const { open, setOpen, state } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
 
@@ -19,10 +19,10 @@ const FixedNavigation = () => {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={() => setOpen(!open)}
         className="mr-2 block sm:hidden"
       >
-        {collapsed ? <Menu /> : <X />}
+        {state === "collapsed" ? <Menu /> : <X />}
       </Button>
 
       {/* Logo for mobile and title for desktop */}
