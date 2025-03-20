@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 const AdminDatabase = () => {
   return (
@@ -47,7 +48,7 @@ const AdminDatabase = () => {
                 <span className="text-zinc-400">Sử dụng</span>
                 <span className="text-zinc-300">65%</span>
               </div>
-              <Progress value={65} className="h-1 bg-zinc-800" indicatorClassName="bg-amber-500" />
+              <Progress value={65} className="h-1 bg-zinc-800 [&>div]:bg-amber-500" />
             </div>
           </CardContent>
         </Card>
