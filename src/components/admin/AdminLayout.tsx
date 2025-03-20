@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
@@ -28,14 +27,15 @@ import {
   Bell,
   LogOut,
   ArrowLeft,
-  FileText
+  FileText,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 
 const AdminLayout = () => {
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isSuperAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useClerk();
@@ -134,6 +134,18 @@ const AdminLayout = () => {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                  
+                  {/* Super Admin only section */}
+                  {isSuperAdmin && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
+                        <Link to="/admin/admin-management">
+                          <ShieldCheck className="h-4 w-4" />
+                          <span>Quản lý Admin</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

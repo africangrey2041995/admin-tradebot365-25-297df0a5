@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +35,7 @@ import AdminLogs from "./pages/admin/Logs";
 import AdminNotifications from "./pages/admin/Notifications";
 import AdminEmail from "./pages/admin/Email";
 import AdminSettings from "./pages/admin/Settings";
+import AdminManagement from "./pages/admin/AdminManagement";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -105,6 +105,7 @@ const App = () => (
                   <Route path="notifications" element={<AdminNotifications />} />
                   <Route path="email" element={<AdminEmail />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="admin-management" element={<AdminManagement />} />
                 </Route>
                 
                 {/* Not found route */}
