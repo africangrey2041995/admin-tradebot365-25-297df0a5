@@ -12,13 +12,9 @@ const PremiumBotsPromo = () => {
   return (
     <motion.div
       className="mb-8"
-      variants={{
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 }
-      }}
-      initial="hidden"
-      animate="visible"
-      transition={{ delay: 0.5, duration: 0.5 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
       <DashboardCard 
         title="Premium Bots" 

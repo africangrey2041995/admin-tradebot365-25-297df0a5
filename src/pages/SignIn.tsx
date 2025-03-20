@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -14,6 +13,7 @@ import {
   KeyIcon, 
   Loader2
 } from 'lucide-react';
+import TradeBotLogo from '@/components/common/TradeBotLogo';
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -24,7 +24,6 @@ const SignIn = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Show a proper loading state rather than infinite spinner
   if (!isLoaded) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
@@ -34,13 +33,11 @@ const SignIn = () => {
     );
   }
 
-  // Handle mock sign in for demonstration without Clerk credentials
   const handleMockSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     
     setIsLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
       if (emailAddress && password) {
         toast({
@@ -59,11 +56,9 @@ const SignIn = () => {
     }, 1500);
   };
 
-  // Mock Google sign in
   const handleMockGoogleSignIn = () => {
     setIsGoogleLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
       toast({
         title: "Đăng nhập thành công",
@@ -74,7 +69,6 @@ const SignIn = () => {
     }, 1500);
   };
 
-  // Real Clerk auth handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -133,7 +127,6 @@ const SignIn = () => {
     }
   };
 
-  // Use mock handlers if Clerk setup has issues
   const onSubmit = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSubmit : handleMockSignIn;
   const onGoogleSignIn = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSignInWithGoogle : handleMockGoogleSignIn;
 
@@ -141,11 +134,7 @@ const SignIn = () => {
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
       <div className="absolute top-8 left-8">
         <Link to="/">
-          <img 
-            src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
-            alt="Trade Bot 365 Logo" 
-            className="h-16 w-auto object-contain" 
-          />
+          <TradeBotLogo size="large" />
         </Link>
       </div>
       

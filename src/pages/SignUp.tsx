@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSignUp } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -15,6 +14,7 @@ import {
   UserIcon,
   Loader2
 } from 'lucide-react';
+import TradeBotLogo from '@/components/common/TradeBotLogo';
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -28,7 +28,6 @@ const SignUp = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // If clerk isn't loaded yet, show a simple loading state
   if (!isLoaded) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
@@ -51,7 +50,6 @@ const SignUp = () => {
         password,
       });
 
-      // Send email verification code
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       
       setPendingVerification(true);
@@ -131,11 +129,7 @@ const SignUp = () => {
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
       <div className="absolute top-8 left-8">
         <Link to="/">
-          <img 
-            src="/lovable-uploads/e2df3904-13a1-447b-8f10-5d6f6439dc6b.png" 
-            alt="Trade Bot 365 Logo" 
-            className="h-16 w-auto object-contain" 
-          />
+          <TradeBotLogo size="large" />
         </Link>
       </div>
       

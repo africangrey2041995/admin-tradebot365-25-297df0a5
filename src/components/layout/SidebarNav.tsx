@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import TradeBotLogo from '@/components/common/TradeBotLogo';
 
 const SidebarNav = () => {
   const location = useLocation();
@@ -35,13 +35,9 @@ const SidebarNav = () => {
   return (
     <Sidebar className="border-r-0">
       <SidebarContent className="bg-[#111111] text-white h-full">
-        {/* Logo - Updated size and centering */}
+        {/* Logo - Using our new component */}
         <div className="py-6 px-4 flex justify-center">
-          <img 
-            src="/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png" 
-            alt="Trade Bot 365" 
-            className="h-16 w-auto" 
-          />
+          <TradeBotLogo size="large" />
         </div>
         
         <SidebarSeparator className="bg-zinc-800" />
