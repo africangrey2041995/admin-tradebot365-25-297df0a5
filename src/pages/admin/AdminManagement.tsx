@@ -41,6 +41,9 @@ import * as z from "zod";
 import { Switch } from "@/components/ui/switch";
 import { UserWithRole } from "@/types";
 
+// Define a more specific admin role type that excludes "user"
+type AdminRoleType = "admin" | "superadmin";
+
 // Schema for add/edit admin form
 const adminFormSchema = z.object({
   fullName: z.string().min(2, {
@@ -66,21 +69,36 @@ const adminFormSchema = z.object({
 
 type AdminFormValues = z.infer<typeof adminFormSchema>;
 
+// Define an admin user type that extends UserWithRole but ensures role is AdminRoleType
+interface AdminUser extends Omit<UserWithRole, 'role'> {
+  role: AdminRoleType;
+  permissions: {
+    manageUsers: boolean;
+    manageBots: boolean;
+    manageDatabase: boolean;
+    viewLogs: boolean;
+    manageNotifications: boolean;
+    manageEmail: boolean;
+    manageSettings: boolean;
+    manageAdmins: boolean;
+  }
+}
+
 const AdminManagement = () => {
   const { isAdmin, isSuperAdmin } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [editingAdmin, setEditingAdmin] = useState<UserWithRole | null>(null);
+  const [editingAdmin, setEditingAdmin] = useState<AdminUser | null>(null);
 
   // Mock admin data
-  const adminUsers = [
+  const adminUsers: AdminUser[] = [
     { 
       id: '1', 
       fullName: 'Nguyễn Văn Admin', 
       email: 'admin@example.com', 
-      role: 'superadmin' as const, 
-      status: 'active' as const,
+      role: 'superadmin', 
+      status: 'active',
       createdAt: '15/01/2024',
       lastLogin: '20/04/2024',
       permissions: {
@@ -98,8 +116,8 @@ const AdminManagement = () => {
       id: '2', 
       fullName: 'Trần Thị Quản Lý', 
       email: 'manager@example.com', 
-      role: 'admin' as const, 
-      status: 'active' as const,
+      role: 'admin', 
+      status: 'active',
       createdAt: '05/02/2024',
       lastLogin: '19/04/2024',
       permissions: {
@@ -117,8 +135,8 @@ const AdminManagement = () => {
       id: '3', 
       fullName: 'Lê Minh Hỗ Trợ', 
       email: 'support@example.com', 
-      role: 'admin' as const, 
-      status: 'active' as const,
+      role: 'admin', 
+      status: 'active',
       createdAt: '12/03/2024',
       lastLogin: '18/04/2024',
       permissions: {
@@ -174,7 +192,7 @@ const AdminManagement = () => {
   };
 
   // Handle edit admin
-  const handleEditAdmin = (admin: UserWithRole) => {
+  const handleEditAdmin = (admin: AdminUser) => {
     setEditingAdmin(admin);
     
     // Set form values
@@ -183,7 +201,7 @@ const AdminManagement = () => {
       email: admin.email || "",
       role: admin.role,
       permissions: {
-        ...(admin as any).permissions
+        ...admin.permissions
       }
     });
     
