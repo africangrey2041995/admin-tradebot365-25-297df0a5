@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const UserProfileSection = () => {
   const { user } = useUser();
@@ -16,6 +17,7 @@ const UserProfileSection = () => {
   const navigate = useNavigate();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
     await signOut();
@@ -43,7 +45,7 @@ const UserProfileSection = () => {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       {/* Theme toggle with tooltip */}
       <Tooltip>
         <TooltipTrigger asChild>
@@ -51,10 +53,10 @@ const UserProfileSection = () => {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+            className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors h-8 w-8"
             aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
           >
-            {resolvedTheme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -65,14 +67,14 @@ const UserProfileSection = () => {
       {/* User dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-200 dark:border-zinc-700">
-            <Avatar className="h-10 w-10">
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full border border-slate-200 dark:border-zinc-700 p-0">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
               <AvatarFallback>{user?.fullName ? getInitials(user.fullName) : "U"}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 mt-1" align="end" forceMount>
+        <DropdownMenuContent className="w-56 mt-1" align={isMobile ? "end" : "start"} forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{user?.fullName}</p>

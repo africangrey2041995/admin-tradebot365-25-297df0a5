@@ -21,42 +21,46 @@ const FixedNavigation = () => {
 
   return (
     <div className="sticky top-0 z-40 h-14 sm:h-16 bg-white dark:bg-zinc-900 shadow-sm border-b border-slate-200 dark:border-zinc-800 flex items-center px-2 sm:px-4">
-      {/* Toggle menu button for mobile - better visibility and sizing */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={toggleSidebar}
-        className={cn(
-          "mr-1 sm:mr-2 block sm:hidden h-9 w-9 p-0",
-          state === "collapsed" ? "text-slate-800 dark:text-white" : "text-slate-800 dark:text-white"
-        )}
-        aria-label="Toggle sidebar"
-      >
-        {state === "collapsed" ? 
-          <Menu className="h-5 w-5" /> : 
-          <X className="h-5 w-5" />
-        }
-      </Button>
+      <div className="flex items-center gap-1">
+        {/* Toggle menu button for mobile */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleSidebar}
+          className={cn(
+            "h-9 w-9 p-0 block sm:hidden",
+            state === "collapsed" ? "text-slate-800 dark:text-white" : "text-slate-800 dark:text-white"
+          )}
+          aria-label="Toggle sidebar"
+        >
+          {state === "collapsed" ? 
+            <Menu className="h-5 w-5" /> : 
+            <X className="h-5 w-5" />
+          }
+        </Button>
+        
+        {/* Move UserProfileSection to the left side */}
+        {!isMobile && <UserProfileSection />}
+      </div>
 
-      {/* Logo for mobile and title for desktop - centered on mobile */}
-      <div className={cn(
-        "flex items-center",
-        isMobile ? "justify-center flex-1" : "mr-2 sm:mr-4"
-      )}>
-        {isMobile ? (
-          <TradeBotLogo size="small" showBetaTag={false} />
-        ) : (
+      {/* Logo centered in the navbar */}
+      <div className="flex-1 flex justify-center items-center">
+        <TradeBotLogo 
+          size={isMobile ? "medium" : "small"} 
+          showBetaTag={false} 
+          className={isMobile ? "scale-110" : ""}
+        />
+      </div>
+
+      {/* Spacer and mobile user profile section on the right */}
+      <div className="flex items-center">
+        {isMobile && <UserProfileSection />}
+        {!isMobile && (
           <h1 className="text-xl font-semibold text-slate-800 dark:text-white hidden md:block truncate max-w-[250px] lg:max-w-none">
             {getTitleFromPathname(location.pathname)}
           </h1>
         )}
       </div>
-
-      {/* Spacer on desktop, none on mobile since logo is centered */}
-      {!isMobile && <div className="flex-1" />}
-
-      {/* User profile section */}
-      <UserProfileSection />
     </div>
   );
 };
