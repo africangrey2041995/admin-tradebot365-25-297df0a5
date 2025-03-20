@@ -124,8 +124,12 @@ export const PremiumBotCard = ({
     switch (exchange.toLowerCase()) {
       case 'coinstart pro':
         return (
-          <div className="flex items-center justify-center w-5 h-5 bg-blue-600 rounded-full">
-            <span className="text-[10px] font-bold text-white">CP</span>
+          <div className="flex items-center justify-center w-5 h-5">
+            <img 
+              src="/lovable-uploads/8107dc0b-de72-421f-b369-5277cc2f8361.png" 
+              alt="Coinstart Pro" 
+              className="w-5 h-5 rounded-full"
+            />
           </div>
         );
       default:
