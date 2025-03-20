@@ -52,6 +52,8 @@ const SidebarNav = () => {
     });
   };
 
+  console.log("Is admin:", isAdmin); // Debug log
+
   return (
     <Sidebar className="border-r-0">
       <SidebarContent className="bg-[#111111] text-white h-full">

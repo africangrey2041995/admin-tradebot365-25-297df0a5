@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,8 @@ const UserProfileSection = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { isAdmin } = useAdmin();
+
+  console.log("Is admin in profile:", isAdmin); // Debug log
 
   const handleSignOut = async () => {
     await signOut();
