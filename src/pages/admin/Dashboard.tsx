@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -154,135 +153,105 @@ const AdminDashboard = () => {
               </div>
             </CardFooter>
           </Card>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Card className="border-zinc-800 bg-zinc-900 text-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="h-5 w-5 text-amber-500" />
-                  <span>Bot mới tạo gần đây</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-zinc-800">
-                      <TableHead className="text-zinc-400">ID</TableHead>
-                      <TableHead className="text-zinc-400">Tên Bot</TableHead>
-                      <TableHead className="text-zinc-400">Chủ sở hữu</TableHead>
-                      <TableHead className="text-zinc-400">Tạo</TableHead>
-                      <TableHead className="text-zinc-400 text-right">Trạng thái</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentBots.map((bot, i) => (
-                      <TableRow key={i} className="border-zinc-800">
-                        <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
-                        <TableCell>{bot.name}</TableCell>
-                        <TableCell>{bot.owner}</TableCell>
-                        <TableCell>{bot.createdAt}</TableCell>
-                        <TableCell className="text-right">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            bot.status === 'Active' 
-                              ? 'bg-green-500/20 text-green-500' 
-                              : 'bg-zinc-500/20 text-zinc-400'
-                          }`}>
-                            {bot.status}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-              <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
-                <div className="flex justify-between w-full">
-                  <span>5 bot mới nhất</span>
-                  <span className="flex items-center text-amber-500 hover:text-amber-400 cursor-pointer">
-                    <span className="mr-1">Xem tất cả bot</span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </CardFooter>
-            </Card>
-
-            <Card className="border-zinc-800 bg-zinc-900 text-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-amber-500" />
-                  <span>Người dùng mới gần đây</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-zinc-800">
-                      <TableHead className="text-zinc-400">ID</TableHead>
-                      <TableHead className="text-zinc-400">Tên</TableHead>
-                      <TableHead className="text-zinc-400">Đăng ký</TableHead>
-                      <TableHead className="text-zinc-400 text-right">Bots</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[
-                      { id: "USER-2405", name: "Nguyễn Văn A", date: "Hôm nay", bots: 2 },
-                      { id: "USER-2404", name: "Trần Thị B", date: "Hôm nay", bots: 0 },
-                      { id: "USER-2402", name: "Lê Minh C", date: "Hôm qua", bots: 1 },
-                      { id: "USER-2401", name: "Phạm Đức D", date: "Hôm qua", bots: 3 },
-                      { id: "USER-2398", name: "Hoàng Thị E", date: "2 ngày trước", bots: 0 }
-                    ].map((user, i) => (
-                      <TableRow key={i} className="border-zinc-800">
-                        <TableCell className="font-mono text-xs text-zinc-400">{user.id}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.date}</TableCell>
-                        <TableCell className="text-right">{user.bots}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-              <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
-                <div className="flex justify-between w-full">
-                  <span>5 người dùng mới nhất</span>
-                  <span className="flex items-center text-amber-500 hover:text-amber-400 cursor-pointer">
-                    <span className="mr-1">Xem tất cả người dùng</span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </CardFooter>
-            </Card>
-          </div>
         </TabsContent>
         
         <TabsContent value="users">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
-              <CardTitle>Người dùng gần đây</CardTitle>
-              <CardDescription className="text-zinc-400">
-                Danh sách người dùng mới đăng ký trong 7 ngày qua.
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-amber-500" />
+                <span>Người dùng mới gần đây</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-zinc-400 text-sm">
-                Nội dung chi tiết về người dùng sẽ được hiển thị ở đây.
-              </div>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-zinc-800">
+                    <TableHead className="text-zinc-400">ID</TableHead>
+                    <TableHead className="text-zinc-400">Tên</TableHead>
+                    <TableHead className="text-zinc-400">Đăng ký</TableHead>
+                    <TableHead className="text-zinc-400 text-right">Bots</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[
+                    { id: "USER-2405", name: "Nguyễn Văn A", date: "Hôm nay", bots: 2 },
+                    { id: "USER-2404", name: "Trần Thị B", date: "Hôm nay", bots: 0 },
+                    { id: "USER-2402", name: "Lê Minh C", date: "Hôm qua", bots: 1 },
+                    { id: "USER-2401", name: "Phạm Đức D", date: "Hôm qua", bots: 3 },
+                    { id: "USER-2398", name: "Hoàng Thị E", date: "2 ngày trước", bots: 0 }
+                  ].map((user, i) => (
+                    <TableRow key={i} className="border-zinc-800">
+                      <TableCell className="font-mono text-xs text-zinc-400">{user.id}</TableCell>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.date}</TableCell>
+                      <TableCell className="text-right">{user.bots}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
+            <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
+              <div className="flex justify-between w-full">
+                <span>5 người dùng mới nhất</span>
+                <span className="flex items-center text-amber-500 hover:text-amber-400 cursor-pointer">
+                  <span className="mr-1">Xem tất cả người dùng</span>
+                  <ArrowUpRight className="h-3 w-3" />
+                </span>
+              </div>
+            </CardFooter>
           </Card>
         </TabsContent>
         
         <TabsContent value="bots">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
-              <CardTitle>Tổng quan Bot</CardTitle>
-              <CardDescription className="text-zinc-400">
-                Thống kê về hoạt động của các bot trong hệ thống.
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-amber-500" />
+                <span>Bot mới tạo gần đây</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-zinc-400 text-sm">
-                Nội dung chi tiết về Bot sẽ được hiển thị ở đây.
-              </div>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-zinc-800">
+                    <TableHead className="text-zinc-400">ID</TableHead>
+                    <TableHead className="text-zinc-400">Tên Bot</TableHead>
+                    <TableHead className="text-zinc-400">Chủ sở hữu</TableHead>
+                    <TableHead className="text-zinc-400">Tạo</TableHead>
+                    <TableHead className="text-zinc-400 text-right">Trạng thái</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentBots.map((bot, i) => (
+                    <TableRow key={i} className="border-zinc-800">
+                      <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
+                      <TableCell>{bot.name}</TableCell>
+                      <TableCell>{bot.owner}</TableCell>
+                      <TableCell>{bot.createdAt}</TableCell>
+                      <TableCell className="text-right">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          bot.status === 'Active' 
+                            ? 'bg-green-500/20 text-green-500' 
+                            : 'bg-zinc-500/20 text-zinc-400'
+                        }`}>
+                          {bot.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
+            <CardFooter className="border-t border-zinc-800 text-zinc-400 text-sm">
+              <div className="flex justify-between w-full">
+                <span>5 bot mới nhất</span>
+                <span className="flex items-center text-amber-500 hover:text-amber-400 cursor-pointer">
+                  <span className="mr-1">Xem tất cả bot</span>
+                  <ArrowUpRight className="h-3 w-3" />
+                </span>
+              </div>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
