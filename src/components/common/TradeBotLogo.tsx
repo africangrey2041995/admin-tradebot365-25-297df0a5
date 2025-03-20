@@ -74,7 +74,6 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({
         width={widthAttr}
         height={heightAttr}
         decoding="sync" // Change to sync for immediate decoding
-        importance="high" // Signal high importance
         style={{ backfaceVisibility: 'hidden' }} // Prevent flickering in some browsers
       />
       {showBetaTag && (
