@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -16,9 +17,11 @@ import {
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const SidebarNav = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   // State for collapsible sections
   const [premiumOpen, setPremiumOpen] = useState(false);
@@ -35,9 +38,16 @@ const SidebarNav = () => {
   return (
     <Sidebar className="border-r-0">
       <SidebarContent className="bg-[#111111] text-white h-full">
-        {/* Logo - Using our new component */}
-        <div className="py-6 px-4 flex justify-center">
-          <TradeBotLogo size="large" />
+        {/* Logo - Using our new component with better contrast and positioning */}
+        <div className={cn(
+          "flex justify-center items-center bg-[#111111]",
+          isMobile ? "py-4" : "py-6 px-4"
+        )}>
+          <TradeBotLogo 
+            size={isMobile ? "medium" : "large"} 
+            className="mx-auto"
+            showBetaTag={true}
+          />
         </div>
         
         <SidebarSeparator className="bg-zinc-800" />
@@ -178,7 +188,7 @@ const CollapsibleNavItem = ({
           )}
         >
           <Icon className="h-5 w-5 mr-3" />
-          <span>{label}</span>
+          <span className="truncate">{label}</span>
         </Link>
         <button
           onClick={(e) => {

@@ -7,26 +7,42 @@ import TradeBotLogo from '@/components/common/TradeBotLogo';
 import UserProfileSection from './UserProfileSection';
 import { useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 const FixedNavigation = () => {
   const { open, setOpen, state } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
 
+  // Toggle sidebar function for better UX
+  const toggleSidebar = () => {
+    setOpen(!open);
+  };
+
   return (
     <div className="sticky top-0 z-40 h-14 sm:h-16 bg-white dark:bg-zinc-900 shadow-sm border-b border-slate-200 dark:border-zinc-800 flex items-center px-2 sm:px-4">
-      {/* Toggle menu button for mobile */}
+      {/* Toggle menu button for mobile - better visibility and sizing */}
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setOpen(!open)}
-        className="mr-1 sm:mr-2 block sm:hidden h-8 w-8 p-0"
+        onClick={toggleSidebar}
+        className={cn(
+          "mr-1 sm:mr-2 block sm:hidden h-9 w-9 p-0",
+          state === "collapsed" ? "text-slate-800 dark:text-white" : "text-slate-800 dark:text-white"
+        )}
+        aria-label="Toggle sidebar"
       >
-        {state === "collapsed" ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
+        {state === "collapsed" ? 
+          <Menu className="h-5 w-5" /> : 
+          <X className="h-5 w-5" />
+        }
       </Button>
 
-      {/* Logo for mobile and title for desktop */}
-      <div className="flex items-center mr-2 sm:mr-4">
+      {/* Logo for mobile and title for desktop - centered on mobile */}
+      <div className={cn(
+        "flex items-center",
+        isMobile ? "justify-center flex-1" : "mr-2 sm:mr-4"
+      )}>
         {isMobile ? (
           <TradeBotLogo size="small" showBetaTag={false} />
         ) : (
@@ -36,7 +52,8 @@ const FixedNavigation = () => {
         )}
       </div>
 
-      <div className="flex-1" />
+      {/* Spacer on desktop, none on mobile since logo is centered */}
+      {!isMobile && <div className="flex-1" />}
 
       {/* User profile section */}
       <UserProfileSection />
