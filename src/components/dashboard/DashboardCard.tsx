@@ -45,21 +45,21 @@ const DashboardCard = ({
       )}
       onClick={onClick}
     >
-      <CardHeader className={`${isMobile ? 'p-3 pb-2' : 'pb-3'}`}>
+      <CardHeader className={`${isMobile ? 'p-2.5 pb-1.5' : 'pb-3'}`}>
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} font-medium text-slate-800 dark:text-white`}>{title}</CardTitle>
-            {description && <CardDescription className="text-slate-500 dark:text-slate-400 mt-1">{description}</CardDescription>}
+          <div className="truncate pr-2">
+            <CardTitle className={`${isMobile ? 'text-sm font-medium' : 'text-lg font-medium'} text-slate-800 dark:text-white truncate`}>{title}</CardTitle>
+            {description && <CardDescription className={`text-slate-500 dark:text-slate-400 mt-0.5 ${isMobile ? 'text-2xs' : 'text-sm'} truncate`}>{description}</CardDescription>}
           </div>
           {icon && (
-            <div className={cn(`${isMobile ? 'p-2' : 'p-3'} rounded-lg`, colorClasses[color])}>
+            <div className={cn(`${isMobile ? 'p-1.5 flex-shrink-0' : 'p-3'} rounded-lg`, colorClasses[color])}>
               {icon}
             </div>
           )}
         </div>
       </CardHeader>
       <CardContent className={`${isMobile ? 'p-0' : 'pb-2'}`}>{children}</CardContent>
-      {footer && <CardFooter className={`${isMobile ? 'p-3 pt-2' : 'pt-3'} border-t border-slate-200 dark:border-zinc-700`}>{footer}</CardFooter>}
+      {footer && <CardFooter className={`${isMobile ? 'p-2.5 pt-1.5' : 'pt-3'} border-t border-slate-200 dark:border-zinc-700`}>{footer}</CardFooter>}
     </Card>
   );
 };

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { CircuitBoard, Users, Bell } from 'lucide-react';
 import DashboardCard from '@/components/dashboard/DashboardCard';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ActivityOverviewProps {
   dashboardStats: {
@@ -23,6 +24,7 @@ interface ActivityOverviewProps {
 
 const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -38,9 +40,11 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
   };
 
   return (
-    <div className="mb-8">
-      <h4 className="text-xl font-medium text-slate-800 dark:text-white mb-4">Tổng Quan Hoạt Động</h4>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className={`${isMobile ? 'mb-4' : 'mb-8'}`}>
+      <h4 className={`${isMobile ? 'text-lg' : 'text-xl'} font-medium text-slate-800 dark:text-white mb-${isMobile ? '2' : '4'}`}>
+        Tổng Quan Hoạt Động
+      </h4>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <motion.div
           custom={0}
           variants={cardVariants}
@@ -51,14 +55,14 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             title="Bot Hoạt Động" 
             description="Hôm nay"
             onClick={() => navigate('/bots')}
-            icon={<CircuitBoard className="h-5 w-5" />}
+            icon={<CircuitBoard className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />}
             color="success"
           >
-            <div className="mt-4">
-              <div className="text-2xl font-semibold">{dashboardStats.todayActiveBots} / {dashboardStats.totalBots}</div>
+            <div className={`mt-${isMobile ? '2' : '4'}`}>
+              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todayActiveBots} / {dashboardStats.totalBots}</div>
               <div className="flex items-center mt-2">
-                <div className="w-full bg-slate-200 dark:bg-zinc-700 rounded-full h-2.5 mt-2">
-                  <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${(dashboardStats.todayActiveBots / dashboardStats.totalBots) * 100}%` }}></div>
+                <div className={`w-full bg-slate-200 dark:bg-zinc-700 rounded-full ${isMobile ? 'h-2' : 'h-2.5'} mt-${isMobile ? '1' : '2'}`}>
+                  <div className="bg-green-500 h-full rounded-full" style={{ width: `${(dashboardStats.todayActiveBots / dashboardStats.totalBots) * 100}%` }}></div>
                 </div>
               </div>
             </div>
@@ -75,14 +79,14 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             title="Tài Khoản Kết Nối" 
             description="Hôm nay"
             onClick={() => navigate('/accounts')}
-            icon={<Users className="h-5 w-5" />}
+            icon={<Users className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />}
             color="primary"
           >
-            <div className="mt-4">
-              <div className="text-2xl font-semibold">{dashboardStats.todayConnectedAccounts} / {dashboardStats.totalAccounts}</div>
+            <div className={`mt-${isMobile ? '2' : '4'}`}>
+              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todayConnectedAccounts} / {dashboardStats.totalAccounts}</div>
               <div className="flex items-center mt-2">
-                <div className="w-full bg-slate-200 dark:bg-zinc-700 rounded-full h-2.5 mt-2">
-                  <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${(dashboardStats.todayConnectedAccounts / dashboardStats.totalAccounts) * 100}%` }}></div>
+                <div className={`w-full bg-slate-200 dark:bg-zinc-700 rounded-full ${isMobile ? 'h-2' : 'h-2.5'} mt-${isMobile ? '1' : '2'}`}>
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: `${(dashboardStats.todayConnectedAccounts / dashboardStats.totalAccounts) * 100}%` }}></div>
                 </div>
               </div>
             </div>
@@ -99,15 +103,15 @@ const ActivityOverview = ({ dashboardStats }: ActivityOverviewProps) => {
             title="Tín Hiệu Mới" 
             description="Hôm nay"
             onClick={() => navigate('/bots')}
-            icon={<Bell className="h-5 w-5" />}
+            icon={<Bell className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />}
             color="info"
           >
-            <div className="mt-4">
-              <div className="text-2xl font-semibold">{dashboardStats.todaySignals}</div>
-              <div className="flex justify-between mt-2 text-sm">
-                <span className="text-green-500">Đã xử lý: {dashboardStats.processedSignals}</span>
-                <span className="text-yellow-500">Đang chờ: {dashboardStats.pendingSignals}</span>
-                <span className="text-red-500">Lỗi: {dashboardStats.failedSignals}</span>
+            <div className={`mt-${isMobile ? '2' : '4'}`}>
+              <div className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>{dashboardStats.todaySignals}</div>
+              <div className={`flex justify-between mt-2 ${isMobile ? 'text-2xs' : 'text-sm'}`}>
+                <span className="text-green-500 truncate">Đã xử lý: {dashboardStats.processedSignals}</span>
+                <span className="text-yellow-500 truncate">Đang chờ: {dashboardStats.pendingSignals}</span>
+                <span className="text-red-500 truncate">Lỗi: {dashboardStats.failedSignals}</span>
               </div>
             </div>
           </DashboardCard>
