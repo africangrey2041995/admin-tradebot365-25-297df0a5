@@ -1,10 +1,26 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
-  RefreshCw,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   User,
   Mail,
   Phone,
@@ -16,8 +32,45 @@ import {
   Download,
   FileText,
   Bot,
-  CreditCard
+  CreditCard,
+  ArrowLeft,
+  Eye,
+  Search
 } from "lucide-react";
+
+// Custom Badge Components for Role and Status
+const RoleBadge = ({ role }: { role: string }) => {
+  return (
+    <Badge
+      className={`
+        ${role === 'admin' ? 'bg-purple-500/20 text-purple-500' : 
+         role === 'mod' ? 'bg-blue-500/20 text-blue-500' : 
+         'bg-zinc-500/20 text-zinc-400'}
+      `}
+    >
+      {role === 'admin' ? 'Admin' : 
+       role === 'mod' ? 'Moderator' : 'User'}
+    </Badge>
+  );
+};
+
+const StatusBadge = ({ status }: { status: string }) => {
+  return (
+    <Badge
+      className={`
+        ${status === 'active' ? 'bg-green-500/20 text-green-500' : 
+         status === 'inactive' ? 'bg-red-500/20 text-red-500' : 
+         status === 'suspended' ? 'bg-amber-500/20 text-amber-500' : 
+         'bg-zinc-500/20 text-zinc-400'}
+      `}
+    >
+      {status === 'active' ? 'Hoạt động' : 
+       status === 'inactive' ? 'Không hoạt động' : 
+       status === 'suspended' ? 'Tạm ngưng' : 
+       status}
+    </Badge>
+  );
+};
 
 const AdminUserDetail = () => {
   const { userId } = useParams<{ userId: string }>();
