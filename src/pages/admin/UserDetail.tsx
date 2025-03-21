@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,6 @@ const UserDetail = () => {
   const [accountsDialogOpen, setAccountsDialogOpen] = useState(false);
   const [selectedAccountsList, setSelectedAccountsList] = useState<any[]>([]);
 
-  // Mock user data (in a real app, this would be fetched from an API)
   const user = {
     id: userId || 'USR-24051',
     name: 'Nguyễn Văn A',
@@ -49,7 +47,6 @@ const UserDetail = () => {
     ]
   };
 
-  // Mock accounts data for the dialog
   const mockAccounts = [
     {
       id: '1',
@@ -79,7 +76,6 @@ const UserDetail = () => {
     }
   ];
 
-  // Subscription tiers with features for reference
   const subscriptionTiers = [
     { 
       id: 'free', 
@@ -106,14 +102,7 @@ const UserDetail = () => {
   };
 
   const handleViewBotDetails = (botId: string, botType: string) => {
-    // Navigate to appropriate bot detail page based on type
-    if (botType === 'custom') {
-      navigate(`/admin/bots/${botId}`);
-    } else if (botType === 'premium') {
-      navigate(`/admin/prebots/${botId}`);
-    } else if (botType === 'prop') {
-      navigate(`/admin/propbots/${botId}`);
-    }
+    navigate(`/admin/user-bots/${botId}`);
   };
 
   const handleViewAccounts = (botId: string, botType: string) => {
@@ -131,7 +120,6 @@ const UserDetail = () => {
     );
   };
 
-  // Counts for the summary cards
   const customBotCount = user.userBots.length;
   const premiumBotCount = user.premiumBots.length;
   const propBotCount = user.propBots.length;
@@ -139,7 +127,6 @@ const UserDetail = () => {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb navigation */}
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -156,7 +143,6 @@ const UserDetail = () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button 
@@ -175,7 +161,6 @@ const UserDetail = () => {
         </div>
       </div>
 
-      {/* User summary card */}
       <Card className="border-zinc-800 bg-zinc-900 text-white">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
@@ -213,7 +198,6 @@ const UserDetail = () => {
         </CardContent>
       </Card>
 
-      {/* Tabs for different sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-zinc-800 border-zinc-700">
           <TabsTrigger value="profile" className="data-[state=active]:bg-zinc-700">
@@ -230,7 +214,6 @@ const UserDetail = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Profile Information Tab */}
         <TabsContent value="profile" className="space-y-6">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
@@ -261,7 +244,6 @@ const UserDetail = () => {
                   <div className="text-sm text-zinc-400">Loại tài khoản</div>
                   <div>{user.accountType}</div>
                 </div>
-                {/* Future feature placeholder for Affiliate */}
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Giới thiệu (Affiliate)</div>
                   <div className="flex items-center gap-2">
@@ -274,9 +256,7 @@ const UserDetail = () => {
           </Card>
         </TabsContent>
 
-        {/* Bots Tab */}
         <TabsContent value="bots" className="space-y-6">
-          {/* Search Bar for Bots */}
           <div className="relative w-full max-w-lg mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
             <Input 
@@ -287,7 +267,6 @@ const UserDetail = () => {
             />
           </div>
 
-          {/* Bot Counts Summary */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
             <Card className="border-zinc-800 bg-zinc-900 text-white">
               <CardContent className="pt-6">
@@ -528,7 +507,6 @@ const UserDetail = () => {
           </Card>
         </TabsContent>
 
-        {/* Subscription Tab */}
         <TabsContent value="subscription" className="space-y-6">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
@@ -609,7 +587,6 @@ const UserDetail = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Accounts Dialog */}
       <Dialog open={accountsDialogOpen} onOpenChange={setAccountsDialogOpen}>
         <DialogContent className="bg-zinc-900 text-white border-zinc-800 sm:max-w-3xl">
           <DialogHeader>
