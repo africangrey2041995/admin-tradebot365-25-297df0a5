@@ -274,10 +274,12 @@ const PropTradingBotDetail = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Card>
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-base flex items-center">
-                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                            Tính năng
-                          </CardTitle>
+                          <div>
+                            <CardTitle className="text-base flex items-center">
+                              <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                              Tính năng
+                            </CardTitle>
+                          </div>
                         </CardHeader>
                         <CardContent>
                           <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
@@ -290,10 +292,12 @@ const PropTradingBotDetail = () => {
                       
                       <Card>
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-base flex items-center">
-                            <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
-                            Yêu cầu
-                          </CardTitle>
+                          <div>
+                            <CardTitle className="text-base flex items-center">
+                              <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
+                              Yêu cầu
+                            </CardTitle>
+                          </div>
                         </CardHeader>
                         <CardContent>
                           <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
@@ -307,10 +311,12 @@ const PropTradingBotDetail = () => {
                     
                     <Card>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-base flex items-center">
-                          <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
-                          Hiệu suất
-                        </CardTitle>
+                        <div>
+                          <CardTitle className="text-base flex items-center">
+                            <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
+                            Hiệu suất
+                          </CardTitle>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -361,7 +367,9 @@ const PropTradingBotDetail = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Đăng ký Bot</CardTitle>
+                <div>
+                  <CardTitle className="text-base">Đăng ký Bot</CardTitle>
+                </div>
               </CardHeader>
               <CardContent>
                 <Button 
@@ -386,7 +394,9 @@ const PropTradingBotDetail = () => {
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                <div>
+                  <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -439,10 +449,12 @@ const PropTradingBotDetail = () => {
           
           <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                <AlertTriangle className="h-5 w-5" />
-                Tín Hiệu Lỗi Cần Khắc Phục
-              </CardTitle>
+              <div>
+                <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                  <AlertTriangle className="h-5 w-5" />
+                  Tín Hiệu Lỗi Cần Khắc Phục
+                </CardTitle>
+              </div>
               <CardDescription className="text-red-600/80 dark:text-red-400/80">
                 Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
               </CardDescription>

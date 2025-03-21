@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -220,7 +221,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild onClick={() => markAsRead(signal.id)}>
-                      <button className="flex items-center">
+                      <button className="flex items-center" type="button">
                         <HelpCircle className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
                         <span className="ml-1 truncate max-w-[150px] text-xs">
                           Details
