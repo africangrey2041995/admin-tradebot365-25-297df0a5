@@ -220,6 +220,7 @@ const PropTradingBotDetail = () => {
           </h1>
         </div>
         
+        {/* Main content area with grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Card>
@@ -355,33 +356,6 @@ const PropTradingBotDetail = () => {
                 </Tabs>
               </CardContent>
             </Card>
-            
-            {/* Error Signals Section - Now moved outside the tabs to its own dedicated section */}
-            <div id="error-signals">
-              {unreadErrorCount > 0 && (
-                <div className="flex items-center gap-2 mb-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 p-3 rounded-md">
-                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  <span className="text-red-700 dark:text-red-400 font-medium">
-                    Có {unreadErrorCount} tín hiệu lỗi mới cần khắc phục
-                  </span>
-                </div>
-              )}
-              
-              <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                    <AlertTriangle className="h-5 w-5" />
-                    Tín Hiệu Lỗi Cần Khắc Phục
-                  </CardTitle>
-                  <CardDescription className="text-red-600/80 dark:text-red-400/80">
-                    Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ErrorSignals botId={botId || ''} />
-                </CardContent>
-              </Card>
-            </div>
           </div>
           
           <div className="space-y-6">
@@ -450,6 +424,33 @@ const PropTradingBotDetail = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        {/* Error Signals Section - Now full width outside of the grid */}
+        <div id="error-signals" className="w-full">
+          {unreadErrorCount > 0 && (
+            <div className="flex items-center gap-2 mb-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 p-3 rounded-md">
+              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <span className="text-red-700 dark:text-red-400 font-medium">
+                Có {unreadErrorCount} tín hiệu lỗi mới cần khắc phục
+              </span>
+            </div>
+          )}
+          
+          <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                <AlertTriangle className="h-5 w-5" />
+                Tín Hiệu Lỗi Cần Khắc Phục
+              </CardTitle>
+              <CardDescription className="text-red-600/80 dark:text-red-400/80">
+                Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ErrorSignals botId={botId || ''} />
+            </CardContent>
+          </Card>
         </div>
       </motion.div>
       
