@@ -19,6 +19,9 @@ interface ErrorSignalsProps {
 interface ExtendedSignal extends TradingViewSignal {
   userId?: string;
   accountName?: string;
+  tradingAccount?: string;
+  tradingAccountType?: string;
+  tradingAccountBalance?: string;
 }
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
@@ -45,7 +48,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'API Authentication Error: Invalid credentials',
             userId: 'user_01HJKLMNOP',
-            accountName: 'Binance Main'
+            accountName: 'Binance Main',
+            tradingAccount: '4056629',
+            tradingAccountType: 'Live',
+            tradingAccountBalance: '$500'
           },
           {
             id: 'CS-20347',
@@ -59,7 +65,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Insufficient balance for operation',
             userId: 'user_01HQRSTUV',
-            accountName: 'Bybit Futures'
+            accountName: 'Bybit Futures',
+            tradingAccount: '65784123',
+            tradingAccountType: 'Demo',
+            tradingAccountBalance: '$10,000'
           },
           {
             id: 'CS-20321',
@@ -73,7 +82,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Exchange rejected order: Market closed',
             userId: 'user_01HWXYZABC',
-            accountName: 'KuCoin Spot'
+            accountName: 'KuCoin Spot',
+            tradingAccount: '98452367',
+            tradingAccountType: 'Live',
+            tradingAccountBalance: '$2,450'
           },
           {
             id: 'CS-20318',
@@ -87,7 +99,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Position not found or already closed',
             userId: 'user_01HDEFGHIJ',
-            accountName: 'OKX Derivatives'
+            accountName: 'OKX Derivatives',
+            tradingAccount: '32541698',
+            tradingAccountType: 'Live',
+            tradingAccountBalance: '$1,750'
           },
         ];
         
@@ -200,9 +215,14 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1">
-                  <CircleDollarSign className="h-3 w-3 text-slate-500" />
-                  {signal.accountName}
+                <div className="text-sm">
+                  <div className="flex items-center gap-1 mb-1">
+                    <CircleDollarSign className="h-3 w-3 text-slate-500" />
+                    {signal.accountName}
+                  </div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">
+                    {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}
+                  </div>
                 </div>
               </TableCell>
               <TableCell className="text-sm text-red-600 dark:text-red-400">
@@ -227,6 +247,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                         <span className="block">Max Lag: {signal.maxLag}</span>
                         <span className="block">User ID: {signal.userId}</span>
                         <span className="block">Account: {signal.accountName}</span>
+                        <span className="block">Trading Account: {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}</span>
                       </div>
                     </TooltipContent>
                   </Tooltip>
