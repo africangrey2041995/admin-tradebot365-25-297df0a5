@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -889,4 +890,54 @@ const PropBotDetail: React.FC = () => {
                 className="w-full"
                 onClick={() => window.open(`/prop-trading-bots/${bot.id}`, '_blank')}
               >
-                Xem trang người
+                Xem trang người dùng
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="accounts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tài khoản đã tích hợp</CardTitle>
+              <CardDescription>
+                Quản lý tài khoản người dùng đã kết nối với bot này
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BotAccountsTable botId={botId || ''} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="logs" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>TB365 Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ TradingView
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TradingViewLogs botId={botId || ''} />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Coinstrat Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ Coinstrat
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CoinstratLogs botId={botId || ''} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default PropBotDetail;
