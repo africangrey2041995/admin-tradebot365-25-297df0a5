@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -25,16 +24,19 @@ import BotProfileTabs from '@/components/bots/BotProfileTabs';
 const AdminPropBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<PremiumBot | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedBot, setEditedBot] = useState<Partial<PremiumBot>>({});
+  
+  const fromUserDetail = location.state?.from === 'userDetail';
+  const userId = location.state?.userId;
 
   useEffect(() => {
     const fetchBotDetails = () => {
       setIsLoading(true);
       
-      // Simulated API call
       setTimeout(() => {
         const mockBot: PremiumBot = {
           id: botId || 'PROP-001',
@@ -63,7 +65,11 @@ const AdminPropBotDetail = () => {
   }, [botId]);
 
   const goBack = () => {
-    navigate('/admin/prop-bots');
+    if (fromUserDetail && userId) {
+      navigate(`/admin/users/${userId}`);
+    } else {
+      navigate('/admin/prop-bots');
+    }
   };
 
   const viewPublicBotProfile = () => {
@@ -82,13 +88,11 @@ const AdminPropBotDetail = () => {
   const handleSaveChanges = () => {
     setIsLoading(true);
     
-    // Simulated API call
     setTimeout(() => {
       setBot(editedBot as PremiumBot);
       setIsEditing(false);
       setIsLoading(false);
       
-      // Show success notification (using alert for simplicity)
       alert('Bot details saved successfully!');
     }, 500);
   };

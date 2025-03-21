@@ -1,18 +1,26 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, User, Bot, CreditCard, ShieldCheck, Search, Eye, ExternalLink } from "lucide-react";
-import { RoleBadge, StatusBadge } from './Users';
+import {
+  RefreshCw,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  Shield,
+  Award,
+  ExternalLink,
+  Download,
+  FileText,
+  Bot,
+  CreditCard
+} from "lucide-react";
 
-const UserDetail = () => {
-  const { userId } = useParams();
+const AdminUserDetail = () => {
+  const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,14 +111,18 @@ const UserDetail = () => {
   };
 
   const handleViewBotDetails = (botId: string, botType: string) => {
-    // Update navigation based on bot type
     if (botType === 'premium') {
-      navigate(`/admin/premium-bots/${botId}`);
+      navigate(`/admin/premium-bots/${botId}`, {
+        state: { from: 'userDetail', userId }
+      });
     } else if (botType === 'prop') {
-      navigate(`/admin/prop-bots/${botId}`);
+      navigate(`/admin/prop-bots/${botId}`, {
+        state: { from: 'userDetail', userId }
+      });
     } else {
-      // Default case for custom user bots
-      navigate(`/admin/user-bots/${botId}`);
+      navigate(`/admin/user-bots/${botId}`, {
+        state: { from: 'userDetail', userId }
+      });
     }
   };
 
@@ -657,4 +669,4 @@ const UserDetail = () => {
   );
 };
 
-export default UserDetail;
+export default AdminUserDetail;

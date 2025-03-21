@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
+  
+  const fromUserDetail = location.state?.from === 'userDetail';
+  const userId = location.state?.userId;
   
   useEffect(() => {
     const fetchBotDetails = () => {
@@ -50,7 +53,11 @@ const AdminUserBotDetail = () => {
   }, [botId]);
 
   const goBack = () => {
-    navigate('/admin/user-bots');
+    if (fromUserDetail && userId) {
+      navigate(`/admin/users/${userId}`);
+    } else {
+      navigate('/admin/user-bots');
+    }
   };
 
   const viewPublicBotProfile = () => {
