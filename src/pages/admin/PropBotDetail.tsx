@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -11,7 +10,6 @@ import ErrorSignals from '@/components/bots/ErrorSignals';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-// Mock data for prop trading bots
 const propBots = [
   {
     id: 'PROP-001',
@@ -63,7 +61,6 @@ const AdminPropBotDetail = () => {
   const [unreadErrorCount, setUnreadErrorCount] = useState(3);
   
   useEffect(() => {
-    // Simulate data loading
     setIsLoading(true);
     setTimeout(() => {
       const foundBot = propBots.find(b => b.id === botId);
@@ -279,17 +276,14 @@ const AdminPropBotDetail = () => {
               </TabsContent>
             </Tabs>
 
-            {/* Error Signals Section */}
             <div className="mt-8">
               <Alert variant="destructive" className="mb-4">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  <div>
-                    <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
-                    <AlertDescription>
-                      There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
-                    </AlertDescription>
-                  </div>
+                <AlertTriangle className="h-5 w-5" />
+                <div>
+                  <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
+                  <AlertDescription>
+                    There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
+                  </AlertDescription>
                 </div>
               </Alert>
 
@@ -329,7 +323,6 @@ const AdminPropBotDetail = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Example error signals */}
                         {[
                           {
                             id: 'ERR-1001',
