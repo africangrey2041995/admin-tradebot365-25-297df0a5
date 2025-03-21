@@ -67,7 +67,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Insufficient balance for operation',
             userId: 'user_01HQRSTUV',
-            botId: 'BOT8932',
+            botId: 'PREMIUM2938',
             tradingAccount: '65784123',
             tradingAccountType: 'Demo',
             tradingAccountBalance: '$10,000'
@@ -84,7 +84,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Exchange rejected order: Market closed',
             userId: 'user_01HWXYZABC',
-            botId: 'BOT2734',
+            botId: 'PROP2734',
             tradingAccount: '98452367',
             tradingAccountType: 'Live',
             tradingAccountBalance: '$2,450'
@@ -155,7 +155,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
 
   const navigateToBotDetail = (botId: string) => {
     if (botId) {
-      // Determine bot type from the main category
+      // Determine bot type from the ID prefix and navigate to the correct detail page
       if (botId.startsWith("BOT")) {
         navigate(`/admin/user-bots/${botId}`);
       } else if (botId.startsWith("PREMIUM")) {
