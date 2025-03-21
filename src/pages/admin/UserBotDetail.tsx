@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,7 +146,6 @@ const AdminUserBotDetail = () => {
                 }`}>
                   {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
                 </div>
-                <div className="text-lg font-bold">ID: {bot.botId}</div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
