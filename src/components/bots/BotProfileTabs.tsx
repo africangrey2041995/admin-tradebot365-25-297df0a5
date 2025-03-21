@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Plus, RefreshCw, AlertTriangle, HelpCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import ErrorSignals from '@/components/bots/ErrorSignals';
+import { Badge } from '@/components/ui/badge';
 
 interface BotProfileTabsProps {
   botId: string;
@@ -15,15 +16,49 @@ interface BotProfileTabsProps {
 }
 
 const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
+  const [unreadErrorCount, setUnreadErrorCount] = useState<number>(0);
+  
+  useEffect(() => {
+    // Simulate fetching unread error count
+    // In a real app, this would come from an API
+    const getUnreadErrorCount = () => {
+      // Mock data for demonstration
+      setUnreadErrorCount(3);
+    };
+    
+    getUnreadErrorCount();
+    
+    // Setup periodic check for new errors
+    const intervalId = setInterval(getUnreadErrorCount, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
+  }, [botId]);
+  
+  const handleErrorTabClick = () => {
+    // Mark errors as read when tab is clicked
+    setUnreadErrorCount(0);
+  };
+
   return (
     <Tabs defaultValue="accounts" className="w-full">
       <TabsList className="mb-4">
         <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
         <TabsTrigger value="logs">Logs From Trading View</TabsTrigger>
         <TabsTrigger value="coinstrat">Log to Coinstrat Pro</TabsTrigger>
-        <TabsTrigger value="errors" className="flex items-center gap-1">
+        <TabsTrigger 
+          value="errors" 
+          className="flex items-center gap-1 relative"
+          onClick={handleErrorTabClick}
+        >
           <AlertTriangle className="h-4 w-4 text-red-500" />
           Error Signals
+          {unreadErrorCount > 0 && (
+            <Badge 
+              className="absolute -top-1.5 -right-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] bg-red-500 text-white rounded-full"
+            >
+              {unreadErrorCount}
+            </Badge>
+          )}
         </TabsTrigger>
       </TabsList>
       
@@ -98,6 +133,11 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
                 <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5" />
                   Error Signals to Fix
+                  {unreadErrorCount > 0 && (
+                    <Badge className="bg-red-500 text-white">
+                      {unreadErrorCount} new
+                    </Badge>
+                  )}
                 </CardTitle>
                 <CardDescription>
                   Critical signals that require your immediate attention

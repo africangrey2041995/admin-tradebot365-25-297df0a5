@@ -2,8 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, HelpCircle } from 'lucide-react';
 import { TradingViewSignal } from '@/types';
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from '@/components/ui/popover';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 interface ErrorSignalsProps {
   botId: string;
@@ -12,6 +23,7 @@ interface ErrorSignalsProps {
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
   const [errorSignals, setErrorSignals] = useState<TradingViewSignal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Mock data loading
@@ -71,12 +83,28 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         ];
         
         setErrorSignals(mockErrorSignals);
+        
+        // Set the first 3 errors as unread for demonstration
+        const newUnreadSet = new Set<string>();
+        mockErrorSignals.slice(0, 3).forEach(signal => {
+          newUnreadSet.add(signal.id);
+        });
+        setUnreadErrors(newUnreadSet);
+        
         setLoading(false);
       }, 800);
     };
 
     fetchErrorSignals();
   }, [botId]);
+
+  const markAsRead = (signalId: string) => {
+    setUnreadErrors(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(signalId);
+      return newSet;
+    });
+  };
 
   const getActionBadge = (action: string) => {
     switch (action) {
@@ -123,8 +151,20 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         </TableHeader>
         <TableBody>
           {errorSignals.map((signal) => (
-            <TableRow key={signal.id} className="border-b border-red-100 dark:border-red-800/20">
-              <TableCell className="font-medium text-red-700 dark:text-red-400">{signal.id}</TableCell>
+            <TableRow 
+              key={signal.id} 
+              className={`border-b border-red-100 dark:border-red-800/20 ${
+                unreadErrors.has(signal.id) ? 'bg-red-50/50 dark:bg-red-900/20' : ''
+              }`}
+            >
+              <TableCell className="font-medium text-red-700 dark:text-red-400">
+                <div className="flex items-center">
+                  {signal.id}
+                  {unreadErrors.has(signal.id) && (
+                    <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                  )}
+                </div>
+              </TableCell>
               <TableCell>{signal.instrument}</TableCell>
               <TableCell>
                 {new Date(signal.timestamp).toLocaleString('en-US', {
@@ -142,8 +182,27 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                   {signal.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-sm text-red-600 dark:text-red-400 max-w-[300px] truncate">
-                {signal.errorMessage}
+              <TableCell className="text-sm text-red-600 dark:text-red-400">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild onClick={() => markAsRead(signal.id)}>
+                      <button className="flex items-center">
+                        <HelpCircle className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
+                        <span className="ml-1 truncate max-w-[150px] text-xs">
+                          Details
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-md p-4 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-800/30 shadow-lg rounded-lg">
+                      <h4 className="font-medium text-red-700 dark:text-red-400 mb-1">Error Details</h4>
+                      <p className="text-red-600 dark:text-red-300 mb-2">{signal.errorMessage}</p>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                        <span className="block">Signal Token: {signal.signalToken}</span>
+                        <span className="block">Max Lag: {signal.maxLag}</span>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </TableCell>
             </TableRow>
           ))}
