@@ -1,22 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  RefreshCw, 
-  Info, 
-  ExternalLink, 
-  ArrowLeft, 
-  Webhook, 
-  Key, 
-  Mail, 
-  Phone, 
-  User, 
-  Activity, 
-  BarChart3, 
-  Clock, 
-  AlertTriangle 
-} from 'lucide-react';
+import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Mail, Phone, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
@@ -240,96 +225,6 @@ const AdminUserBotDetail = () => {
                   </Card>
                 </div>
               )}
-            </CardContent>
-          </Card>
-          
-          {/* New summary card to fill the empty space */}
-          <Card className="border-slate-200 dark:border-slate-700 mt-6">
-            <CardHeader>
-              <CardTitle>Tổng quan hoạt động</CardTitle>
-              <CardDescription>
-                Thống kê hoạt động gần đây của bot này
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800/30">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Tín hiệu</p>
-                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">28</p>
-                      </div>
-                      <Activity className="h-8 w-8 text-blue-500" />
-                    </div>
-                    <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-2">
-                      Trong 7 ngày qua
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-green-600 dark:text-green-400 mb-1">Tỷ lệ thành công</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-300">86%</p>
-                      </div>
-                      <BarChart3 className="h-8 w-8 text-green-500" />
-                    </div>
-                    <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-2">
-                      ↑ 4% so với tuần trước
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800/30 md:col-span-2 lg:col-span-1">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-amber-600 dark:text-amber-400 mb-1">Lỗi</p>
-                        <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">3</p>
-                      </div>
-                      <AlertTriangle className="h-8 w-8 text-amber-500" />
-                    </div>
-                    <p className="text-xs text-amber-600/70 dark:text-amber-400/70 mt-2">
-                      Cần xử lý
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card className="border-slate-200 dark:border-slate-700">
-                <CardContent className="p-4">
-                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-slate-500" />
-                    Hoạt động gần đây
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Tín hiệu mua BTC</span>
-                      </div>
-                      <span className="text-slate-500 text-xs">Hôm nay, 14:23</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span>Tín hiệu bán ETH</span>
-                      </div>
-                      <span className="text-slate-500 text-xs">Hôm nay, 10:15</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span>Kết nối tài khoản mới</span>
-                      </div>
-                      <span className="text-slate-500 text-xs">Hôm qua, 18:45</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </CardContent>
           </Card>
         </div>
