@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -146,6 +145,7 @@ const PropBotDetail: React.FC = () => {
   const [editingFeatures, setEditingFeatures] = useState(false);
   const [editingRequirements, setEditingRequirements] = useState(false);
   const [editingPerformance, setEditingPerformance] = useState(false);
+  const [editingBotInfo, setEditingBotInfo] = useState(false);
   
   const [generalForm, setGeneralForm] = useState({
     name: bot.name,
@@ -167,6 +167,14 @@ const PropBotDetail: React.FC = () => {
   
   const [newFeature, setNewFeature] = useState('');
   const [newRequirement, setNewRequirement] = useState('');
+  
+  const [botInfoForm, setBotInfoForm] = useState({
+    exchange: bot.exchange,
+    type: 'Prop Trading',
+    status: bot.status,
+    id: bot.id,
+    subscribers: bot.subscribers.toString()
+  });
   
   const colorSchemeClasses = {
     blue: {
@@ -276,6 +284,17 @@ const PropBotDetail: React.FC = () => {
     toast.success('Hiệu suất đã được cập nhật');
   };
   
+  const saveBotInfo = () => {
+    setBot({
+      ...bot,
+      exchange: botInfoForm.exchange,
+      status: botInfoForm.status,
+      subscribers: parseInt(botInfoForm.subscribers, 10)
+    });
+    setEditingBotInfo(false);
+    toast.success('Thông tin bot đã được cập nhật');
+  };
+  
   const removeFeature = (index: number) => {
     const updated = [...featuresForm];
     updated.splice(index, 1);
@@ -319,6 +338,17 @@ const PropBotDetail: React.FC = () => {
       performanceAllTime: bot.performanceAllTime
     });
     setEditingPerformance(false);
+  };
+  
+  const cancelBotInfo = () => {
+    setBotInfoForm({
+      exchange: bot.exchange,
+      type: 'Prop Trading',
+      status: bot.status,
+      id: bot.id,
+      subscribers: bot.subscribers.toString()
+    });
+    setEditingBotInfo(false);
   };
   
   return (
@@ -837,52 +867,150 @@ const PropBotDetail: React.FC = () => {
               </Card>
               
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                    <CardDescription>
+                      Thông tin chi tiết về bot
+                    </CardDescription>
+                  </div>
+                  {!editingBotInfo ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingBotInfo(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelBotInfo}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveBotInfo}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Sàn giao dịch
+                  {!editingBotInfo ? (
+                    <>
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Sàn giao dịch
+                        </div>
+                        <div className="mt-1">{bot.exchange}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Loại bot
+                        </div>
+                        <div className="mt-1">Prop Trading</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Trạng thái
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <span className={`inline-block w-2 h-2 rounded-full ${bot.status === 'active' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></span>
+                          {bot.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          ID Bot
+                        </div>
+                        <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
+                          {bot.id}
+                        </code>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Người đăng ký
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <Users className="h-4 w-4 mr-1 text-slate-400" />
+                          {bot.subscribers} người dùng
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="exchange">Sàn giao dịch</Label>
+                        <Input 
+                          id="exchange" 
+                          value={botInfoForm.exchange} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, exchange: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="type">Loại bot</Label>
+                        <Input 
+                          id="type" 
+                          value={botInfoForm.type} 
+                          disabled
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Trạng thái</Label>
+                        <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="botStatus">Bot đang hoạt động</Label>
+                          </div>
+                          <Switch 
+                            id="botStatus" 
+                            checked={botInfoForm.status === 'active'}
+                            onCheckedChange={(checked) => 
+                              setBotInfoForm({
+                                ...botInfoForm, 
+                                status: checked ? 'active' : 'inactive'
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="id">ID Bot</Label>
+                        <Input 
+                          id="id" 
+                          value={botInfoForm.id} 
+                          disabled
+                          className="bg-slate-50 dark:bg-slate-800 text-slate-500"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="subscribers">Số người đăng ký</Label>
+                        <Input 
+                          id="subscribers" 
+                          type="number"
+                          min="0"
+                          value={botInfoForm.subscribers} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, subscribers: e.target.value})}
+                        />
+                      </div>
                     </div>
-                    <div className="mt-1">{bot.exchange}</div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Loại bot
-                    </div>
-                    <div className="mt-1">Prop Trading</div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Trạng thái
-                    </div>
-                    <div className="mt-1 flex items-center">
-                      <span className={`inline-block w-2 h-2 rounded-full ${bot.status === 'active' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></span>
-                      {bot.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      ID Bot
-                    </div>
-                    <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
-                      {bot.id}
-                    </code>
-                  </div>
-                  
-                  <div>
-                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Người đăng ký
-                    </div>
-                    <div className="mt-1 flex items-center">
-                      <Users className="h-4 w-4 mr-1 text-slate-400" />
-                      {bot.subscribers} người dùng
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
               
