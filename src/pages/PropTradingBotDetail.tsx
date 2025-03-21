@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -12,6 +11,7 @@ import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import ErrorSignals from '@/components/bots/ErrorSignals';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 
 const propTradingBots = [
@@ -99,6 +99,8 @@ const PropTradingBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [unreadErrorCount, setUnreadErrorCount] = useState(3);
   
   const bot = propTradingBots.find(b => b.id === botId);
   
@@ -172,6 +174,14 @@ const PropTradingBotDetail = () => {
   
   const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
   
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    if (value === "errors") {
+      setUnreadErrorCount(0);
+    }
+  };
+  
   return (
     <MainLayout title={bot.name}>
       <motion.div
@@ -229,12 +239,28 @@ const PropTradingBotDetail = () => {
                   </Badge>
                 </div>
                 
-                <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="w-full grid grid-cols-4">
+                <Tabs 
+                  defaultValue="overview" 
+                  value={activeTab}
+                  onValueChange={handleTabChange}
+                  className="w-full"
+                >
+                  <TabsList className="w-full grid grid-cols-5">
                     <TabsTrigger value="overview">Tổng quan</TabsTrigger>
                     <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
                     <TabsTrigger value="tb365-logs">TB365 Logs</TabsTrigger>
                     <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
+                    <TabsTrigger value="errors" className="flex items-center gap-1 relative">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      Tín Hiệu Lỗi
+                      {unreadErrorCount > 0 && (
+                        <Badge 
+                          className="absolute -top-1.5 -right-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] bg-red-500 text-white rounded-full"
+                        >
+                          {unreadErrorCount}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="overview" className="pt-4 space-y-6">
@@ -319,6 +345,23 @@ const PropTradingBotDetail = () => {
                   
                   <TabsContent value="coinstrat-logs" className="pt-4">
                     <CoinstratLogs botId={botId || ''} />
+                  </TabsContent>
+                  
+                  <TabsContent value="errors" className="pt-4">
+                    <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                          <AlertTriangle className="h-5 w-5" />
+                          Tín Hiệu Lỗi Cần Khắc Phục
+                        </CardTitle>
+                        <CardDescription className="text-red-600/80 dark:text-red-400/80">
+                          Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ErrorSignals botId={botId || ''} />
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 </Tabs>
               </CardContent>
