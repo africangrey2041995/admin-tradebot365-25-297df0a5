@@ -6,8 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, ArrowLeft, Bot, Check, Edit, RefreshCw, Trash2, AlertCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Bot, Check, Edit, RefreshCw, Trash2, AlertCircle, Info } from 'lucide-react';
 import ErrorSignals from '@/components/bots/ErrorSignals';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 // Mock data for prop trading bots
 const propBots = [
@@ -272,6 +274,122 @@ const AdminPropBotDetail = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {/* Error Signals Section */}
+            <div className="mt-8">
+              <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-5 w-5" />
+                <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
+                <AlertDescription>
+                  There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
+                </AlertDescription>
+              </Alert>
+
+              <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
+                <CardHeader>
+                  <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Error Signals to Fix
+                    {unreadErrorCount > 0 && (
+                      <Badge className="bg-red-500 text-white">
+                        {unreadErrorCount} new
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription className="text-red-600/80 dark:text-red-400/80">
+                    Critical signals that require immediate attention for this prop trading bot
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b bg-red-50/50 dark:bg-red-900/20">
+                          <th className="px-4 py-3 text-left font-medium">ID</th>
+                          <th className="px-4 py-3 text-left font-medium">User ID</th>
+                          <th className="px-4 py-3 text-left font-medium">Account Trading</th>
+                          <th className="px-4 py-3 text-left font-medium">Symbol</th>
+                          <th className="px-4 py-3 text-left font-medium">Date</th>
+                          <th className="px-4 py-3 text-left font-medium">Quantity</th>
+                          <th className="px-4 py-3 text-left font-medium">Action</th>
+                          <th className="px-4 py-3 text-left font-medium">Status</th>
+                          <th className="px-4 py-3 text-left font-medium">Note</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* Example error signals */}
+                        {[
+                          {
+                            id: 'ERR-1001',
+                            userId: 'USER-5432',
+                            account: 'Account #4553 (Prop)',
+                            symbol: 'BTC/USDT',
+                            date: '2023-12-15 14:23',
+                            quantity: '0.5',
+                            action: 'ENTER_LONG',
+                            status: 'Failed',
+                            note: 'Insufficient balance in trading account'
+                          },
+                          {
+                            id: 'ERR-1002',
+                            userId: 'USER-2198',
+                            account: 'Account #7821 (Futures)',
+                            symbol: 'ETH/USDT',
+                            date: '2023-12-14 09:17',
+                            quantity: '5',
+                            action: 'EXIT_SHORT',
+                            status: 'Failed',
+                            note: 'API key expired'
+                          },
+                          {
+                            id: 'ERR-1003',
+                            userId: 'USER-3375',
+                            account: 'Account #9923 (Prop)',
+                            symbol: 'SOL/USDT',
+                            date: '2023-12-13 22:45',
+                            quantity: '20',
+                            action: 'ENTER_SHORT',
+                            status: 'Failed',
+                            note: 'Position already exists'
+                          }
+                        ].map((error, index) => (
+                          <tr key={index} className="border-b hover:bg-red-50/30 dark:hover:bg-red-900/10">
+                            <td className="px-4 py-3">{error.id}</td>
+                            <td className="px-4 py-3">{error.userId}</td>
+                            <td className="px-4 py-3">{error.account}</td>
+                            <td className="px-4 py-3">{error.symbol}</td>
+                            <td className="px-4 py-3">{error.date}</td>
+                            <td className="px-4 py-3">{error.quantity}</td>
+                            <td className="px-4 py-3">
+                              <Badge variant="outline" className="border-red-200 text-red-600">
+                                {error.action}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3">
+                              <Badge className="bg-red-100 text-red-700">
+                                {error.status}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Info className="h-4 w-4 text-red-500 cursor-pointer" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{error.note}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </CardContent>
         </Card>
       </div>
