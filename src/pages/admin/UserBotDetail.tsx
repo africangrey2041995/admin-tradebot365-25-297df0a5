@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import ErrorSignals from '@/components/bots/ErrorSignals';
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -165,17 +163,10 @@ const AdminUserBotDetail = () => {
           </div>
 
           <Tabs defaultValue="accounts">
-            <TabsList className="grid grid-cols-4 mb-6">
+            <TabsList className="grid grid-cols-3 mb-6">
               <TabsTrigger value="accounts" className="text-white">Tài khoản (12)</TabsTrigger>
               <TabsTrigger value="trading-view" className="text-white">TradingView Logs</TabsTrigger>
               <TabsTrigger value="coinstart" className="text-white">Coinstart Logs</TabsTrigger>
-              <TabsTrigger value="error-signals" className="text-white flex items-center gap-1 relative">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                Error Signals
-                <Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] bg-red-500 text-white rounded-full">
-                  3
-                </Badge>
-              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="accounts">
@@ -228,7 +219,7 @@ const AdminUserBotDetail = () => {
                 <CardHeader>
                   <CardTitle className="text-white">TradingView Signal Logs</CardTitle>
                   <CardDescription className="text-zinc-400">
-                    Lịch sử tín hiệu giao d��ch từ TradingView
+                    Lịch sử tín hiệu giao dịch từ TradingView
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -322,25 +313,6 @@ const AdminUserBotDetail = () => {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="error-signals">
-              <Card className="border-zinc-800 bg-zinc-900">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                    Tín Hiệu Lỗi Cần Khắc Phục
-                  </CardTitle>
-                  <CardDescription className="text-zinc-400">
-                    Các tín hiệu giao dịch gặp lỗi cần được xử lý
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <ErrorSignals botId={botId || ''} />
                   </div>
                 </CardContent>
               </Card>
