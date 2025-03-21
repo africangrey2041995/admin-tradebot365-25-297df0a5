@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2 } from 'lucide-react';
+import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import ErrorSignals from '@/components/bots/ErrorSignals';
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -13,6 +16,7 @@ const AdminUserBotDetail = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
+  const [unreadErrorCount, setUnreadErrorCount] = useState(3);
   
   const fromUserDetail = location.state?.from === 'userDetail';
   const userId = location.state?.userId;
@@ -50,6 +54,13 @@ const AdminUserBotDetail = () => {
     };
     
     fetchBotDetails();
+
+    // Simulate fetching unread error count
+    const getUnreadErrorCount = () => {
+      setUnreadErrorCount(3);
+    };
+    
+    getUnreadErrorCount();
   }, [botId]);
 
   const goBack = () => {
@@ -163,10 +174,21 @@ const AdminUserBotDetail = () => {
           </div>
 
           <Tabs defaultValue="accounts">
-            <TabsList className="grid grid-cols-3 mb-6">
+            <TabsList className="grid grid-cols-4 mb-6">
               <TabsTrigger value="accounts" className="text-white">Tài khoản (12)</TabsTrigger>
               <TabsTrigger value="trading-view" className="text-white">TradingView Logs</TabsTrigger>
               <TabsTrigger value="coinstart" className="text-white">Coinstart Logs</TabsTrigger>
+              <TabsTrigger value="errors" className="text-white flex items-center gap-1 relative">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+                Errors
+                {unreadErrorCount > 0 && (
+                  <Badge 
+                    className="absolute -top-1.5 -right-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] bg-red-500 text-white rounded-full"
+                  >
+                    {unreadErrorCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="accounts">
@@ -314,6 +336,28 @@ const AdminUserBotDetail = () => {
                       </tbody>
                     </table>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="errors">
+              <Card className="border-red-900/10 bg-red-50/10 border-red-800/30">
+                <CardHeader>
+                  <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Error Signals to Fix
+                    {unreadErrorCount > 0 && (
+                      <Badge className="bg-red-500 text-white">
+                        {unreadErrorCount} new
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription className="text-red-600/80 dark:text-red-400/80">
+                    Critical signals that require your immediate attention
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ErrorSignals botId={botId || ''} />
                 </CardContent>
               </Card>
             </TabsContent>

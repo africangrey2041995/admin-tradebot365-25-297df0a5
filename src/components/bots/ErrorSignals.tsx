@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -159,13 +160,13 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         <TableHeader>
           <TableRow className="bg-red-50 dark:bg-red-900/20">
             <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
           </TableRow>
         </TableHeader>
@@ -185,6 +186,20 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                   )}
                 </div>
               </TableCell>
+              <TableCell className="font-mono text-xs">
+                <div className="flex items-center gap-1">
+                  <User className="h-3 w-3 text-slate-500" />
+                  {signal.userId}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">
+                  <div className="flex items-center gap-1 mb-1">
+                    <CircleDollarSign className="h-3 w-3 text-slate-500" />
+                    {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}
+                  </div>
+                </div>
+              </TableCell>
               <TableCell>{signal.instrument}</TableCell>
               <TableCell>
                 {new Date(signal.timestamp).toLocaleString('en-US', {
@@ -201,20 +216,6 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                 <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400">
                   {signal.status}
                 </Badge>
-              </TableCell>
-              <TableCell className="font-mono text-xs">
-                <div className="flex items-center gap-1">
-                  <User className="h-3 w-3 text-slate-500" />
-                  {signal.userId}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="text-sm">
-                  <div className="flex items-center gap-1 mb-1">
-                    <CircleDollarSign className="h-3 w-3 text-slate-500" />
-                    {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}
-                  </div>
-                </div>
               </TableCell>
               <TableCell className="text-sm text-red-600 dark:text-red-400">
                 <TooltipProvider>
