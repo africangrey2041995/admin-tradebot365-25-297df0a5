@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key } from 'lucide-react';
+import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Mail, Phone, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
@@ -14,6 +14,13 @@ const AdminUserBotDetail = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    status: 'active' | 'inactive' | 'suspended';
+  } | null>(null);
   
   const fromUserDetail = location.state?.from === 'userDetail';
   const userId = location.state?.userId;
@@ -22,6 +29,7 @@ const AdminUserBotDetail = () => {
     const fetchBotDetails = () => {
       setIsLoading(true);
       
+      // Mock data - in a real app, this would be an API call
       setTimeout(() => {
         const mockBot: BotCardProps = {
           title: botId === 'BOT-3201' ? 'BTC Long' : 
@@ -45,13 +53,23 @@ const AdminUserBotDetail = () => {
           status: 'Active',
         };
         
+        // Mock user info
+        const mockUserInfo = {
+          id: userId || 'USR001',
+          name: 'Nguyễn Văn A',
+          email: 'dbtcompany17@gmail.com',
+          phone: '+84 912 345 678',
+          status: 'active' as const,
+        };
+        
         setBot(mockBot);
+        setUserInfo(mockUserInfo);
         setIsLoading(false);
       }, 500);
     };
     
     fetchBotDetails();
-  }, [botId]);
+  }, [botId, userId]);
 
   const goBack = () => {
     if (fromUserDetail && userId) {
@@ -68,6 +86,12 @@ const AdminUserBotDetail = () => {
 
   const viewPublicBotProfile = () => {
     window.open(`/bots/${botId}`, '_blank');
+  };
+
+  const viewUserDetails = () => {
+    if (userInfo) {
+      navigate(`/admin/users/${userInfo.id}`);
+    }
   };
 
   if (isLoading) {
@@ -109,68 +133,154 @@ const AdminUserBotDetail = () => {
         </Button>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle className="text-xl text-white">{bot.title}</CardTitle>
-            <CardDescription className="text-zinc-400">{bot.subtitle}</CardDescription>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              bot.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-            }`}>
-              {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
-            </div>
-            <div className="text-lg font-bold text-white">ID: {bot.botId}</div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-            <div className="lg:col-span-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5">
+          <Card className="border-zinc-800 bg-zinc-900">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-xl text-white">{bot.title}</CardTitle>
+                <CardDescription className="text-zinc-400">{bot.subtitle}</CardDescription>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  bot.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                }`}>
+                  {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
+                </div>
+                <div className="text-lg font-bold text-white">ID: {bot.botId}</div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
               <BotInfoCard bot={bot} />
-            </div>
+            </CardContent>
+          </Card>
+        </div>
             
-            <div className="lg:col-span-7">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-white">Thông tin Tích hợp</CardTitle>
-                  <CardDescription className="text-zinc-400">
-                    Thông tin tích hợp API của bot này (chỉ hiển thị cho Admin)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
-                      <Webhook className="h-4 w-4 text-primary" />
-                      Webhook URL
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
-                        https://api.tradebot365.com/webhook/{botId?.toLowerCase()}
+        <div className="lg:col-span-7">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-white">Thông tin Người Dùng</CardTitle>
+              <CardDescription className="text-zinc-400">
+                Thông tin về người dùng sở hữu bot này
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {userInfo && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="text-xs text-zinc-400">Người dùng ID</p>
+                          <Button 
+                            variant="link" 
+                            className="p-0 h-auto font-medium text-primary"
+                            onClick={viewUserDetails}
+                          >
+                            {userInfo.id}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div>
-                    <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
-                      <Key className="h-4 w-4 text-red-400" />
-                      Signal Token <span className="text-xs text-red-400">(Đã ẩn)</span>
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
-                        ************************
+                  <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-emerald-500" />
+                        <div>
+                          <p className="text-xs text-zinc-400">Tên</p>
+                          <p className="font-medium text-white">{userInfo.name}</p>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-xs text-zinc-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <p className="text-xs text-zinc-400">Email</p>
+                          <p className="font-medium text-white">{userInfo.email}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-yellow-500" />
+                        <div>
+                          <p className="text-xs text-zinc-400">Số điện thoại</p>
+                          <p className="font-medium text-white">{userInfo.phone}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-zinc-800 border-zinc-700 md:col-span-2">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-3 w-3 rounded-full ${
+                          userInfo.status === 'active' ? 'bg-green-500' : 
+                          userInfo.status === 'inactive' ? 'bg-yellow-500' : 'bg-red-500'
+                        }`} />
+                        <div>
+                          <p className="text-xs text-zinc-400">Trạng thái</p>
+                          <p className="font-medium text-white">
+                            {userInfo.status === 'active' ? 'Hoạt động' : 
+                             userInfo.status === 'inactive' ? 'Không hoạt động' : 'Đã khóa'}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Card className="border-zinc-800 bg-zinc-900">
+        <CardHeader>
+          <CardTitle className="text-white">Thông tin Tích hợp</CardTitle>
+          <CardDescription className="text-zinc-400">
+            Thông tin tích hợp API của bot này (chỉ hiển thị cho Admin)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+              <Webhook className="h-4 w-4 text-primary" />
+              Webhook URL
+            </h3>
+            <div className="flex items-center gap-2">
+              <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
+                https://api.tradebot365.com/webhook/{botId?.toLowerCase()}
+              </div>
             </div>
           </div>
-
-          <BotProfileTabs botId={botId || ''} onAddAccount={handleAddAccount} />
+          
+          <div>
+            <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+              <Key className="h-4 w-4 text-red-400" />
+              Signal Token <span className="text-xs text-red-400">(Đã ẩn)</span>
+            </h3>
+            <div className="flex items-center gap-2">
+              <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
+                ************************
+              </div>
+            </div>
+            <p className="text-xs text-zinc-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>
+          </div>
         </CardContent>
       </Card>
+
+      <BotProfileTabs botId={botId || ''} onAddAccount={handleAddAccount} />
     </div>
   );
 };
