@@ -135,19 +135,6 @@ const AdminUserBotDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5">
           <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-xl">{bot.title}</CardTitle>
-                <CardDescription>{bot.subtitle}</CardDescription>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  bot.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
-                  {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
-                </div>
-              </div>
-            </CardHeader>
             <CardContent className="pt-6">
               <BotInfoCard bot={bot} />
             </CardContent>
