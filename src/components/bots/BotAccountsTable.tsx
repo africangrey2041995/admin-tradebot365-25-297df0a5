@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2, PencilIcon } from 'lucide-react';
+import { Eye, Trash2, PencilIcon, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Account, ConnectionStatus } from '@/types';
 
@@ -24,6 +24,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
         const mockAccounts: Account[] = [
           {
             id: '1',
+            userId: 'USR001',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',
@@ -37,6 +38,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
           },
           {
             id: '2',
+            userId: 'USR002',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',
@@ -50,6 +52,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
           },
           {
             id: '3',
+            userId: 'USR003',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',
@@ -72,6 +75,10 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
 
   const handleViewAccount = (accountId: string) => {
     navigate(`/accounts/${accountId}`);
+  };
+
+  const handleViewUser = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   const getStatusBadge = (status: ConnectionStatus) => {
@@ -105,6 +112,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
       <TableHeader>
         <TableRow>
           <TableHead>Account Profile</TableHead>
+          <TableHead>User ID</TableHead>
           <TableHead>Api</TableHead>
           <TableHead>Account Trading</TableHead>
           <TableHead>Actions</TableHead>
@@ -118,6 +126,16 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
                 <div className="font-medium">{account.userAccount}</div>
                 <div className="text-xs text-muted-foreground">{account.userEmail}</div>
               </div>
+            </TableCell>
+            <TableCell>
+              <Button 
+                variant="link" 
+                className="p-0 h-auto font-medium text-primary flex items-center gap-1"
+                onClick={() => handleViewUser(account.userId || '')}
+              >
+                <User className="h-3 w-3" />
+                {account.userId}
+              </Button>
             </TableCell>
             <TableCell>
               <div className="font-medium">{account.apiName}</div>

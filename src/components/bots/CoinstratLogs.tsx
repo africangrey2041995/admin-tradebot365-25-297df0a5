@@ -3,21 +3,25 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types';
-import { Check, X, Info, Eye, List } from 'lucide-react';
+import { Check, X, Info, Eye, List, User } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import { 
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useNavigate } from 'react-router-dom';
+import { ExtendedSignal } from './error-signals/types';
 
 interface CoinstratLogsProps {
   botId: string;
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
+  const navigate = useNavigate();
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState<CoinstratSignal | null>(null);
@@ -42,8 +46,18 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             amount: '1.5',
             status: 'Processed',
             processedAccounts: [
-              { accountId: 'acc001', name: 'Account 1', timestamp: new Date().toISOString() },
-              { accountId: 'acc002', name: 'Account 2', timestamp: new Date().toISOString() }
+              { 
+                accountId: 'acc001', 
+                userId: 'USR001',
+                name: '24958130 | Live | $500', 
+                timestamp: new Date().toISOString() 
+              },
+              { 
+                accountId: 'acc002', 
+                userId: 'USR002',
+                name: '24958131 | Live | $500', 
+                timestamp: new Date().toISOString() 
+              }
             ],
             failedAccounts: []
           },
@@ -59,12 +73,18 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             amount: '2.3',
             status: 'Sent',
             processedAccounts: [
-              { accountId: 'acc001', name: 'Account 1', timestamp: new Date(Date.now() - 3600000).toISOString() }
+              { 
+                accountId: 'acc001', 
+                userId: 'USR001',
+                name: '24958130 | Live | $500', 
+                timestamp: new Date(Date.now() - 3600000).toISOString() 
+              }
             ],
             failedAccounts: [
               { 
                 accountId: 'acc003', 
-                name: 'Account 3', 
+                userId: 'USR003',
+                name: '24958132 | Demo | $10000', 
                 timestamp: new Date(Date.now() - 3590000).toISOString(),
                 reason: 'Connection timeout'
               }
@@ -85,13 +105,15 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
             failedAccounts: [
               { 
                 accountId: 'acc001', 
-                name: 'Account 1', 
+                userId: 'USR001',
+                name: '24958130 | Live | $500', 
                 timestamp: new Date(Date.now() - 7200000).toISOString(),
                 reason: 'Invalid account configuration'
               },
               { 
                 accountId: 'acc002', 
-                name: 'Account 2', 
+                userId: 'USR002',
+                name: '24958131 | Live | $500', 
                 timestamp: new Date(Date.now() - 7190000).toISOString(),
                 reason: 'Invalid account configuration'
               }
@@ -151,6 +173,10 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
   const showAccountsDialog = (log: CoinstratSignal) => {
     setSelectedLog(log);
     setAccountsDialogOpen(true);
+  };
+
+  const handleViewUser = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   if (loading) {
@@ -267,6 +293,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Name</TableHead>
+                          <TableHead>User ID</TableHead>
                           <TableHead>Time</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -274,6 +301,16 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                         {selectedLog.processedAccounts.map((account) => (
                           <TableRow key={account.accountId}>
                             <TableCell className="font-medium">{account.name}</TableCell>
+                            <TableCell>
+                              <Button 
+                                variant="link" 
+                                className="p-0 h-auto font-medium text-primary flex items-center gap-1"
+                                onClick={() => handleViewUser(account.userId || '')}
+                              >
+                                <User className="h-3 w-3" />
+                                {account.userId}
+                              </Button>
+                            </TableCell>
                             <TableCell>
                               {new Date(account.timestamp).toLocaleString('en-US', {
                                 day: '2-digit',
@@ -301,6 +338,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Name</TableHead>
+                          <TableHead>User ID</TableHead>
                           <TableHead>Time</TableHead>
                           <TableHead>Reason</TableHead>
                         </TableRow>
@@ -309,6 +347,16 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                         {selectedLog.failedAccounts.map((account) => (
                           <TableRow key={account.accountId}>
                             <TableCell className="font-medium">{account.name}</TableCell>
+                            <TableCell>
+                              <Button 
+                                variant="link" 
+                                className="p-0 h-auto font-medium text-primary flex items-center gap-1"
+                                onClick={() => handleViewUser(account.userId || '')}
+                              >
+                                <User className="h-3 w-3" />
+                                {account.userId}
+                              </Button>
+                            </TableCell>
                             <TableCell>
                               {new Date(account.timestamp).toLocaleString('en-US', {
                                 day: '2-digit',

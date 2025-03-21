@@ -13,3 +13,12 @@ export interface ExtendedSignal extends TradingViewSignal {
 export interface ErrorSignalsProps {
   botId: string;
 }
+
+// Add userId to account objects in CoinstratSignal
+export interface AccountWithUser {
+  accountId: string;
+  userId?: string;
+  name: string;
+  timestamp: string;
+  reason?: string;
+}
