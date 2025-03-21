@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus, Eye } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -13,10 +13,12 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from 'react-router-dom';
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   const bots = [
     { 
@@ -76,6 +78,10 @@ const AdminPremiumBots = () => {
     } else {
       setFilterStatus(null);
     }
+  };
+
+  const viewBotDetail = (botId: string) => {
+    navigate(`/admin/premium-bots/${botId}`);
   };
 
   const filteredBots = bots
@@ -163,6 +169,10 @@ const AdminPremiumBots = () => {
                           <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                             <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-zinc-800" />
+                            <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => viewBotDetail(bot.id)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span>Xem chi tiết</span>
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="focus:bg-zinc-800">
                               <Settings className="mr-2 h-4 w-4" />
                               <span>Chỉnh sửa</span>

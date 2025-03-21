@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus, Eye } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -13,51 +13,45 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from 'react-router-dom';
 
 const AdminPropBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   const bots = [
     { 
       id: 'PROP-001', 
-      name: 'Prop Trading Alpha', 
+      name: 'Prop Trading Master', 
       status: 'active',
-      users: 28,
-      profit: '+21.5%',
+      users: 12,
+      profit: '+22.5%',
       createdDate: '05/01/2024'
     },
     { 
       id: 'PROP-002', 
-      name: 'Prop Trading Beta', 
+      name: 'Prop FTMO Winner', 
       status: 'active',
-      users: 19,
-      profit: '+16.8%',
-      createdDate: '12/02/2024'
+      users: 8,
+      profit: '+17.3%',
+      createdDate: '20/02/2024'
     },
     { 
       id: 'PROP-003', 
-      name: 'Prop Arbitrage Master', 
-      status: 'inactive',
-      users: 7,
-      profit: '-1.2%',
-      createdDate: '20/03/2024'
+      name: 'Prop Trading Elite', 
+      status: 'maintenance',
+      users: 5,
+      profit: '+9.1%',
+      createdDate: '15/03/2024'
     },
     { 
       id: 'PROP-004', 
-      name: 'Prop Trading Elite', 
-      status: 'active',
-      users: 34,
-      profit: '+11.7%',
-      createdDate: '08/12/2023'
-    },
-    { 
-      id: 'PROP-005', 
-      name: 'Prop Trading Gamma', 
-      status: 'maintenance',
-      users: 15,
-      profit: '+8.9%',
-      createdDate: '25/02/2024'
+      name: 'Prop 100K Challenge', 
+      status: 'inactive',
+      users: 0,
+      profit: '0.0%',
+      createdDate: '05/04/2024'
     }
   ];
 
@@ -78,6 +72,10 @@ const AdminPropBots = () => {
     }
   };
 
+  const viewBotDetail = (botId: string) => {
+    navigate(`/admin/prop-bots/${botId}`);
+  };
+
   const filteredBots = bots
     .filter(bot => 
       (searchTerm === '' || 
@@ -92,9 +90,9 @@ const AdminPropBots = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">Quản lý Prop Trading Bots</h1>
-        <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
           <Plus className="h-4 w-4 mr-2" />
-          Thêm Prop Trading Bot mới
+          Thêm Prop Bot mới
         </Button>
       </div>
 
@@ -163,6 +161,10 @@ const AdminPropBots = () => {
                           <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                             <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-zinc-800" />
+                            <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => viewBotDetail(bot.id)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span>Xem chi tiết</span>
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="focus:bg-zinc-800">
                               <Settings className="mr-2 h-4 w-4" />
                               <span>Chỉnh sửa</span>

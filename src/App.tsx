@@ -39,7 +39,9 @@ import AdminEmail from "./pages/admin/Email";
 import AdminSettings from "./pages/admin/Settings";
 import AdminManagement from "./pages/admin/AdminManagement";
 import AdminPremiumBots from "./pages/admin/PremiumBots";
+import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
 import AdminPropBots from "./pages/admin/PropBots";
+import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
 
@@ -107,11 +109,10 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  {/* Removed duplicate route for bots/:botId */}
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
-                  <Route path="premium-bots/:botId" element={<AdminUserBotDetail />} />
+                  <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
-                  <Route path="prop-bots/:botId" element={<AdminUserBotDetail />} />
+                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
                   <Route path="user-bots" element={<AdminUserBots />} />
                   <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="database" element={<AdminDatabase />} />
