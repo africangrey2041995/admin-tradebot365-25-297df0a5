@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -102,7 +103,15 @@ const UserDetail = () => {
   };
 
   const handleViewBotDetails = (botId: string, botType: string) => {
-    navigate(`/admin/user-bots/${botId}`);
+    // Update navigation based on bot type
+    if (botType === 'premium') {
+      navigate(`/admin/premium-bots/${botId}`);
+    } else if (botType === 'prop') {
+      navigate(`/admin/prop-bots/${botId}`);
+    } else {
+      // Default case for custom user bots
+      navigate(`/admin/user-bots/${botId}`);
+    }
   };
 
   const handleViewAccounts = (botId: string, botType: string) => {
