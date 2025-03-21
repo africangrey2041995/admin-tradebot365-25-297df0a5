@@ -55,7 +55,6 @@ import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
-// Placeholder data for prop trading bots
 const propTradingBots = [
   {
     id: 'ptb-001',
@@ -141,17 +140,14 @@ const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   
-  // Find the bot or use a default one if not found
   const initialBot = propTradingBots.find(b => b.id === botId) || propTradingBots[0];
   const [bot, setBot] = useState(initialBot);
   
-  // Editing state for each section
   const [editingGeneral, setEditingGeneral] = useState(false);
   const [editingFeatures, setEditingFeatures] = useState(false);
   const [editingRequirements, setEditingRequirements] = useState(false);
   const [editingPerformance, setEditingPerformance] = useState(false);
   
-  // Form state
   const [generalForm, setGeneralForm] = useState({
     name: bot.name,
     description: bot.description,
@@ -170,11 +166,9 @@ const PropBotDetail: React.FC = () => {
     performanceAllTime: bot.performanceAllTime
   });
   
-  // For adding new items
   const [newFeature, setNewFeature] = useState('');
   const [newRequirement, setNewRequirement] = useState('');
   
-  // Handle color scheme classes
   const colorSchemeClasses = {
     blue: {
       badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400',
@@ -226,7 +220,6 @@ const PropBotDetail: React.FC = () => {
   const riskColor = getColorByRisk(bot.risk);
   const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
   
-  // Save handlers
   const saveGeneralInfo = () => {
     setBot({
       ...bot,
@@ -243,7 +236,6 @@ const PropBotDetail: React.FC = () => {
   };
   
   const saveFeatures = () => {
-    // Add the new feature if it's not empty
     const updatedFeatures = [...featuresForm];
     if (newFeature.trim()) {
       updatedFeatures.push(newFeature.trim());
@@ -260,7 +252,6 @@ const PropBotDetail: React.FC = () => {
   };
   
   const saveRequirements = () => {
-    // Add the new requirement if it's not empty
     const updatedRequirements = [...requirementsForm];
     if (newRequirement.trim()) {
       updatedRequirements.push(newRequirement.trim());
@@ -953,3 +944,4 @@ const PropBotDetail: React.FC = () => {
 };
 
 export default PropBotDetail;
+
