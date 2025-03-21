@@ -17,6 +17,7 @@ interface BotProfileTabsProps {
 
 const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
   const [unreadErrorCount, setUnreadErrorCount] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<string>("accounts");
   
   useEffect(() => {
     // Simulate fetching unread error count
@@ -34,13 +35,22 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
     return () => clearInterval(intervalId);
   }, [botId]);
   
-  const handleErrorTabClick = () => {
-    // Mark errors as read when tab is clicked
-    setUnreadErrorCount(0);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    // Mark errors as read when error tab is clicked
+    if (value === "errors") {
+      setUnreadErrorCount(0);
+    }
   };
 
   return (
-    <Tabs defaultValue="accounts" className="w-full">
+    <Tabs 
+      defaultValue="accounts" 
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="w-full"
+    >
       <TabsList className="mb-4">
         <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
         <TabsTrigger value="logs">Logs From Trading View</TabsTrigger>
@@ -48,7 +58,6 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
         <TabsTrigger 
           value="errors" 
           className="flex items-center gap-1 relative"
-          onClick={handleErrorTabClick}
         >
           <AlertTriangle className="h-4 w-4 text-red-500" />
           Error Signals

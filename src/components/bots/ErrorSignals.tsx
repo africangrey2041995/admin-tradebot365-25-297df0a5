@@ -5,11 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, HelpCircle } from 'lucide-react';
 import { TradingViewSignal } from '@/types';
 import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from '@/components/ui/popover';
-import { 
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -193,7 +188,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                         </span>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-md p-4 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-800/30 shadow-lg rounded-lg">
+                    <TooltipContent 
+                      side="right" 
+                      className="max-w-md p-4 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-800/30 shadow-lg rounded-lg"
+                    >
                       <h4 className="font-medium text-red-700 dark:text-red-400 mb-1">Error Details</h4>
                       <p className="text-red-600 dark:text-red-300 mb-2">{signal.errorMessage}</p>
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
