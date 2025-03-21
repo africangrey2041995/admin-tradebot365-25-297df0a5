@@ -14,12 +14,14 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from 'react-router-dom';
 
 const AdminLogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState('all');
   const [botTypeFilter, setBotTypeFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
+  const navigate = useNavigate();
 
   // Sample log data
   const logs = [
@@ -143,6 +145,23 @@ const AdminLogs = () => {
     alert('Đã làm mới nhật ký hệ thống');
   };
 
+  const navigateToBotDetail = (botId: string | null, botType: string) => {
+    if (!botId) return;
+    
+    let route = '';
+    if (botType === 'user') {
+      route = `/admin/user-bots/${botId}`;
+    } else if (botType === 'premium') {
+      route = `/admin/premium-bots/${botId}`;
+    } else if (botType === 'prop') {
+      route = `/admin/prop-bots/${botId}`;
+    }
+    
+    if (route) {
+      navigate(route);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -221,6 +240,7 @@ const AdminLogs = () => {
                 <TableRow className="border-zinc-800">
                   <TableHead className="text-zinc-400 w-[100px]">Mức độ</TableHead>
                   <TableHead className="text-zinc-400">Thông điệp</TableHead>
+                  <TableHead className="text-zinc-400 w-[100px]">Bot ID</TableHead>
                   <TableHead className="text-zinc-400 w-[130px]">Loại Bot</TableHead>
                   <TableHead className="text-zinc-400 w-[130px]">Nguồn</TableHead>
                   <TableHead className="text-zinc-400 w-[180px]">Thời gian</TableHead>
@@ -235,8 +255,18 @@ const AdminLogs = () => {
                       </TableCell>
                       <TableCell className="text-sm">
                         {log.message}
-                        {log.botId && (
-                          <Badge className="ml-2 bg-zinc-800 text-zinc-400">{log.botId}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {log.botId ? (
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto font-mono text-amber-500 hover:text-amber-400"
+                            onClick={() => navigateToBotDetail(log.botId, log.botType)}
+                          >
+                            {log.botId}
+                          </Button>
+                        ) : (
+                          <span className="text-zinc-500">-</span>
                         )}
                       </TableCell>
                       <TableCell className="text-sm">
@@ -248,7 +278,7 @@ const AdminLogs = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-zinc-500">
+                    <TableCell colSpan={6} className="h-24 text-center text-zinc-500">
                       Không tìm thấy nhật ký phù hợp với bộ lọc.
                     </TableCell>
                   </TableRow>
