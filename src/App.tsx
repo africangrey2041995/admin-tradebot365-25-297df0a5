@@ -44,6 +44,7 @@ import AdminPropBots from "./pages/admin/PropBots";
 import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+import AdminBotErrors from "./pages/admin/BotErrors";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -109,6 +110,7 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
+                  <Route path="bot-errors" element={<AdminBotErrors />} />
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />

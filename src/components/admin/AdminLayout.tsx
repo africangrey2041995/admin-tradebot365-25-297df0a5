@@ -1,3 +1,4 @@
+
 import React, { ReactNode } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
@@ -31,7 +32,8 @@ import {
   ShieldCheck,
   Crown,
   Briefcase,
-  UserCircle
+  UserCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -159,6 +161,16 @@ const AdminLayout: React.FC = () => {
                       <Link to="/admin/user-bots">
                         <UserCircle className="h-4 w-4" />
                         <span>Bot người dùng</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/bot-errors')}>
+                      <Link to="/admin/bot-errors">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span>Quản lý lỗi Bot</span>
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 ml-auto text-xs font-medium">8</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

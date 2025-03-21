@@ -14,7 +14,8 @@ import {
   Sparkles,
   TrendingUp,
   ChevronDown,
-  Shield
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
