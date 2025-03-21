@@ -135,19 +135,19 @@ const AdminUserBotDetail = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5">
-          <Card className="border-zinc-800 bg-zinc-900">
+          <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
-                <CardTitle className="text-xl text-white">{bot.title}</CardTitle>
-                <CardDescription className="text-zinc-400">{bot.subtitle}</CardDescription>
+                <CardTitle className="text-xl">{bot.title}</CardTitle>
+                <CardDescription>{bot.subtitle}</CardDescription>
               </div>
               <div className="flex items-center gap-3">
                 <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  bot.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                  bot.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                 }`}>
                   {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
                 </div>
-                <div className="text-lg font-bold text-white">ID: {bot.botId}</div>
+                <div className="text-lg font-bold">ID: {bot.botId}</div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
@@ -157,22 +157,22 @@ const AdminUserBotDetail = () => {
         </div>
             
         <div className="lg:col-span-7">
-          <Card>
+          <Card className="border-slate-200 dark:border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">Thông tin Người Dùng</CardTitle>
-              <CardDescription className="text-zinc-400">
+              <CardTitle>Thông tin Người Dùng</CardTitle>
+              <CardDescription>
                 Thông tin về người dùng sở hữu bot này
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {userInfo && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="bg-zinc-800 border-zinc-700">
+                  <Card className="bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <User className="h-5 w-5 text-primary" />
                         <div>
-                          <p className="text-xs text-zinc-400">Người dùng ID</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Người dùng ID</p>
                           <Button 
                             variant="link" 
                             className="p-0 h-auto font-medium text-primary"
@@ -185,43 +185,43 @@ const AdminUserBotDetail = () => {
                     </CardContent>
                   </Card>
                   
-                  <Card className="bg-zinc-800 border-zinc-700">
+                  <Card className="bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <User className="h-5 w-5 text-emerald-500" />
                         <div>
-                          <p className="text-xs text-zinc-400">Tên</p>
-                          <p className="font-medium text-white">{userInfo.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Tên</p>
+                          <p className="font-medium">{userInfo.name}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                   
-                  <Card className="bg-zinc-800 border-zinc-700">
+                  <Card className="bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <Mail className="h-5 w-5 text-blue-500" />
                         <div>
-                          <p className="text-xs text-zinc-400">Email</p>
-                          <p className="font-medium text-white">{userInfo.email}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
+                          <p className="font-medium">{userInfo.email}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                   
-                  <Card className="bg-zinc-800 border-zinc-700">
+                  <Card className="bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <Phone className="h-5 w-5 text-yellow-500" />
                         <div>
-                          <p className="text-xs text-zinc-400">Số điện thoại</p>
-                          <p className="font-medium text-white">{userInfo.phone}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Số điện thoại</p>
+                          <p className="font-medium">{userInfo.phone}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                   
-                  <Card className="bg-zinc-800 border-zinc-700 md:col-span-2">
+                  <Card className="bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 md:col-span-2">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className={`h-3 w-3 rounded-full ${
@@ -229,8 +229,8 @@ const AdminUserBotDetail = () => {
                           userInfo.status === 'inactive' ? 'bg-yellow-500' : 'bg-red-500'
                         }`} />
                         <div>
-                          <p className="text-xs text-zinc-400">Trạng thái</p>
-                          <p className="font-medium text-white">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Trạng thái</p>
+                          <p className="font-medium">
                             {userInfo.status === 'active' ? 'Hoạt động' : 
                              userInfo.status === 'inactive' ? 'Không hoạt động' : 'Đã khóa'}
                           </p>
@@ -245,37 +245,37 @@ const AdminUserBotDetail = () => {
         </div>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900">
+      <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         <CardHeader>
-          <CardTitle className="text-white">Thông tin Tích hợp</CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardTitle>Thông tin Tích hợp</CardTitle>
+          <CardDescription>
             Thông tin tích hợp API của bot này (chỉ hiển thị cho Admin)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+            <h3 className="text-sm font-medium mb-1 flex items-center gap-2">
               <Webhook className="h-4 w-4 text-primary" />
               Webhook URL
             </h3>
             <div className="flex items-center gap-2">
-              <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
+              <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-sm w-full font-mono border border-slate-200 dark:border-slate-700">
                 https://api.tradebot365.com/webhook/{botId?.toLowerCase()}
               </div>
             </div>
           </div>
           
           <div>
-            <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+            <h3 className="text-sm font-medium mb-1 flex items-center gap-2">
               <Key className="h-4 w-4 text-red-400" />
               Signal Token <span className="text-xs text-red-400">(Đã ẩn)</span>
             </h3>
             <div className="flex items-center gap-2">
-              <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
+              <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-sm w-full font-mono border border-slate-200 dark:border-slate-700">
                 ************************
               </div>
             </div>
-            <p className="text-xs text-zinc-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>
+            <p className="text-xs text-slate-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>
           </div>
         </CardContent>
       </Card>
