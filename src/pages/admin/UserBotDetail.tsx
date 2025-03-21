@@ -88,7 +88,7 @@ const AdminUserBotDetail = () => {
           <Button variant="outline" size="icon" onClick={goBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-white">Chi tiết Bot Người Dùng</h1>
+          <h1 className="text-2xl font-bold">Chi tiết Bot Người Dùng</h1>
         </div>
         <Button variant="outline" onClick={viewPublicBotProfile}>
           <ExternalLink className="h-4 w-4 mr-2" />
@@ -318,4 +318,3 @@ const AdminUserBotDetail = () => {
 };
 
 export default AdminUserBotDetail;
-

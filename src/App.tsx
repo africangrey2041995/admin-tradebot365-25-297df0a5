@@ -107,7 +107,7 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  <Route path="bots/:botId" element={<AdminUserBotDetail />} />
+                  {/* Removed duplicate route for bots/:botId */}
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />

@@ -84,6 +84,7 @@ const AdminUserBots = () => {
   };
 
   const viewBotDetail = (botId: string) => {
+    // Always navigate to user-bots path for consistency
     navigate(`/admin/user-bots/${botId}`);
   };
 
