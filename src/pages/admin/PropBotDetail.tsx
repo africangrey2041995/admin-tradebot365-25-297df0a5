@@ -257,14 +257,16 @@ const AdminPropBotDetail = () => {
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                      <CardTitle className="text-red-600 dark:text-red-400">
-                        Error Signals to Fix
-                        {unreadErrorCount > 0 && (
-                          <Badge className="ml-2 bg-red-500 text-white">
-                            {unreadErrorCount} new
-                          </Badge>
-                        )}
-                      </CardTitle>
+                      <div>
+                        <CardTitle className="text-red-600 dark:text-red-400">
+                          Error Signals to Fix
+                          {unreadErrorCount > 0 && (
+                            <Badge className="ml-2 bg-red-500 text-white">
+                              {unreadErrorCount} new
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </div>
                     </div>
                     <CardDescription className="text-red-600/80 dark:text-red-400/80">
                       Critical signals that require immediate attention for this prop trading bot
@@ -295,14 +297,16 @@ const AdminPropBotDetail = () => {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                    <CardTitle className="text-red-600 dark:text-red-400">
-                      Error Signals to Fix
-                      {unreadErrorCount > 0 && (
-                        <Badge className="ml-2 bg-red-500 text-white">
-                          {unreadErrorCount} new
-                        </Badge>
-                      )}
-                    </CardTitle>
+                    <div>
+                      <CardTitle className="text-red-600 dark:text-red-400">
+                        Error Signals to Fix
+                        {unreadErrorCount > 0 && (
+                          <Badge className="ml-2 bg-red-500 text-white">
+                            {unreadErrorCount} new
+                          </Badge>
+                        )}
+                      </CardTitle>
+                    </div>
                   </div>
                   <CardDescription className="text-red-600/80 dark:text-red-400/80">
                     Critical signals that require immediate attention for this prop trading bot
@@ -382,7 +386,7 @@ const AdminPropBotDetail = () => {
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <button>
+                                    <button type="button">
                                       <Info className="h-4 w-4 text-red-500 cursor-pointer" />
                                     </button>
                                   </TooltipTrigger>
