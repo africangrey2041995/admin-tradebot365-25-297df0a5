@@ -27,7 +27,7 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Connected Accounts</CardTitle>
+                <CardTitle className="text-black">Connected Accounts</CardTitle>
                 <CardDescription>Manage accounts connected to this bot</CardDescription>
               </div>
               <Button 
@@ -50,7 +50,7 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Logs From Trading View</CardTitle>
+                <CardTitle className="text-black">Logs From Trading View</CardTitle>
                 <CardDescription>Recent webhook messages received from TradingView</CardDescription>
               </div>
               <Button variant="outline">
@@ -70,7 +70,7 @@ const BotProfileTabs = ({ botId, onAddAccount }: BotProfileTabsProps) => {
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Log to Coinstrat Pro</CardTitle>
+                <CardTitle className="text-black">Log to Coinstrat Pro</CardTitle>
                 <CardDescription>Signals pushed to connected accounts via Coinstrat Pro</CardDescription>
               </div>
               <Button variant="outline">

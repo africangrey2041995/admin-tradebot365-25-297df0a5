@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -42,6 +43,20 @@ const UserBotDetail: React.FC = () => {
           <TabsTrigger value="integration">Tích hợp</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-black">Thông tin Bot</CardTitle>
+              <CardDescription>
+                Thông tin cơ bản về bot của người dùng
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Thông tin bot sẽ hiển thị ở đây</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="integration">
           <Card>
