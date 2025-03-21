@@ -11,6 +11,7 @@ export interface Bot {
 
 export interface Account {
   id: string;
+  userId?: string; // Added userId property
   clientId?: string;
   secretId?: string;
   accessToken?: string;
@@ -73,12 +74,14 @@ export interface CoinstratSignal {
 
 export interface ProcessedAccount {
   accountId: string;
+  userId?: string; // Added userId property
   name: string;
   timestamp: string;
 }
 
 export interface FailedAccount {
   accountId: string;
+  userId?: string; // Added userId property
   name: string;
   timestamp: string;
   reason: string;
