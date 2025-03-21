@@ -13,10 +13,12 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from 'react-router-dom';
 
 const AdminUserBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   const bots = [
     { 
@@ -79,6 +81,14 @@ const AdminUserBots = () => {
     } else {
       setFilterStatus(null);
     }
+  };
+
+  const viewBotDetail = (botId: string) => {
+    navigate(`/admin/user-bots/${botId}`);
+  };
+
+  const viewUserDetail = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   const filteredBots = bots
@@ -161,11 +171,17 @@ const AdminUserBots = () => {
                           <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                             <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-zinc-800" />
-                            <DropdownMenuItem className="focus:bg-zinc-800">
+                            <DropdownMenuItem 
+                              className="focus:bg-zinc-800"
+                              onClick={() => viewBotDetail(bot.id)}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               <span>Xem chi tiết</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="focus:bg-zinc-800">
+                            <DropdownMenuItem 
+                              className="focus:bg-zinc-800"
+                              onClick={() => viewUserDetail(bot.ownerId)}
+                            >
                               <User className="mr-2 h-4 w-4" />
                               <span>Xem thông tin chủ sở hữu</span>
                             </DropdownMenuItem>
@@ -260,3 +276,4 @@ const BotStatusBadge = ({ status }: { status: string }) => {
 };
 
 export default AdminUserBots;
+

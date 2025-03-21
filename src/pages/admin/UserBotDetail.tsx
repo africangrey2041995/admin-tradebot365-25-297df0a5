@@ -2,13 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, Info, ExternalLink, ArrowLeft } from 'lucide-react';
+import { RefreshCw, Info, ExternalLink, ArrowLeft, Webhook, Key, Link2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
-import BotProfileTabs from '@/components/bots/BotProfileTabs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot } from '@/types';
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -90,7 +88,7 @@ const AdminUserBotDetail = () => {
           <Button variant="outline" size="icon" onClick={goBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">Chi tiết Bot Người Dùng</h1>
+          <h1 className="text-2xl font-bold text-white">Chi tiết Bot Người Dùng</h1>
         </div>
         <Button variant="outline" onClick={viewPublicBotProfile}>
           <ExternalLink className="h-4 w-4 mr-2" />
@@ -101,7 +99,7 @@ const AdminUserBotDetail = () => {
       <Card className="border-zinc-800 bg-zinc-900">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div>
-            <CardTitle className="text-xl">{bot.title}</CardTitle>
+            <CardTitle className="text-xl text-white">{bot.title}</CardTitle>
             <CardDescription className="text-zinc-400">{bot.subtitle}</CardDescription>
           </div>
           <div className="flex items-center gap-3">
@@ -110,7 +108,7 @@ const AdminUserBotDetail = () => {
             }`}>
               {bot.status === 'Active' ? 'Hoạt động' : 'Không hoạt động'}
             </div>
-            <div className="text-lg font-bold">ID: {bot.botId}</div>
+            <div className="text-lg font-bold text-white">ID: {bot.botId}</div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
@@ -122,14 +120,17 @@ const AdminUserBotDetail = () => {
             <div className="lg:col-span-7">
               <Card>
                 <CardHeader>
-                  <CardTitle>Thông tin Tích hợp</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Thông tin Tích hợp</CardTitle>
+                  <CardDescription className="text-zinc-400">
                     Thông tin tích hợp API của bot này (chỉ hiển thị cho Admin)
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-white mb-1">Webhook URL</h3>
+                    <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+                      <Webhook className="h-4 w-4 text-primary" />
+                      Webhook URL
+                    </h3>
                     <div className="flex items-center gap-2">
                       <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
                         https://api.tradebot365.com/webhook/{botId?.toLowerCase()}
@@ -138,12 +139,16 @@ const AdminUserBotDetail = () => {
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-white mb-1">Signal Token <span className="text-xs text-red-400">(Admin Only)</span></h3>
+                    <h3 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+                      <Key className="h-4 w-4 text-red-400" />
+                      Signal Token <span className="text-xs text-red-400">(Đã ẩn)</span>
+                    </h3>
                     <div className="flex items-center gap-2">
                       <div className="bg-zinc-800 p-3 rounded-md text-sm w-full font-mono text-gray-200 border border-zinc-700">
-                        CST{Math.random().toString(36).substring(2, 10).toUpperCase()}{botId?.replace('BOT', '')}
+                        ************************
                       </div>
                     </div>
+                    <p className="text-xs text-zinc-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>
                   </div>
                 </CardContent>
               </Card>
@@ -152,16 +157,16 @@ const AdminUserBotDetail = () => {
 
           <Tabs defaultValue="accounts">
             <TabsList className="grid grid-cols-3 mb-6">
-              <TabsTrigger value="accounts">Tài khoản (12)</TabsTrigger>
-              <TabsTrigger value="trading-view">TradingView Logs</TabsTrigger>
-              <TabsTrigger value="coinstart">Coinstart Logs</TabsTrigger>
+              <TabsTrigger value="accounts" className="text-white">Tài khoản (12)</TabsTrigger>
+              <TabsTrigger value="trading-view" className="text-white">TradingView Logs</TabsTrigger>
+              <TabsTrigger value="coinstart" className="text-white">Coinstart Logs</TabsTrigger>
             </TabsList>
             
             <TabsContent value="accounts">
               <Card className="border-zinc-800 bg-zinc-900">
                 <CardHeader>
-                  <CardTitle>Tài khoản đã kết nối</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Tài khoản đã kết nối</CardTitle>
+                  <CardDescription className="text-zinc-400">
                     Danh sách tài khoản đã kết nối với bot này
                   </CardDescription>
                 </CardHeader>
@@ -205,8 +210,8 @@ const AdminUserBotDetail = () => {
             <TabsContent value="trading-view">
               <Card className="border-zinc-800 bg-zinc-900">
                 <CardHeader>
-                  <CardTitle>TradingView Signal Logs</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">TradingView Signal Logs</CardTitle>
+                  <CardDescription className="text-zinc-400">
                     Lịch sử tín hiệu giao dịch từ TradingView
                   </CardDescription>
                 </CardHeader>
@@ -256,8 +261,8 @@ const AdminUserBotDetail = () => {
             <TabsContent value="coinstart">
               <Card className="border-zinc-800 bg-zinc-900">
                 <CardHeader>
-                  <CardTitle>Coinstart Signal Logs</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Coinstart Signal Logs</CardTitle>
+                  <CardDescription className="text-zinc-400">
                     Lịch sử tín hiệu được gửi đến Coinstart
                   </CardDescription>
                 </CardHeader>
@@ -313,3 +318,4 @@ const AdminUserBotDetail = () => {
 };
 
 export default AdminUserBotDetail;
+
