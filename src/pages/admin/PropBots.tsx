@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,12 +12,33 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const AdminPropBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [newBot, setNewBot] = useState({
+    name: '',
+    description: '',
+    riskLevel: 'low',
+    propFirm: 'coinstrat_pro',
+    maxDrawdown: '5',
+    targetProfit: '10',
+  });
   
   const bots = [
     { 
@@ -60,7 +80,6 @@ const AdminPropBots = () => {
   };
 
   const handleFilterClick = () => {
-    // Toggle between filter states
     if (!filterStatus) {
       setFilterStatus('active');
     } else if (filterStatus === 'active') {
@@ -73,7 +92,28 @@ const AdminPropBots = () => {
   };
 
   const viewBotDetail = (botId: string) => {
-    navigate(`/admin/prop-bots/${botId}`);
+    navigate(`/admin/prop-bots/${botId}`, { 
+      state: { from: location.pathname } 
+    });
+  };
+  
+  const handleAddBot = () => {
+    if (!newBot.name || !newBot.description || !newBot.maxDrawdown || !newBot.targetProfit) {
+      toast.error("Vui lòng điền đầy đủ thông tin bot");
+      return;
+    }
+    
+    toast.success("Đã thêm Prop Trading Bot mới thành công");
+    setIsAddBotDialogOpen(false);
+    
+    setNewBot({
+      name: '',
+      description: '',
+      riskLevel: 'low',
+      propFirm: 'coinstrat_pro',
+      maxDrawdown: '5',
+      targetProfit: '10',
+    });
   };
 
   const filteredBots = bots
@@ -90,7 +130,10 @@ const AdminPropBots = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">Quản lý Prop Trading Bots</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button 
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={() => setIsAddBotDialogOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Thêm Prop Bot mới
         </Button>
@@ -221,11 +264,127 @@ const AdminPropBots = () => {
           </div>
         </CardContent>
       </Card>
+      
+      <Dialog open={isAddBotDialogOpen} onOpenChange={setIsAddBotDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] border-zinc-800 bg-zinc-900 text-white">
+          <DialogHeader>
+            <DialogTitle>Thêm Prop Trading Bot Mới</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Tạo mới một Prop Trading Bot được tối ưu cho các bài kiểm tra Prop Trading.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Tên Bot</Label>
+              <Input
+                id="name"
+                placeholder="Nhập tên của Bot"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={newBot.name}
+                onChange={(e) => setNewBot({...newBot, name: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="description">Mô tả</Label>
+              <Input
+                id="description"
+                placeholder="Mô tả chiến lược và tính năng của Bot"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={newBot.description}
+                onChange={(e) => setNewBot({...newBot, description: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="propFirm">Công ty Prop Trading</Label>
+                <Select 
+                  value={newBot.propFirm} 
+                  onValueChange={(value) => setNewBot({...newBot, propFirm: value})}
+                >
+                  <SelectTrigger id="propFirm" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Chọn công ty" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectItem value="coinstrat_pro">Coinstrat Pro</SelectItem>
+                    <SelectItem value="ftmo">FTMO</SelectItem>
+                    <SelectItem value="funded_next">FundedNext</SelectItem>
+                    <SelectItem value="multiple">Nhiều công ty</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="riskLevel">Mức độ rủi ro</Label>
+                <Select 
+                  value={newBot.riskLevel} 
+                  onValueChange={(value) => setNewBot({...newBot, riskLevel: value})}
+                >
+                  <SelectTrigger id="riskLevel" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Chọn mức độ rủi ro" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectItem value="low">Thấp</SelectItem>
+                    <SelectItem value="medium">Trung bình</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
+                <Input
+                  id="maxDrawdown"
+                  type="number"
+                  min="1"
+                  max="10"
+                  placeholder="ví dụ: 5"
+                  className="bg-zinc-800 border-zinc-700 text-white"
+                  value={newBot.maxDrawdown}
+                  onChange={(e) => setNewBot({...newBot, maxDrawdown: e.target.value})}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="targetProfit">Mục tiêu lợi nhuận (%)</Label>
+                <Input
+                  id="targetProfit"
+                  type="number"
+                  min="5"
+                  max="30"
+                  placeholder="ví dụ: 10"
+                  className="bg-zinc-800 border-zinc-700 text-white"
+                  value={newBot.targetProfit}
+                  onChange={(e) => setNewBot({...newBot, targetProfit: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAddBotDialogOpen(false)}
+              className="border-zinc-700 text-zinc-400"
+            >
+              Hủy
+            </Button>
+            <Button 
+              onClick={handleAddBot}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Tạo Bot
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-// Bot Status Badge Component
 const BotStatusBadge = ({ status }: { status: string }) => {
   switch(status) {
     case 'active':

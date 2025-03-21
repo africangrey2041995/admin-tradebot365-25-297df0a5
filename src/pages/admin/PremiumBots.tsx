@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,12 +12,32 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [newBot, setNewBot] = useState({
+    name: '',
+    description: '',
+    riskLevel: 'medium',
+    exchangeType: 'binance',
+    profitTarget: '',
+  });
   
   const bots = [
     { 
@@ -68,7 +87,6 @@ const AdminPremiumBots = () => {
   };
 
   const handleFilterClick = () => {
-    // Toggle between filter states
     if (!filterStatus) {
       setFilterStatus('active');
     } else if (filterStatus === 'active') {
@@ -81,7 +99,27 @@ const AdminPremiumBots = () => {
   };
 
   const viewBotDetail = (botId: string) => {
-    navigate(`/admin/premium-bots/${botId}`);
+    navigate(`/admin/premium-bots/${botId}`, { 
+      state: { from: location.pathname } 
+    });
+  };
+  
+  const handleAddBot = () => {
+    if (!newBot.name || !newBot.description || !newBot.profitTarget) {
+      toast.error("Vui lòng điền đầy đủ thông tin bot");
+      return;
+    }
+    
+    toast.success("Đã thêm Premium Bot mới thành công");
+    setIsAddBotDialogOpen(false);
+    
+    setNewBot({
+      name: '',
+      description: '',
+      riskLevel: 'medium',
+      exchangeType: 'binance',
+      profitTarget: '',
+    });
   };
 
   const filteredBots = bots
@@ -98,7 +136,10 @@ const AdminPremiumBots = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">Quản lý Premium Bots</h1>
-        <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+        <Button 
+          className="bg-amber-500 hover:bg-amber-600 text-white"
+          onClick={() => setIsAddBotDialogOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Thêm Premium Bot mới
         </Button>
@@ -229,11 +270,110 @@ const AdminPremiumBots = () => {
           </div>
         </CardContent>
       </Card>
+      
+      <Dialog open={isAddBotDialogOpen} onOpenChange={setIsAddBotDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] border-zinc-800 bg-zinc-900 text-white">
+          <DialogHeader>
+            <DialogTitle>Thêm Premium Bot Mới</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Tạo mới một Premium Bot để người dùng có thể đăng ký sử dụng.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Tên Bot</Label>
+              <Input
+                id="name"
+                placeholder="Nhập tên của Bot"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={newBot.name}
+                onChange={(e) => setNewBot({...newBot, name: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="description">Mô tả</Label>
+              <Input
+                id="description"
+                placeholder="Mô tả chiến lược và tính năng của Bot"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={newBot.description}
+                onChange={(e) => setNewBot({...newBot, description: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="riskLevel">Mức độ rủi ro</Label>
+                <Select 
+                  value={newBot.riskLevel} 
+                  onValueChange={(value) => setNewBot({...newBot, riskLevel: value})}
+                >
+                  <SelectTrigger id="riskLevel" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Chọn mức độ rủi ro" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectItem value="low">Thấp</SelectItem>
+                    <SelectItem value="medium">Trung bình</SelectItem>
+                    <SelectItem value="high">Cao</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="exchangeType">Sàn giao dịch</Label>
+                <Select 
+                  value={newBot.exchangeType} 
+                  onValueChange={(value) => setNewBot({...newBot, exchangeType: value})}
+                >
+                  <SelectTrigger id="exchangeType" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Chọn sàn giao dịch" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectItem value="binance">Binance</SelectItem>
+                    <SelectItem value="bybit">ByBit</SelectItem>
+                    <SelectItem value="coinstart_pro">Coinstart Pro</SelectItem>
+                    <SelectItem value="multiple">Nhiều sàn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="profitTarget">Mục tiêu lợi nhuận (%)</Label>
+              <Input
+                id="profitTarget"
+                type="number"
+                placeholder="ví dụ: 15.5"
+                className="bg-zinc-800 border-zinc-700 text-white"
+                value={newBot.profitTarget}
+                onChange={(e) => setNewBot({...newBot, profitTarget: e.target.value})}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAddBotDialogOpen(false)}
+              className="border-zinc-700 text-zinc-400"
+            >
+              Hủy
+            </Button>
+            <Button 
+              onClick={handleAddBot}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Tạo Bot
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-// Bot Status Badge Component
 const BotStatusBadge = ({ status }: { status: string }) => {
   switch(status) {
     case 'active':
