@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, HelpCircle, User, CircleDollarSign } from 'lucide-react';
+import { AlertTriangle, HelpCircle, User, CircleDollarSign, ExternalLink } from 'lucide-react';
 import { TradingViewSignal } from '@/types';
+import { useNavigate } from 'react-router-dom';
 import { 
   Tooltip,
   TooltipContent,
@@ -20,9 +22,11 @@ interface ExtendedSignal extends TradingViewSignal {
   tradingAccount?: string;
   tradingAccountType?: string;
   tradingAccountBalance?: string;
+  botId?: string;
 }
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
+  const navigate = useNavigate();
   const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
@@ -46,6 +50,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'API Authentication Error: Invalid credentials',
             userId: 'user_01HJKLMNOP',
+            botId: 'BOT7459',
             tradingAccount: '4056629',
             tradingAccountType: 'Live',
             tradingAccountBalance: '$500'
@@ -62,6 +67,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Insufficient balance for operation',
             userId: 'user_01HQRSTUV',
+            botId: 'BOT8932',
             tradingAccount: '65784123',
             tradingAccountType: 'Demo',
             tradingAccountBalance: '$10,000'
@@ -78,6 +84,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Exchange rejected order: Market closed',
             userId: 'user_01HWXYZABC',
+            botId: 'BOT2734',
             tradingAccount: '98452367',
             tradingAccountType: 'Live',
             tradingAccountBalance: '$2,450'
@@ -94,6 +101,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             status: 'Failed',
             errorMessage: 'Position not found or already closed',
             userId: 'user_01HDEFGHIJ',
+            botId: 'BOT1234',
             tradingAccount: '32541698',
             tradingAccountType: 'Live',
             tradingAccountBalance: '$1,750'
@@ -139,6 +147,25 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
     }
   };
 
+  const navigateToUserDetail = (userId: string) => {
+    if (userId) {
+      navigate(`/admin/users/${userId.replace('user_', '')}`);
+    }
+  };
+
+  const navigateToBotDetail = (botId: string) => {
+    if (botId) {
+      // Determine bot type from the main category
+      if (botId.startsWith("BOT")) {
+        navigate(`/admin/user-bots/${botId}`);
+      } else if (botId.startsWith("PREMIUM")) {
+        navigate(`/admin/premium-bots/${botId}`);
+      } else if (botId.startsWith("PROP")) {
+        navigate(`/admin/prop-bots/${botId}`);
+      }
+    }
+  };
+
   if (loading) {
     return <div className="py-8 text-center text-muted-foreground">Loading error signals...</div>;
   }
@@ -164,6 +191,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
@@ -202,11 +230,24 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                   {signal.status}
                 </Badge>
               </TableCell>
+              <TableCell>
+                <button 
+                  onClick={() => navigateToBotDetail(signal.botId || '')}
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                >
+                  {signal.botId}
+                  <ExternalLink className="h-3 w-3" />
+                </button>
+              </TableCell>
               <TableCell className="font-mono text-xs">
-                <div className="flex items-center gap-1">
-                  <User className="h-3 w-3 text-slate-500" />
+                <button 
+                  onClick={() => navigateToUserDetail(signal.userId || '')}
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  <User className="h-3 w-3" />
                   {signal.userId}
-                </div>
+                  <ExternalLink className="h-3 w-3" />
+                </button>
               </TableCell>
               <TableCell>
                 <div className="text-sm">
@@ -236,6 +277,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                         <span className="block">Signal Token: {signal.signalToken}</span>
                         <span className="block">Max Lag: {signal.maxLag}</span>
+                        <span className="block">Bot ID: {signal.botId}</span>
                         <span className="block">User ID: {signal.userId}</span>
                         <span className="block">Trading Account: {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}</span>
                       </div>
