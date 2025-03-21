@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -362,7 +363,7 @@ const PropBotDetail: React.FC = () => {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-white">
             {bot.name}
           </h1>
         </div>
