@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { 
   RefreshCw, 
   Info, 
@@ -15,11 +17,64 @@ import {
   Edit,
   Check,
   X,
-  TrendingUp
+  ChevronLeft,
+  Sparkles,
+  TrendingUp,
+  Bot,
+  CircuitBoard,
+  Wallet,
+  Calendar,
+  Users,
+  BarChart4,
+  LineChart,
+  Activity,
+  PieChart,
+  Plus,
+  Pencil,
+  Save,
+  CircleDollarSign
 } from 'lucide-react';
 import { PremiumBot } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import BotProfileTabs from '@/components/bots/BotProfileTabs';
+import { toast } from 'sonner';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar, ComposedChart, Legend } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+
+const tradePerformanceData = [
+  { name: 'Jan', profit: 15.8, trades: 32 },
+  { name: 'Feb', profit: 9.5, trades: 28 },
+  { name: 'Mar', profit: -1.2, trades: 18 },
+  { name: 'Apr', profit: 7.3, trades: 22 },
+  { name: 'May', profit: 12.7, trades: 30 },
+  { name: 'Jun', profit: 18.2, trades: 35 },
+  { name: 'Jul', profit: 8.4, trades: 25 },
+  { name: 'Aug', profit: -2.1, trades: 15 },
+  { name: 'Sep', profit: 11.6, trades: 27 },
+  { name: 'Oct', profit: 20.3, trades: 32 },
+];
+
+const monthlyPerformance = [
+  { month: 'Jan', value: 15.8 },
+  { month: 'Feb', value: 9.5 },
+  { month: 'Mar', value: -1.2 },
+  { month: 'Apr', value: 7.3 },
+  { month: 'May', value: 12.7 },
+  { month: 'Jun', value: 18.2 },
+  { month: 'Jul', value: 8.4 },
+  { month: 'Aug', value: -2.1 },
+  { month: 'Sep', value: 11.6 },
+  { month: 'Oct', value: 20.3 },
+  { month: 'Nov', value: 0 },
+  { month: 'Dec', value: 0 },
+];
+
+const statisticsData = [
+  { name: 'Win Rate', value: '72%', icon: <Activity className="h-4 w-4 text-green-500" /> },
+  { name: 'Avg Profit', value: '3.5%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
+  { name: 'Max Drawdown', value: '6.2%', icon: <LineChart className="h-4 w-4 text-red-500" /> },
+  { name: 'Sharp Ratio', value: '2.1', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
+];
 
 const AdminPropBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -27,8 +82,11 @@ const AdminPropBotDetail = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<PremiumBot | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedBot, setEditedBot] = useState<Partial<PremiumBot>>({});
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
+  
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editableBot, setEditableBot] = useState<Partial<PremiumBot>>({});
   
   const fromUserDetail = location.state?.from === 'userDetail';
   const userId = location.state?.userId;
@@ -39,24 +97,25 @@ const AdminPropBotDetail = () => {
       
       setTimeout(() => {
         const mockBot: PremiumBot = {
-          id: botId || 'PROP-001',
+          id: botId || 'ptb-001',
           name: 'Prop Trading Master',
-          description: 'Bot giao dịch chuyên nghiệp cho các quỹ prop trading.',
-          exchange: 'bybit',
+          description: 'Bot giao dịch sử dụng vốn của công ty với hiệu suất cao và quản lý rủi ro chặt chẽ.',
+          exchange: 'Coinstart Pro',
           type: 'prop',
-          performanceLastMonth: '+22.5%',
-          performanceAllTime: '+120.2%',
-          risk: 'high',
-          minCapital: '5000',
+          performanceLastMonth: '+20.3%',
+          performanceAllTime: '+155.7%',
+          risk: 'medium',
+          minCapital: '$1,000',
           status: 'active',
-          subscribers: 12,
+          subscribers: 52,
           imageUrl: null,
           colorScheme: 'blue',
-          isIntegrated: false
+          isIntegrated: true,
+          botId: 'PROP8459',
         };
         
         setBot(mockBot);
-        setEditedBot(mockBot);
+        setEditableBot(mockBot);
         setIsLoading(false);
       }, 500);
     };
@@ -76,34 +135,100 @@ const AdminPropBotDetail = () => {
     window.open(`/prop-trading-bots/${botId}`, '_blank');
   };
 
-  const handleStartEditing = () => {
-    setIsEditing(true);
+  const handleEditSection = (section: string) => {
+    setEditingSection(section);
   };
 
-  const handleCancelEditing = () => {
-    setIsEditing(false);
-    setEditedBot(bot || {});
+  const handleCancelEdit = () => {
+    setEditingSection(null);
+    setEditableBot(bot || {});
   };
 
   const handleSaveChanges = () => {
     setIsLoading(true);
     
     setTimeout(() => {
-      setBot(editedBot as PremiumBot);
-      setIsEditing(false);
+      setBot({...bot, ...editableBot} as PremiumBot);
+      setEditingSection(null);
       setIsLoading(false);
       
-      alert('Bot details saved successfully!');
+      toast.success('Thông tin bot đã được cập nhật!');
     }, 500);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditedBot(prev => ({ ...prev, [name]: value }));
+    setEditableBot(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setEditedBot(prev => ({ ...prev, [name]: value }));
+    setEditableBot(prev => ({ ...prev, [name]: value }));
+  };
+
+  const refreshTabData = () => {
+    setIsLoading(true);
+    // Simulate API call with a timer
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success(`Đã làm mới dữ liệu tab ${
+        activeTab === "overview" ? "Tổng quan" : 
+        activeTab === "accounts" ? "Tài khoản" : 
+        activeTab === "trading-logs" ? "TB365 Logs" : "Coinstrat Logs"
+      }`);
+    }, 1000);
+  };
+
+  const getRiskLabel = (risk: string) => {
+    switch (risk) {
+      case 'low': return 'Thấp';
+      case 'medium': return 'Trung bình';
+      case 'high': return 'Cao';
+      default: return risk;
+    }
+  };
+  
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'momentum': return 'Momentum';
+      case 'scalping': return 'Scalping';
+      case 'swing': return 'Swing';
+      case 'grid': return 'Grid';
+      case 'trend': return 'Trend';
+      case 'prop': return 'Prop Trading';
+      default: return type;
+    }
+  };
+
+  const generateChartData = () => {
+    if (selectedChartPeriod === "month") {
+      return monthlyPerformance;
+    } else if (selectedChartPeriod === "week") {
+      return [
+        { day: 'Mon', value: 3.2 },
+        { day: 'Tue', value: 5.1 },
+        { day: 'Wed', value: -1.3 },
+        { day: 'Thu', value: 2.7 },
+        { day: 'Fri', value: 4.5 },
+        { day: 'Sat', value: 3.2 },
+        { day: 'Sun', value: 2.1 }
+      ];
+    } else {
+      return [
+        { year: '2020', value: 45.2 },
+        { year: '2021', value: 62.7 },
+        { year: '2022', value: 48.3 },
+        { year: '2023', value: 155.7 }
+      ];
+    }
   };
 
   if (isLoading) {
@@ -134,287 +259,645 @@ const AdminPropBotDetail = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={goBack}>
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" size="sm" onClick={goBack}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Quay lại
           </Button>
-          <h1 className="text-2xl font-bold text-zinc-100">Chi tiết Prop Trading Bot</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
+            {bot.name}
+            <CircleDollarSign className="h-5 w-5 text-blue-500 ml-2" />
+          </h1>
+          <Badge className={getRiskColor(bot.risk)}>
+            Rủi ro: {getRiskLabel(bot.risk)}
+          </Badge>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
+            {bot.botId}
+          </Badge>
         </div>
         <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <Button variant="outline" onClick={handleCancelEditing}>
-                <X className="h-4 w-4 mr-2" />
-                Hủy
-              </Button>
-              <Button onClick={handleSaveChanges}>
-                <Check className="h-4 w-4 mr-2" />
-                Lưu thay đổi
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={viewPublicBotProfile}>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Xem trang người dùng
-              </Button>
-              <Button onClick={handleStartEditing}>
-                <Edit className="h-4 w-4 mr-2" />
-                Chỉnh sửa
-              </Button>
-            </>
-          )}
+          <Button variant="outline" onClick={viewPublicBotProfile}>
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Xem trang người dùng
+          </Button>
         </div>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900">
-        <CardHeader className="pb-2">
-          {isEditing ? (
-            <div className="space-y-2">
-              <CardTitle>
-                <Input 
-                  name="name" 
-                  value={editedBot.name || ''} 
-                  onChange={handleInputChange} 
-                  className="text-xl font-bold text-white bg-zinc-800 border-zinc-700"
-                />
-              </CardTitle>
-              <CardDescription>
-                <Textarea 
-                  name="description" 
-                  value={editedBot.description || ''} 
-                  onChange={handleInputChange} 
-                  className="text-zinc-400 bg-zinc-800 border-zinc-700 min-h-[80px]"
-                />
-              </CardDescription>
-            </div>
-          ) : (
-            <div>
-              <CardTitle className="text-xl text-zinc-100">{bot.name}</CardTitle>
-              <CardDescription className="text-zinc-400">{bot.description}</CardDescription>
-            </div>
-          )}
-        </CardHeader>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
+          <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
+        </TabsList>
         
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-            <div className="lg:col-span-5">
-              <Card className="border-zinc-800 bg-zinc-800">
-                <CardHeader>
-                  <CardTitle className="text-zinc-100">Bot Information</CardTitle>
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle>Biểu đồ hiệu suất</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={refreshTabData} 
+                      disabled={isLoading}
+                      className="h-8 w-8"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
+                    <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
+                      <TabsList>
+                        <TabsTrigger value="week">Tuần</TabsTrigger>
+                        <TabsTrigger value="month">Tháng</TabsTrigger>
+                        <TabsTrigger value="year">Năm</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px] w-full">
+                    <ChartContainer
+                      config={{
+                        profit: {
+                          label: "Profit",
+                          theme: {
+                            light: "#10b981",
+                            dark: "#34d399"
+                          }
+                        },
+                        loss: {
+                          label: "Loss",
+                          theme: {
+                            light: "#ef4444",
+                            dark: "#f87171"
+                          }
+                        },
+                        line: {
+                          label: "Performance Line",
+                          theme: {
+                            light: "#60a5fa",
+                            dark: "#3b82f6"
+                          }
+                        }
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={generateChartData()}
+                          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                          <XAxis 
+                            dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
+                            className="text-xs font-medium" 
+                          />
+                          <YAxis className="text-xs font-medium" />
+                          <ChartTooltip 
+                            content={
+                              <ChartTooltipContent 
+                                formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
+                              />
+                            } 
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke="#10b981" 
+                            fillOpacity={1} 
+                            fill="url(#colorPositive)" 
+                            activeDot={{ r: 6 }} 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle>Chi tiết giao dịch</CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={refreshTabData} 
+                    disabled={isLoading}
+                    className="h-8 w-8"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px]">
+                    <ChartContainer
+                      config={{
+                        profit: {
+                          label: "Profit",
+                          theme: {
+                            light: "#10b981",
+                            dark: "#34d399"
+                          }
+                        },
+                        trades: {
+                          label: "Trades",
+                          theme: {
+                            light: "#60a5fa",
+                            dark: "#3b82f6"
+                          }
+                        }
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart
+                          data={tradePerformanceData}
+                          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                        >
+                          <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
+                          <XAxis dataKey="name" scale="band" />
+                          <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
+                          <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
+                          <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
+                    {statisticsData.map((stat, index) => (
+                      <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          {stat.icon}
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                            {stat.name}
+                          </span>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {stat.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>Thông tin chung</CardTitle>
+                  {editingSection === 'general-info' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('general-info')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {isEditing ? (
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Exchange</label>
-                        <Select 
-                          value={editedBot.exchange || ''} 
-                          onValueChange={(value) => handleSelectChange('exchange', value)}
-                        >
-                          <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                            <SelectValue placeholder="Select exchange" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-900 border-zinc-700">
-                            <SelectItem value="binance">Binance</SelectItem>
-                            <SelectItem value="coinbase">Coinbase</SelectItem>
-                            <SelectItem value="kucoin">KuCoin</SelectItem>
-                            <SelectItem value="bybit">Bybit</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Risk Level</label>
-                        <Select 
-                          value={editedBot.risk || ''} 
-                          onValueChange={(value) => handleSelectChange('risk', value as 'low' | 'medium' | 'high')}
-                        >
-                          <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                            <SelectValue placeholder="Select risk level" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-900 border-zinc-700">
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Status</label>
-                        <Select 
-                          value={editedBot.status || ''} 
-                          onValueChange={(value) => handleSelectChange('status', value as 'active' | 'inactive')}
-                        >
-                          <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-900 border-zinc-700">
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Minimum Capital</label>
+                  {editingSection === 'general-info' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Tên Bot</label>
                         <Input 
-                          name="minCapital" 
-                          value={editedBot.minCapital || ''} 
+                          name="name" 
+                          value={editableBot.name || ''} 
                           onChange={handleInputChange} 
-                          className="bg-zinc-900 border-zinc-700 text-white"
+                          className="mt-1"
                         />
                       </div>
+                      <div>
+                        <label className="text-sm font-medium">Mô tả</label>
+                        <Textarea 
+                          name="description" 
+                          value={editableBot.description || ''} 
+                          onChange={handleInputChange} 
+                          className="mt-1 min-h-[100px]"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Loại Bot</label>
+                          <Select 
+                            value={editableBot.type || ''}
+                            onValueChange={(value) => handleSelectChange('type', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn loại bot" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="prop">Prop Trading</SelectItem>
+                              <SelectItem value="momentum">Momentum</SelectItem>
+                              <SelectItem value="scalping">Scalping</SelectItem>
+                              <SelectItem value="swing">Swing</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Sàn giao dịch</label>
+                          <Input 
+                            name="exchange" 
+                            value={editableBot.exchange || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Mức độ rủi ro</label>
+                          <Select 
+                            value={editableBot.risk || ''}
+                            onValueChange={(value) => handleSelectChange('risk', value as 'low' | 'medium' | 'high')}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn mức độ rủi ro" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">Thấp</SelectItem>
+                              <SelectItem value="medium">Trung bình</SelectItem>
+                              <SelectItem value="high">Cao</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Bot ID</label>
+                          <Input 
+                            name="botId" 
+                            value={editableBot.botId || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Vốn tối thiểu</label>
+                          <Input 
+                            name="minCapital" 
+                            value={editableBot.minCapital || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Trạng thái</label>
+                          <Select 
+                            value={editableBot.status || ''}
+                            onValueChange={(value) => handleSelectChange('status', value as 'active' | 'inactive')}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn trạng thái" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">Hoạt động</SelectItem>
+                              <SelectItem value="inactive">Không hoạt động</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Bot className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot.type)}</span>
+                      </div>
                       
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Performance Last Month</label>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <CircuitBoard className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.exchange}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Wallet className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.minCapital}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Bot ID</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.botId}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Subscribers</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.subscribers}</span>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>Hiệu suất</CardTitle>
+                  {editingSection === 'performance' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('performance')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editingSection === 'performance' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Hiệu suất tháng này</label>
                         <Input 
                           name="performanceLastMonth" 
-                          value={editedBot.performanceLastMonth || ''} 
+                          value={editableBot.performanceLastMonth || ''} 
                           onChange={handleInputChange} 
-                          className="bg-zinc-900 border-zinc-700 text-white"
+                          className="mt-1"
                         />
                       </div>
-                      
-                      <div className="grid gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Performance All Time</label>
+                      <div>
+                        <label className="text-sm font-medium">Hiệu suất tổng thời gian</label>
                         <Input 
                           name="performanceAllTime" 
-                          value={editedBot.performanceAllTime || ''} 
+                          value={editableBot.performanceAllTime || ''} 
                           onChange={handleInputChange} 
-                          className="bg-zinc-900 border-zinc-700 text-white"
+                          className="mt-1"
                         />
                       </div>
                     </div>
                   ) : (
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-zinc-400">ID</div>
-                          <div className="font-mono text-zinc-100">{bot.id}</div>
+                    <>
+                      <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="h-4 w-4 text-slate-500" />
+                          <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
                         </div>
-                        <div>
-                          <div className="text-sm text-zinc-400">Exchange</div>
-                          <div className="text-zinc-100">{bot.exchange}</div>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-zinc-400">Risk Level</div>
-                          <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            bot.risk === 'high' ? 'bg-red-500/20 text-red-500' : 
-                            bot.risk === 'medium' ? 'bg-yellow-500/20 text-yellow-500' : 
-                            'bg-green-500/20 text-green-500'
-                          }`}>
-                            {bot.risk.charAt(0).toUpperCase() + bot.risk.slice(1)}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-zinc-400">Status</div>
-                          <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            bot.status === 'active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-                          }`}>
-                            {bot.status === 'active' ? 'Active' : 'Inactive'}
-                          </div>
+                        <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                          {bot.performanceLastMonth}
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-zinc-400">Minimum Capital</div>
-                          <div className="text-zinc-100">${bot.minCapital}</div>
+                      <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <BarChart4 className="h-4 w-4 text-slate-500" />
+                          <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
                         </div>
-                        <div>
-                          <div className="text-sm text-zinc-400">Subscribers</div>
-                          <div className="text-zinc-100">{bot.subscribers}</div>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-zinc-400">Last Month</div>
-                          <div className={`text-lg font-bold ${
-                            bot.performanceLastMonth.startsWith('+') ? 'text-green-500' : 'text-red-500'
-                          }`}>{bot.performanceLastMonth}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-zinc-400">All Time</div>
-                          <div className={`text-lg font-bold ${
-                            bot.performanceAllTime.startsWith('+') ? 'text-green-500' : 'text-red-500'
-                          }`}>{bot.performanceAllTime}</div>
+                        <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                          {bot.performanceAllTime}
                         </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
-            </div>
-            
-            <div className="lg:col-span-7">
-              <Card className="border-zinc-800 bg-zinc-800">
-                <CardHeader>
-                  <CardTitle className="text-zinc-100">Thông tin Tích hợp</CardTitle>
-                  <CardDescription className="text-zinc-400">
-                    Thông tin tích hợp API của bot này (chỉ hiển thị cho Admin)
-                  </CardDescription>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>API Tích hợp</CardTitle>
+                  {editingSection === 'api' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('api')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-zinc-300 mb-1 flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
                       <Webhook className="h-4 w-4 text-primary" />
                       Webhook URL
                     </h3>
-                    {isEditing ? (
-                      <Input 
-                        value={`https://api.tradebot365.com/webhook/prop/${botId?.toLowerCase()}`}
-                        readOnly
-                        className="bg-zinc-900 border-zinc-700 text-white font-mono text-sm w-full"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="bg-zinc-900 p-3 rounded-md text-sm w-full font-mono text-zinc-300 border border-zinc-700">
-                          https://api.tradebot365.com/webhook/prop/{botId?.toLowerCase()}
-                        </div>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-slate-50 p-3 rounded-md text-sm w-full font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        https://api.tradebot365.com/webhook/prop/{bot.id.toLowerCase()}
                       </div>
-                    )}
+                    </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-zinc-300 mb-1 flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
                       <Key className="h-4 w-4 text-red-400" />
-                      Signal Token {isEditing ? '' : <span className="text-xs text-red-400">(Đã ẩn)</span>}
+                      Signal Token
                     </h3>
-                    {isEditing ? (
+                    {editingSection === 'api' ? (
                       <div className="flex items-center gap-2">
                         <Input 
-                          name="signalToken"
-                          defaultValue="CSTYSPMEV8C-PROP"
-                          className="bg-zinc-900 border-zinc-700 text-white font-mono text-sm w-full"
+                          type="text"
+                          className="font-mono"
+                          value="CQTYSPMEV8C-PROP-TOKEN"
+                          readOnly={false}
                         />
                         <Button variant="outline" size="sm">
-                          Generate New
+                          Tạo mới
                         </Button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <div className="bg-zinc-900 p-3 rounded-md text-sm w-full font-mono text-zinc-300 border border-zinc-700">
+                        <div className="bg-slate-50 p-3 rounded-md text-sm w-full font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           ************************
                         </div>
                       </div>
                     )}
-                    {!isEditing && <p className="text-xs text-zinc-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>}
+                    {!editingSection && <p className="text-xs text-slate-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>}
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
-
+        </TabsContent>
+        
+        <TabsContent value="accounts">
           <BotProfileTabs botId={bot.id} onAddAccount={() => {
-            console.log("Add account to prop trading bot", bot.id);
+            console.log("Add account to prop bot", bot.id);
+            toast.success("Chức năng thêm tài khoản đang được phát triển");
           }} />
-        </CardContent>
-      </Card>
+        </TabsContent>
+        
+        <TabsContent value="trading-logs">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle>TB365 Signal Logs</CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={refreshTabData} 
+                disabled={isLoading} 
+                className="h-8"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                {isLoading ? 'Đang làm mới...' : 'Làm mới'}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium">ID</th>
+                      <th className="text-left py-3 px-4 font-medium">Hành động</th>
+                      <th className="text-left py-3 px-4 font-medium">Cặp tiền</th>
+                      <th className="text-left py-3 px-4 font-medium">Trạng thái</th>
+                      <th className="text-left py-3 px-4 font-medium">Thời gian</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <tr key={i} className="border-b">
+                        <td className="py-3 px-4 font-mono text-xs">SIG-{10000 + i}</td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${
+                            i % 2 === 0 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                          }`}>
+                            {i % 2 === 0 ? 'ENTER_LONG' : 'EXIT_LONG'}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">BTC/USDT</td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${
+                            i % 4 === 0 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                          }`}>
+                            {i % 4 === 0 ? 'Pending' : 'Processed'}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-400">
+                          {new Date().toLocaleString('vi-VN')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="coinstrat-logs">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle>Coinstart Signal Logs</CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={refreshTabData} 
+                disabled={isLoading} 
+                className="h-8"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                {isLoading ? 'Đang làm mới...' : 'Làm mới'}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium">ID</th>
+                      <th className="text-left py-3 px-4 font-medium">Hành động</th>
+                      <th className="text-left py-3 px-4 font-medium">Cặp tiền</th>
+                      <th className="text-left py-3 px-4 font-medium">Trạng thái</th>
+                      <th className="text-left py-3 px-4 font-medium">Tài khoản</th>
+                      <th className="text-left py-3 px-4 font-medium">Thời gian</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <tr key={i} className="border-b">
+                        <td className="py-3 px-4 font-mono text-xs">CS-{20000 + i}</td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${
+                            i % 2 === 0 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                          }`}>
+                            {i % 2 === 0 ? 'ENTER_LONG' : 'EXIT_LONG'}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">BTC/USDT</td>
+                        <td className="py-3 px-4">
+                          <Badge className={`${
+                            i % 5 === 0 ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                          }`}>
+                            {i % 5 === 0 ? 'Failed' : 'Processed'}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">ACC-{1000 + i}</td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-400">
+                          {new Date().toLocaleString('vi-VN')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
