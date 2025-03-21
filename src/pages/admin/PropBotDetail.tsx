@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -333,6 +334,7 @@ const PropBotDetail = () => {
   
   return (
     <AdminLayout>
+      {/* AdminLayout now properly accepts children */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -960,4 +962,3 @@ const PropBotDetail = () => {
 };
 
 export default PropBotDetail;
-
