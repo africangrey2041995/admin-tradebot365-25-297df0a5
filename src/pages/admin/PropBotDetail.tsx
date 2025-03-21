@@ -255,15 +255,17 @@ const AdminPropBotDetail = () => {
               <TabsContent value="errors" className="mt-4">
                 <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
                   <CardHeader>
-                    <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5" />
-                      Error Signals to Fix
-                      {unreadErrorCount > 0 && (
-                        <Badge className="bg-red-500 text-white">
-                          {unreadErrorCount} new
-                        </Badge>
-                      )}
-                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                      <CardTitle className="text-red-600 dark:text-red-400">
+                        Error Signals to Fix
+                        {unreadErrorCount > 0 && (
+                          <Badge className="ml-2 bg-red-500 text-white">
+                            {unreadErrorCount} new
+                          </Badge>
+                        )}
+                      </CardTitle>
+                    </div>
                     <CardDescription className="text-red-600/80 dark:text-red-400/80">
                       Critical signals that require immediate attention for this prop trading bot
                     </CardDescription>
@@ -278,24 +280,30 @@ const AdminPropBotDetail = () => {
             {/* Error Signals Section */}
             <div className="mt-8">
               <Alert variant="destructive" className="mb-4">
-                <AlertTriangle className="h-5 w-5" />
-                <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
-                <AlertDescription>
-                  There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
-                </AlertDescription>
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  <div>
+                    <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
+                    <AlertDescription>
+                      There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
+                    </AlertDescription>
+                  </div>
+                </div>
               </Alert>
 
               <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
                 <CardHeader>
-                  <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5" />
-                    Error Signals to Fix
-                    {unreadErrorCount > 0 && (
-                      <Badge className="bg-red-500 text-white">
-                        {unreadErrorCount} new
-                      </Badge>
-                    )}
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                    <CardTitle className="text-red-600 dark:text-red-400">
+                      Error Signals to Fix
+                      {unreadErrorCount > 0 && (
+                        <Badge className="ml-2 bg-red-500 text-white">
+                          {unreadErrorCount} new
+                        </Badge>
+                      )}
+                    </CardTitle>
+                  </div>
                   <CardDescription className="text-red-600/80 dark:text-red-400/80">
                     Critical signals that require immediate attention for this prop trading bot
                   </CardDescription>
@@ -373,8 +381,10 @@ const AdminPropBotDetail = () => {
                             <td className="px-4 py-3">
                               <TooltipProvider>
                                 <Tooltip>
-                                  <TooltipTrigger>
-                                    <Info className="h-4 w-4 text-red-500 cursor-pointer" />
+                                  <TooltipTrigger asChild>
+                                    <button>
+                                      <Info className="h-4 w-4 text-red-500 cursor-pointer" />
+                                    </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p className="max-w-xs">{error.note}</p>
