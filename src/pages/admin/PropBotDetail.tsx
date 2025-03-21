@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -138,7 +137,7 @@ const propTradingBots = [
   }
 ];
 
-const PropBotDetail = () => {
+const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   
@@ -334,7 +333,6 @@ const PropBotDetail = () => {
   
   return (
     <AdminLayout>
-      {/* AdminLayout now properly accepts children */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -350,7 +348,6 @@ const PropBotDetail = () => {
             </h1>
           </div>
           
-          {/* Delete Bot Dialog */}
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive">
@@ -391,7 +388,6 @@ const PropBotDetail = () => {
           <TabsContent value="details" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                {/* General Info Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-start justify-between pb-2">
                     <div className="space-y-1">
@@ -563,7 +559,6 @@ const PropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Features Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-start justify-between pb-2">
                     <div className="space-y-1">
@@ -665,7 +660,6 @@ const PropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Requirements Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-start justify-between pb-2">
                     <div className="space-y-1">
@@ -769,7 +763,6 @@ const PropBotDetail = () => {
               </div>
               
               <div className="space-y-6">
-                {/* Performance Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-start justify-between pb-2">
                     <div className="space-y-1">
@@ -854,7 +847,6 @@ const PropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Bot Info Card */}
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">Thông tin Bot</CardTitle>
@@ -905,7 +897,6 @@ const PropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Preview Button */}
                 <Button 
                   className="w-full"
                   onClick={() => window.open(`/prop-trading-bots/${bot.id}`, '_blank')}

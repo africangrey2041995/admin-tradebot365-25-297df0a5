@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
 import { useClerk } from '@clerk/clerk-react';
@@ -38,7 +38,11 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 
-const AdminLayout = () => {
+interface AdminLayoutProps {
+  children?: ReactNode;
+}
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { isAdmin, isSuperAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
@@ -264,7 +268,7 @@ const AdminLayout = () => {
           
           {/* Admin Content */}
           <div className="flex-1 p-6">
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </div>
       </div>
