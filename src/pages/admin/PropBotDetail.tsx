@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -12,7 +11,6 @@ import {
   AlertTriangle,
   Users,
   DollarSign,
-  Calendar,
   Edit3,
   X,
   Plus,
@@ -334,7 +332,7 @@ const PropBotDetail = () => {
   };
   
   return (
-    <AdminLayout title={`Quản lý Prop Bot: ${bot.name}`}>
+    <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -962,3 +960,4 @@ const PropBotDetail = () => {
 };
 
 export default PropBotDetail;
+
