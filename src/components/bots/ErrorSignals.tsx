@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, HelpCircle } from 'lucide-react';
+import { AlertTriangle, HelpCircle, User, CircleDollarSign } from 'lucide-react';
 import { TradingViewSignal } from '@/types';
 import { 
   Tooltip,
@@ -15,8 +15,14 @@ interface ErrorSignalsProps {
   botId: string;
 }
 
+// Extended signal type to include user and account information
+interface ExtendedSignal extends TradingViewSignal {
+  userId?: string;
+  accountName?: string;
+}
+
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
-  const [errorSignals, setErrorSignals] = useState<TradingViewSignal[]>([]);
+  const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
 
@@ -25,8 +31,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
     const fetchErrorSignals = () => {
       setLoading(true);
       setTimeout(() => {
-        // Mock error signals data
-        const mockErrorSignals: TradingViewSignal[] = [
+        // Mock error signals data with added user ID and account information
+        const mockErrorSignals: ExtendedSignal[] = [
           {
             id: 'CS-20354',
             action: 'ENTER_LONG',
@@ -38,6 +44,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             amount: '1.5',
             status: 'Failed',
             errorMessage: 'API Authentication Error: Invalid credentials',
+            userId: 'user_01HJKLMNOP',
+            accountName: 'Binance Main'
           },
           {
             id: 'CS-20347',
@@ -50,6 +58,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             amount: '0.8',
             status: 'Failed',
             errorMessage: 'Insufficient balance for operation',
+            userId: 'user_01HQRSTUV',
+            accountName: 'Bybit Futures'
           },
           {
             id: 'CS-20321',
@@ -62,6 +72,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             amount: '10.2',
             status: 'Failed',
             errorMessage: 'Exchange rejected order: Market closed',
+            userId: 'user_01HWXYZABC',
+            accountName: 'KuCoin Spot'
           },
           {
             id: 'CS-20318',
@@ -74,6 +86,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             amount: '150',
             status: 'Failed',
             errorMessage: 'Position not found or already closed',
+            userId: 'user_01HDEFGHIJ',
+            accountName: 'OKX Derivatives'
           },
         ];
         
@@ -141,6 +155,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
             <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
           </TableRow>
         </TableHeader>
@@ -177,6 +193,18 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                   {signal.status}
                 </Badge>
               </TableCell>
+              <TableCell className="font-mono text-xs">
+                <div className="flex items-center gap-1">
+                  <User className="h-3 w-3 text-slate-500" />
+                  {signal.userId}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <CircleDollarSign className="h-3 w-3 text-slate-500" />
+                  {signal.accountName}
+                </div>
+              </TableCell>
               <TableCell className="text-sm text-red-600 dark:text-red-400">
                 <TooltipProvider>
                   <Tooltip>
@@ -197,6 +225,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                         <span className="block">Signal Token: {signal.signalToken}</span>
                         <span className="block">Max Lag: {signal.maxLag}</span>
+                        <span className="block">User ID: {signal.userId}</span>
+                        <span className="block">Account: {signal.accountName}</span>
                       </div>
                     </TooltipContent>
                   </Tooltip>
