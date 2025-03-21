@@ -1,407 +1,1071 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowLeft, 
+  Bot, 
+  Save, 
+  CheckCircle2,
+  CircleAlert, 
+  BarChart2, 
+  TrendingUp,
+  AlertTriangle,
+  Users,
+  DollarSign,
+  Edit3,
+  X,
+  Plus,
+  Trash2
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, ArrowLeft, Bot, Check, Edit, RefreshCw, Trash2, AlertCircle, Info } from 'lucide-react';
-import ErrorSignals from '@/components/bots/ErrorSignals';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from '@/components/ui/switch';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
+import TradingViewLogs from '@/components/bots/TradingViewLogs';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
-const propBots = [
+const propTradingBots = [
   {
-    id: 'PROP-001',
-    name: 'Prop Master Strategy',
-    description: 'Advanced prop trading strategy for Coinstrat Pro',
-    status: 'active',
+    id: 'ptb-001',
+    name: 'Prop Master',
+    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
     type: 'prop',
-    performanceLastMonth: '+12.5%',
-    performanceAllTime: '+45.7%',
-    minCapital: '$1,000',
-    risk: 'medium',
-    createdAt: '2023-09-15',
+    performanceLastMonth: '+11.2%',
+    performanceAllTime: '+45.8%',
+    risk: 'low',
+    minCapital: '$500',
+    status: 'active',
+    subscribers: 120,
+    imageUrl: null,
+    colorScheme: 'blue',
     features: [
-      'Optimized for Prop Trading Challenges',
-      'Low drawdown strategy',
-      'Consistent profit taking',
-      'Risk management built-in'
+      'Tối ưu hóa để vượt qua các bài kiểm tra Prop Trading',
+      'Quản lý rủi ro tự động theo yêu cầu của Coinstrat Pro',
+      'Báo cáo hiệu suất chi tiết theo các tiêu chí đánh giá Prop Trading',
+      'Chiến lược giao dịch nhất quán với tỷ lệ win cao'
     ],
-    subscribers: 348
+    requirements: [
+      'Vốn tối thiểu $500',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp với giai đoạn Challenger hoặc Verification'
+    ]
   },
   {
-    id: 'PROP-002',
+    id: 'ptb-002',
     name: 'Risk Manager Pro',
-    description: 'Low risk prop trading strategy focused on capital preservation',
-    status: 'active',
+    description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
     exchange: 'Coinstrat Pro',
     type: 'prop',
-    performanceLastMonth: '+8.3%',
-    performanceAllTime: '+32.1%',
-    minCapital: '$500',
+    performanceLastMonth: '+8.5%',
+    performanceAllTime: '+38.9%',
     risk: 'low',
-    createdAt: '2023-10-05',
+    minCapital: '$700',
+    status: 'active',
+    subscribers: 95,
+    imageUrl: null,
+    colorScheme: 'green',
     features: [
-      'Ultra low drawdown',
-      'Consistent small wins',
-      'Automatic position sizing',
-      'Designed for FTMO'
+      'Kiểm soát chặt chẽ tỷ lệ rủi ro trên từng giao dịch',
+      'Giữ mức drawdown tối đa dưới 5%',
+      'Tự động điều chỉnh kích thước vị thế dựa trên biến động thị trường',
+      'Báo cáo phân tích rủi ro chi tiết'
     ],
-    subscribers: 215
+    requirements: [
+      'Vốn tối thiểu $700',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp cho giai đoạn Verification hoặc Funded'
+    ]
+  },
+  {
+    id: 'ptb-003',
+    name: 'Consistent Trader',
+    description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+9.7%',
+    performanceAllTime: '+42.3%',
+    risk: 'medium',
+    status: 'active',
+    minCapital: '$600',
+    subscribers: 83,
+    imageUrl: null,
+    colorScheme: 'purple',
+    features: [
+      'Tính nhất quán cao trong mọi điều kiện thị trường',
+      'Tỷ lệ win/loss ổn định trên 65%',
+      'Thời gian nắm giữ giao dịch tối ưu',
+      'Cơ chế tự động tránh các sự kiện thị trường biến động mạnh'
+    ],
+    requirements: [
+      'Vốn tối thiểu $600',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp với tất cả các giai đoạn Prop Trading'
+    ]
   }
 ];
 
-const AdminPropBotDetail = () => {
+const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [bot, setBot] = useState<any>(null);
-  const [unreadErrorCount, setUnreadErrorCount] = useState(3);
   
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const foundBot = propBots.find(b => b.id === botId);
-      setBot(foundBot || null);
-      setIsLoading(false);
-    }, 500);
-  }, [botId]);
+  const initialBot = propTradingBots.find(b => b.id === botId) || propTradingBots[0];
+  const [bot, setBot] = useState(initialBot);
   
-  const goBack = () => {
-    navigate('/admin/prop-bots');
+  const [editingGeneral, setEditingGeneral] = useState(false);
+  const [editingFeatures, setEditingFeatures] = useState(false);
+  const [editingRequirements, setEditingRequirements] = useState(false);
+  const [editingPerformance, setEditingPerformance] = useState(false);
+  const [editingBotInfo, setEditingBotInfo] = useState(false);
+  
+  const [generalForm, setGeneralForm] = useState({
+    name: bot.name,
+    description: bot.description,
+    exchange: bot.exchange,
+    risk: bot.risk,
+    minCapital: bot.minCapital,
+    status: bot.status,
+    colorScheme: bot.colorScheme
+  });
+  
+  const [featuresForm, setFeaturesForm] = useState([...bot.features]);
+  const [requirementsForm, setRequirementsForm] = useState([...bot.requirements]);
+  
+  const [performanceForm, setPerformanceForm] = useState({
+    performanceLastMonth: bot.performanceLastMonth,
+    performanceAllTime: bot.performanceAllTime
+  });
+  
+  const [newFeature, setNewFeature] = useState('');
+  const [newRequirement, setNewRequirement] = useState('');
+  
+  const [botInfoForm, setBotInfoForm] = useState({
+    exchange: bot.exchange,
+    type: 'Prop Trading',
+    status: bot.status,
+    id: bot.id,
+    subscribers: bot.subscribers.toString()
+  });
+  
+  const colorSchemeClasses = {
+    blue: {
+      badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-900/10',
+      icon: 'text-blue-500 dark:text-blue-400',
+      border: 'border-blue-200 dark:border-blue-800/30'
+    },
+    green: {
+      badge: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400',
+      bg: 'bg-green-50 dark:bg-green-900/10',
+      icon: 'text-green-500 dark:text-green-400',
+      border: 'border-green-200 dark:border-green-800/30'
+    },
+    purple: {
+      badge: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400',
+      bg: 'bg-purple-50 dark:bg-purple-900/10',
+      icon: 'text-purple-500 dark:text-purple-400',
+      border: 'border-purple-200 dark:border-purple-800/30'
+    },
+    red: {
+      badge: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-900/10',
+      icon: 'text-red-500 dark:text-red-400',
+      border: 'border-red-200 dark:border-red-800/30'
+    },
+    default: {
+      badge: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400',
+      bg: 'bg-slate-50 dark:bg-slate-900/10',
+      icon: 'text-slate-500 dark:text-slate-400',
+      border: 'border-slate-200 dark:border-slate-800/30'
+    }
   };
   
-  if (isLoading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-lg">Loading prop bot details...</span>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const getColorByRisk = (risk: string) => {
+    switch (risk) {
+      case 'low': return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400';
+      case 'medium': return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400';
+      case 'high': return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
+      default: return 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400';
+    }
+  };
   
-  if (!bot) {
-    return (
-      <AdminLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <AlertCircle className="h-16 w-16 text-destructive mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Bot Not Found</h1>
-          <p className="text-muted-foreground mb-6">The prop trading bot you're looking for doesn't exist.</p>
-          <Button onClick={goBack}>Go Back to Prop Bots</Button>
-        </div>
-      </AdminLayout>
-    );
-  }
-
+  const riskLabel = {
+    'low': 'Thấp',
+    'medium': 'Trung bình',
+    'high': 'Cao'
+  }[bot.risk as 'low' | 'medium' | 'high'] || '';
+  
+  const riskColor = getColorByRisk(bot.risk);
+  const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
+  
+  const saveGeneralInfo = () => {
+    setBot({
+      ...bot,
+      name: generalForm.name,
+      description: generalForm.description,
+      exchange: generalForm.exchange,
+      risk: generalForm.risk,
+      minCapital: generalForm.minCapital,
+      status: generalForm.status,
+      colorScheme: generalForm.colorScheme
+    });
+    setEditingGeneral(false);
+    toast.success('Thông tin chung đã được cập nhật');
+  };
+  
+  const saveFeatures = () => {
+    const updatedFeatures = [...featuresForm];
+    if (newFeature.trim()) {
+      updatedFeatures.push(newFeature.trim());
+      setNewFeature('');
+    }
+    
+    setBot({
+      ...bot,
+      features: updatedFeatures
+    });
+    setFeaturesForm(updatedFeatures);
+    setEditingFeatures(false);
+    toast.success('Tính năng đã được cập nhật');
+  };
+  
+  const saveRequirements = () => {
+    const updatedRequirements = [...requirementsForm];
+    if (newRequirement.trim()) {
+      updatedRequirements.push(newRequirement.trim());
+      setNewRequirement('');
+    }
+    
+    setBot({
+      ...bot,
+      requirements: updatedRequirements
+    });
+    setRequirementsForm(updatedRequirements);
+    setEditingRequirements(false);
+    toast.success('Yêu cầu đã được cập nhật');
+  };
+  
+  const savePerformance = () => {
+    setBot({
+      ...bot,
+      performanceLastMonth: performanceForm.performanceLastMonth,
+      performanceAllTime: performanceForm.performanceAllTime
+    });
+    setEditingPerformance(false);
+    toast.success('Hiệu suất đã được cập nhật');
+  };
+  
+  const saveBotInfo = () => {
+    setBot({
+      ...bot,
+      exchange: botInfoForm.exchange,
+      status: botInfoForm.status,
+      subscribers: parseInt(botInfoForm.subscribers, 10)
+    });
+    setEditingBotInfo(false);
+    toast.success('Thông tin bot đã được cập nhật');
+  };
+  
+  const removeFeature = (index: number) => {
+    const updated = [...featuresForm];
+    updated.splice(index, 1);
+    setFeaturesForm(updated);
+  };
+  
+  const removeRequirement = (index: number) => {
+    const updated = [...requirementsForm];
+    updated.splice(index, 1);
+    setRequirementsForm(updated);
+  };
+  
+  const cancelGeneral = () => {
+    setGeneralForm({
+      name: bot.name,
+      description: bot.description,
+      exchange: bot.exchange,
+      risk: bot.risk,
+      minCapital: bot.minCapital,
+      status: bot.status,
+      colorScheme: bot.colorScheme
+    });
+    setEditingGeneral(false);
+  };
+  
+  const cancelFeatures = () => {
+    setFeaturesForm([...bot.features]);
+    setNewFeature('');
+    setEditingFeatures(false);
+  };
+  
+  const cancelRequirements = () => {
+    setRequirementsForm([...bot.requirements]);
+    setNewRequirement('');
+    setEditingRequirements(false);
+  };
+  
+  const cancelPerformance = () => {
+    setPerformanceForm({
+      performanceLastMonth: bot.performanceLastMonth,
+      performanceAllTime: bot.performanceAllTime
+    });
+    setEditingPerformance(false);
+  };
+  
+  const cancelBotInfo = () => {
+    setBotInfoForm({
+      exchange: bot.exchange,
+      type: 'Prop Trading',
+      status: bot.status,
+      id: bot.id,
+      subscribers: bot.subscribers.toString()
+    });
+    setEditingBotInfo(false);
+  };
+  
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" onClick={goBack}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-2xl font-bold">Prop Trading Bot Details</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Bot
-            </Button>
-            <Button variant="destructive">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Bot
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => navigate('/admin/prop-bots')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">
+            {bot.name}
+          </h1>
         </div>
         
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-2xl">{bot.name}</CardTitle>
-                <CardDescription className="mt-1">{bot.description}</CardDescription>
-              </div>
-              <Badge className={bot.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
-                {bot.status === 'active' ? 'Active' : 'Inactive'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Bot ID</div>
-                <div className="font-medium">{bot.id}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Exchange</div>
-                <div className="font-medium">{bot.exchange}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Type</div>
-                <div className="font-medium">{bot.type === 'prop' ? 'Prop Trading' : 'Standard'}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Performance (Last Month)</div>
-                <div className="font-medium text-green-600">{bot.performanceLastMonth}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Performance (All Time)</div>
-                <div className="font-medium text-green-600">{bot.performanceAllTime}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Min. Capital</div>
-                <div className="font-medium">{bot.minCapital}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Risk Level</div>
-                <div className="font-medium">
-                  <Badge className={
-                    bot.risk === 'low' ? 'bg-green-100 text-green-700' : 
-                    bot.risk === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
-                    'bg-red-100 text-red-700'
-                  }>
-                    {bot.risk === 'low' ? 'Low' : bot.risk === 'medium' ? 'Medium' : 'High'}
-                  </Badge>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Created At</div>
-                <div className="font-medium">{bot.createdAt}</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">Subscribers</div>
-                <div className="font-medium">{bot.subscribers}</div>
-              </div>
-            </div>
-
-            <Tabs defaultValue="features">
-              <TabsList>
-                <TabsTrigger value="features">Features</TabsTrigger>
-                <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
-                <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger 
-                  value="errors" 
-                  className="flex items-center gap-1 relative"
-                >
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                  Error Signals
-                  {unreadErrorCount > 0 && (
-                    <Badge 
-                      className="absolute -top-1.5 -right-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] bg-red-500 text-white rounded-full"
-                    >
-                      {unreadErrorCount}
-                    </Badge>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="features" className="mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Bot Features</CardTitle>
-                    <CardDescription>Key features of this prop trading bot</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 list-none">
-                      {bot.features.map((feature: string, index: number) => (
-                        <li key={index} className="flex items-start">
-                          <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="subscribers" className="mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Subscribers</CardTitle>
-                    <CardDescription>Users who have subscribed to this bot</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground mb-4">Subscriber details table would appear here</p>
-                      <Button variant="outline">View All Subscribers</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="performance" className="mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Performance Stats</CardTitle>
-                    <CardDescription>Historical performance data for this bot</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground mb-4">Performance chart would appear here</p>
-                      <Button variant="outline">View Detailed Stats</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="errors" className="mt-4">
-                <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                      <div>
-                        <CardTitle className="text-red-600 dark:text-red-400">
-                          Error Signals to Fix
-                          {unreadErrorCount > 0 && (
-                            <Badge className="ml-2 bg-red-500 text-white">
-                              {unreadErrorCount} new
-                            </Badge>
-                          )}
-                        </CardTitle>
-                      </div>
-                    </div>
-                    <CardDescription className="text-red-600/80 dark:text-red-400/80">
-                      Critical signals that require immediate attention for this prop trading bot
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Xóa Bot
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xác nhận xóa Bot</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn xóa bot "{bot.name}"? Hành động này không thể hoàn tác.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {}}>Hủy</Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  toast.success(`Bot ${bot.name} đã được xóa`);
+                  navigate('/admin/prop-bots');
+                }}
+              >
+                Xóa Bot
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      <Tabs defaultValue="details" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="details">Chi tiết</TabsTrigger>
+          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="details" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle>Thông tin chung</CardTitle>
+                    <CardDescription>
+                      Thông tin cơ bản về Prop Trading Bot
                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ErrorSignals botId={botId || ''} />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-
-            <div className="mt-8">
-              <Alert variant="destructive" className="mb-4">
-                <AlertTriangle className="h-5 w-5" />
-                <div>
-                  <AlertTitle>Error Signals Needing Immediate Attention</AlertTitle>
-                  <AlertDescription>
-                    There are {unreadErrorCount} unresolved error signals that require immediate administrator attention.
-                  </AlertDescription>
-                </div>
-              </Alert>
-
-              <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                    <div>
-                      <CardTitle className="text-red-600 dark:text-red-400">
-                        Error Signals to Fix
-                        {unreadErrorCount > 0 && (
-                          <Badge className="ml-2 bg-red-500 text-white">
-                            {unreadErrorCount} new
-                          </Badge>
-                        )}
-                      </CardTitle>
-                    </div>
                   </div>
-                  <CardDescription className="text-red-600/80 dark:text-red-400/80">
-                    Critical signals that require immediate attention for this prop trading bot
-                  </CardDescription>
+                  {!editingGeneral ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingGeneral(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelGeneral}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveGeneralInfo}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-red-50/50 dark:bg-red-900/20">
-                          <th className="px-4 py-3 text-left font-medium">ID</th>
-                          <th className="px-4 py-3 text-left font-medium">User ID</th>
-                          <th className="px-4 py-3 text-left font-medium">Account Trading</th>
-                          <th className="px-4 py-3 text-left font-medium">Symbol</th>
-                          <th className="px-4 py-3 text-left font-medium">Date</th>
-                          <th className="px-4 py-3 text-left font-medium">Quantity</th>
-                          <th className="px-4 py-3 text-left font-medium">Action</th>
-                          <th className="px-4 py-3 text-left font-medium">Status</th>
-                          <th className="px-4 py-3 text-left font-medium">Note</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          {
-                            id: 'ERR-1001',
-                            userId: 'USER-5432',
-                            account: 'Account #4553 (Prop)',
-                            symbol: 'BTC/USDT',
-                            date: '2023-12-15 14:23',
-                            quantity: '0.5',
-                            action: 'ENTER_LONG',
-                            status: 'Failed',
-                            note: 'Insufficient balance in trading account'
-                          },
-                          {
-                            id: 'ERR-1002',
-                            userId: 'USER-2198',
-                            account: 'Account #7821 (Futures)',
-                            symbol: 'ETH/USDT',
-                            date: '2023-12-14 09:17',
-                            quantity: '5',
-                            action: 'EXIT_SHORT',
-                            status: 'Failed',
-                            note: 'API key expired'
-                          },
-                          {
-                            id: 'ERR-1003',
-                            userId: 'USER-3375',
-                            account: 'Account #9923 (Prop)',
-                            symbol: 'SOL/USDT',
-                            date: '2023-12-13 22:45',
-                            quantity: '20',
-                            action: 'ENTER_SHORT',
-                            status: 'Failed',
-                            note: 'Position already exists'
-                          }
-                        ].map((error, index) => (
-                          <tr key={index} className="border-b hover:bg-red-50/30 dark:hover:bg-red-900/10">
-                            <td className="px-4 py-3">{error.id}</td>
-                            <td className="px-4 py-3">{error.userId}</td>
-                            <td className="px-4 py-3">{error.account}</td>
-                            <td className="px-4 py-3">{error.symbol}</td>
-                            <td className="px-4 py-3">{error.date}</td>
-                            <td className="px-4 py-3">{error.quantity}</td>
-                            <td className="px-4 py-3">
-                              <Badge variant="outline" className="border-red-200 text-red-600">
-                                {error.action}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3">
-                              <Badge className="bg-red-100 text-red-700">
-                                {error.status}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <button type="button">
-                                      <Info className="h-4 w-4 text-red-500 cursor-pointer" />
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs">{error.note}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  {!editingGeneral ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Avatar className={`h-14 w-14 ${colors.bg} ${colors.border} border-2`}>
+                          <AvatarFallback className={colors.icon}>
+                            <Bot className="h-6 w-6" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold">{bot.name}</h3>
+                          <p className="text-muted-foreground">{bot.description}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        <Badge variant="outline" className={riskColor}>
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          Rủi ro: {riskLabel}
+                        </Badge>
+                        <Badge variant="outline" className={colors.badge}>
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          Vốn tối thiểu: {bot.minCapital}
+                        </Badge>
+                        <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400">
+                          <Users className="h-3 w-3 mr-1" />
+                          {bot.subscribers} người đăng ký
+                        </Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Tên Bot</Label>
+                          <Input 
+                            id="name" 
+                            value={generalForm.name} 
+                            onChange={(e) => setGeneralForm({...generalForm, name: e.target.value})}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="exchange">Sàn giao dịch</Label>
+                          <Input 
+                            id="exchange" 
+                            value={generalForm.exchange} 
+                            onChange={(e) => setGeneralForm({...generalForm, exchange: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Mô tả</Label>
+                        <Textarea 
+                          id="description" 
+                          value={generalForm.description} 
+                          onChange={(e) => setGeneralForm({...generalForm, description: e.target.value})}
+                          rows={3}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="risk">Mức độ rủi ro</Label>
+                          <Select 
+                            value={generalForm.risk} 
+                            onValueChange={(value) => setGeneralForm({...generalForm, risk: value})}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn mức độ rủi ro" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">Thấp</SelectItem>
+                              <SelectItem value="medium">Trung bình</SelectItem>
+                              <SelectItem value="high">Cao</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="minCapital">Vốn tối thiểu</Label>
+                          <Input 
+                            id="minCapital" 
+                            value={generalForm.minCapital} 
+                            onChange={(e) => setGeneralForm({...generalForm, minCapital: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="colorScheme">Màu sắc</Label>
+                          <Select 
+                            value={generalForm.colorScheme} 
+                            onValueChange={(value) => setGeneralForm({...generalForm, colorScheme: value})}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn màu sắc" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="blue">Xanh dương</SelectItem>
+                              <SelectItem value="green">Xanh lá</SelectItem>
+                              <SelectItem value="purple">Tím</SelectItem>
+                              <SelectItem value="red">Đỏ</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="status">Trạng thái</Label>
+                          <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <Label htmlFor="status">Bot đang hoạt động</Label>
+                            </div>
+                            <Switch 
+                              id="status" 
+                              checked={generalForm.status === 'active'}
+                              onCheckedChange={(checked) => 
+                                setGeneralForm({
+                                  ...generalForm, 
+                                  status: checked ? 'active' : 'inactive'
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                      Tính năng
+                    </CardTitle>
+                    <CardDescription>
+                      Các tính năng chính của bot
+                    </CardDescription>
                   </div>
+                  {!editingFeatures ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingFeatures(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelFeatures}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveFeatures}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  {!editingFeatures ? (
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                      {bot.features.map((feature, index) => (
+                        <li key={index}>{feature}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="space-y-4">
+                      {featuresForm.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Input 
+                            value={feature} 
+                            onChange={(e) => {
+                              const updated = [...featuresForm];
+                              updated[index] = e.target.value;
+                              setFeaturesForm(updated);
+                            }} 
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeFeature(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Thêm tính năng mới" 
+                          value={newFeature}
+                          onChange={(e) => setNewFeature(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newFeature.trim()) {
+                              e.preventDefault();
+                              setFeaturesForm([...featuresForm, newFeature.trim()]);
+                              setNewFeature('');
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => {
+                            if (newFeature.trim()) {
+                              setFeaturesForm([...featuresForm, newFeature.trim()]);
+                              setNewFeature('');
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
+                      Yêu cầu
+                    </CardTitle>
+                    <CardDescription>
+                      Các yêu cầu để sử dụng bot
+                    </CardDescription>
+                  </div>
+                  {!editingRequirements ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingRequirements(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelRequirements}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveRequirements}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  {!editingRequirements ? (
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                      {bot.requirements.map((req, index) => (
+                        <li key={index}>{req}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="space-y-4">
+                      {requirementsForm.map((req, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Input 
+                            value={req} 
+                            onChange={(e) => {
+                              const updated = [...requirementsForm];
+                              updated[index] = e.target.value;
+                              setRequirementsForm(updated);
+                            }} 
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeRequirement(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Thêm yêu cầu mới" 
+                          value={newRequirement}
+                          onChange={(e) => setNewRequirement(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newRequirement.trim()) {
+                              e.preventDefault();
+                              setRequirementsForm([...requirementsForm, newRequirement.trim()]);
+                              setNewRequirement('');
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => {
+                            if (newRequirement.trim()) {
+                              setRequirementsForm([...requirementsForm, newRequirement.trim()]);
+                              setNewRequirement('');
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </AdminLayout>
+            
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
+                      Hiệu suất
+                    </CardTitle>
+                    <CardDescription>
+                      Dữ liệu hiệu suất giao dịch
+                    </CardDescription>
+                  </div>
+                  {!editingPerformance ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingPerformance(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelPerformance}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={savePerformance}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  {!editingPerformance ? (
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất tháng trước</div>
+                        <div className="text-2xl font-bold mt-1 flex items-center">
+                          {bot.performanceLastMonth}
+                          <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                        </div>
+                      </div>
+                      
+                      <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất từ đầu</div>
+                        <div className="text-2xl font-bold mt-1 flex items-center">
+                          {bot.performanceAllTime}
+                          <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="performanceLastMonth">Hiệu suất tháng trước</Label>
+                        <Input 
+                          id="performanceLastMonth" 
+                          value={performanceForm.performanceLastMonth} 
+                          onChange={(e) => setPerformanceForm({...performanceForm, performanceLastMonth: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="performanceAllTime">Hiệu suất từ đầu</Label>
+                        <Input 
+                          id="performanceAllTime" 
+                          value={performanceForm.performanceAllTime} 
+                          onChange={(e) => setPerformanceForm({...performanceForm, performanceAllTime: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                    <CardDescription>
+                      Thông tin chi tiết về bot
+                    </CardDescription>
+                  </div>
+                  {!editingBotInfo ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingBotInfo(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelBotInfo}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveBotInfo}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {!editingBotInfo ? (
+                    <>
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Sàn giao dịch
+                        </div>
+                        <div className="mt-1">{bot.exchange}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Loại bot
+                        </div>
+                        <div className="mt-1">Prop Trading</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Trạng thái
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <span className={`inline-block w-2 h-2 rounded-full ${bot.status === 'active' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></span>
+                          {bot.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          ID Bot
+                        </div>
+                        <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
+                          {bot.id}
+                        </code>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Người đăng ký
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <Users className="h-4 w-4 mr-1 text-slate-400" />
+                          {bot.subscribers} người dùng
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="exchange">Sàn giao dịch</Label>
+                        <Input 
+                          id="exchange" 
+                          value={botInfoForm.exchange} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, exchange: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="type">Loại bot</Label>
+                        <Input 
+                          id="type" 
+                          value={botInfoForm.type} 
+                          disabled
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Trạng thái</Label>
+                        <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="botStatus">Bot đang hoạt động</Label>
+                          </div>
+                          <Switch 
+                            id="botStatus" 
+                            checked={botInfoForm.status === 'active'}
+                            onCheckedChange={(checked) => 
+                              setBotInfoForm({
+                                ...botInfoForm, 
+                                status: checked ? 'active' : 'inactive'
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="id">ID Bot</Label>
+                        <Input 
+                          id="id" 
+                          value={botInfoForm.id} 
+                          disabled
+                          className="bg-slate-50 dark:bg-slate-800 text-slate-500"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="subscribers">Số người đăng ký</Label>
+                        <Input 
+                          id="subscribers" 
+                          type="number"
+                          min="0"
+                          value={botInfoForm.subscribers} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, subscribers: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Button 
+                className="w-full"
+                onClick={() => window.open(`/prop-trading-bots/${bot.id}`, '_blank')}
+              >
+                Xem trang người dùng
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="accounts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tài khoản đã tích hợp</CardTitle>
+              <CardDescription>
+                Quản lý tài khoản người dùng đã kết nối với bot này
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BotAccountsTable botId={botId || ''} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="logs" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>TB365 Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ TradingView
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TradingViewLogs botId={botId || ''} />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Coinstrat Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ Coinstrat
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CoinstratLogs botId={botId || ''} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
-export default AdminPropBotDetail;
+export default PropBotDetail;

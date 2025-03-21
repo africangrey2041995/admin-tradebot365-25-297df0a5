@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -178,7 +179,9 @@ const PropTradingBotDetail = () => {
     setActiveTab(value);
   };
   
+  // Mark errors as read when viewing the error section
   useEffect(() => {
+    // In a real app, this would be an API call to mark errors as read
     const markErrorsAsRead = () => {
       const errorSection = document.getElementById('error-signals');
       if (errorSection && errorSection.getBoundingClientRect().top <= window.innerHeight) {
@@ -188,6 +191,7 @@ const PropTradingBotDetail = () => {
 
     window.addEventListener('scroll', markErrorsAsRead);
     
+    // Check on initial load too
     markErrorsAsRead();
     
     return () => {
@@ -216,6 +220,7 @@ const PropTradingBotDetail = () => {
           </h1>
         </div>
         
+        {/* Main content area with grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Card>
@@ -421,6 +426,7 @@ const PropTradingBotDetail = () => {
           </div>
         </div>
         
+        {/* Error Signals Section - Now full width outside of the grid */}
         <div id="error-signals" className="w-full">
           {unreadErrorCount > 0 && (
             <div className="flex items-center gap-2 mb-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 p-3 rounded-md">
@@ -436,11 +442,6 @@ const PropTradingBotDetail = () => {
               <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
                 <AlertTriangle className="h-5 w-5" />
                 Tín Hiệu Lỗi Cần Khắc Phục
-                {unreadErrorCount > 0 && (
-                  <Badge className="bg-red-500 text-white">
-                    {unreadErrorCount} mới
-                  </Badge>
-                )}
               </CardTitle>
               <CardDescription className="text-red-600/80 dark:text-red-400/80">
                 Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
