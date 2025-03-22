@@ -1,8 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   AlertTriangle, 
@@ -23,11 +23,13 @@ type CoinstratLog = {
   status: 'success' | 'pending' | 'failed';
   timestamp: string;
   signalId: string;
+  idTv: string;
   instrument: string;
   action: string;
-  price: string;
-  volume: string;
+  quantity: string;
   message?: string;
+  accountsTotal: number;
+  accountsSuccess: number;
 };
 
 type AccountForSignal = {
@@ -57,35 +59,41 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
       setTimeout(() => {
         const mockLogs: CoinstratLog[] = [
           {
-            id: 'CSTLOG-001',
+            id: 'CST001',
             status: 'success',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            timestamp: '2025-03-22T07:27:00',
             signalId: 'CST001',
+            idTv: 'SIG001',
             instrument: 'BTCUSDT',
             action: 'ENTER_LONG',
-            price: '65,892.45',
-            volume: '0.025',
+            quantity: '1.5',
+            accountsTotal: 2,
+            accountsSuccess: 2
           },
           {
-            id: 'CSTLOG-002',
-            status: 'pending',
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            id: 'CST002',
+            status: 'success',
+            timestamp: '2025-03-22T06:27:00',
             signalId: 'CST002',
+            idTv: 'SIG002',
             instrument: 'ETHUSDT',
             action: 'EXIT_LONG',
-            price: '3,456.78',
-            volume: '0.15',
+            quantity: '2.3',
+            accountsTotal: 2,
+            accountsSuccess: 1
           },
           {
-            id: 'CSTLOG-003',
+            id: 'CST003',
             status: 'failed',
-            timestamp: new Date(Date.now() - 10800000).toISOString(),
+            timestamp: '2025-03-22T05:27:00',
             signalId: 'CST003',
+            idTv: 'SIG003',
             instrument: 'SOLUSDT',
             action: 'ENTER_SHORT',
-            price: '142.35',
-            volume: '1.5',
+            quantity: '3.7',
             message: 'Insufficient balance',
+            accountsTotal: 2,
+            accountsSuccess: 0
           }
         ];
         
@@ -129,6 +137,20 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
     setIsDialogOpen(true);
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'success':
+      case 'executed':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'pending':
+        return <Clock className="h-5 w-5 text-yellow-500" />;
+      case 'failed':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'success':
@@ -164,35 +186,41 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
     setTimeout(() => {
       const mockLogs: CoinstratLog[] = [
         {
-          id: 'CSTLOG-001',
+          id: 'CST001',
           status: 'success',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          timestamp: '2025-03-22T07:27:00',
           signalId: 'CST001',
+          idTv: 'SIG001',
           instrument: 'BTCUSDT',
           action: 'ENTER_LONG',
-          price: '65,892.45',
-          volume: '0.025',
+          quantity: '1.5',
+          accountsTotal: 2,
+          accountsSuccess: 2
         },
         {
-          id: 'CSTLOG-002',
-          status: 'pending',
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          id: 'CST002',
+          status: 'success',
+          timestamp: '2025-03-22T06:27:00',
           signalId: 'CST002',
+          idTv: 'SIG002',
           instrument: 'ETHUSDT',
           action: 'EXIT_LONG',
-          price: '3,456.78',
-          volume: '0.15',
+          quantity: '2.3',
+          accountsTotal: 2,
+          accountsSuccess: 1
         },
         {
-          id: 'CSTLOG-003',
+          id: 'CST003',
           status: 'failed',
-          timestamp: new Date(Date.now() - 10800000).toISOString(),
+          timestamp: '2025-03-22T05:27:00',
           signalId: 'CST003',
+          idTv: 'SIG003',
           instrument: 'SOLUSDT',
           action: 'ENTER_SHORT',
-          price: '142.35',
-          volume: '1.5',
+          quantity: '3.7',
           message: 'Insufficient balance',
+          accountsTotal: 2,
+          accountsSuccess: 0
         }
       ];
       setLogs(mockLogs);
@@ -236,39 +264,52 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Status</TableHead>
               <TableHead>ID</TableHead>
-              <TableHead>Thời gian</TableHead>
-              <TableHead>Signal ID</TableHead>
-              <TableHead>Cặp tiền</TableHead>
-              <TableHead>Hành động</TableHead>
-              <TableHead>Giá</TableHead>
-              <TableHead>KL</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
+              <TableHead>ID TV</TableHead>
+              <TableHead>Symbol</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Action</TableHead>
+              <TableHead>Accounts</TableHead>
+              <TableHead>Note</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {logs.map((log) => (
               <TableRow key={log.id}>
+                <TableCell>{getStatusIcon(log.status)}</TableCell>
                 <TableCell className="font-medium">{log.id}</TableCell>
+                <TableCell>{log.idTv}</TableCell>
+                <TableCell>{log.instrument}</TableCell>
                 <TableCell>
-                  {new Date(log.timestamp).toLocaleString('vi-VN', {
+                  {new Date(log.timestamp).toLocaleString('en-US', {
+                    month: 'short',
                     day: '2-digit',
-                    month: '2-digit',
+                    year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
                 </TableCell>
-                <TableCell>{log.signalId}</TableCell>
-                <TableCell>{log.instrument}</TableCell>
+                <TableCell>{log.quantity}</TableCell>
                 <TableCell>{getActionBadge(log.action)}</TableCell>
-                <TableCell>{log.price}</TableCell>
-                <TableCell>{log.volume}</TableCell>
-                <TableCell>{getStatusBadge(log.status)}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleViewAccounts(log.signalId)}>
-                    <Eye className="h-4 w-4" />
+                <TableCell>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="px-2 py-1 h-auto text-blue-600 font-medium"
+                    onClick={() => handleViewAccounts(log.signalId)}
+                  >
+                    {log.accountsSuccess} / {log.accountsTotal} <Eye className="h-3.5 w-3.5 ml-1" />
                   </Button>
+                </TableCell>
+                <TableCell>
+                  {log.message && (
+                    <div className="text-red-500 flex items-center">
+                      <AlertTriangle className="h-4 w-4 mr-1" />
+                      <span className="text-xs">{log.message}</span>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
