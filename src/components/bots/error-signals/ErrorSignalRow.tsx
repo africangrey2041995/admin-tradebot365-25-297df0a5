@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -17,14 +18,34 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
   const navigate = useNavigate();
 
   const navigateToBotDetail = (botId: string) => {
+    console.log("Navigating to bot with ID:", botId);
+    
     if (botId) {
       // Route to the appropriate bot detail page based on the bot ID prefix
       if (botId.startsWith("BOT")) {
+        console.log("Navigating to user bot:", `/bots/${botId}`);
         navigate(`/bots/${botId}`);
       } else if (botId.startsWith("PREMIUM")) {
+        console.log("Navigating to premium bot:", `/integrated-premium-bots/${botId}`);
         navigate(`/integrated-premium-bots/${botId}`);
       } else if (botId.startsWith("PROP")) {
+        console.log("Navigating to prop bot:", `/integrated-prop-bots/${botId}`);
         navigate(`/integrated-prop-bots/${botId}`);
+      } else if (botId.startsWith("MY")) {
+        // Handle "MY-" prefixed bots by removing the "MY-" prefix and redirecting accordingly
+        const actualBotId = botId.replace("MY-", "");
+        if (botId.includes("USER")) {
+          console.log("Navigating to user bot from MY prefix:", `/bots/${actualBotId}`);
+          navigate(`/bots/${actualBotId}`);
+        } else if (botId.includes("PREMIUM")) {
+          console.log("Navigating to premium bot from MY prefix:", `/integrated-premium-bots/${actualBotId}`);
+          navigate(`/integrated-premium-bots/${actualBotId}`);
+        } else if (botId.includes("PROP")) {
+          console.log("Navigating to prop bot from MY prefix:", `/integrated-prop-bots/${actualBotId}`);
+          navigate(`/integrated-prop-bots/${actualBotId}`);
+        } else {
+          console.log("Unknown MY- bot type for ID:", botId);
+        }
       } else {
         console.log("Unknown bot type for ID:", botId);
       }
@@ -64,7 +85,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
       </TableCell>
       <TableCell>
         <button 
-          onClick={() => navigateToBotDetail(signal.botId || '')}
+          onClick={(e) => {
+            e.preventDefault();
+            navigateToBotDetail(signal.botId || '');
+          }}
           className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
         >
           {signal.botName || signal.botId}
