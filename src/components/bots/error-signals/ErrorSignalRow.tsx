@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -21,11 +20,11 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
     if (botId) {
       // Route to the appropriate bot detail page based on the bot ID prefix
       if (botId.startsWith("BOT")) {
-        navigate(`/bots/${botId.toLowerCase()}`);
+        navigate(`/bots/${botId}`);
       } else if (botId.startsWith("PREMIUM")) {
-        navigate(`/integrated-premium-bots/${botId.toLowerCase()}`);
+        navigate(`/integrated-premium-bots/${botId}`);
       } else if (botId.startsWith("PROP")) {
-        navigate(`/integrated-prop-bots/${botId.toLowerCase()}`);
+        navigate(`/integrated-prop-bots/${botId}`);
       } else {
         console.log("Unknown bot type for ID:", botId);
       }
