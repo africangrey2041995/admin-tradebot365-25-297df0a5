@@ -103,8 +103,11 @@ export const PackageForm: React.FC<PackageFormProps> = ({
           quarterly: pkg.pricing.quarterly,
           yearly: pkg.pricing.yearly,
           currency: pkg.pricing.currency,
-        }
-      } as unknown as FormValues;
+        },
+        isActive: pkg.isActive,
+        isPopular: pkg.isPopular || false,
+        isEnterprise: pkg.isEnterprise || false,
+      } as FormValues;
     }
 
     return {
@@ -144,8 +147,22 @@ export const PackageForm: React.FC<PackageFormProps> = ({
 
   // Handle form submission
   const onFormSubmit = (data: FormValues) => {
-    // Zod has already done the transformations for us in the schema
-    onSubmit(data as unknown as Partial<Package>);
+    // Process data before submitting
+    const submittedData: Partial<Package> = {
+      ...data,
+      limits: {
+        bots: data.limits.bots === 'Infinity' ? Infinity : Number(data.limits.bots),
+        accounts: data.limits.accounts === 'Infinity' ? Infinity : Number(data.limits.accounts),
+      },
+      pricing: {
+        monthly: Number(data.pricing.monthly),
+        quarterly: Number(data.pricing.quarterly),
+        yearly: Number(data.pricing.yearly),
+        currency: data.pricing.currency,
+      }
+    };
+    
+    onSubmit(submittedData);
   };
 
   // Add new feature field
