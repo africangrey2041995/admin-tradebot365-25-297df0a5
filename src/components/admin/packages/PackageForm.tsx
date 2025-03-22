@@ -49,28 +49,30 @@ const packageSchema = z.object({
   description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự'),
   features: z.array(z.string().min(1, 'Tính năng không được để trống')),
   limits: z.object({
-    bots: z.preprocess(
-      (val) => (val === 'Infinity' || val === '' || val === '∞') ? Infinity : Number(val),
-      z.number().min(0, 'Giới hạn bot phải là số dương hoặc không giới hạn')
-    ),
-    accounts: z.preprocess(
-      (val) => (val === 'Infinity' || val === '' || val === '∞') ? Infinity : Number(val),
-      z.number().min(0, 'Giới hạn tài khoản phải là số dương hoặc không giới hạn')
-    ),
+    bots: z.union([
+      z.literal('Infinity').transform(() => Infinity),
+      z.number().min(0, 'Giới hạn bot phải là số dương hoặc không giới hạn'),
+      z.string().regex(/^\d+$/).transform(val => Number(val))
+    ]),
+    accounts: z.union([
+      z.literal('Infinity').transform(() => Infinity),
+      z.number().min(0, 'Giới hạn tài khoản phải là số dương hoặc không giới hạn'),
+      z.string().regex(/^\d+$/).transform(val => Number(val))
+    ]),
   }),
   pricing: z.object({
-    monthly: z.preprocess(
-      (val) => Number(val),
-      z.number().min(0, 'Giá hàng tháng phải là số dương hoặc 0')
-    ),
-    quarterly: z.preprocess(
-      (val) => Number(val),
-      z.number().min(0, 'Giá hàng quý phải là số dương hoặc 0')
-    ),
-    yearly: z.preprocess(
-      (val) => Number(val),
-      z.number().min(0, 'Giá hàng năm phải là số dương hoặc 0')
-    ),
+    monthly: z.union([
+      z.number().min(0, 'Giá hàng tháng phải là số dương hoặc 0'),
+      z.string().regex(/^\d+$/).transform(val => Number(val))
+    ]),
+    quarterly: z.union([
+      z.number().min(0, 'Giá hàng quý phải là số dương hoặc 0'),
+      z.string().regex(/^\d+$/).transform(val => Number(val))
+    ]),
+    yearly: z.union([
+      z.number().min(0, 'Giá hàng năm phải là số dương hoặc 0'),
+      z.string().regex(/^\d+$/).transform(val => Number(val))
+    ]),
     currency: z.string().default('VND'),
   }),
   isActive: z.boolean().default(true),
@@ -127,15 +129,8 @@ export const PackageForm: React.FC<PackageFormProps> = ({
 
   // Handle form submission
   const onFormSubmit = (data: FormValues) => {
-    // Convert string representations of Infinity back to actual number
-    const processedData = {
-      ...data,
-      limits: {
-        bots: data.limits.bots === 'Infinity' ? Infinity : Number(data.limits.bots),
-        accounts: data.limits.accounts === 'Infinity' ? Infinity : Number(data.limits.accounts),
-      }
-    };
-    onSubmit(processedData);
+    // Zod has already done the transformations for us in the schema
+    onSubmit(data as unknown as Partial<Package>);
   };
 
   // Add new feature field
