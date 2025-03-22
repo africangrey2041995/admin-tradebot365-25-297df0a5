@@ -107,7 +107,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         isActive: pkg.isActive,
         isPopular: pkg.isPopular || false,
         isEnterprise: pkg.isEnterprise || false,
-      } as FormValues;
+      } as unknown as FormValues;
     }
 
     return {
