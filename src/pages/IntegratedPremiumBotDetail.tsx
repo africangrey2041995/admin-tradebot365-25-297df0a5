@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -724,12 +725,13 @@ const IntegratedPremiumBotDetail = () => {
           </TabsContent>
         </Tabs>
       
-      <AddAccountDialog 
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot.id}
-        onAddAccount={handleAddAccount}
-      />
+        <AddAccountDialog 
+          open={isAddAccountDialogOpen}
+          onOpenChange={setIsAddAccountDialogOpen}
+          botId={bot.id}
+          onAddAccount={handleAddAccount}
+        />
+      </div>
     </MainLayout>
   );
 };

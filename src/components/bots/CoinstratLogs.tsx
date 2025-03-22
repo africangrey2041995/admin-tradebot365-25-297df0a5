@@ -98,7 +98,6 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
   }, [botId]);
 
   const handleViewAccounts = (signalId: string) => {
-    // Simulate fetching accounts for this signal
     const mockAccounts: AccountForSignal[] = [
       {
         id: 'ACC-001',
