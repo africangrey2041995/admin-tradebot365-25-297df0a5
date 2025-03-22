@@ -45,7 +45,12 @@ export const Tooltip: React.FC<{ children: ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-export const TooltipTrigger: React.FC<{ asChild?: boolean; children: ReactNode }> = ({ 
+interface TooltipTriggerProps {
+  asChild?: boolean;
+  children: ReactNode;
+}
+
+export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({ 
   children,
   asChild = false,
 }) => {
@@ -55,7 +60,7 @@ export const TooltipTrigger: React.FC<{ asChild?: boolean; children: ReactNode }
     throw new Error('TooltipTrigger must be used within a TooltipProvider');
   }
   
-  const { setOpen, setContent, setPosition } = context;
+  const { setOpen, setPosition } = context;
   
   const handleMouseEnter = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -72,8 +77,20 @@ export const TooltipTrigger: React.FC<{ asChild?: boolean; children: ReactNode }
   
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
-      onMouseEnter: handleMouseEnter,
-      onMouseLeave: handleMouseLeave,
+      onMouseEnter: (e: React.MouseEvent) => {
+        handleMouseEnter(e);
+        // Call original onMouseEnter if it exists
+        if (children.props.onMouseEnter) {
+          children.props.onMouseEnter(e);
+        }
+      },
+      onMouseLeave: (e: React.MouseEvent) => {
+        handleMouseLeave();
+        // Call original onMouseLeave if it exists
+        if (children.props.onMouseLeave) {
+          children.props.onMouseLeave(e);
+        }
+      },
     });
   }
   

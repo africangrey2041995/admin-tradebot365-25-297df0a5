@@ -2,12 +2,16 @@
 import { useState } from "react";
 import { ToastProps } from "./toast";
 
+interface Toast extends ToastProps {
+  id: string;
+}
+
 export const useToast = () => {
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const toast = (props: ToastProps) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    const newToast = { ...props, id };
+    const id = props.id || Math.random().toString(36).substring(2, 9);
+    const newToast: Toast = { ...props, id };
     setToasts((prev) => [...prev, newToast]);
 
     if (props.duration !== Infinity) {
@@ -21,7 +25,7 @@ export const useToast = () => {
       dismiss: () => setToasts((prev) => prev.filter((t) => t.id !== id)),
       update: (props: ToastProps) => {
         setToasts((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, ...props } : t))
+          prev.map((t) => (t.id === id ? { ...t, ...props, id } : t))
         );
       },
     };
