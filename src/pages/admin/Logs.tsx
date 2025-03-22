@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from 'react-router-dom';
+import { ActivityLog } from '@/types';
 
 const AdminLogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,8 +22,7 @@ const AdminLogs = () => {
   const [activeTab, setActiveTab] = useState('all');
   const navigate = useNavigate();
 
-  // Sample log data - focused on user and admin activities
-  const logs = [
+  const logs: ActivityLog[] = [
     { 
       id: 'LOG1001',
       type: 'user_registration',
@@ -136,7 +135,6 @@ const AdminLogs = () => {
     },
   ];
 
-  // Filter logs based on search term, activity type, and active tab
   const filteredLogs = logs.filter(log => {
     const matchesSearch = 
       searchTerm === '' || 
@@ -147,7 +145,6 @@ const AdminLogs = () => {
     
     const matchesActivityType = activityTypeFilter === 'all' || log.type === activityTypeFilter;
     
-    // Filter based on active tab
     const isUserActivity = log.type === 'user_registration' || log.type === 'user_login';
     const isAdminActivity = log.type === 'admin_login' || log.type === 'admin_action';
     
@@ -160,9 +157,7 @@ const AdminLogs = () => {
   });
 
   const handleRefresh = () => {
-    // In a real implementation, this would fetch fresh logs from the server
     console.log('Refreshing logs...');
-    // For now, just show a message to the user
     alert('Đã làm mới nhật ký hoạt động');
   };
 
@@ -224,6 +219,11 @@ const AdminLogs = () => {
     }
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -260,7 +260,7 @@ const AdminLogs = () => {
             <div className="relative w-full sm:max-w-[400px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
               <Input 
-                placeholder="Tìm kiếm theo người dùng, email, hoặc hành động..." 
+                placeholder="Tìm kiếm theo người dùng, email..." 
                 className="pl-10 bg-zinc-800 border-zinc-700 text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -285,13 +285,13 @@ const AdminLogs = () => {
             <Table>
               <TableHeader>
                 <TableRow className="border-zinc-800">
-                  <TableHead className="text-zinc-400 w-[140px]">Loại hoạt động</TableHead>
-                  <TableHead className="text-zinc-400">Hành động</TableHead>
-                  <TableHead className="text-zinc-400 w-[140px]">ID người dùng</TableHead>
-                  <TableHead className="text-zinc-400 w-[180px]">Tên người dùng</TableHead>
-                  <TableHead className="text-zinc-400 w-[200px]">Email</TableHead>
-                  <TableHead className="text-zinc-400 w-[150px]">Địa chỉ IP</TableHead>
-                  <TableHead className="text-zinc-400 w-[180px]">Thời gian</TableHead>
+                  <TableHead className="text-zinc-400 w-[120px]">Loại</TableHead>
+                  <TableHead className="text-zinc-400 w-[180px]">Hành động</TableHead>
+                  <TableHead className="text-zinc-400 w-[120px]">ID</TableHead>
+                  <TableHead className="text-zinc-400 w-[160px]">Người dùng</TableHead>
+                  <TableHead className="text-zinc-400 w-[180px]">Email</TableHead>
+                  <TableHead className="text-zinc-400 w-[100px]">IP</TableHead>
+                  <TableHead className="text-zinc-400 w-[140px]">Thời gian</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -299,27 +299,44 @@ const AdminLogs = () => {
                   filteredLogs.map((log) => (
                     <TableRow key={log.id} className="border-zinc-800">
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center">
                           {getActivityIcon(log.type)}
                           {getActivityBadge(log.type)}
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">
-                        <div className="font-medium">{log.action}</div>
-                        <div className="text-xs text-zinc-400 mt-1">{log.details}</div>
+                        <div className="font-medium truncate max-w-[160px]" title={log.action}>
+                          {truncateText(log.action, 20)}
+                        </div>
+                        <div className="text-xs text-zinc-400 mt-1 truncate max-w-[160px]" title={log.details}>
+                          {truncateText(log.details, 22)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <button 
                           onClick={() => navigateToUserDetail(log.userId)}
-                          className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors"
+                          className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors truncate max-w-[100px]"
+                          title={log.userId}
                         >
-                          {log.userId}
+                          {truncateText(log.userId, 8)}
                         </button>
                       </TableCell>
-                      <TableCell className="text-sm">{log.userName}</TableCell>
-                      <TableCell className="text-sm text-zinc-400">{log.userEmail}</TableCell>
+                      <TableCell className="text-sm">
+                        <div className="truncate max-w-[140px]" title={log.userName}>
+                          {truncateText(log.userName, 15)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-zinc-400">
+                        <div className="truncate max-w-[160px]" title={log.userEmail}>
+                          {truncateText(log.userEmail, 18)}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm font-mono text-zinc-400">{log.ipAddress}</TableCell>
-                      <TableCell className="text-sm text-zinc-400">{log.timestamp}</TableCell>
+                      <TableCell className="text-sm text-zinc-400">
+                        <div className="truncate" title={log.timestamp}>
+                          {log.timestamp}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
