@@ -19,23 +19,41 @@ import { UserStatusBadge } from './UserStatusBadge';
 import { UserPlanBadge } from './UserPlanBadge';
 import { User } from '@/types/admin-types';
 
-type UsersTableProps = {
+export interface UsersTableProps {
   users: User[];
   selectedUsers: string[];
   selectAll: boolean;
   onSelectAll: () => void;
   onSelectUser: (userId: string) => void;
   onViewUserDetails: (userId: string) => void;
-};
+  loading?: boolean;
+  selectedUser?: User | null;
+  activeUsers?: number;
+  inactiveUsers?: number;
+  suspendedUsers?: number;
+  newUsersThisMonth?: number;
+  searchTerm?: string;
+  filterStatus?: string | null;
+  planFilter?: string | null;
+  usersPerPage?: number;
+  handleSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFilterClick?: (status: string | null) => void;
+  handleUserCheckbox?: (userId: string, checked: boolean) => void;
+  handleBulkAction?: (action: 'activate' | 'deactivate' | 'delete') => void;
+  exportToCSV?: () => void;
+  exportToExcel?: () => void;
+  setPlanFilter?: (plan: string | null) => void;
+  setCurrentPage?: (page: number) => void;
+}
 
-export const UsersTable = ({
+export const UsersTable: React.FC<UsersTableProps> = ({
   users,
   selectedUsers,
   selectAll,
   onSelectAll,
   onSelectUser,
   onViewUserDetails
-}: UsersTableProps) => {
+}) => {
   return (
     <div className="overflow-x-auto">
       <Table>

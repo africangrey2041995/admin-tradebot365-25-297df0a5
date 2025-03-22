@@ -7,8 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { UsersPagination } from '@/components/admin/users/UsersPagination';
-import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
 import { AddUserDialog } from '@/components/admin/users/AddUserDialog';
+import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
 import { useUsers } from '@/hooks/admin/useUsers';
 
 const AdminUsers = () => {
@@ -53,21 +53,21 @@ const AdminUsers = () => {
     setFilterStatus(status);
   };
 
-  const handleUserCheckbox = (userId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedUsers([...selectedUsers, userId]);
-    } else {
+  const handleUserCheckbox = (userId: string) => {
+    if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
+    } else {
+      setSelectedUsers([...selectedUsers, userId]);
     }
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    setSelectAll(checked);
-    if (checked) {
-      setSelectedUsers(users.map(user => user.id));
-    } else {
+  const handleSelectAll = () => {
+    if (selectAll) {
       setSelectedUsers([]);
+    } else {
+      setSelectedUsers(users.map(user => user.id));
     }
+    setSelectAll(!selectAll);
   };
 
   const handleBulkAction = (action: 'activate' | 'deactivate' | 'delete') => {
@@ -95,6 +95,10 @@ const AdminUsers = () => {
     toast.success("User added successfully");
   };
 
+  const handleViewUserDetails = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -118,27 +122,11 @@ const AdminUsers = () => {
         <CardContent>
           <UsersTable
             users={users}
-            loading={loading}
-            selectedUser={selectedUser}
-            activeUsers={activeUsers}
-            inactiveUsers={inactiveUsers}
-            suspendedUsers={suspendedUsers}
-            newUsersThisMonth={newUsersThisMonth}
-            searchTerm={searchTerm}
-            filterStatus={filterStatus}
-            planFilter={planFilter}
             selectedUsers={selectedUsers}
             selectAll={selectAll}
-            usersPerPage={pageSize}
-            handleSearchChange={handleSearchChange}
-            handleFilterClick={handleFilterClick}
-            handleUserCheckbox={handleUserCheckbox}
-            handleSelectAll={handleSelectAll}
-            handleBulkAction={handleBulkAction}
-            exportToCSV={exportToCSV}
-            exportToExcel={exportToExcel}
-            setPlanFilter={setPlanFilter}
-            setCurrentPage={handlePageChange}
+            onSelectAll={handleSelectAll}
+            onSelectUser={handleUserCheckbox}
+            onViewUserDetails={handleViewUserDetails}
           />
 
           <UsersPagination

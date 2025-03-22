@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
-import { PremiumBot } from "@/types/admin-types";
 import { PremiumBotStatsCards } from '@/components/admin/premium-bots/PremiumBotStatsCards';
 import { PremiumBotsActions } from '@/components/admin/premium-bots/PremiumBotsActions';
 import { PremiumBotsTable } from '@/components/admin/premium-bots/PremiumBotsTable';
 import { PremiumBotsPagination } from '@/components/admin/premium-bots/PremiumBotsPagination';
 import { AddPremiumBotDialog } from '@/components/admin/premium-bots/AddPremiumBotDialog';
 import { BulkActionDialog } from '@/components/admin/premium-bots/BulkActionDialog';
-import { BotStatus } from '@/constants/botTypes';
+import { BotStatus, BotType, BotRiskLevel } from '@/constants/botTypes';
+import { PremiumBot } from '@/types/admin-types';
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,43 +48,78 @@ const AdminPremiumBots = () => {
   const bots: PremiumBot[] = [
     { 
       id: 'PRE-001', 
-      name: 'Premium DCA Bot', 
+      name: 'Premium DCA Bot',
+      type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
       users: 48,
       profit: '+18.5%',
-      createdDate: '10/02/2024'
+      createdDate: '10/02/2024',
+      performanceLastMonth: '+12.3%',
+      performanceAllTime: '+56.8%',
+      risk: BotRiskLevel.MEDIUM,
+      minCapital: '$500',
+      subscribers: 48,
+      lastUpdated: '15/02/2024'
     },
     { 
       id: 'PRE-002', 
-      name: 'Premium Swing Trader', 
+      name: 'Premium Swing Trader',
+      type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
       users: 32,
       profit: '+14.3%',
-      createdDate: '15/03/2024'
+      createdDate: '15/03/2024',
+      performanceLastMonth: '+9.2%',
+      performanceAllTime: '+41.5%',
+      risk: BotRiskLevel.MEDIUM,
+      minCapital: '$800',
+      subscribers: 32,
+      lastUpdated: '20/03/2024'
     },
     { 
       id: 'PRE-003', 
-      name: 'Premium Scalper Pro', 
+      name: 'Premium Scalper Pro',
+      type: BotType.PREMIUM_BOT,
       status: BotStatus.INACTIVE,
       users: 12,
       profit: '-2.1%',
-      createdDate: '05/03/2024'
+      createdDate: '05/03/2024',
+      performanceLastMonth: '-2.1%',
+      performanceAllTime: '+15.8%',
+      risk: BotRiskLevel.HIGH,
+      minCapital: '$1000',
+      subscribers: 12,
+      lastUpdated: '10/03/2024'
     },
     { 
       id: 'PRE-004', 
-      name: 'Premium Grid Bot', 
+      name: 'Premium Grid Bot',
+      type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
       users: 56,
       profit: '+9.7%',
-      createdDate: '22/01/2024'
+      createdDate: '22/01/2024',
+      performanceLastMonth: '+5.7%',
+      performanceAllTime: '+35.2%',
+      risk: BotRiskLevel.LOW,
+      minCapital: '$300',
+      subscribers: 56,
+      lastUpdated: '25/01/2024'
     },
     { 
       id: 'PRE-005', 
-      name: 'Premium Crypto Master', 
+      name: 'Premium Crypto Master',
+      type: BotType.PREMIUM_BOT,
       status: BotStatus.MAINTENANCE,
       users: 22,
       profit: '+7.8%',
-      createdDate: '18/11/2023'
+      createdDate: '18/11/2023',
+      performanceLastMonth: '+4.3%',
+      performanceAllTime: '+28.9%',
+      risk: BotRiskLevel.MEDIUM,
+      minCapital: '$600',
+      subscribers: 22,
+      lastUpdated: '22/11/2023'
     }
   ];
 
@@ -142,7 +177,6 @@ const AdminPremiumBots = () => {
     setActiveTab('general');
   };
 
-  // Filter bots based on search term and status filter
   const filteredBots = bots
     .filter(bot => 
       (searchTerm === '' || 
@@ -153,7 +187,6 @@ const AdminPremiumBots = () => {
       (filterStatus === null || bot.status === filterStatus)
     );
   
-  // Handle checkbox change for a single bot
   const handleCheckboxChange = (botId: string) => {
     setSelectedBots(prev => {
       if (prev.includes(botId)) {
@@ -164,7 +197,6 @@ const AdminPremiumBots = () => {
     });
   };
   
-  // Handle select all checkbox change
   const handleSelectAllChange = () => {
     if (selectAll) {
       setSelectedBots([]);
@@ -174,17 +206,14 @@ const AdminPremiumBots = () => {
     setSelectAll(!selectAll);
   };
   
-  // Clear all selections
   const clearSelections = () => {
     setSelectedBots([]);
     setSelectAll(false);
   };
   
-  // Export data to CSV
   const exportToCSV = () => {
     let botsToExport = filteredBots;
     
-    // If there are selected bots, only export those
     if (selectedBots.length > 0) {
       botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
     }
@@ -194,7 +223,6 @@ const AdminPremiumBots = () => {
       return;
     }
     
-    // Create CSV content
     const csvHeader = ["ID", "Tên Bot", "Trạng thái", "Tài khoản", "Lợi nhuận", "Ngày tạo"];
     const csvRows = botsToExport.map(bot => [
       bot.id,
@@ -205,13 +233,11 @@ const AdminPremiumBots = () => {
       bot.createdDate
     ]);
     
-    // Combine header and rows
     const csvContent = [
       csvHeader.join(","),
       ...csvRows.map(row => row.join(","))
     ].join("\n");
     
-    // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -225,11 +251,9 @@ const AdminPremiumBots = () => {
     toast.success(`Đã xuất ${botsToExport.length} bot thành công`);
   };
   
-  // Export data to Excel (XLSX format)
   const exportToExcel = () => {
     let botsToExport = filteredBots;
     
-    // If there are selected bots, only export those
     if (selectedBots.length > 0) {
       botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
     }
@@ -239,7 +263,6 @@ const AdminPremiumBots = () => {
       return;
     }
     
-    // Create a simple HTML table for Excel export
     const tableHTML = `
       <table>
         <thead>
@@ -267,7 +290,6 @@ const AdminPremiumBots = () => {
       </table>
     `;
     
-    // Convert to blob and download
     const blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -281,7 +303,6 @@ const AdminPremiumBots = () => {
     toast.success(`Đã xuất ${botsToExport.length} bot thành công`);
   };
   
-  // Handle bulk action confirmation dialog
   const openBulkActionDialog = (action: 'activate' | 'deactivate') => {
     if (selectedBots.length === 0) {
       toast.error("Vui lòng chọn ít nhất một bot");
@@ -292,20 +313,15 @@ const AdminPremiumBots = () => {
     setIsBulkActionDialogOpen(true);
   };
   
-  // Execute bulk action
   const executeBulkAction = () => {
     if (!bulkAction || selectedBots.length === 0) {
       setIsBulkActionDialogOpen(false);
       return;
     }
     
-    // In a real app, this would call an API to update the bots
-    // For now, we'll just show a success message
-    
     const actionText = bulkAction === 'activate' ? 'kích hoạt' : 'tạm dừng';
     toast.success(`Đã ${actionText} ${selectedBots.length} bot thành công`);
     
-    // Close dialog and clear selections
     setIsBulkActionDialogOpen(false);
     clearSelections();
   };

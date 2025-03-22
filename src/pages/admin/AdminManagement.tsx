@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { UserWithRole } from '@/types/admin-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Switch } from "@/components/ui/switch";
-import { UserWithRole } from "@/types";
 
 // Define a more specific admin role type that excludes "user"
 type AdminRoleType = "admin" | "superadmin";

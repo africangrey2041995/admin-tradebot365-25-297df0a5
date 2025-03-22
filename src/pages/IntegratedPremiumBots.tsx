@@ -14,7 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
-import { PremiumBot } from '@/types';
+import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
+import { PremiumBot } from '@/types/admin-types';
+import { Account } from '@/types';
 
 const integratedPremiumBots: PremiumBot[] = [
   {
@@ -22,17 +24,19 @@ const integratedPremiumBots: PremiumBot[] = [
     name: 'Alpha Momentum',
     description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
     exchange: 'Coinstart Pro',
-    type: 'momentum',
+    type: BotType.PREMIUM_BOT,
     performanceLastMonth: '+18.5%',
     performanceAllTime: '+125.4%',
-    risk: 'medium',
+    risk: BotRiskLevel.MEDIUM,
     minCapital: '$500',
-    status: 'active',
+    status: BotStatus.ACTIVE,
     subscribers: 86,
     imageUrl: null,
     colorScheme: 'green',
     isIntegrated: true,
     botId: 'BOT7459',
+    createdDate: '2023-10-15',
+    lastUpdated: '2023-11-10',
     accounts: [
       {
         id: 'acc-001',
@@ -40,7 +44,13 @@ const integratedPremiumBots: PremiumBot[] = [
         status: 'Connected',
         createdDate: '2023-10-15',
         lastUpdated: '2023-11-10',
-        volumeMultiplier: '2'
+        volumeMultiplier: '2',
+        userId: 'user-123',
+        apiName: 'Binance',
+        apiId: 'binance-123',
+        tradingAccount: 'Spot',
+        tradingAccountType: 'Spot',
+        tradingAccountBalance: '$1,200'
       },
       {
         id: 'acc-002',
@@ -48,7 +58,13 @@ const integratedPremiumBots: PremiumBot[] = [
         status: 'Connected',
         createdDate: '2023-10-20',
         lastUpdated: '2023-11-10',
-        volumeMultiplier: '1'
+        volumeMultiplier: '1',
+        userId: 'user-123',
+        apiName: 'Bybit',
+        apiId: 'bybit-123',
+        tradingAccount: 'Spot',
+        tradingAccountType: 'Spot',
+        tradingAccountBalance: '$800'
       }
     ]
   },
@@ -57,17 +73,19 @@ const integratedPremiumBots: PremiumBot[] = [
     name: 'Gamma Grid',
     description: 'Bot grid trading với chiến lược phân bổ thanh khoản thông minh dựa trên biến động thị trường.',
     exchange: 'Coinstart Pro',
-    type: 'grid',
+    type: BotType.PREMIUM_BOT,
     performanceLastMonth: '+7.6%',
     performanceAllTime: '+52.3%',
-    risk: 'low',
+    risk: BotRiskLevel.LOW,
     minCapital: '$300',
-    status: 'active',
+    status: BotStatus.ACTIVE,
     subscribers: 98,
     imageUrl: null,
     colorScheme: 'purple',
     isIntegrated: true,
     botId: 'BOT8932',
+    createdDate: '2023-11-05',
+    lastUpdated: '2023-11-10',
     accounts: [
       {
         id: 'acc-003',
@@ -75,7 +93,13 @@ const integratedPremiumBots: PremiumBot[] = [
         status: 'Connected',
         createdDate: '2023-11-05',
         lastUpdated: '2023-11-10',
-        volumeMultiplier: '1'
+        volumeMultiplier: '1',
+        userId: 'user-123',
+        apiName: 'Binance',
+        apiId: 'binance-123',
+        tradingAccount: 'Spot',
+        tradingAccountType: 'Spot',
+        tradingAccountBalance: '$1,500'
       }
     ]
   }
@@ -88,7 +112,7 @@ const IntegratedPremiumBots = () => {
 
   const filteredBots = integratedPremiumBots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        bot.description.toLowerCase().includes(searchTerm.toLowerCase());
+                        (bot.description?.toLowerCase().includes(searchTerm.toLowerCase()) || false);
     const matchesRisk = riskFilter === 'all' || bot.risk === riskFilter;
     
     return matchesSearch && matchesRisk;
@@ -96,6 +120,12 @@ const IntegratedPremiumBots = () => {
 
   const handleBotClick = (botId: string) => {
     navigate(`/integrated-premium-bots/${botId}`);
+  };
+
+  const getAccountCount = (accounts: Account[] | number | undefined): string => {
+    if (!accounts) return "0";
+    if (typeof accounts === 'number') return accounts.toString();
+    return accounts.length.toString();
   };
 
   const cardVariants = {
@@ -189,7 +219,7 @@ const IntegratedPremiumBots = () => {
                 <PremiumBotCard 
                   id={bot.id}
                   name={bot.name}
-                  description={bot.description}
+                  description={bot.description || ''}
                   exchange={bot.exchange}
                   type={bot.type}
                   performanceLastMonth={bot.performanceLastMonth}
@@ -200,7 +230,7 @@ const IntegratedPremiumBots = () => {
                   imageUrl={bot.imageUrl}
                   colorScheme={bot.colorScheme}
                   isIntegrated={true}
-                  accountCount={bot.accounts?.length.toString() || "0"}
+                  accountCount={getAccountCount(bot.accounts)}
                   botId={bot.botId}
                 />
               </motion.div>

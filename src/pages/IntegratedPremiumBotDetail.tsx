@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -57,7 +56,7 @@ const tradePerformanceData = [
 
 const monthlyPerformance = [
   { month: 'Jan', value: 12.5 },
-  { month: 'Feb', value: 8.3 },
+  { name: 'Feb', value: 8.3 },
   { name: 'Mar', value: -2.1 },
   { name: 'Apr', value: 5.7 },
   { name: 'May', value: 15.2 },
@@ -113,6 +112,8 @@ const AdminPremiumBotDetail = () => {
           colorScheme: 'green',
           isIntegrated: true,
           botId: 'PRE7459',
+          createdDate: '2023-10-15',
+          lastUpdated: '2023-11-10'
         };
         
         setBot(mockBot);
@@ -229,6 +230,10 @@ const AdminPremiumBotDetail = () => {
         { year: '2023', value: 125.4 }
       ];
     }
+  };
+
+  const handleAddAccount = () => {
+    toast.success("Opening add account dialog");
   };
 
   if (isLoading) {
@@ -775,7 +780,7 @@ const AdminPremiumBotDetail = () => {
         </TabsContent>
         
         <TabsContent value="accounts">
-          <BotProfileTabs botId={bot.id} />
+          <BotProfileTabs botId={bot?.id || ''} onAddAccount={handleAddAccount} />
         </TabsContent>
         
         <TabsContent value="trading-logs">
@@ -815,3 +820,4 @@ const AdminPremiumBotDetail = () => {
 };
 
 export default AdminPremiumBotDetail;
+
