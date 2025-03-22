@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Search, RefreshCw, MoreHorizontal } from "lucide-react";
+import { UserPlus, Search, RefreshCw, MoreHorizontal, Users, UserCheck, UserX, TrendingUp } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useNavigate } from 'react-router-dom';
+import { UsersStatsCards } from '@/components/admin/users/UsersStatsCards';
+import { useUsers } from '@/hooks/admin/useUsers';
 
 const Users = () => {
   // Make sure these state hooks are properly defined
@@ -37,6 +40,16 @@ const Users = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   
   const navigate = useNavigate();
+  const { totalUsers } = useUsers();
+
+  // Mock stats data
+  const statsData = {
+    totalUsers: 5,
+    activeUsers: 3,
+    inactiveUsers: 1,
+    suspendedUsers: 1,
+    newUsersThisMonth: 2
+  };
 
   const mockUsers = [
     {
@@ -130,6 +143,16 @@ const Users = () => {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="mb-6">
+        <UsersStatsCards 
+          totalUsers={statsData.totalUsers}
+          activeUsers={statsData.activeUsers}
+          inactiveUsers={statsData.inactiveUsers}
+          suspendedUsers={statsData.suspendedUsers}
+          newUsersThisMonth={statsData.newUsersThisMonth}
+        />
+      </div>
+      
       <Card className="border-zinc-800 bg-zinc-900 text-white">
         <CardHeader>
           <CardTitle>Quản lý Người dùng</CardTitle>
