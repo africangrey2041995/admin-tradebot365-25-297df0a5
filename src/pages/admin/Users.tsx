@@ -43,9 +43,11 @@ const Users = () => {
   const statsData = {
     totalUsers: 5,
     activeUsers: 3,
-    inactiveUsers: 1,
-    suspendedUsers: 1,
-    newUsersThisMonth: 2
+    inactiveUsers: 2,
+    suspendedUsers: 0,
+    newUsersThisMonth: 2,
+    newUsersThisWeek: 1,
+    newUsersToday: 0
   };
 
   const mockUsers = [
@@ -146,6 +148,8 @@ const Users = () => {
           inactiveUsers={statsData.inactiveUsers}
           suspendedUsers={statsData.suspendedUsers}
           newUsersThisMonth={statsData.newUsersThisMonth}
+          newUsersThisWeek={statsData.newUsersThisWeek}
+          newUsersToday={statsData.newUsersToday}
         />
       </div>
       
