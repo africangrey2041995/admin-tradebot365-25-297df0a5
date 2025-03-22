@@ -50,12 +50,12 @@ const packageSchema = z.object({
   features: z.array(z.string().min(1, 'Tính năng không được để trống')),
   limits: z.object({
     bots: z.union([
-      z.literal('Infinity').transform(() => Infinity),
+      z.literal('Infinity').transform(() => Infinity as number),
       z.number().min(0, 'Giới hạn bot phải là số dương hoặc không giới hạn'),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
     accounts: z.union([
-      z.literal('Infinity').transform(() => Infinity),
+      z.literal('Infinity').transform(() => Infinity as number),
       z.number().min(0, 'Giới hạn tài khoản phải là số dương hoặc không giới hạn'),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
@@ -89,15 +89,25 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   package: pkg,
   isSubmitting
 }) => {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(packageSchema),
-    defaultValues: pkg ? {
-      ...pkg,
-      limits: {
-        bots: pkg.limits.bots === Infinity ? 'Infinity' : pkg.limits.bots,
-        accounts: pkg.limits.accounts === Infinity ? 'Infinity' : pkg.limits.accounts,
-      }
-    } : {
+  // Create specific defaultValues by processing the package data
+  const getDefaultValues = (): FormValues => {
+    if (pkg) {
+      return {
+        ...pkg,
+        limits: {
+          bots: pkg.limits.bots === Infinity ? 'Infinity' : pkg.limits.bots,
+          accounts: pkg.limits.accounts === Infinity ? 'Infinity' : pkg.limits.accounts,
+        },
+        pricing: {
+          monthly: pkg.pricing.monthly,
+          quarterly: pkg.pricing.quarterly,
+          yearly: pkg.pricing.yearly,
+          currency: pkg.pricing.currency,
+        }
+      } as unknown as FormValues;
+    }
+
+    return {
       planId: UserPlan.BASIC,
       name: '',
       description: '',
@@ -115,7 +125,12 @@ export const PackageForm: React.FC<PackageFormProps> = ({
       isActive: true,
       isPopular: false,
       isEnterprise: false,
-    }
+    };
+  };
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(packageSchema),
+    defaultValues: getDefaultValues()
   });
 
   const { control, handleSubmit, setValue, watch } = form;
