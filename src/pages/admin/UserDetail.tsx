@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,10 +34,11 @@ import {
   CreditCard,
   ArrowLeft,
   Eye,
-  Search
+  Search,
+  Package
 } from "lucide-react";
+import { UserPackageManagement } from '@/components/admin/users/UserPackageManagement';
 
-// Custom Badge Components for Role and Status
 const RoleBadge = ({ role }: { role: string }) => {
   return (
     <Badge
@@ -286,6 +286,10 @@ const AdminUserDetail = () => {
             <CreditCard className="h-4 w-4 mr-2" />
             Gói đăng ký
           </TabsTrigger>
+          <TabsTrigger value="packages" className="data-[state=active]:bg-zinc-700">
+            <Package className="h-4 w-4 mr-2" />
+            Quản lý gói
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -311,7 +315,7 @@ const AdminUserDetail = () => {
                   <div>{user.phone}</div>
                 </div>
                 <div className="space-y-2">
-                  <div className="text-sm text-zinc-400">Địa chỉ</div>
+                  <div className="text-sm text-zinc-400">��ịa chỉ</div>
                   <div>{user.address || "Chưa cập nhật"}</div>
                 </div>
                 <div className="space-y-2">
@@ -652,6 +656,81 @@ const AdminUserDetail = () => {
                       <td className="py-3">01/01/2024</td>
                       <td className="py-3">Nâng cấp lên gói Basic</td>
                       <td className="py-3 text-right">200,000 VND</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="packages" className="space-y-6">
+          <UserPackageManagement 
+            userId={userId || ''}
+            currentPlan={user.subscription.toLowerCase()}
+            subscriptionStartDate="2023-03-01"
+            subscriptionEndDate="2024-03-01"
+            autoRenew={true}
+            paymentMethod="Thẻ tín dụng"
+            lastPaymentDate="2023-03-01"
+            paymentAmount="500,000 VND"
+          />
+
+          <Card className="border-zinc-800 bg-zinc-900 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Clock className="h-5 w-5 mr-2 text-amber-500" />
+                Lịch sử thay đổi gói
+              </CardTitle>
+              <CardDescription className="text-zinc-400">
+                Lịch sử các thay đổi gói dịch vụ của người dùng
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-zinc-800">
+                      <th className="text-left pb-3 text-zinc-400">Ngày thay đổi</th>
+                      <th className="text-left pb-3 text-zinc-400">Hành động</th>
+                      <th className="text-left pb-3 text-zinc-400">Gói cũ</th>
+                      <th className="text-left pb-3 text-zinc-400">Gói mới</th>
+                      <th className="text-left pb-3 text-zinc-400">Thực hiện bởi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-zinc-800">
+                      <td className="py-3">01/03/2023</td>
+                      <td className="py-3">
+                        <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/30 border-0">
+                          Nâng cấp
+                        </Badge>
+                      </td>
+                      <td className="py-3">Basic</td>
+                      <td className="py-3">Premium</td>
+                      <td className="py-3">Admin (id: admin-001)</td>
+                    </tr>
+                    <tr className="border-b border-zinc-800">
+                      <td className="py-3">01/02/2023</td>
+                      <td className="py-3">
+                        <Badge className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-0">
+                          Nâng cấp
+                        </Badge>
+                      </td>
+                      <td className="py-3">Free</td>
+                      <td className="py-3">Basic</td>
+                      <td className="py-3">Người dùng</td>
+                    </tr>
+                    <tr className="border-b border-zinc-800">
+                      <td className="py-3">15/08/2022</td>
+                      <td className="py-3">
+                        <Badge className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0">
+                          Đăng ký
+                        </Badge>
+                      </td>
+                      <td className="py-3">-</td>
+                      <td className="py-3">Free</td>
+                      <td className="py-3">Người dùng</td>
                     </tr>
                   </tbody>
                 </table>

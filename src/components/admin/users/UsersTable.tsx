@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserPlanBadge } from "../users/UserPlanBadge";
 
 interface User {
   id: string;
@@ -84,7 +85,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({
               <TableCell>{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.status}</TableCell>
-              <TableCell>{user.plan}</TableCell>
+              <TableCell>
+                <UserPlanBadge plan={user.plan} />
+              </TableCell>
               <TableCell>{user.joinDate}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
