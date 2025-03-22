@@ -26,13 +26,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Package } from '@/types';
 import { UserPlan, USER_PLAN_DISPLAY } from '@/constants/userConstants';
-import { Loader2, Plus, X } from 'lucide-react';
+import { Loader2, Plus, X, Info } from 'lucide-react';
 
 interface PackageFormProps {
   open: boolean;
@@ -42,6 +48,17 @@ interface PackageFormProps {
   isSubmitting: boolean;
 }
 
+// Helper function to transform limit values
+const transformLimitValue = (value: number): number => {
+  // If value is 0 or greater than 999, treat as unlimited (Infinity)
+  return value === 0 || value > 999 ? Infinity : value;
+};
+
+// Helper function to display limit values
+const displayLimitValue = (value: number): string => {
+  return value === Infinity ? "0" : value.toString();
+};
+
 // Define form schema using Zod
 const packageSchema = z.object({
   planId: z.nativeEnum(UserPlan),
@@ -49,16 +66,12 @@ const packageSchema = z.object({
   description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự'),
   features: z.array(z.string().min(1, 'Tính năng không được để trống')),
   limits: z.object({
-    bots: z.union([
-      z.literal('Infinity'),
-      z.number().min(0),
-      z.string().regex(/^\d+$/).transform(val => Number(val))
-    ]),
-    accounts: z.union([
-      z.literal('Infinity'),
-      z.number().min(0),
-      z.string().regex(/^\d+$/).transform(val => Number(val))
-    ]),
+    bots: z.number()
+      .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
+      .transform(transformLimitValue),
+    accounts: z.number()
+      .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
+      .transform(transformLimitValue),
   }),
   pricing: z.object({
     monthly: z.union([
@@ -96,8 +109,8 @@ export const PackageForm: React.FC<PackageFormProps> = ({
       return {
         ...pkg,
         limits: {
-          bots: pkg.limits.bots === Infinity ? 'Infinity' : pkg.limits.bots,
-          accounts: pkg.limits.accounts === Infinity ? 'Infinity' : pkg.limits.accounts,
+          bots: pkg.limits.bots === Infinity ? 0 : pkg.limits.bots,
+          accounts: pkg.limits.accounts === Infinity ? 0 : pkg.limits.accounts,
         },
         pricing: {
           monthly: pkg.pricing.monthly,
@@ -108,7 +121,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         isActive: pkg.isActive,
         isPopular: pkg.isPopular || false,
         isEnterprise: pkg.isEnterprise || false,
-      } as unknown as FormValues;
+      } as FormValues;
     }
 
     // For creating a new package
@@ -152,9 +165,10 @@ export const PackageForm: React.FC<PackageFormProps> = ({
     // Process data before submitting
     const submittedData: Partial<Package> = {
       ...data,
+      // No need for special handling since schema transformation already happens
       limits: {
-        bots: data.limits.bots === 'Infinity' ? Infinity : Number(data.limits.bots),
-        accounts: data.limits.accounts === 'Infinity' ? Infinity : Number(data.limits.accounts),
+        bots: data.limits.bots,
+        accounts: data.limits.accounts,
       },
       pricing: {
         monthly: Number(data.pricing.monthly),
@@ -315,16 +329,30 @@ export const PackageForm: React.FC<PackageFormProps> = ({
                           <div className="relative">
                             <Input
                               {...field}
+                              type="number"
+                              min="0"
                               placeholder="Số bot"
                               className="bg-zinc-800 border-zinc-700 pl-10"
+                              onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                              value={displayLimitValue(field.value)}
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
                               Bots:
                             </span>
                           </div>
                         </FormControl>
-                        <FormDescription className="text-xs">
-                          Nhập "Infinity" cho không giới hạn
+                        <FormDescription className="text-xs flex items-center gap-1">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3 w-3 cursor-help text-zinc-400" />
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-zinc-800 border-zinc-700 text-white">
+                                <p>Nhập 0 hoặc lớn hơn 999 để đặt không giới hạn</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <span>Nhập 0 hoặc &gt;999 cho không giới hạn</span>
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -340,8 +368,12 @@ export const PackageForm: React.FC<PackageFormProps> = ({
                           <div className="relative">
                             <Input
                               {...field}
+                              type="number"
+                              min="0"
                               placeholder="Số tài khoản"
                               className="bg-zinc-800 border-zinc-700 pl-10"
+                              onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                              value={displayLimitValue(field.value)}
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
                               Acc:
