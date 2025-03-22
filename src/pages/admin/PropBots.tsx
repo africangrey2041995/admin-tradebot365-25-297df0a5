@@ -37,6 +37,13 @@ const AdminPropBots = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  const totalBots = 4;
+  const activeBots = 2;
+  const totalUsers = 25;
+  const averageUsersPerBot = Math.round(totalUsers / totalBots);
+  const totalProfit = '+14.7%';
+  const activePercent = Math.round((activeBots / totalBots) * 100);
+  
   const [newBot, setNewBot] = useState({
     name: '',
     description: '',
@@ -186,6 +193,56 @@ const AdminPropBots = () => {
           Thêm Prop Bot mới
         </Button>
       </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center">
+              <div className="w-full">
+                <p className="text-zinc-400 text-sm">Tài khoản</p>
+                <h3 className="text-3xl font-bold mt-1">{totalUsers}</h3>
+                <div className="mt-4">
+                  <p className="text-zinc-400 text-xs">Bình quân mỗi bot</p>
+                  <p className="text-lg font-medium">{averageUsersPerBot}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center">
+              <div className="w-full">
+                <p className="text-zinc-400 text-sm">Prop Bots</p>
+                <h3 className="text-3xl font-bold mt-1">{totalBots}</h3>
+                <div className="mt-4">
+                  <p className="text-zinc-400 text-xs">Đang hoạt động</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-medium">{activeBots}</p>
+                    <span className="text-xs text-green-500">({activePercent}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center">
+              <div className="w-full">
+                <p className="text-zinc-400 text-sm">Lợi nhuận trung bình</p>
+                <h3 className="text-3xl font-bold mt-1 text-green-500">{totalProfit}</h3>
+                <div className="mt-4">
+                  <p className="text-zinc-400 text-xs">Tháng này</p>
+                  <p className="text-lg font-medium text-green-500">+8.5%</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className="border-zinc-800 bg-zinc-900 text-white">
         <CardHeader>
@@ -222,7 +279,7 @@ const AdminPropBots = () => {
                   <TableHead className="text-zinc-400 w-28">ID</TableHead>
                   <TableHead className="text-zinc-400">Tên Bot</TableHead>
                   <TableHead className="text-zinc-400">Trạng thái</TableHead>
-                  <TableHead className="text-zinc-400 text-right">Người dùng</TableHead>
+                  <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
                   <TableHead className="text-zinc-400 text-right">Lợi nhuận</TableHead>
                   <TableHead className="text-zinc-400">Ngày tạo</TableHead>
                   <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
