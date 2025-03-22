@@ -111,3 +111,16 @@ export interface ExtendedSignal extends TradingViewSignal {
   exchange?: string;
   processingTime?: string;
 }
+
+// Add ActivityLog interface for the system logs
+export interface ActivityLog {
+  id: string;
+  type: 'user_registration' | 'user_login' | 'admin_login' | 'admin_action';
+  action: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  ipAddress: string;
+  timestamp: string;
+  details: string;
+}
