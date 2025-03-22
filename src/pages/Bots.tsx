@@ -117,7 +117,7 @@ const Bots = () => {
   };
 
   return (
-    <MainLayout title="Quản Lý Bot">
+    <MainLayout title="Bot Người Dùng">
       <BotsHeader 
         onAddBot={() => setIsAddBotDialogOpen(true)} 
         searchTerm={searchTerm}
