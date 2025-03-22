@@ -26,6 +26,8 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
         navigate(`/integrated-premium-bots/${botId.toLowerCase()}`);
       } else if (botId.startsWith("PROP")) {
         navigate(`/integrated-prop-bots/${botId.toLowerCase()}`);
+      } else {
+        console.log("Unknown bot type for ID:", botId);
       }
     }
   };

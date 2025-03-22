@@ -20,7 +20,11 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   loading 
 }) => {
   if (loading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading error signals...</div>;
+    return (
+      <div className="py-8 text-center text-muted-foreground">
+        <div className="animate-pulse">Loading error signals...</div>
+      </div>
+    );
   }
 
   if (errorSignals.length === 0) {
