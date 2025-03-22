@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -210,7 +209,7 @@ const AdminPremiumBots = () => {
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <div className="w-full">
-                <p className="text-zinc-400 text-sm">Người dùng</p>
+                <p className="text-zinc-400 text-sm">Tài khoản</p>
                 <h3 className="text-3xl font-bold mt-1">{totalUsers}</h3>
                 <div className="mt-4">
                   <p className="text-zinc-400 text-xs">Bình quân mỗi bot</p>
@@ -274,7 +273,7 @@ const AdminPremiumBots = () => {
                   <TableHead className="text-zinc-400 w-28">ID</TableHead>
                   <TableHead className="text-zinc-400">Tên Bot</TableHead>
                   <TableHead className="text-zinc-400">Trạng thái</TableHead>
-                  <TableHead className="text-zinc-400 text-right">Người dùng</TableHead>
+                  <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
                   <TableHead className="text-zinc-400 text-right">Lợi nhuận</TableHead>
                   <TableHead className="text-zinc-400">Ngày tạo</TableHead>
                   <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
