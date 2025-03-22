@@ -1,31 +1,53 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { LucideIcon } from 'lucide-react';
-import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import React, { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface NavMenuItemProps {
-  icon: LucideIcon;
-  label: string;
-  path: string;
-  isActive: boolean;
+  icon?: ReactNode;
+  children: ReactNode;
+  isActive?: boolean;
+  asChild?: boolean;
+  onClick?: () => void;
+  tooltipText?: string;
 }
 
-const NavMenuItem = ({ icon: Icon, label, path, isActive }: NavMenuItemProps) => {
-  return (
-    <SidebarMenuItem key={path}>
-      <SidebarMenuButton 
-        asChild 
-        isActive={isActive}
-        tooltip={label}
-      >
-        <Link to={path}>
-          <Icon className="h-4 w-4" />
-          <span>{label}</span>
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
+const NavMenuItem: React.FC<NavMenuItemProps> = ({
+  icon,
+  children,
+  isActive = false,
+  asChild = false,
+  onClick,
+  tooltipText
+}) => {
+  const menuItem = (
+    <div
+      className={cn(
+        "flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer",
+        "transition-colors duration-200",
+        isActive
+          ? "bg-zinc-800 text-white"
+          : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+      )}
+      onClick={onClick}
+    >
+      {icon && <span className="mr-2">{icon}</span>}
+      <span className="flex-1">{children}</span>
+    </div>
   );
+
+  if (tooltipText) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>{menuItem}</TooltipTrigger>
+          <TooltipContent>{tooltipText}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return menuItem;
 };
 
 export default NavMenuItem;

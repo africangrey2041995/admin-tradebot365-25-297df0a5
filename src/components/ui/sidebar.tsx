@@ -1,83 +1,107 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { ReactNode, createContext, useContext, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type SidebarState = 'expanded' | 'collapsed';
 
 interface SidebarContextType {
   state: SidebarState;
-  setState: (state: SidebarState) => void;
   openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
+  setOpenMobile: React.Dispatch<React.SetStateAction<boolean>>;
+  toggle: () => void;
+  expand: () => void;
+  collapse: () => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export const SidebarProvider = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState<SidebarState>('expanded');
-  const [openMobile, setOpenMobile] = useState(false);
-
-  return (
-    <SidebarContext.Provider value={{ state, setState, openMobile, setOpenMobile }}>
-      {children}
-    </SidebarContext.Provider>
-  );
-};
-
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSidebar must be used within a SidebarProvider');
   }
   return context;
 };
 
-export const Sidebar = ({ className, children }: { className?: string, children: ReactNode }) => {
-  return <div className={className}>{children}</div>;
+export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [state, setState] = useState<SidebarState>('expanded');
+  const [openMobile, setOpenMobile] = useState(false);
+
+  const toggle = () => {
+    setState(prevState => (prevState === 'expanded' ? 'collapsed' : 'expanded'));
+  };
+
+  const expand = () => setState('expanded');
+  const collapse = () => setState('collapsed');
+
+  return (
+    <SidebarContext.Provider value={{ state, openMobile, setOpenMobile, toggle, expand, collapse }}>
+      {children}
+    </SidebarContext.Provider>
+  );
 };
 
-export const SidebarContent = ({ className, children }: { className?: string, children: ReactNode }) => {
-  return <div className={className}>{children}</div>;
+// Sidebar components
+export const Sidebar: React.FC<{ className?: string; children: ReactNode }> = ({ className, children }) => {
+  return <div className={cn("h-screen", className)}>{children}</div>;
 };
 
-export const SidebarTrigger = ({ className }: { className?: string }) => {
-  const { state, setState } = useSidebar();
+export const SidebarContent: React.FC<{ className?: string; children: ReactNode }> = ({ className, children }) => {
+  const { state, openMobile } = useSidebar();
+  
+  return (
+    <div className={cn(
+      "h-full overflow-y-auto",
+      state === 'collapsed' ? 'w-16' : 'w-64',
+      openMobile ? 'block' : 'hidden md:block',
+      className
+    )}>
+      {children}
+    </div>
+  );
+};
+
+export const SidebarTrigger: React.FC<{ className?: string }> = ({ className }) => {
+  const { toggle } = useSidebar();
+  
   return (
     <button 
-      className={className}
-      onClick={() => setState(state === 'expanded' ? 'collapsed' : 'expanded')}
+      onClick={toggle}
+      className={cn("p-2 rounded-md", className)}
     >
-      Toggle
+      ☰
     </button>
   );
 };
 
-export const SidebarSeparator = ({ className }: { className?: string }) => {
-  return <hr className={className} />;
+export const SidebarSeparator: React.FC<{ className?: string }> = ({ className }) => {
+  return <div className={cn("h-[1px] w-full my-2", className)} />;
 };
 
-export const SidebarMenu = ({ children }: { children: ReactNode }) => {
-  return <ul className="space-y-1">{children}</ul>;
+export const SidebarMenu: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return <div className="space-y-1 px-2">{children}</div>;
 };
 
-export const SidebarMenuItem = ({ children }: { children: ReactNode }) => {
-  return <li>{children}</li>;
+export const SidebarMenuItem: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return <div>{children}</div>;
 };
 
-export const SidebarMenuButton = ({ 
+export const SidebarMenuButton: React.FC<{ 
+  children: ReactNode;
+  asChild?: boolean;
+  isActive?: boolean;
+  onClick?: () => void;
+}> = ({ 
   children, 
-  asChild = false,
   isActive = false,
   onClick
-}: { 
-  children: ReactNode, 
-  asChild?: boolean,
-  isActive?: boolean,
-  onClick?: () => void
 }) => {
-  if (asChild) return <>{children}</>;
   return (
-    <button 
-      className={`flex items-center w-full px-3 py-2 text-sm rounded-md ${isActive ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
+    <button
+      className={cn(
+        "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+        isActive ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+      )}
       onClick={onClick}
     >
       {children}
@@ -85,14 +109,14 @@ export const SidebarMenuButton = ({
   );
 };
 
-export const SidebarGroup = ({ children }: { children: ReactNode }) => {
-  return <div className="py-2">{children}</div>;
+export const SidebarGroup: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return <div className="mb-4">{children}</div>;
 };
 
-export const SidebarGroupLabel = ({ children }: { children: ReactNode }) => {
-  return <h3 className="px-3 py-2 text-xs font-medium text-zinc-500">{children}</h3>;
+export const SidebarGroupLabel: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return <h3 className="px-3 mb-1 text-xs font-semibold text-zinc-500 uppercase tracking-wider">{children}</h3>;
 };
 
-export const SidebarGroupContent = ({ children }: { children: ReactNode }) => {
+export const SidebarGroupContent: React.FC<{ children: ReactNode }> = ({ children }) => {
   return <div>{children}</div>;
 };
