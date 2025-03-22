@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { UserCog, Download } from "lucide-react";
+import { UserCog, Download, FileSpreadsheet } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,12 +16,14 @@ type UserActionsProps = {
   selectedUsers: string[];
   onBulkAction: (action: string) => void;
   onExportCSV: () => void;
+  onExportExcel: () => void;
 };
 
 export const UserActions = ({
   selectedUsers,
   onBulkAction,
-  onExportCSV
+  onExportCSV,
+  onExportExcel
 }: UserActionsProps) => {
   return (
     <div className="flex gap-2 w-full sm:w-auto justify-end">
@@ -71,14 +73,35 @@ export const UserActions = ({
         </DropdownMenuContent>
       </DropdownMenu>
       
-      <Button 
-        variant="outline" 
-        className="border-zinc-700 text-zinc-400"
-        onClick={onExportCSV}
-      >
-        <Download className="h-4 w-4 mr-2" />
-        Xuất CSV
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="border-zinc-700 text-zinc-400"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Xuất dữ liệu
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
+          <DropdownMenuLabel>Xuất dữ liệu</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuItem 
+            className="focus:bg-zinc-800 cursor-pointer"
+            onClick={onExportExcel}
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            <span>Xuất Excel</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            className="focus:bg-zinc-800 cursor-pointer"
+            onClick={onExportCSV}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            <span>Xuất CSV</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

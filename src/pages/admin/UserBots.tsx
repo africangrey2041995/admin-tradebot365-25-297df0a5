@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -20,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { UserBot } from '@/types/admin-types';
+import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
 
 const AdminUserBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -142,13 +142,40 @@ const AdminUserBots = () => {
       return;
     }
 
-    // In a real app, we would generate and download the file here
-    // For now, we'll just show a toast message
-    const fileName = `user-bots-${new Date().toISOString().slice(0, 10)}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+    // Define headers for export
+    const headers = ["ID", "Tên Bot", "Chủ sở hữu", "ID chủ sở hữu", "Trạng thái", "Tài khoản", "Ngày tạo"];
+    
+    // Map status to Vietnamese
+    const translateStatus = (status: string): string => {
+      switch(status) {
+        case 'active': return 'Hoạt động';
+        case 'inactive': return 'Không hoạt động';
+        default: return status;
+      }
+    };
+    
+    // Format data for export
+    const exportData = botsToExport.map(bot => [
+      bot.id,
+      bot.name,
+      bot.owner,
+      bot.ownerId,
+      translateStatus(bot.status),
+      bot.accounts.toString(),
+      bot.createdDate
+    ]);
+    
+    const filename = `user-bots-${new Date().toISOString().slice(0, 10)}`;
+    
+    if (format === 'csv') {
+      exportToCSV(headers, exportData, filename);
+    } else {
+      exportToExcel(headers, exportData, filename, 'User Bots');
+    }
     
     toast.success(
       `Đã xuất ${botsToExport.length} bot ra file ${format.toUpperCase()}`,
-      { description: `Tên file: ${fileName}` }
+      { description: `Dữ liệu đã được xuất thành công` }
     );
   };
 

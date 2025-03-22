@@ -3,6 +3,8 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Search, Filter, Play, Pause, Download, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { FileSpreadsheet } from "lucide-react";
 
 interface PremiumBotsActionsProps {
   searchTerm: string;
@@ -71,24 +73,36 @@ export const PremiumBotsActions: React.FC<PremiumBotsActionsProps> = ({
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-zinc-700 text-zinc-400"
-            onClick={() => exportToCSV()}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Xuất CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-zinc-700 text-zinc-400"
-            onClick={() => exportToExcel()}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Xuất Excel
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-zinc-700 text-zinc-400"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Xuất dữ liệu
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
+              <DropdownMenuLabel>Xuất dữ liệu</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem 
+                className="focus:bg-zinc-800 cursor-pointer"
+                onClick={exportToExcel}
+              >
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                <span>Xuất Excel</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="focus:bg-zinc-800 cursor-pointer"
+                onClick={exportToCSV}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                <span>Xuất CSV</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="outline"
             size="sm"
