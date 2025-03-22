@@ -1,47 +1,92 @@
 
-import React, { useState, ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { LucideIcon, ChevronDown } from 'lucide-react';
+import { SidebarMenuItem } from '@/components/ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
-interface CollapsibleMenuItemProps {
-  icon?: React.ReactNode;
-  title: string;
-  defaultOpen?: boolean;
-  children: ReactNode;
+interface SubItem {
+  icon: LucideIcon;
+  label: string;
+  path: string;
 }
 
-const CollapsibleMenuItem: React.FC<CollapsibleMenuItemProps> = ({
-  icon,
-  title,
-  defaultOpen = false,
-  children
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+interface CollapsibleMenuItemProps {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+  isActive: boolean;
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
+  subItems: SubItem[];
+  isActiveSubItem: (path: string) => boolean;
+}
 
-  const toggleOpen = () => setIsOpen(!isOpen);
-
+const CollapsibleMenuItem = ({ 
+  icon: Icon, 
+  label, 
+  path, 
+  isActive, 
+  isOpen, 
+  setOpen,
+  subItems,
+  isActiveSubItem
+}: CollapsibleMenuItemProps) => {
   return (
-    <div className="mb-1">
-      <button
-        onClick={toggleOpen}
-        className={cn(
-          "flex items-center w-full px-3 py-2 text-sm font-medium rounded-md",
-          "hover:bg-zinc-800 hover:text-white transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-zinc-700",
-          isOpen ? "bg-zinc-800 text-white" : "text-zinc-400"
-        )}
+    <SidebarMenuItem className="flex flex-col mb-0">
+      {/* Main item link */}
+      <Link 
+        to={path}
+        className={`
+          flex items-center py-2 px-3 text-sm rounded-md w-full mb-0
+          ${isActive && !isOpen
+            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
+            : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
+          }
+        `}
       >
-        {icon && <span className="mr-2">{icon}</span>}
-        <span className="flex-1 text-left">{title}</span>
-        <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "transform rotate-180")} />
-      </button>
+        <Icon className="h-4 w-4 mr-2" />
+        <span>{label}</span>
+      </Link>
       
-      {isOpen && (
-        <div className="mt-1 ml-6 pl-2 border-l border-zinc-700">
-          {children}
-        </div>
-      )}
-    </div>
+      {/* Collapsible sub-items */}
+      <Collapsible 
+        open={isOpen} 
+        onOpenChange={setOpen}
+        className="w-full"
+      >
+        <CollapsibleTrigger asChild>
+          <button
+            className={`
+              flex items-center justify-end py-0.5 px-3 text-sm rounded-md w-full
+              text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
+            `}
+          >
+            <ChevronDown 
+              className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" 
+            />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-0.5">
+          {subItems.map((subItem) => (
+            <Link 
+              key={subItem.path} 
+              to={subItem.path}
+              className={`
+                flex items-center py-1.5 px-6 text-sm rounded-md ml-4
+                ${isActiveSubItem(subItem.path) 
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
+                  : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
+                }
+              `}
+            >
+              <subItem.icon className="h-3.5 w-3.5 mr-2" />
+              <span>{subItem.label}</span>
+            </Link>
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
+    </SidebarMenuItem>
   );
 };
 

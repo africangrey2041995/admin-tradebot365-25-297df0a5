@@ -1,19 +1,36 @@
 
-import { useState, useEffect } from 'react';
+import * as React from "react"
+
+const MOBILE_BREAKPOINT = 640 // Changed from 768 to 640 for better mobile detection
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' ? window.innerWidth < 768 : false
-  );
+  const [isMobile, setIsMobile] = React.useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  )
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    
+    const onChange = () => {
+      const isMobileView = window.innerWidth < MOBILE_BREAKPOINT
+      setIsMobile(isMobileView)
+      
+      // Handle html class for global styles
+      if (isMobileView) {
+        document.documentElement.classList.add('is-mobile')
+      } else {
+        document.documentElement.classList.remove('is-mobile')
+      }
+    }
+    
+    // Modern way to listen for changes
+    mql.addEventListener("change", onChange)
+    onChange() // Call initially to set the state
+    
+    return () => {
+      mql.removeEventListener("change", onChange)
+    }
+  }, [])
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return isMobile;
+  return isMobile
 }

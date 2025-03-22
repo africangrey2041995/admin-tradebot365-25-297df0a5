@@ -1,24 +1,23 @@
 
-import React, { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import React from 'react';
+import { SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu } from '@/components/ui/sidebar';
 
 interface NavGroupProps {
-  title?: string;
-  children: ReactNode;
+  label: string;
+  children: React.ReactNode;
+  noSpacing?: boolean;
 }
 
-const NavGroup: React.FC<NavGroupProps> = ({ title, children }) => {
+const NavGroup = ({ label, children, noSpacing = false }: NavGroupProps) => {
   return (
-    <div className="mb-6">
-      {title && (
-        <h2 className="px-3 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-          {title}
-        </h2>
-      )}
-      <div className="space-y-1">
-        {children}
-      </div>
-    </div>
+    <SidebarGroup>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu className={noSpacing ? "flex flex-col space-y-0" : ""}>
+          {children}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 };
 

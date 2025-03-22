@@ -1,236 +1,139 @@
 
-import { useEffect } from "react";
-import { useRoutes, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/theme-provider";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { AuthProvider } from "@/context/auth-context";
-import { SocketProvider } from "@/context/socket-context";
-import { AdminLayout } from "@/components/layout/AdminLayout";
-import DashboardPage from "@/pages/admin/Dashboard";
-import UsersPage from "@/pages/admin/Users";
-import UserBotsPage from "@/pages/admin/UserBots";
-import PremiumBotsPage from "@/pages/admin/PremiumBots";
-import PropBotsPage from "@/pages/admin/PropBots";
-import UserDetail from "@/pages/admin/UserDetail";
-import PremiumBotDetail from "@/pages/admin/PremiumBotDetail";
-import PropBotDetail from "@/pages/admin/PropBotDetail";
-import SettingsPage from "@/pages/admin/Settings";
-import LoginPage from "@/pages/auth/Login";
-import RegisterPage from "@/pages/auth/Register";
-import ForgotPasswordPage from "@/pages/auth/ForgotPassword";
-import ResetPasswordPage from "@/pages/auth/ResetPassword";
-import PricingPage from "@/pages/Pricing";
-import ContactPage from "@/pages/Contact";
-import HomePage from "@/pages/Home";
-import AboutPage from "@/pages/About";
-import LegalPage from "@/pages/Legal";
-import NotFoundPage from "@/pages/NotFound";
-import ProfilePage from "@/pages/Profile";
-import BotStorePage from "@/pages/BotStore";
-import UserBotsDetailPage from "@/pages/UserBotsDetail";
-import AdminPackages from "./pages/admin/Packages";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { ClerkProvider } from "@clerk/clerk-react";
+import { ThemeProvider } from "next-themes";
+import Index from "./pages/Index";
+import Bots from "./pages/Bots";
+import BotProfile from "./pages/BotProfile";
+import Accounts from "./pages/Accounts";
+import AccountProfile from "./pages/AccountProfile";
+import PremiumBots from "./pages/PremiumBots";
+import PremiumBotDetail from "./pages/PremiumBotDetail";
+import IntegratedPremiumBots from "./pages/IntegratedPremiumBots";
+import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
+import PropTradingBots from "./pages/PropTradingBots";
+import IntegratedPropBots from "./pages/IntegratedPropBots";
+import IntegratedPropBotDetail from "./pages/IntegratedPropBotDetail";
+import PropTradingBotDetail from "./pages/PropTradingBotDetail";
+import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import UserProfile from "./pages/UserProfile";
+import Settings from "./pages/Settings";
 
-const App = () => {
-  const { toast } = useToast();
-  const { pathname } = useLocation();
-  
-  // Remove useSettings for now since it's causing errors
-  // const { settings } = useSettings();
+// Admin Pages
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminUserDetail from "./pages/admin/UserDetail";
+import AdminBots from "./pages/admin/Bots";
+import AdminDatabase from "./pages/admin/Database";
+import AdminLogs from "./pages/admin/Logs";
+import AdminNotifications from "./pages/admin/Notifications";
+import AdminEmail from "./pages/admin/Email";
+import AdminSettings from "./pages/admin/Settings";
+import AdminManagement from "./pages/admin/AdminManagement";
+import AdminPremiumBots from "./pages/admin/PremiumBots";
+import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
+import AdminPropBots from "./pages/admin/PropBots";
+import AdminPropBotDetail from "./pages/admin/PropBotDetail";
+import AdminUserBots from "./pages/admin/UserBots";
+import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+import AdminBotErrors from "./pages/admin/BotErrors";
 
-  // useEffect(() => {
-  //   if (settings?.debug) {
-  //     toast({
-  //       title: "Debug Mode Enabled",
-  //       description: "Debug mode is enabled in the settings.",
-  //     });
-  //   }
-  // }, [settings?.debug, toast]);
+// Fixed Clerk publishable key - this is your test key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
-  const element = useRoutes([
-    {
-      path: "/",
-      element: <HomePage />,
-    },
-    {
-      path: "/home",
-      element: <HomePage />,
-    },
-    {
-      path: "/about",
-      element: <AboutPage />,
-    },
-    {
-      path: "/contact",
-      element: <ContactPage />,
-    },
-    {
-      path: "/legal",
-      element: <LegalPage />,
-    },
-    {
-      path: "/pricing",
-      element: <PricingPage />,
-    },
-    {
-      path: "/profile",
-      element: <ProfilePage />,
-    },
-    {
-      path: "/bot-store",
-      element: <BotStorePage />,
-    },
-    {
-      path: "/user-bots/:botId",
-      element: <UserBotsDetailPage />,
-    },
-    {
-      path: "/login",
-      element: <LoginPage />,
-    },
-    {
-      path: "/register",
-      element: <RegisterPage />,
-    },
-    {
-      path: "/forgot-password",
-      element: <ForgotPasswordPage />,
-    },
-    {
-      path: "/reset-password",
-      element: <ResetPasswordPage />,
-    },
-    {
-      path: "/admin",
-      element: (
-        <AdminLayout>
-          <DashboardPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/dashboard",
-      element: (
-        <AdminLayout>
-          <DashboardPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/users",
-      element: (
-        <AdminLayout>
-          <UsersPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/users/:userId",
-      element: (
-        <AdminLayout>
-          <UserDetail />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/user-bots",
-      element: (
-        <AdminLayout>
-          <UserBotsPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/user-bots/:botId",
-      element: (
-        <AdminLayout>
-          <UserBotsPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/premium-bots",
-      element: (
-        <AdminLayout>
-          <PremiumBotsPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/premium-bots/:botId",
-      element: (
-        <AdminLayout>
-          <PremiumBotDetail />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/prop-bots",
-      element: (
-        <AdminLayout>
-          <PropBotsPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/prop-bots/:botId",
-      element: (
-        <AdminLayout>
-          <PropBotDetail />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/settings",
-      element: (
-        <AdminLayout>
-          <SettingsPage />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "/admin/packages",
-      element: (
-        <AdminLayout>
-          <AdminPackages />
-        </AdminLayout>
-      ),
-    },
-    {
-      path: "*",
-      element: <NotFoundPage />,
-    },
-  ]);
+const queryClient = new QueryClient();
 
-  return (
-    <SocketProvider>
-      <AuthProvider>
-        <ThemeProvider
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div
-            className={cn(
-              "min-h-screen antialiased",
-              "bg-background text-foreground",
-              "dark:bg-zinc-900 dark:text-zinc-50"
-            )}
-          >
-            {pathname.startsWith("/admin") ? null : <SiteHeader />}
-            <main className="container relative pt-16 pb-20 md:py-24 lg:pb-32">
-              {element}
-            </main>
-            {pathname.startsWith("/admin") ? null : <SiteFooter />}
-          </div>
+const App = () => (
+  <ClerkProvider 
+    publishableKey={PUBLISHABLE_KEY}
+    appearance={{
+      elements: {
+        formButtonPrimary: 'bg-[#04ce91] hover:bg-[#03b17d]',
+        card: 'bg-[#111111]',
+        formInput: 'bg-[#1a1a1a] text-white',
+        footerActionLink: 'text-[#04ce91] hover:text-[#03b17d]',
+        headerTitle: 'text-white',
+        headerSubtitle: 'text-zinc-400',
+        socialButtonsBlockButton: 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white',
+        dividerLine: 'bg-zinc-700',
+        dividerText: 'text-zinc-500',
+        formFieldLabel: 'text-zinc-400',
+        identityPreviewText: 'text-white',
+        identityPreviewEditButton: 'text-[#04ce91]'
+      },
+      layout: {
+        showOptionalFields: false,
+        socialButtonsVariant: 'iconButton',
+      }
+    }}
+  >
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
           <Toaster />
-        </ThemeProvider>
-      </AuthProvider>
-    </SocketProvider>
-  );
-};
+          <Sonner />
+          <BrowserRouter>
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* Main routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/bots" element={<Bots />} />
+                <Route path="/bots/:botId" element={<BotProfile />} />
+                <Route path="/premium-bots" element={<PremiumBots />} />
+                <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+                <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+                <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+                <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+                <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
+                <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/accounts/:accountId" element={<AccountProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/settings" element={<Settings />} />
+                
+                {/* Auth routes */}
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="users/:userId" element={<AdminUserDetail />} />
+                  <Route path="bots" element={<AdminBots />} />
+                  <Route path="bot-errors" element={<AdminBotErrors />} />
+                  <Route path="premium-bots" element={<AdminPremiumBots />} />
+                  <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
+                  <Route path="prop-bots" element={<AdminPropBots />} />
+                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
+                  <Route path="user-bots" element={<AdminUserBots />} />
+                  <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
+                  <Route path="database" element={<AdminDatabase />} />
+                  <Route path="logs" element={<AdminLogs />} />
+                  <Route path="notifications" element={<AdminNotifications />} />
+                  <Route path="email" element={<AdminEmail />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route path="admin-management" element={<AdminManagement />} />
+                </Route>
+                
+                {/* Not found route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  </ClerkProvider>
+);
 
 export default App;

@@ -1,38 +1,33 @@
-
-import React, { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { Toast } from "@/components/ui/toast";
-import { AnimatePresence, motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast"
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "@/components/ui/toast"
 
 export function Toaster() {
-  const { toasts, dismiss } = useToast();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) return null;
+  const { toasts } = useToast()
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 w-full max-w-sm">
-      <AnimatePresence>
-        {toasts.map((toast) => (
-          <motion.div
-            key={toast.id}
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="overflow-hidden relative pointer-events-auto">
-              <div onClick={() => dismiss(toast.id)}>
-                <Toast {...toast} />
-              </div>
+    <ToastProvider>
+      {toasts.map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast key={id} {...props}>
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && (
+                <ToastDescription>{description}</ToastDescription>
+              )}
             </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+            {action}
+            <ToastClose />
+          </Toast>
+        )
+      })}
+      <ToastViewport />
+    </ToastProvider>
+  )
 }
