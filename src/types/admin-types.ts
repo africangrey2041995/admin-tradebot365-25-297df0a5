@@ -1,37 +1,20 @@
 
-export type User = {
+export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
-  status: string;
-  plan: string;
+  status: 'active' | 'inactive' | 'pending';
+  plan: 'free' | 'basic' | 'premium' | 'enterprise';
+  role?: 'user' | 'admin' | 'support';
   bots: number;
-  botTypes: string[];
-  activity: string;
   joinDate: string;
-};
+}
 
-export type AdminBot = {
+export interface PremiumBot {
   id: string;
   name: string;
-  status: string;
+  status: 'active' | 'inactive' | 'maintenance';
+  users: number;
+  profit: string;
   createdDate: string;
-};
-
-export type UserBot = AdminBot & {
-  owner: string;
-  ownerId: string;
-  accounts: number;
-};
-
-export type PremiumBot = AdminBot & {
-  users: number;
-  profit: string;
-};
-
-export type PropBot = AdminBot & {
-  users: number;
-  profit: string;
-  type: string;
-};
+}
