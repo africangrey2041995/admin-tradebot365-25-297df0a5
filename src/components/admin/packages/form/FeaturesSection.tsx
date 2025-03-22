@@ -24,7 +24,7 @@ export function FeaturesSection() {
 
   // Add new feature field
   const addFeature = () => {
-    append({ value: '' } as any);  // Using a temporary workaround with type assertion
+    append('');  // Append an empty string as a new feature
   };
 
   return (
