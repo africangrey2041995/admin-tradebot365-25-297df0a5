@@ -33,6 +33,7 @@ const AdminUsers = () => {
     handleSelectAll,
     handleBulkAction,
     exportToCSV,
+    exportToExcel,
     setPlanFilter,
     setCurrentPage
   } = useUsers();
@@ -81,6 +82,7 @@ const AdminUsers = () => {
               selectedUsers={selectedUsers}
               onBulkAction={handleBulkAction}
               onExportCSV={exportToCSV}
+              onExportExcel={exportToExcel}
             />
           </div>
 

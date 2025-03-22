@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types/admin-types';
+import { exportToCSV as exportDataToCSV, exportToExcel as exportDataToExcel } from '@/utils/exportUtils';
 
 const mockUsers: User[] = [
   { 
@@ -88,13 +89,11 @@ export const useUsers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
 
-  // Stats calculated from users data
   const totalUsers = users.length;
   const activeUsers = users.filter(user => user.status === 'active').length;
   const inactiveUsers = users.filter(user => user.status === 'inactive').length;
   const suspendedUsers = users.filter(user => user.status === 'suspended').length;
   
-  // Mock calculation for new users this month
   const newUsersThisMonth = 2;
 
   useEffect(() => {
@@ -113,7 +112,6 @@ export const useUsers = () => {
       );
     
     setFilteredUsers(result);
-    // Reset selection when filters change
     setSelectedUsers([]);
     setSelectAll(false);
   }, [searchTerm, filterStatus, planFilter, users]);
@@ -183,21 +181,24 @@ export const useUsers = () => {
       user.joinDate
     ]);
     
-    const csvContent = [
-      headers.join(','),
-      ...userDataCSV.map(row => row.join(','))
-    ].join('\n');
+    exportDataToCSV(headers, userDataCSV, `user_data_${new Date().toISOString().slice(0, 10)}`);
+    toast.success('Đã xuất dữ liệu người dùng thành công');
+  };
+
+  const exportToExcel = () => {
+    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói dịch vụ', 'Số lượng bot', 'Ngày tham gia'];
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `user_data_${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const userData = filteredUsers.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.status === 'active' ? 'Hoạt động' : user.status === 'inactive' ? 'Không hoạt động' : 'Đã khóa',
+      user.plan,
+      user.bots.toString(),
+      user.joinDate
+    ]);
     
+    exportDataToExcel(headers, userData, `user_data_${new Date().toISOString().slice(0, 10)}`, 'User Data');
     toast.success('Đã xuất dữ liệu người dùng thành công');
   };
 
@@ -223,6 +224,7 @@ export const useUsers = () => {
     handleUserCheckbox,
     handleSelectAll,
     handleBulkAction,
-    exportToCSV
+    exportToCSV,
+    exportToExcel
   };
 };
