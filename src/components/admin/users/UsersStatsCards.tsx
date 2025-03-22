@@ -51,7 +51,7 @@ export const UsersStatsCards = ({
               <div className="text-2xl font-semibold">{activeUsers}</div>
             </div>
             <div>
-              <div className="text-yellow-400 text-sm">Không hoạt động</div>
+              <div className="text-yellow-400 text-sm">Tạm Khóa</div>
               <div className="text-2xl font-semibold">{inactiveUsers}</div>
             </div>
           </div>
