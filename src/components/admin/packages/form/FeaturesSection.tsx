@@ -24,7 +24,7 @@ export function FeaturesSection() {
 
   // Add new feature field
   const addFeature = () => {
-    append('');  // This line was causing the error
+    append({ value: '' } as any);  // Using a temporary workaround with type assertion
   };
 
   return (
