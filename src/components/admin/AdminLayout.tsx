@@ -33,7 +33,8 @@ import {
   Crown,
   Briefcase,
   UserCircle,
-  AlertTriangle
+  AlertTriangle,
+  Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -127,6 +128,15 @@ const AdminLayout: React.FC = () => {
                       <Link to="/admin/users">
                         <Users className="h-4 w-4" />
                         <span>Quản lý người dùng</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/packages')}>
+                      <Link to="/admin/packages">
+                        <Package className="h-4 w-4" />
+                        <span>Quản lý gói dịch vụ</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

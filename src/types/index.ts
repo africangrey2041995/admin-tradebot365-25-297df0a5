@@ -67,3 +67,27 @@ export interface VersionInfo {
   features: string[];
   changelog: string[];
 }
+
+// Package definition - based on existing UserPlan and USER_PLAN_LIMITS
+export interface Package {
+  id: string;
+  planId: UserPlan;
+  name: string;
+  description: string;
+  features: string[];
+  limits: {
+    bots: number;
+    accounts: number;
+  };
+  pricing: {
+    monthly: number;
+    quarterly: number;
+    yearly: number;
+    currency: string;
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isPopular?: boolean;
+  isEnterprise?: boolean;
+}
