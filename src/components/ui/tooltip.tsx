@@ -76,19 +76,20 @@ export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({
   };
   
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    // Type the cloned element properly to handle event props
+    return React.cloneElement(children as React.ReactElement<any>, {
       onMouseEnter: (e: React.MouseEvent) => {
         handleMouseEnter(e);
         // Call original onMouseEnter if it exists
-        if (children.props.onMouseEnter) {
-          children.props.onMouseEnter(e);
+        if ((children as any).props.onMouseEnter) {
+          (children as any).props.onMouseEnter(e);
         }
       },
       onMouseLeave: (e: React.MouseEvent) => {
         handleMouseLeave();
         // Call original onMouseLeave if it exists
-        if (children.props.onMouseLeave) {
-          children.props.onMouseLeave(e);
+        if ((children as any).props.onMouseLeave) {
+          (children as any).props.onMouseLeave(e);
         }
       },
     });
