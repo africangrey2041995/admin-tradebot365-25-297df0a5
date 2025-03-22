@@ -1,5 +1,5 @@
+
 import React, { useState } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { UserActions } from '@/components/admin/users/UserActions';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { UsersFilter } from '@/components/admin/users/UsersFilter';
@@ -8,6 +8,9 @@ import { UsersStatsCards } from '@/components/admin/users/UsersStatsCards';
 import { BulkActionDialog } from '@/components/admin/premium-bots/BulkActionDialog';
 import { useUsers } from '@/hooks/admin/useUsers';
 import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
+
+// We're removing the AdminLayout import as we're not directly using it here
+// The parent route should have the AdminLayout which renders the Outlet component
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,7 +117,11 @@ const Users = () => {
   };
   
   return (
-    <AdminLayout title="Quản lý người dùng" subtitle="Quản lý tất cả người dùng trên hệ thống">
+    // Removed AdminLayout wrapper since it should be in the parent route component
+    <div>
+      <h1 className="text-2xl font-semibold mb-4">Quản lý người dùng</h1>
+      <p className="text-zinc-400 mb-6">Quản lý tất cả người dùng trên hệ thống</p>
+      
       <UsersStatsCards 
         totalUsers={totalUsers}
         activeUsers={activeUsers}
@@ -166,7 +173,7 @@ const Users = () => {
         bulkAction={bulkAction === 'activate' ? 'activate' : 'deactivate'}
         onConfirm={handleConfirmBulkAction}
       />
-    </AdminLayout>
+    </div>
   );
 };
 
