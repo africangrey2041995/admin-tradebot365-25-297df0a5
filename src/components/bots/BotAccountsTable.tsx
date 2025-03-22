@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from 'lucide-react';
+import { Trash2, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Account, ConnectionStatus } from '@/types';
 
@@ -72,10 +72,6 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
 
     fetchAccounts();
   }, [botId]);
-
-  const handleViewAccount = (accountId: string) => {
-    navigate(`/accounts/${accountId}`);
-  };
 
   const handleViewUserDetails = (userId: string) => {
     navigate(`/admin/users/${userId}`);
@@ -150,9 +146,8 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
                   size="sm" 
                   variant="ghost" 
                   className="h-8 w-8 p-0"
-                  onClick={() => handleViewAccount(account.id)}
                 >
-                  <Eye className="h-4 w-4" />
+                  <Edit3 className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 
