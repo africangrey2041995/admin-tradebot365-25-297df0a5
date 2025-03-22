@@ -21,6 +21,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         blue: "bg-blue-600 text-zinc-100 hover:bg-blue-700 border border-blue-700 font-semibold shadow-sm",
         tradebot: "bg-tradebot text-zinc-900 hover:bg-tradebot/90 shadow-md shadow-tradebot/20 border border-tradebot/80 font-semibold",
+        white: "bg-white text-black hover:bg-gray-100 border border-gray-200 font-medium shadow-sm",
       },
       size: {
         default: "h-10 px-4 py-2",

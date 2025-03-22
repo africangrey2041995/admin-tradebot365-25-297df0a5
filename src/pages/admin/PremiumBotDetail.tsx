@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -57,16 +56,16 @@ const tradePerformanceData = [
 const monthlyPerformance = [
   { month: 'Jan', value: 12.5 },
   { month: 'Feb', value: 8.3 },
-  { month: 'Mar', value: -2.1 },
-  { month: 'Apr', value: 5.7 },
-  { month: 'May', value: 15.2 },
-  { month: 'Jun', value: 10.1 },
-  { month: 'Jul', value: 5.5 },
-  { month: 'Aug', value: -3.2 },
-  { month: 'Sep', value: 9.8 },
-  { month: 'Oct', value: 18.5 },
-  { month: 'Nov', value: 0 },
-  { month: 'Dec', value: 0 },
+  { name: 'Mar', value: -2.1 },
+  { name: 'Apr', value: 5.7 },
+  { name: 'May', value: 15.2 },
+  { name: 'Jun', value: 10.1 },
+  { name: 'Jul', value: 5.5 },
+  { name: 'Aug', value: -3.2 },
+  { name: 'Sep', value: 9.8 },
+  { name: 'Oct', value: 18.5 },
+  { name: 'Nov', value: 0 },
+  { name: 'Dec', value: 0 },
 ];
 
 const statisticsData = [
@@ -258,7 +257,7 @@ const AdminPremiumBotDetail = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={goBack}>
+          <Button variant="white" size="sm" onClick={goBack}>
             <ChevronLeft className="h-4 w-4 mr-1" />
             Quay lại
           </Button>
