@@ -127,11 +127,11 @@ const Users = () => {
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-2">
           <UsersFilter 
             searchTerm={searchTerm}
-            filterStatus={filterStatus}
-            planFilter={hookPlanFilter}
+            filterStatus={statusFilter}
             onSearchChange={handleSearchChange}
             onFilterClick={handleFilterClick}
             onPlanFilterChange={handlePlanFilterChange}
+            planFilter={planFilter}
           />
           
           <UserActions 
