@@ -78,6 +78,8 @@ const packageSchema = z.object({
   isEnterprise: z.boolean().default(false),
 });
 
+type FormValues = z.infer<typeof packageSchema>;
+
 export const PackageForm: React.FC<PackageFormProps> = ({
   open,
   onOpenChange,
@@ -85,7 +87,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   package: pkg,
   isSubmitting
 }) => {
-  const form = useForm<z.infer<typeof packageSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(packageSchema),
     defaultValues: pkg ? {
       ...pkg,
@@ -124,8 +126,16 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   });
 
   // Handle form submission
-  const onFormSubmit = (data: z.infer<typeof packageSchema>) => {
-    onSubmit(data);
+  const onFormSubmit = (data: FormValues) => {
+    // Convert string representations of Infinity back to actual number
+    const processedData = {
+      ...data,
+      limits: {
+        bots: data.limits.bots === 'Infinity' ? Infinity : Number(data.limits.bots),
+        accounts: data.limits.accounts === 'Infinity' ? Infinity : Number(data.limits.accounts),
+      }
+    };
+    onSubmit(processedData);
   };
 
   // Add new feature field

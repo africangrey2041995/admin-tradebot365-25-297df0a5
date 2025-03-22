@@ -7,6 +7,7 @@ export * from './connection';
 
 // Re-export bot-related enums from constants for convenience
 export { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
+import { UserPlan } from '@/constants/userConstants';
 
 /**
  * Các types khác
