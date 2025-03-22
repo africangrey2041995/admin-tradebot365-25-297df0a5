@@ -2,7 +2,7 @@
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { User, CircleDollarSign, ExternalLink } from 'lucide-react';
+import { CircleDollarSign, ExternalLink } from 'lucide-react';
 import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
@@ -17,21 +17,15 @@ interface ErrorSignalRowProps {
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMarkAsRead }) => {
   const navigate = useNavigate();
 
-  const navigateToUserDetail = (userId: string) => {
-    if (userId) {
-      navigate(`/admin/users/${userId.replace('user_', '')}`);
-    }
-  };
-
   const navigateToBotDetail = (botId: string) => {
     if (botId) {
       // Route to the appropriate bot detail page based on the bot ID prefix
       if (botId.startsWith("BOT")) {
-        navigate(`/admin/user-bots/${botId}`);
+        navigate(`/bots/${botId.toLowerCase()}`);
       } else if (botId.startsWith("PREMIUM")) {
-        navigate(`/admin/premium-bots/${botId}`);
+        navigate(`/integrated-premium-bots/${botId.toLowerCase()}`);
       } else if (botId.startsWith("PROP")) {
-        navigate(`/admin/prop-bots/${botId}`);
+        navigate(`/integrated-prop-bots/${botId.toLowerCase()}`);
       }
     }
   };
@@ -72,16 +66,8 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
           onClick={() => navigateToBotDetail(signal.botId || '')}
           className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
         >
-          {signal.botId}
+          {signal.botName || signal.botId}
           <ExternalLink className="h-3 w-3" />
-        </button>
-      </TableCell>
-      <TableCell className="font-mono text-xs">
-        <button 
-          onClick={() => navigateToUserDetail(signal.userId || '')}
-          className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors"
-        >
-          {signal.userId}
         </button>
       </TableCell>
       <TableCell>

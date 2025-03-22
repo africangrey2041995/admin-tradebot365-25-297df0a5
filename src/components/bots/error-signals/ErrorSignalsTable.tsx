@@ -38,8 +38,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
             <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
           </TableRow>

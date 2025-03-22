@@ -39,8 +39,8 @@ const Navigation: React.FC<NavigationProps> = ({ closeSidebar }) => {
     { name: 'Premium Đã Tích Hợp', href: '/integrated-premium-bots', icon: BarChart3, isBeta: true },
     { name: 'Prop Trading Bots', href: '/prop-trading-bots', icon: Briefcase },
     { name: 'Prop Đã Tích Hợp', href: '/integrated-prop-bots', icon: Users, isBeta: true },
-    { name: 'Tài khoản', href: '/accounts', icon: CreditCard },
     { name: 'Lỗi Bot', href: '/bot-errors', icon: AlertTriangle, badge: '4' },
+    { name: 'Tài khoản', href: '/accounts', icon: CreditCard },
     { name: 'Cài đặt', href: '/settings', icon: Settings }
   ];
 
