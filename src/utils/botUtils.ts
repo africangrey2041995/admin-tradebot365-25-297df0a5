@@ -74,6 +74,18 @@ export function isValidBotId(botId: string, expectedType: BotType): boolean {
 }
 
 /**
+ * Tạo ID bot mới theo định dạng chuẩn
+ * @param type Loại bot cần tạo ID
+ * @param sequence Số thứ tự (nếu không cung cấp sẽ tạo ngẫu nhiên)
+ * @returns ID bot mới
+ */
+export function generateBotId(type: BotType, sequence?: number): string {
+  const prefix = BOT_ID_PREFIXES[type];
+  const seq = sequence || Math.floor(1000 + Math.random() * 9000);
+  return `${prefix}${seq}`;
+}
+
+/**
  * In log thông tin bot ID để debug
  * @param botId ID cần kiểm tra
  * @param context Thông tin bổ sung để debug

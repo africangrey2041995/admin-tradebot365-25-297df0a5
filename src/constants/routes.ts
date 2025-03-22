@@ -18,6 +18,10 @@ export const USER_ROUTES = {
   INTEGRATED_PROP_BOT_DETAIL: (botId: string) => `/integrated-prop-bots/${botId}`,
   ACCOUNTS: '/accounts',
   ACCOUNT_DETAIL: (accountId: string) => `/accounts/${accountId}`,
+  SETTINGS: '/settings',
+  PROFILE: '/profile',
+  SIGNALS: '/signals',
+  CONNECTIONS: '/connections',
 };
 
 // Admin Routes
@@ -33,4 +37,30 @@ export const ADMIN_ROUTES = {
   PROP_BOT_DETAIL: (botId: string) => `/admin/prop-bots/${botId}`,
   USER_BOTS: '/admin/user-bots',
   USER_BOT_DETAIL: (botId: string) => `/admin/user-bots/${botId}`,
+  ADMIN_MANAGEMENT: '/admin/admin-management',
+  SYSTEM_LOGS: '/admin/logs',
+  NOTIFICATIONS: '/admin/notifications',
+  EMAIL: '/admin/email',
+  DATABASE: '/admin/database',
+  SETTINGS: '/admin/settings',
+};
+
+// Shared Routes (common routes with same structure for both admin and user)
+export const SHARED_ROUTES = {
+  BOT_DETAIL: (isAdmin: boolean, botType: string, botId: string) => {
+    if (isAdmin) {
+      switch (botType) {
+        case 'premium': return ADMIN_ROUTES.PREMIUM_BOT_DETAIL(botId);
+        case 'prop': return ADMIN_ROUTES.PROP_BOT_DETAIL(botId);
+        default: return ADMIN_ROUTES.USER_BOT_DETAIL(botId);
+      }
+    } else {
+      switch (botType) {
+        case 'premium': return USER_ROUTES.PREMIUM_BOT_DETAIL(botId);
+        case 'prop': return USER_ROUTES.PROP_BOT_DETAIL(botId);
+        default: return USER_ROUTES.BOT_DETAIL(botId);
+      }
+    }
+  },
+  SETTINGS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.SETTINGS : USER_ROUTES.SETTINGS,
 };
