@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +7,7 @@ import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
@@ -16,6 +17,7 @@ interface ErrorSignalRowProps {
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMarkAsRead }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const navigateToBotDetail = (botId: string) => {
     console.log("Navigating to bot with ID:", botId);
@@ -31,7 +33,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
         console.log("Navigating to user bot:", `/bots/${botId}`);
         navigate(`/bots/${botId}`);
       } else if (botId.startsWith("PREMIUM")) {
-        console.log("Navigating to premium bot:", `/integrated-premium-bots/PREMIUM${botId.split("PREMIUM")[1]}`);
+        console.log("Navigating to premium bot:", `/integrated-premium-bots/${botId}`);
         navigate(`/integrated-premium-bots/${botId}`);
       } else if (botId.startsWith("PROP")) {
         console.log("Navigating to prop bot:", `/integrated-prop-bots/${botId}`);
@@ -50,15 +52,27 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
           navigate(`/integrated-prop-bots/${actualBotId}`);
         } else {
           console.log("Unknown MY- bot type for ID:", botId);
-          toast.error(`Không thể xác định loại bot: ${botId}`);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: `Không thể xác định loại bot: ${botId}`
+          });
         }
       } else {
         console.log("Unknown bot type for ID:", botId);
-        toast.error(`Không thể xác định loại bot: ${botId}`);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: `Không thể xác định loại bot: ${botId}`
+        });
       }
     } catch (error) {
       console.error("Error navigating to bot:", error);
-      toast.error("Có lỗi khi chuyển hướng đến trang chi tiết bot");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Có lỗi khi chuyển hướng đến trang chi tiết bot"
+      });
     }
   };
 

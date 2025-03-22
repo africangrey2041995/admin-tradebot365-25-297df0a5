@@ -21,10 +21,10 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Spot',
       tradingAccountBalance: '$15,420',
       botId: botType === 'USER-BOTS' ? 'BOT7459' : 
-             botType === 'PREMIUM-BOTS' ? 'PRE7459' : 
+             botType === 'PREMIUM-BOTS' ? 'PREMIUM7459' : 
              botType === 'PROP-BOTS' ? 'PROP001' :
              botType === 'MY-USER-BOTS' ? 'BOT7459' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PRE7459' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM7459' :
              botType === 'MY-PROP-BOTS' ? 'PROP001' : 'UNKNOWN001',
       botName: botType === 'USER-BOTS' ? 'Ultra 2in1' : 
                botType === 'PREMIUM-BOTS' ? 'Alpha Momentum' : 
@@ -51,10 +51,10 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Spot',
       tradingAccountBalance: '$8,750',
       botId: botType === 'USER-BOTS' ? 'BOT8932' : 
-             botType === 'PREMIUM-BOTS' ? 'PRE8932' : 
+             botType === 'PREMIUM-BOTS' ? 'PREMIUM8932' : 
              botType === 'PROP-BOTS' ? 'PROP002' :
              botType === 'MY-USER-BOTS' ? 'BOT8932' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PRE8932' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM8932' :
              botType === 'MY-PROP-BOTS' ? 'PROP002' : 'UNKNOWN002',
       botName: botType === 'USER-BOTS' ? 'Long Master' : 
                botType === 'PREMIUM-BOTS' ? 'Gamma Grid' : 
@@ -81,10 +81,10 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Margin',
       tradingAccountBalance: '$25,600',
       botId: botType === 'USER-BOTS' ? 'BOT2734' : 
-             botType === 'PREMIUM-BOTS' ? 'PRE8932' : 
+             botType === 'PREMIUM-BOTS' ? 'PREMIUM2734' : 
              botType === 'PROP-BOTS' ? 'PROP003' :
              botType === 'MY-USER-BOTS' ? 'BOT2734' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PRE8932' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM2734' :
              botType === 'MY-PROP-BOTS' ? 'PROP003' : 'UNKNOWN003',
       botName: botType === 'USER-BOTS' ? 'Gold Trading' : 
                botType === 'PREMIUM-BOTS' ? 'Gamma Grid' : 
@@ -111,10 +111,10 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Prop',
       tradingAccountBalance: '$50,000',
       botId: botType === 'USER-BOTS' ? 'BOT1267' : 
-             botType === 'PREMIUM-BOTS' ? 'PRE7459' : 
+             botType === 'PREMIUM-BOTS' ? 'PREMIUM7459' : 
              botType === 'PROP-BOTS' ? 'PROP004' :
              botType === 'MY-USER-BOTS' ? 'BOT1267' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PRE7459' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM7459' :
              botType === 'MY-PROP-BOTS' ? 'PROP004' : 'UNKNOWN004',
       botName: botType === 'USER-BOTS' ? 'Forex Master' : 
                botType === 'PREMIUM-BOTS' ? 'Alpha Momentum' : 
