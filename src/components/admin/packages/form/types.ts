@@ -78,7 +78,7 @@ export const getDefaultValues = (pkg: Package | null): FormValues => {
     planId: UserPlan.BASIC,
     name: '',
     description: '',
-    features: [''],
+    features: [''],  // Initialize with an empty string element
     limits: {
       bots: 1,
       accounts: 1,
