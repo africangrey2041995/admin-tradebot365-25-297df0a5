@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ErrorSignalsProps } from './error-signals/types';
 import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
-import { getMockErrorSignals } from './error-signals/mockData';
+import { mockErrorSignals } from './error-signals/mockData';
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
   const [errorSignals, setErrorSignals] = useState([]);
@@ -15,14 +15,18 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
       setLoading(true);
       setTimeout(() => {
         // Get mock data based on bot type
-        const mockErrorSignals = getMockErrorSignals(botId);
+        const mockData = mockErrorSignals.filter(signal => 
+          !botId || signal.botId === botId
+        );
         
-        setErrorSignals(mockErrorSignals);
+        setErrorSignals(mockData);
         
         // Set the first 2 errors as unread for demonstration
         const newUnreadSet = new Set<string>();
-        mockErrorSignals.slice(0, 2).forEach(signal => {
-          newUnreadSet.add(signal.id);
+        mockData.slice(0, 2).forEach(signal => {
+          if (signal.id) {
+            newUnreadSet.add(signal.id);
+          }
         });
         setUnreadErrors(newUnreadSet);
         

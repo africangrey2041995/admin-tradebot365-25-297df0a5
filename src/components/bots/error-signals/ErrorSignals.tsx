@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './ErrorSignalsTable';
 import { ExtendedSignal, ErrorSignalsProps } from './types';
-import { getErrorSignals } from './mockData';
+import { mockErrorSignals } from './mockData';
 import { useNavigation } from '@/hooks/useNavigation';
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
@@ -22,13 +22,20 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
     try {
       // Giả lập API call với timeout
       setTimeout(() => {
-        // Sử dụng mock data phù hợp với context admin/user
-        const signals = getErrorSignals(isAdminContext, botId);
+        // Lọc dữ liệu mẫu để phù hợp với bot ID
+        const signals = mockErrorSignals.filter(signal => 
+          !botId || signal.botId === botId
+        );
+        
         setErrorSignals(signals);
         
         // Đặt tất cả lỗi là chưa đọc
         const newUnread = new Set<string>();
-        signals.forEach(signal => newUnread.add(signal.id));
+        signals.slice(0, 2).forEach(signal => {
+          if (signal.id) {
+            newUnread.add(signal.id);
+          }
+        });
         setUnreadErrors(newUnread);
         
         setLoading(false);
