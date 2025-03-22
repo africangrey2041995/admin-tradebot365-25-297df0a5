@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -35,8 +36,6 @@ const AdminUsers = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [planFilter, setPlanFilter] = useState<string | null>(null);
-  const [botTypeFilter, setBotTypeFilter] = useState<string | null>(null);
-  const [activityFilter, setActivityFilter] = useState<string | null>(null);
   
   const totalUsers = 6;
   const activeUsers = 4;
@@ -218,12 +217,6 @@ const AdminUsers = () => {
     )
     .filter(user => 
       (planFilter === null || user.plan === planFilter)
-    )
-    .filter(user => 
-      (botTypeFilter === null || user.botTypes.includes(botTypeFilter))
-    )
-    .filter(user => 
-      (activityFilter === null || user.activity === activityFilter)
     );
 
   return (
@@ -321,7 +314,7 @@ const AdminUsers = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full sm:max-w-[600px]">
+              <div className="w-full sm:max-w-[300px]">
                 <Select value={planFilter || ""} onValueChange={(value) => setPlanFilter(value || null)}>
                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                     <SelectValue placeholder="Gói dịch vụ" />
@@ -331,31 +324,6 @@ const AdminUsers = () => {
                     <SelectItem value="premium">Premium</SelectItem>
                     <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="trial">Trial</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select value={botTypeFilter || ""} onValueChange={(value) => setBotTypeFilter(value || null)}>
-                  <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectValue placeholder="Loại bot" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectItem value="all">Tất cả loại</SelectItem>
-                    <SelectItem value="trading">Trading</SelectItem>
-                    <SelectItem value="crypto">Crypto</SelectItem>
-                    <SelectItem value="forex">Forex</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select value={activityFilter || ""} onValueChange={(value) => setActivityFilter(value || null)}>
-                  <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectValue placeholder="Mức độ hoạt động" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectItem value="all">Tất cả mức độ</SelectItem>
-                    <SelectItem value="high">Cao</SelectItem>
-                    <SelectItem value="medium">Trung bình</SelectItem>
-                    <SelectItem value="low">Thấp</SelectItem>
-                    <SelectItem value="none">Không hoạt động</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -597,21 +565,18 @@ export const PlanBadge = ({ plan }: { plan: string }) => {
     case 'premium':
       return (
         <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/30 border-0">
-          <Shield className="h-3 w-3 mr-1" />
           Premium
         </Badge>
       );
     case 'basic':
       return (
         <Badge className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-0">
-          <Users className="h-3 w-3 mr-1" />
           Basic
         </Badge>
       );
     case 'trial':
       return (
-        <Badge className="bg-purple-500/20 text-purple-500 hover:bg-purple-500/30 border-0">
-          <Bot className="h-3 w-3 mr-1" />
+        <Badge className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0">
           Trial
         </Badge>
       );
