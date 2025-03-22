@@ -1,11 +1,9 @@
+
 import { useEffect } from "react";
 import { useRoutes, useLocation } from "react-router-dom";
-
-import { routes } from "@/routes";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { useSettings } from "@/hooks/use-settings";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -39,16 +37,18 @@ import AdminPackages from "./pages/admin/Packages";
 const App = () => {
   const { toast } = useToast();
   const { pathname } = useLocation();
-  const { settings } = useSettings();
+  
+  // Remove useSettings for now since it's causing errors
+  // const { settings } = useSettings();
 
-  useEffect(() => {
-    if (settings?.debug) {
-      toast({
-        title: "Debug Mode Enabled",
-        description: "Debug mode is enabled in the settings.",
-      });
-    }
-  }, [settings?.debug, toast]);
+  // useEffect(() => {
+  //   if (settings?.debug) {
+  //     toast({
+  //       title: "Debug Mode Enabled",
+  //       description: "Debug mode is enabled in the settings.",
+  //     });
+  //   }
+  // }, [settings?.debug, toast]);
 
   const element = useRoutes([
     {
@@ -209,7 +209,6 @@ const App = () => {
     <SocketProvider>
       <AuthProvider>
         <ThemeProvider
-          attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange

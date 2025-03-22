@@ -1,56 +1,101 @@
-import * as React from "react"
-import * as AccordionPrimitive from "@radix-ui/react-accordion"
-import { ChevronDown } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-const Accordion = AccordionPrimitive.Root
+interface AccordionContextType {
+  value: string | null;
+  onChange: (value: string) => void;
+  type: 'single' | 'multiple';
+}
 
-const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn("border-b", className)}
-    {...props}
-  />
-))
-AccordionItem.displayName = "AccordionItem"
+const AccordionContext = createContext<AccordionContextType | undefined>(undefined);
 
-const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-        className
-      )}
-      {...props}
+export const Accordion = ({ 
+  children, 
+  type = 'single', 
+  collapsible = false,
+  className = '',
+  value: controlledValue,
+  onValueChange
+}: { 
+  children: ReactNode;
+  type?: 'single' | 'multiple';
+  collapsible?: boolean;
+  className?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+}) => {
+  const [value, setValue] = useState<string | null>(null);
+
+  const onChange = (newValue: string) => {
+    if (controlledValue !== undefined && onValueChange) {
+      onValueChange(newValue);
+    } else {
+      setValue(newValue === value ? null : newValue);
+    }
+  };
+
+  return (
+    <AccordionContext.Provider value={{ value: controlledValue || value, onChange, type }}>
+      <div className={className}>{children}</div>
+    </AccordionContext.Provider>
+  );
+};
+
+export const AccordionItem = ({ 
+  children, 
+  value,
+  className = ''
+}: { 
+  children: ReactNode;
+  value: string;
+  className?: string;
+}) => {
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+};
+
+export const AccordionTrigger = ({ 
+  children,
+  className = ''
+}: { 
+  children: ReactNode;
+  className?: string;
+}) => {
+  const context = useContext(AccordionContext);
+  if (!context) throw new Error('AccordionTrigger must be used within an Accordion');
+  
+  const { value, onChange } = context;
+  
+  return (
+    <div 
+      className={`py-4 px-4 cursor-pointer ${className}`}
+      onClick={() => onChange(value || '')}
     >
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
+    </div>
+  );
+};
 
-const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-    {...props}
-  >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
-  </AccordionPrimitive.Content>
-))
-
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
-
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export const AccordionContent = ({ 
+  children,
+  className = ''
+}: { 
+  children: ReactNode;
+  className?: string;
+}) => {
+  const context = useContext(AccordionContext);
+  if (!context) throw new Error('AccordionContent must be used within an Accordion');
+  
+  const { value } = context;
+  
+  if (!value) return null;
+  
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+};

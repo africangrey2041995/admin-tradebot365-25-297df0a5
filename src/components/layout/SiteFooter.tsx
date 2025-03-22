@@ -1,37 +1,58 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Link } from "react-router-dom";
 
-interface SiteFooterProps {
-  className?: string;
-}
-
-export const SiteFooter: React.FC<SiteFooterProps> = ({ className }) => {
+export const SiteFooter = () => {
   return (
-    <footer className={cn("border-t bg-background", className)}>
-      <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
-        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="font-bold">TradeBot</span>
-          </Link>
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            © 2023 TradeBot. Bản quyền thuộc về Công ty CP TradeBot.
-          </p>
+    <footer className="w-full border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+      <div className="container py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">TradeBot</h3>
+            <p className="text-sm text-muted-foreground">
+              Automated trading solutions for everyone
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold mb-4">Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-sm">Home</Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-sm">About</Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="text-sm">Pricing</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-sm">Contact</Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/legal" className="text-sm">Terms of Service</Link>
+              </li>
+              <li>
+                <Link to="/legal" className="text-sm">Privacy Policy</Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold mb-4">Contact</h3>
+            <address className="text-sm not-italic">
+              <p>Email: info@tradebot.com</p>
+              <p>Phone: +1 234 567 890</p>
+            </address>
+          </div>
         </div>
-        <div className="flex gap-4">
-          <Link
-            to="/legal"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Điều khoản
-          </Link>
-          <Link
-            to="/privacy"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Bảo mật
-          </Link>
+        <div className="mt-8 border-t border-slate-200 dark:border-zinc-800 pt-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} TradeBot. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

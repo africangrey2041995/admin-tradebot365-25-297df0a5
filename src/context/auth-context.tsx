@@ -1,11 +1,11 @@
 
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'support';
+  role: "admin" | "user" | "support";
   image?: string;
 }
 
@@ -13,49 +13,43 @@ interface AuthContextType {
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
-  isLoading: boolean;
-  error: string | null;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user for development
-const mockUser: User = {
-  id: 'user-001',
-  name: 'Admin User',
-  email: 'admin@example.com',
-  role: 'admin',
-  image: '/placeholder.svg',
-};
-
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>({
+    id: "user-1",
+    name: "Admin User",
+    email: "admin@example.com",
+    role: "admin",
+  });
 
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Mock authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUser(mockUser);
-    } catch (err) {
-      setError('Authentication failed');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    // Mock authentication
+    const mockUser = {
+      id: "user-1",
+      name: "Admin User",
+      email: email,
+      role: email.includes("admin") ? "admin" : "user" as "admin" | "user" | "support",
+    };
+    setUser(mockUser);
   };
 
   const signOut = () => {
-    // Mock sign out
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, isLoading, error }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        signIn,
+        signOut,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -64,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

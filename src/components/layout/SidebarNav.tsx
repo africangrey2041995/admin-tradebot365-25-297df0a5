@@ -9,7 +9,7 @@ import {
   Package,
   AlertTriangle,
   HelpCircle,
-  LogOut, // Changed from Logout to LogOut
+  LogOut, // Corrected from Logout to LogOut
 } from "lucide-react";
 import { NavItem } from "@/types/nav";
 import { useAuth } from "@/hooks/use-auth";
@@ -108,7 +108,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ className }) => {
           )}
         >
           <item.icon className="h-4 w-4" />
-          {item.title}
+          <span>{item.title}</span>
         </Link>
       </li>
     ));
