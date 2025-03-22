@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus, Eye } from "lucide-react";
+import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus, Eye, Check, Download, X } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -27,12 +27,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PremiumBot } from "@/types/admin-types";
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [selectedBots, setSelectedBots] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [isBulkActionDialogOpen, setIsBulkActionDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -56,7 +62,7 @@ const AdminPremiumBots = () => {
     maxLeverage: '3'
   });
   
-  const bots = [
+  const bots: PremiumBot[] = [
     { 
       id: 'PRE-001', 
       name: 'Premium DCA Bot', 
@@ -160,6 +166,7 @@ const AdminPremiumBots = () => {
     setActiveTab('general');
   };
 
+  // Filter bots based on search term and status filter
   const filteredBots = bots
     .filter(bot => 
       (searchTerm === '' || 
@@ -169,6 +176,163 @@ const AdminPremiumBots = () => {
     .filter(bot => 
       (filterStatus === null || bot.status === filterStatus)
     );
+  
+  // Handle checkbox change for a single bot
+  const handleCheckboxChange = (botId: string) => {
+    setSelectedBots(prev => {
+      if (prev.includes(botId)) {
+        return prev.filter(id => id !== botId);
+      } else {
+        return [...prev, botId];
+      }
+    });
+  };
+  
+  // Handle select all checkbox change
+  const handleSelectAllChange = () => {
+    if (selectAll) {
+      setSelectedBots([]);
+    } else {
+      setSelectedBots(filteredBots.map(bot => bot.id));
+    }
+    setSelectAll(!selectAll);
+  };
+  
+  // Clear all selections
+  const clearSelections = () => {
+    setSelectedBots([]);
+    setSelectAll(false);
+  };
+  
+  // Export data to CSV
+  const exportToCSV = () => {
+    let botsToExport = filteredBots;
+    
+    // If there are selected bots, only export those
+    if (selectedBots.length > 0) {
+      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
+    }
+    
+    if (botsToExport.length === 0) {
+      toast.error("Không có dữ liệu để xuất");
+      return;
+    }
+    
+    // Create CSV content
+    const csvHeader = ["ID", "Tên Bot", "Trạng thái", "Tài khoản", "Lợi nhuận", "Ngày tạo"];
+    const csvRows = botsToExport.map(bot => [
+      bot.id,
+      bot.name,
+      bot.status,
+      bot.users.toString(),
+      bot.profit,
+      bot.createdDate
+    ]);
+    
+    // Combine header and rows
+    const csvContent = [
+      csvHeader.join(","),
+      ...csvRows.map(row => row.join(","))
+    ].join("\n");
+    
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `premium-bots-export-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Đã xuất ${botsToExport.length} bot thành công`);
+  };
+  
+  // Export data to Excel (XLSX format)
+  const exportToExcel = () => {
+    let botsToExport = filteredBots;
+    
+    // If there are selected bots, only export those
+    if (selectedBots.length > 0) {
+      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
+    }
+    
+    if (botsToExport.length === 0) {
+      toast.error("Không có dữ liệu để xuất");
+      return;
+    }
+    
+    // Create a simple HTML table for Excel export
+    const tableHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên Bot</th>
+            <th>Trạng thái</th>
+            <th>Tài khoản</th>
+            <th>Lợi nhuận</th>
+            <th>Ngày tạo</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${botsToExport.map(bot => `
+            <tr>
+              <td>${bot.id}</td>
+              <td>${bot.name}</td>
+              <td>${bot.status}</td>
+              <td>${bot.users}</td>
+              <td>${bot.profit}</td>
+              <td>${bot.createdDate}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    
+    // Convert to blob and download
+    const blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `premium-bots-export-${new Date().toISOString().split('T')[0]}.xls`);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Đã xuất ${botsToExport.length} bot thành công`);
+  };
+  
+  // Handle bulk action confirmation dialog
+  const openBulkActionDialog = (action: 'activate' | 'deactivate') => {
+    if (selectedBots.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một bot");
+      return;
+    }
+    
+    setBulkAction(action);
+    setIsBulkActionDialogOpen(true);
+  };
+  
+  // Execute bulk action
+  const executeBulkAction = () => {
+    if (!bulkAction || selectedBots.length === 0) {
+      setIsBulkActionDialogOpen(false);
+      return;
+    }
+    
+    // In a real app, this would call an API to update the bots
+    // For now, we'll just show a success message
+    
+    const actionText = bulkAction === 'activate' ? 'kích hoạt' : 'tạm dừng';
+    toast.success(`Đã ${actionText} ${selectedBots.length} bot thành công`);
+    
+    // Close dialog and clear selections
+    setIsBulkActionDialogOpen(false);
+    clearSelections();
+  };
 
   return (
     <div className="space-y-6">
@@ -246,30 +410,100 @@ const AdminPremiumBots = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-            <div className="relative w-full sm:max-w-[400px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
-              <Input 
-                placeholder="Tìm kiếm Bot..." 
-                className="pl-10 bg-zinc-800 border-zinc-700 text-white"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative w-full sm:max-w-[400px]">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
+                <Input 
+                  placeholder="Tìm kiếm Bot..." 
+                  className="pl-10 bg-zinc-800 border-zinc-700 text-white"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                className={`border-zinc-700 ${filterStatus ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`}
+                onClick={handleFilterClick}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                {filterStatus ? `Lọc: ${filterStatus}` : 'Lọc'}
+              </Button>
             </div>
-            <Button 
-              variant="outline" 
-              className={`border-zinc-700 ${filterStatus ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`}
-              onClick={handleFilterClick}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {filterStatus ? `Lọc: ${filterStatus}` : 'Lọc'}
-            </Button>
+            
+            {/* Bulk action controls */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center">
+                {selectedBots.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white bg-zinc-800 px-3 py-1 rounded-md">
+                      Đã chọn {selectedBots.length} bot
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 border-zinc-700 text-zinc-400"
+                      onClick={clearSelections}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Bỏ chọn
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-zinc-400"
+                  onClick={() => exportToCSV()}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Xuất CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-zinc-400"
+                  onClick={() => exportToExcel()}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Xuất Excel
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-green-500 hover:text-green-400"
+                  onClick={() => openBulkActionDialog('activate')}
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Kích hoạt
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-yellow-500 hover:text-yellow-400"
+                  onClick={() => openBulkActionDialog('deactivate')}
+                >
+                  <Pause className="h-4 w-4 mr-2" />
+                  Tạm dừng
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-zinc-800">
+                  <TableHead className="w-10">
+                    <Checkbox 
+                      checked={selectAll}
+                      onCheckedChange={handleSelectAllChange}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
                   <TableHead className="text-zinc-400 w-28">ID</TableHead>
                   <TableHead className="text-zinc-400">Tên Bot</TableHead>
                   <TableHead className="text-zinc-400">Trạng thái</TableHead>
@@ -283,6 +517,13 @@ const AdminPremiumBots = () => {
                 {filteredBots.length > 0 ? (
                   filteredBots.map((bot) => (
                     <TableRow key={bot.id} className="border-zinc-800">
+                      <TableCell>
+                        <Checkbox 
+                          checked={selectedBots.includes(bot.id)}
+                          onCheckedChange={() => handleCheckboxChange(bot.id)}
+                          aria-label={`Select ${bot.name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
                       <TableCell className="font-medium">{bot.name}</TableCell>
                       <TableCell>
@@ -336,7 +577,7 @@ const AdminPremiumBots = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                       Không tìm thấy kết quả phù hợp.
                     </TableCell>
                   </TableRow>
@@ -555,128 +796,4 @@ const AdminPremiumBots = () => {
                   
                   <div className="grid gap-2">
                     <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        id="maxDrawdown"
-                        defaultValue={[5]}
-                        max={20}
-                        step={1}
-                        value={[parseInt(newBot.maxDrawdown)]}
-                        onValueChange={(value) => setNewBot({...newBot, maxDrawdown: value[0].toString()})}
-                        className="flex-1"
-                      />
-                      <span className="min-w-[3rem] text-center font-medium">{newBot.maxDrawdown}%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="features" className="space-y-4">
-              <div className="grid gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="featureAdvancedEntries">Điểm vào nâng cao</Label>
-                    <p className="text-sm text-zinc-400">Sử dụng nhiều chỉ báo kết hợp để xác định điểm vào tối ưu</p>
-                  </div>
-                  <Switch
-                    id="featureAdvancedEntries"
-                    checked={newBot.featureAdvancedEntries}
-                    onCheckedChange={(checked) => setNewBot({...newBot, featureAdvancedEntries: checked})}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="featureAutomaticSl">Stop Loss tự động</Label>
-                    <p className="text-sm text-zinc-400">Tự động đặt stop loss dựa trên biến động thị trường</p>
-                  </div>
-                  <Switch
-                    id="featureAutomaticSl"
-                    checked={newBot.featureAutomaticSl}
-                    onCheckedChange={(checked) => setNewBot({...newBot, featureAutomaticSl: checked})}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="featureDynamicTp">Take Profit động</Label>
-                    <p className="text-sm text-zinc-400">Điều chỉnh take profit dựa trên xu hướng thị trường</p>
-                  </div>
-                  <Switch
-                    id="featureDynamicTp"
-                    checked={newBot.featureDynamicTp}
-                    onCheckedChange={(checked) => setNewBot({...newBot, featureDynamicTp: checked})}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="featureSmartFilters">Bộ lọc thông minh</Label>
-                    <p className="text-sm text-zinc-400">Loại bỏ tín hiệu sai trong điều kiện thị trường không thuận lợi</p>
-                  </div>
-                  <Switch
-                    id="featureSmartFilters"
-                    checked={newBot.featureSmartFilters}
-                    onCheckedChange={(checked) => setNewBot({...newBot, featureSmartFilters: checked})}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsAddBotDialogOpen(false)}
-              className="border-zinc-700 text-zinc-400"
-            >
-              Hủy
-            </Button>
-            <Button 
-              onClick={handleAddBot}
-              className="bg-amber-500 hover:bg-amber-600 text-white"
-            >
-              Tạo Bot
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-const BotStatusBadge = ({ status }: { status: string }) => {
-  switch(status) {
-    case 'active':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-          <span className="text-green-500">Hoạt động</span>
-        </div>
-      );
-    case 'inactive':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></div>
-          <span className="text-yellow-500">Không hoạt động</span>
-        </div>
-      );
-    case 'maintenance':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-blue-500 mr-2"></div>
-          <span className="text-blue-500">Bảo trì</span>
-        </div>
-      );
-    default:
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-zinc-500 mr-2"></div>
-          <span className="text-zinc-500">Không xác định</span>
-        </div>
-      );
-  }
-};
-
-export default AdminPremiumBots;
+                    <div
