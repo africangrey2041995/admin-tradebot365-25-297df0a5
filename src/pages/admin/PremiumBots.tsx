@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -29,6 +30,33 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PremiumBot } from "@/types/admin-types";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
+
+// BotStatusBadge component for rendering status badges
+const BotStatusBadge = ({ status }: { status: string }) => {
+  if (status === 'active') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+      Hoạt động
+    </span>;
+  } else if (status === 'inactive') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+      Không hoạt động
+    </span>;
+  } else {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-500/10 text-orange-500 border border-orange-500/20">
+      Bảo trì
+    </span>;
+  }
+};
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -605,6 +633,7 @@ const AdminPremiumBots = () => {
         </CardContent>
       </Card>
       
+      {/* Add Bot Dialog */}
       <Dialog open={isAddBotDialogOpen} onOpenChange={setIsAddBotDialogOpen}>
         <DialogContent className="lg:max-w-[800px] border-zinc-800 bg-zinc-900 text-white">
           <DialogHeader>
@@ -796,4 +825,137 @@ const AdminPremiumBots = () => {
                   
                   <div className="grid gap-2">
                     <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
-                    <div
+                    <div className="flex items-center gap-4">
+                      <Slider
+                        id="maxDrawdown"
+                        defaultValue={[5]}
+                        max={20}
+                        step={1}
+                        value={[parseInt(newBot.maxDrawdown)]}
+                        onValueChange={(value) => setNewBot({...newBot, maxDrawdown: value[0].toString()})}
+                        className="flex-1"
+                      />
+                      <span className="min-w-[3rem] text-center font-medium">{newBot.maxDrawdown}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="features" className="space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-lg font-medium pb-2 border-b border-zinc-800">Tính năng cao cấp</Label>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <Label htmlFor="featureAdvancedEntries" className="font-medium">Entry Points Nâng cao</Label>
+                      <p className="text-xs text-zinc-400">Cải thiện điểm vào lệnh với các xác nhận đa chỉ báo</p>
+                    </div>
+                    <Switch
+                      id="featureAdvancedEntries"
+                      checked={newBot.featureAdvancedEntries}
+                      onCheckedChange={(checked) => setNewBot({...newBot, featureAdvancedEntries: checked})}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <Label htmlFor="featureAutomaticSl" className="font-medium">Stop Loss Tự động</Label>
+                      <p className="text-xs text-zinc-400">Tự động đặt và điều chỉnh stop loss dựa trên biến động</p>
+                    </div>
+                    <Switch
+                      id="featureAutomaticSl"
+                      checked={newBot.featureAutomaticSl}
+                      onCheckedChange={(checked) => setNewBot({...newBot, featureAutomaticSl: checked})}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <Label htmlFor="featureDynamicTp" className="font-medium">Take Profit Động</Label>
+                      <p className="text-xs text-zinc-400">Điều chỉnh mục tiêu lợi nhuận dựa trên momentum thị trường</p>
+                    </div>
+                    <Switch
+                      id="featureDynamicTp"
+                      checked={newBot.featureDynamicTp}
+                      onCheckedChange={(checked) => setNewBot({...newBot, featureDynamicTp: checked})}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <Label htmlFor="featureSmartFilters" className="font-medium">Bộ lọc thông minh</Label>
+                      <p className="text-xs text-zinc-400">Tránh giao dịch trong điều kiện thị trường không thuận lợi</p>
+                    </div>
+                    <Switch
+                      id="featureSmartFilters"
+                      checked={newBot.featureSmartFilters}
+                      onCheckedChange={(checked) => setNewBot({...newBot, featureSmartFilters: checked})}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddBotDialogOpen(false)}
+              className="border-zinc-700 text-zinc-400"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleAddBot}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Tạo Bot
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Bulk Action Dialog */}
+      <AlertDialog open={isBulkActionDialogOpen} onOpenChange={setIsBulkActionDialogOpen}>
+        <AlertDialogContent className="border-zinc-800 bg-zinc-900 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {bulkAction === 'activate' ? 'Kích hoạt hàng loạt' : 'Tạm dừng hàng loạt'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Bạn có chắc chắn muốn {bulkAction === 'activate' ? 'kích hoạt' : 'tạm dừng'} {selectedBots.length} bot đã chọn?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-zinc-700 text-zinc-400">Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeBulkAction}
+              className={bulkAction === 'activate' ? 'bg-green-500 hover:bg-green-600' : 'bg-yellow-500 hover:bg-yellow-600'}
+            >
+              {bulkAction === 'activate' ? (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  Kích hoạt
+                </>
+              ) : (
+                <>
+                  <Pause className="mr-2 h-4 w-4" />
+                  Tạm dừng
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default AdminPremiumBots;
+
