@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -29,6 +30,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PropBot } from '@/types/admin-types';
+import * as XLSX from 'xlsx';
 
 const AdminPropBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -226,13 +228,62 @@ const AdminPropBots = () => {
       return;
     }
 
-    // In a real app, we would generate and download the file here
-    // For now, we'll just show a toast message
-    const fileName = `prop-bots-${new Date().toISOString().slice(0, 10)}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+    // Define headers for export
+    const headers = ["ID", "Tên Bot", "Trạng thái", "Loại", "Tài khoản", "Lợi nhuận", "Ngày tạo"];
+    
+    // Map status to Vietnamese
+    const translateStatus = (status: string): string => {
+      switch(status) {
+        case 'active': return 'Hoạt động';
+        case 'inactive': return 'Tạm dừng';
+        case 'maintenance': return 'Bảo trì';
+        default: return status;
+      }
+    };
+    
+    // Format data for export
+    const exportData = botsToExport.map(bot => [
+      bot.id,
+      bot.name,
+      translateStatus(bot.status),
+      bot.type || 'N/A',
+      bot.users.toString(),
+      bot.profit,
+      bot.createdDate
+    ]);
+    
+    if (format === 'csv') {
+      // Create CSV content
+      const csvContent = [
+        headers.join(','),
+        ...exportData.map(row => row.join(','))
+      ].join('\n');
+      
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `prop-bots-${new Date().toISOString().slice(0, 10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // Create worksheet for Excel
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData]);
+      
+      // Create workbook and add the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Prop Bots');
+      
+      // Generate Excel file and download
+      XLSX.writeFile(workbook, `prop-bots-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
     
     toast.success(
       `Đã xuất ${botsToExport.length} bot ra file ${format.toUpperCase()}`,
-      { description: `Tên file: ${fileName}` }
+      { description: `Dữ liệu đã được xuất thành công` }
     );
   };
 
