@@ -23,7 +23,7 @@ export const UsersStatsCards = ({
   newUsersToday = 0
 }: UsersStatsCardsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <Card className="bg-zinc-900 border-zinc-800 text-white p-5">
         <div className="space-y-3">
           <div className="text-zinc-400 text-sm font-medium">Tổng người dùng</div>
@@ -37,17 +37,6 @@ export const UsersStatsCards = ({
               <div className="text-yellow-400 text-sm">Không hoạt động</div>
               <div className="text-2xl font-semibold">{inactiveUsers}</div>
             </div>
-          </div>
-        </div>
-      </Card>
-      
-      <Card className="bg-zinc-900 border-zinc-800 text-white p-5">
-        <div className="space-y-3">
-          <div className="text-zinc-400 text-sm font-medium">Tài khoản</div>
-          <div className="text-4xl font-bold text-white">{totalUsers * 34}</div>
-          <div className="pt-2">
-            <div className="text-blue-400 text-sm">Bình quân mỗi người dùng</div>
-            <div className="text-2xl font-semibold">34.0</div>
           </div>
         </div>
       </Card>
