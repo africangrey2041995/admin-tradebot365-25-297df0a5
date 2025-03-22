@@ -79,11 +79,9 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
       <TableCell className="font-mono text-xs">
         <button 
           onClick={() => navigateToUserDetail(signal.userId || '')}
-          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline"
+          className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors"
         >
-          <User className="h-3 w-3" />
           {signal.userId}
-          <ExternalLink className="h-3 w-3" />
         </button>
       </TableCell>
       <TableCell>
