@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 /**
  * Hook tùy chỉnh để xử lý điều hướng thông minh trong ứng dụng
+ * với cơ chế xử lý lỗi được cải thiện
  */
 export function useNavigation() {
   const navigate = useNavigate();
@@ -105,13 +106,16 @@ export function useNavigation() {
   
   /**
    * Quay lại trang trước đó
+   * @param fallbackRoute Đường dẫn dự phòng nếu không thể quay lại
    */
-  const goBack = () => {
+  const goBack = (fallbackRoute?: string) => {
     try {
       navigate(-1);
     } catch (error) {
       console.error('Error navigating back:', error);
-      navigate(isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME);
+      const defaultFallback = isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME;
+      navigate(fallbackRoute || defaultFallback);
+      toast.info('Không thể quay lại trang trước. Đã chuyển hướng về trang chính.');
     }
   };
 
@@ -131,11 +135,27 @@ export function useNavigation() {
       toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
     }
   };
+
+  /**
+   * Điều hướng đến một đường dẫn cụ thể với xử lý lỗi
+   * @param path Đường dẫn cần điều hướng đến
+   * @param options Tùy chọn điều hướng
+   */
+  const navigateTo = (path: string, options?: { replace?: boolean; state?: any }) => {
+    try {
+      navigate(path, options);
+    } catch (error) {
+      console.error(`Error navigating to ${path}:`, error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
+      navigate(isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME);
+    }
+  };
   
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
     navigateToBotErrors,
+    navigateTo,
     goBack,
     isAdminContext
   };

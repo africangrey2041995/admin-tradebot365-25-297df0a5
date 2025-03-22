@@ -1,10 +1,9 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, RefreshCw, UserCircle } from "lucide-react";
-import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
 import { DataTable } from "@/components/ui/data-table";
 import { BotStatus } from '@/constants/botTypes';
@@ -120,38 +119,74 @@ const AdminUserBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [userBots, setUserBots] = useState<UserBot[]>([]);
   const { navigateToBotDetail } = useNavigation();
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredBots = mockUserBots.filter(bot =>
+  const fetchUserBots = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API call
+      setTimeout(() => {
+        try {
+          // 10% chance of error for demonstration
+          if (Math.random() < 0.1) {
+            throw new Error("Lỗi kết nối máy chủ khi lấy dữ liệu User Bots");
+          }
+          setUserBots(mockUserBots);
+          setIsLoading(false);
+        } catch (innerError) {
+          console.error('Error processing user bots data:', innerError);
+          setError(innerError instanceof Error ? innerError : new Error('Unknown error processing data'));
+          setIsLoading(false);
+          toast.error('Đã xảy ra lỗi khi xử lý dữ liệu User Bots');
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Error fetching user bots:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      setIsLoading(false);
+      toast.error('Đã xảy ra lỗi khi tải dữ liệu User Bots');
+    }
+  }, []);
+  
+  // Load data when component mounts
+  useEffect(() => {
+    fetchUserBots();
+  }, [fetchUserBots]);
+
+  const filteredBots = userBots.filter(bot =>
     bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     bot.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addUserBot = () => {
-    toast.success("Chức năng thêm User Bot đang được phát triển");
+    try {
+      toast.success("Chức năng thêm User Bot đang được phát triển");
+    } catch (error) {
+      console.error('Error in addUserBot function:', error);
+      toast.error('Đã xảy ra lỗi khi thực hiện chức năng thêm User Bot');
+    }
   };
   
   const handleRowClick = useCallback((row: UserBot) => {
-    navigateToBotDetail(row.id);
+    try {
+      navigateToBotDetail(row.id);
+    } catch (error) {
+      console.error('Error navigating to bot detail:', error);
+      toast.error('Không thể chuyển đến trang chi tiết bot');
+    }
   }, [navigateToBotDetail]);
   
   const handleRefreshData = useCallback(() => {
-    setIsLoading(true);
-    setError(null);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // 10% chance of error for demonstration
-      if (Math.random() < 0.1) {
-        setError(new Error("Lỗi kết nối máy chủ khi lấy dữ liệu User Bots"));
-      }
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    toast.info('Đang làm mới dữ liệu User Bots...');
+    fetchUserBots();
+  }, [fetchUserBots]);
 
   return (
     <ErrorBoundary>

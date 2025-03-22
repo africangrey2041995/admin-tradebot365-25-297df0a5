@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ExtendedSignal } from '@/types';
 import ErrorSignalRow from './ErrorSignalRow';
 import NoErrorsState from './NoErrorsState';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { toast } from 'sonner';
 
 interface ErrorSignalsTableProps {
   errorSignals: ExtendedSignal[];
@@ -24,6 +26,18 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   onRefresh,
   error
 }) => {
+  const handleRefresh = () => {
+    if (onRefresh) {
+      try {
+        toast.info('Đang làm mới dữ liệu...');
+        onRefresh();
+      } catch (err) {
+        console.error('Error refreshing data:', err);
+        toast.error('Đã xảy ra lỗi khi làm mới dữ liệu');
+      }
+    }
+  };
+
   // Xử lý trạng thái loading
   if (loading) {
     return (
@@ -42,7 +56,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
         <h3 className="text-lg font-semibold mb-2">Đã xảy ra lỗi khi tải dữ liệu</h3>
         <p className="mb-4 text-sm text-red-400">{error.message}</p>
         {onRefresh && (
-          <Button variant="outline" className="border-red-300" onClick={onRefresh}>
+          <Button variant="outline" className="border-red-300" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Thử lại
           </Button>
@@ -58,48 +72,53 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
 
   // Hiển thị bảng lỗi
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-red-50 dark:bg-red-900/20">
-            <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {errorSignals.map((signal) => (
-            <ErrorSignalRow 
-              key={signal.id} 
-              signal={signal} 
-              isUnread={unreadErrors.has(signal.id)}
-              onMarkAsRead={onMarkAsRead}
-            />
-          ))}
-        </TableBody>
-      </Table>
-      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
-        <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
-        </p>
-        {onRefresh && (
-          <div className="mt-2 flex justify-end">
-            <Button variant="outline" size="sm" onClick={onRefresh} className="text-xs">
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Làm mới dữ liệu
-            </Button>
-          </div>
-        )}
+    <ErrorBoundary 
+      errorTitle="Lỗi hiển thị bảng lỗi" 
+      errorDescription="Đã xảy ra lỗi khi hiển thị bảng lỗi tín hiệu."
+    >
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-red-50 dark:bg-red-900/20">
+              <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {errorSignals.map((signal) => (
+              <ErrorSignalRow 
+                key={signal.id} 
+                signal={signal} 
+                isUnread={unreadErrors.has(signal.id)}
+                onMarkAsRead={onMarkAsRead}
+              />
+            ))}
+          </TableBody>
+        </Table>
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
+          <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
+          </p>
+          {onRefresh && (
+            <div className="mt-2 flex justify-end">
+              <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs">
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Làm mới dữ liệu
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 

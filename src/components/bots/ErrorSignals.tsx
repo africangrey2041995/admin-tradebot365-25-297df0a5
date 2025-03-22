@@ -1,58 +1,101 @@
 
-import React, { useState, useEffect } from 'react';
-import { ErrorSignalsProps } from './error-signals/types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
-import { mockErrorSignals } from './error-signals/mockData';
 import { ExtendedSignal } from '@/types';
+import { ErrorSignalsProps } from './error-signals/types';
+import { mockErrorSignals } from './error-signals/mockData';
+import { toast } from 'sonner';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
   const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
-  const [loading, setLoading] = useState(true);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    // Mock data loading
-    const fetchErrorSignals = () => {
-      setLoading(true);
+  // Fetch error signals
+  const fetchErrorSignals = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Giả lập API call với timeout
       setTimeout(() => {
-        // Get mock data based on bot type
-        const mockData = mockErrorSignals.filter(signal => 
-          !botId || signal.botId === botId
-        );
-        
-        setErrorSignals(mockData);
-        
-        // Set the first 2 errors as unread for demonstration
-        const newUnreadSet = new Set<string>();
-        mockData.slice(0, 2).forEach(signal => {
-          if (signal.id) {
-            newUnreadSet.add(signal.id);
-          }
-        });
-        setUnreadErrors(newUnreadSet);
-        
-        setLoading(false);
+        try {
+          // Lọc dữ liệu mẫu để phù hợp với bot ID
+          const signals = mockErrorSignals.filter(signal => 
+            !botId || signal.botId === botId
+          );
+          
+          setErrorSignals(signals);
+          
+          // Đặt tất cả lỗi là chưa đọc
+          const newUnread = new Set<string>();
+          signals.slice(0, 2).forEach(signal => {
+            if (signal.id) {
+              newUnread.add(signal.id);
+            }
+          });
+          setUnreadErrors(newUnread);
+          
+          setLoading(false);
+        } catch (innerErr) {
+          console.error('Error processing signals:', innerErr);
+          setError(innerErr instanceof Error ? innerErr : new Error('Unknown error processing signals'));
+          setLoading(false);
+          toast.error('Đã xảy ra lỗi khi xử lý dữ liệu tín hiệu lỗi');
+        }
       }, 800);
-    };
-
-    fetchErrorSignals();
+    } catch (err) {
+      console.error('Error fetching error signals:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      setLoading(false);
+      toast.error('Đã xảy ra lỗi khi tải dữ liệu tín hiệu lỗi');
+    }
   }, [botId]);
+  
+  // Load data khi component mount hoặc botId thay đổi
+  useEffect(() => {
+    fetchErrorSignals();
+  }, [fetchErrorSignals]);
 
-  const markAsRead = (signalId: string) => {
-    setUnreadErrors(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(signalId);
-      return newSet;
-    });
+  // Xử lý đánh dấu lỗi đã đọc
+  const handleMarkAsRead = (signalId: string) => {
+    try {
+      setUnreadErrors(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(signalId);
+        return newSet;
+      });
+      toast.success('Đã đánh dấu tín hiệu lỗi là đã đọc');
+    } catch (err) {
+      console.error('Error marking signal as read:', err);
+      toast.error('Đã xảy ra lỗi khi đánh dấu tín hiệu lỗi là đã đọc');
+    }
   };
 
   return (
-    <ErrorSignalsTable 
-      errorSignals={errorSignals} 
-      unreadErrors={unreadErrors} 
-      onMarkAsRead={markAsRead}
-      loading={loading}
-    />
+    <ErrorBoundary>
+      <Card>
+        <CardHeader>
+          <CardTitle>Error Signals</CardTitle>
+          <CardDescription>
+            Signals that failed to process due to errors. Requires attention.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ErrorSignalsTable 
+            errorSignals={errorSignals} 
+            unreadErrors={unreadErrors} 
+            onMarkAsRead={handleMarkAsRead}
+            loading={loading}
+            error={error}
+            onRefresh={fetchErrorSignals}
+          />
+        </CardContent>
+      </Card>
+    </ErrorBoundary>
   );
 };
 

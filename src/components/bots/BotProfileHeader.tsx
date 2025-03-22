@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Trash, Power } from 'lucide-react';
 import { toast } from 'sonner';
 import EditBotDialog from './EditBotDialog';
 import { BotCardProps } from './BotCard';
+import { useNavigation } from '@/hooks/useNavigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,35 +26,51 @@ interface BotProfileHeaderProps {
 }
 
 const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfileHeaderProps) => {
-  const navigate = useNavigate();
+  const { goBack } = useNavigation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const handleBack = () => {
-    navigate('/bots');
+    try {
+      goBack();
+    } catch (error) {
+      console.error('Error navigating back:', error);
+      toast.error('Không thể quay lại trang trước. Đang chuyển về trang Bot.');
+      // Fallback navigation logic would be handled in the useNavigation hook
+    }
   };
 
   const handleDeleteBot = () => {
-    // Here you would implement the actual deletion logic
-    console.log(`Deleting bot: ${botId}`);
-    
-    // Show success toast
-    toast.success(`Bot ${botId} đã được xóa`);
-    
-    // Navigate back to bots page
-    navigate('/bots');
+    try {
+      // Here you would implement the actual deletion logic
+      console.log(`Deleting bot: ${botId}`);
+      
+      // Show success toast
+      toast.success(`Bot ${botId} đã được xóa`);
+      
+      // Navigate back to bots page
+      goBack();
+    } catch (error) {
+      console.error(`Error deleting bot ${botId}:`, error);
+      toast.error('Đã xảy ra lỗi khi xóa bot. Vui lòng thử lại sau.');
+    }
   };
 
   const handleSaveBot = (updatedBot: Partial<BotCardProps>) => {
-    onUpdateBot(updatedBot);
-    toast.success('Cài đặt bot đã được cập nhật thành công');
+    try {
+      onUpdateBot(updatedBot);
+      toast.success('Cài đặt bot đã được cập nhật thành công');
+    } catch (error) {
+      console.error('Error updating bot settings:', error);
+      toast.error('Đã xảy ra lỗi khi cập nhật cài đặt bot');
+    }
   };
 
   return (
     <div className="flex items-center justify-between mb-6">
       <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
         <ArrowLeft className="h-4 w-4" />
-        Quay Lại Trang Bot
+        Quay Lại
       </Button>
       
       <div className="flex items-center gap-2">

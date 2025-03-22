@@ -9,6 +9,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
@@ -25,9 +26,26 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   
   const handleBotClick = () => {
     if (signal.botId) {
-      navigateToBotDetail(signal.botId);
+      try {
+        navigateToBotDetail(signal.botId);
+      } catch (error) {
+        console.error('Error navigating to bot details:', error);
+        toast.error('Không thể điều hướng đến trang bot. Vui lòng thử lại sau.');
+      }
     } else {
       console.warn('Cannot navigate: Bot ID is missing from signal');
+      toast.warning('Không thể điều hướng: ID bot không tồn tại trong tín hiệu');
+    }
+  };
+  
+  const handleMarkAsRead = () => {
+    if (signal.id) {
+      try {
+        onMarkAsRead(signal.id);
+      } catch (error) {
+        console.error('Error marking signal as read:', error);
+        toast.error('Không thể đánh dấu tín hiệu là đã đọc. Vui lòng thử lại sau.');
+      }
     }
   };
   
@@ -91,7 +109,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
           <Button
             size="sm" 
             variant="ghost" 
-            onClick={() => onMarkAsRead(signal.id)}
+            onClick={handleMarkAsRead}
             className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />

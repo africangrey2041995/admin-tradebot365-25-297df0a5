@@ -10,6 +10,9 @@ interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onReset?: () => void;
+  errorTitle?: string;
+  errorDescription?: string;
+  showErrorDetails?: boolean;
 }
 
 interface ErrorBoundaryState {
@@ -68,10 +71,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         <div className="min-h-[400px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-background border rounded-lg p-6 shadow-sm text-center">
             <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">Đã xảy ra lỗi</h2>
+            <h2 className="text-2xl font-semibold mb-2">
+              {this.props.errorTitle || 'Đã xảy ra lỗi'}
+            </h2>
             <p className="text-muted-foreground mb-6">
-              Rất tiếc, có lỗi đã xảy ra khi tải thành phần này.
-              {this.state.error && (
+              {this.props.errorDescription || 'Rất tiếc, có lỗi đã xảy ra khi tải thành phần này.'}
+              {(this.props.showErrorDetails !== false) && this.state.error && (
                 <span className="block mt-2 text-sm text-destructive/80 font-mono bg-muted p-2 rounded">
                   {this.state.error.toString()}
                 </span>
