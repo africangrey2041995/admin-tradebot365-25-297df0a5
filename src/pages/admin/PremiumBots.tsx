@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
-// Mocking premium bot data
 const premiumBots = [
   {
     id: 'pb-001',
@@ -144,7 +144,6 @@ const PremiumBots = () => {
   const [riskFilter, setRiskFilter] = useState('all');
   const [sortOption, setSortOption] = useState('performance');
   
-  // Filter bots based on search term and risk level
   const filteredBots = premiumBots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         bot.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -153,7 +152,6 @@ const PremiumBots = () => {
     return matchesSearch && matchesRisk;
   });
 
-  // Sort bots based on selected sort option
   const sortedBots = [...filteredBots].sort((a, b) => {
     if (sortOption === 'performance') {
       return parseFloat(b.performanceLastMonth.replace('%', '')) - 
@@ -178,14 +176,11 @@ const PremiumBots = () => {
     })
   };
 
-  // Mock data for statistics
   const totalBots = premiumBots.length;
   const activeBots = premiumBots.filter(bot => bot.status === 'active').length;
   const inactiveBots = totalBots - activeBots;
   
-  // Change this variable name to better reflect what it represents
-  const totalAccounts = 85; // Mock total number of trading accounts
-  
+  const totalAccounts = 85;
   const averageProfit = "+12.4%";
   const profitableBots = Math.round(totalBots * 0.75);
   
@@ -200,7 +195,6 @@ const PremiumBots = () => {
           </Button>
         </div>
         
-        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="border-zinc-800 bg-zinc-900/80 text-white">
             <CardContent className="p-6">
@@ -254,7 +248,6 @@ const PremiumBots = () => {
           </Card>
         </div>
 
-        {/* Search and Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="md:col-span-2">
             <Input
@@ -295,7 +288,6 @@ const PremiumBots = () => {
           </div>
         </div>
 
-        {/* Bot Cards */}
         {sortedBots.length > 0 ? (
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {sortedBots.map((bot, index) => (
