@@ -9,14 +9,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { FormProvider, UseFormReturn } from 'react-hook-form';
-import { Package } from '@/types';
+import { FormProvider, UseFormReturn, SubmitHandler } from 'react-hook-form';
 import { FormValues } from './types';
 
 interface FormStructureProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<Package>) => void;
+  onSubmit: (data: FormValues) => void;
   form: UseFormReturn<FormValues>;
   isEdit: boolean;
   isSubmitting: boolean;

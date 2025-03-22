@@ -37,10 +37,11 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   const handleFormSubmit = (data: FormValues) => {
     // Process data before submitting
     const submittedData: Partial<Package> = {
-      ...data,
+      planId: data.planId,
+      name: data.name,
+      description: data.description,
       // Extract feature values from objects
       features: data.features.map(feature => feature.value),
-      // Limits already transformed by Zod schema
       limits: {
         bots: data.limits.bots,
         accounts: data.limits.accounts,
@@ -50,7 +51,10 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         quarterly: Number(data.pricing.quarterly),
         yearly: Number(data.pricing.yearly),
         currency: data.pricing.currency,
-      }
+      },
+      isActive: data.isActive,
+      isPopular: data.isPopular,
+      isEnterprise: data.isEnterprise
     };
     
     onSubmit(submittedData);
