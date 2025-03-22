@@ -26,7 +26,7 @@ export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Xác nhận thao tác hàng loạt</DialogTitle>
           <DialogDescription className="text-zinc-400">
-            {`Bạn đang thực hiện ${actionText} ${selectedBotsCount} premium bot đã chọn.`}
+            {`Bạn đang thực hiện ${actionText} ${selectedBotsCount} ${bulkAction === 'activate' ? 'tài khoản người dùng' : 'tài khoản người dùng'} đã chọn.`}
           </DialogDescription>
         </DialogHeader>
         

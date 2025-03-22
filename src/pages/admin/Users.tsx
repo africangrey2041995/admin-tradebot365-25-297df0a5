@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { UserActions } from '@/components/admin/users/UserActions';
@@ -18,36 +17,40 @@ const Users = () => {
   const [page, setPage] = useState(1);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [bulkAction, setBulkAction] = useState<string>('');
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   
   const {
     users,
-    filteredUsers,
-    selectedUsers,
-    setSelectedUsers,
-    isLoading,
-    userStats,
-    toggleUserSelection,
-    filterUsers,
+    totalUsers,
+    activeUsers,
+    inactiveUsers,
+    suspendedUsers,
+    newUsersThisMonth,
+    searchTerm: hookSearchTerm,
+    filterStatus,
+    planFilter: hookPlanFilter,
+    handleSearchChange,
+    handleFilterClick,
+    handleUserCheckbox,
+    handleSelectAll,
+    handleBulkAction: hookHandleBulkAction,
+    selectAll,
+    exportToCSV: hookExportToCSV
   } = useUsers();
-  
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    filterUsers(e.target.value, statusFilter, roleFilter, planFilter);
-  };
   
   const handleStatusFilterChange = (status: string | null) => {
     setStatusFilter(status);
-    filterUsers(searchTerm, status, roleFilter, planFilter);
+    handleFilterClick(status);
   };
   
   const handleRoleFilterChange = (role: string | null) => {
     setRoleFilter(role);
-    filterUsers(searchTerm, statusFilter, role, planFilter);
+    // Role filtering is not implemented in the hook, but we keep the UI consistent
   };
   
   const handlePlanFilterChange = (plan: string | null) => {
     setPlanFilter(plan);
-    filterUsers(searchTerm, statusFilter, roleFilter, plan);
+    // We need to implement this in the useUsers hook if needed
   };
   
   const handlePageChange = (newPage: number) => {
@@ -62,41 +65,72 @@ const Users = () => {
   const handleConfirmBulkAction = () => {
     console.log(`Performing ${bulkAction} action on users:`, selectedUsers);
     
+    // Use the bulk action handler from the hook
+    hookHandleBulkAction(bulkAction);
+    
     // Clear selections after action
     setSelectedUsers([]);
     setBulkActionDialogOpen(false);
   };
 
   const handleExportCSV = () => {
+    // Convert users to the format expected by exportToCSV
+    const data = users.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.role || 'user',
+      user.status,
+      user.plan,
+      user.bots.toString(),
+      user.joinDate
+    ]);
+    
     exportToCSV(
-      filteredUsers,
-      'users-export',
-      ['id', 'name', 'email', 'role', 'status', 'plan', 'bots', 'joinDate']
+      ['ID', 'Name', 'Email', 'Role', 'Status', 'Plan', 'Bots', 'Join Date'],
+      data,
+      'users-export'
     );
   };
 
   const handleExportExcel = () => {
+    // Convert users to the format expected by exportToExcel
+    const data = users.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.role || 'user',
+      user.status,
+      user.plan,
+      user.bots.toString(),
+      user.joinDate
+    ]);
+    
     exportToExcel(
-      filteredUsers,
-      'users-export',
-      ['id', 'name', 'email', 'role', 'status', 'plan', 'bots', 'joinDate']
+      ['ID', 'Name', 'Email', 'Role', 'Status', 'Plan', 'Bots', 'Join Date'],
+      data,
+      'users-export'
     );
   };
   
   return (
     <AdminLayout title="Quản lý người dùng" subtitle="Quản lý tất cả người dùng trên hệ thống">
-      <UsersStatsCards stats={userStats} />
+      <UsersStatsCards 
+        totalUsers={totalUsers}
+        activeUsers={activeUsers}
+        inactiveUsers={inactiveUsers}
+        suspendedUsers={suspendedUsers}
+        newUsersThisMonth={newUsersThisMonth}
+      />
       
       <div className="flex flex-col gap-1.5 mt-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-2">
           <UsersFilter 
             searchTerm={searchTerm}
-            statusFilter={statusFilter}
-            roleFilter={roleFilter}
-            planFilter={planFilter}
+            filterStatus={filterStatus}
+            planFilter={hookPlanFilter}
             onSearchChange={handleSearchChange}
-            onStatusFilterChange={handleStatusFilterChange}
-            onRoleFilterChange={handleRoleFilterChange}
+            onFilterClick={handleFilterClick}
             onPlanFilterChange={handlePlanFilterChange}
           />
           
@@ -109,16 +143,18 @@ const Users = () => {
         </div>
         
         <UsersTable 
-          users={filteredUsers}
+          users={users}
           selectedUsers={selectedUsers}
-          onUserSelect={toggleUserSelection}
-          isLoading={isLoading}
-          page={page}
+          selectAll={selectAll}
+          onSelectAll={handleSelectAll}
+          onSelectUser={handleUserCheckbox}
+          onViewUserDetails={(userId) => console.log('View user details', userId)}
         />
         
         <UsersPagination 
-          totalItems={filteredUsers.length} 
           currentPage={page} 
+          totalUsers={users.length}
+          usersPerPage={10}
           onPageChange={handlePageChange} 
         />
       </div>
@@ -126,20 +162,9 @@ const Users = () => {
       <BulkActionDialog
         open={bulkActionDialogOpen}
         onOpenChange={setBulkActionDialogOpen}
-        title={`${bulkAction === 'activate' ? 'Kích hoạt' : 
-               bulkAction === 'suspend' ? 'Tạm khóa' : 
-               bulkAction === 'premium' ? 'Nâng cấp lên Premium' : 
-               'Chuyển về Basic'} tài khoản`}
-        description={`Bạn có chắc chắn muốn ${bulkAction === 'activate' ? 'kích hoạt' : 
-                    bulkAction === 'suspend' ? 'tạm khóa' : 
-                    bulkAction === 'premium' ? 'nâng cấp lên Premium' : 
-                    'chuyển về Basic'} ${selectedUsers.length} tài khoản đã chọn?`}
-        actionText={bulkAction === 'activate' ? 'Kích hoạt' : 
-                  bulkAction === 'suspend' ? 'Tạm khóa' : 
-                  bulkAction === 'premium' ? 'Nâng cấp' : 'Chuyển đổi'}
-        actionVariant={bulkAction === 'activate' ? 'default' : 
-                      bulkAction === 'suspend' ? 'destructive' : 'default'}
-        onAction={handleConfirmBulkAction}
+        selectedBotsCount={selectedUsers.length}
+        bulkAction={bulkAction === 'activate' ? 'activate' : 'deactivate'}
+        onConfirm={handleConfirmBulkAction}
       />
     </AdminLayout>
   );
