@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Search, RefreshCw, MoreHorizontal, Users, UserCheck, UserX, TrendingUp } from "lucide-react";
+import { UserPlus, Search, RefreshCw, MoreHorizontal, UsersIcon, UserCheck, UserX, TrendingUp } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,14 +34,12 @@ import { UsersStatsCards } from '@/components/admin/users/UsersStatsCards';
 import { useUsers } from '@/hooks/admin/useUsers';
 
 const Users = () => {
-  // Make sure these state hooks are properly defined
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   
   const navigate = useNavigate();
   const { totalUsers } = useUsers();
 
-  // Mock stats data
   const statsData = {
     totalUsers: 5,
     activeUsers: 3,
@@ -128,7 +125,6 @@ const Users = () => {
     return matchesSearch && matchesStatus;
   });
   
-  // Add proper handlers for search and filter
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
