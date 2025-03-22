@@ -37,12 +37,13 @@ const AdminPropBots = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const totalBots = 4;
-  const activeBots = 2;
-  const totalUsers = 25;
-  const averageUsersPerBot = Math.round(totalUsers / totalBots);
-  const totalProfit = '+14.7%';
-  const activePercent = Math.round((activeBots / totalBots) * 100);
+  const totalBots = 5;
+  const activeBots = 3;
+  const inactiveBots = 2;
+  const totalAccounts = 170;
+  const averageAccountsPerBot = 34;
+  const performanceRate = "9.6%";
+  const topPerformingRatio = "4 / 5";
   
   const [newBot, setNewBot] = useState({
     name: '',
@@ -195,50 +196,44 @@ const AdminPropBots = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
           <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <div className="w-full">
-                <p className="text-zinc-400 text-sm">Tài khoản</p>
-                <h3 className="text-3xl font-bold mt-1">{totalUsers}</h3>
-                <div className="mt-4">
-                  <p className="text-zinc-400 text-xs">Bình quân mỗi bot</p>
-                  <p className="text-lg font-medium">{averageUsersPerBot}</p>
-                </div>
+            <p className="text-zinc-400 text-sm">Tổng Bot</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4">{totalBots}</h2>
+            
+            <div className="flex justify-between text-sm">
+              <div>
+                <p className="text-green-500">Hoạt động</p>
+                <p className="text-2xl font-semibold mt-1">{activeBots}</p>
+              </div>
+              <div>
+                <p className="text-yellow-500">Không hoạt động</p>
+                <p className="text-2xl font-semibold mt-1">{inactiveBots}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
           <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <div className="w-full">
-                <p className="text-zinc-400 text-sm">Prop Bots</p>
-                <h3 className="text-3xl font-bold mt-1">{totalBots}</h3>
-                <div className="mt-4">
-                  <p className="text-zinc-400 text-xs">Đang hoạt động</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-lg font-medium">{activeBots}</p>
-                    <span className="text-xs text-green-500">({activePercent}%)</span>
-                  </div>
-                </div>
-              </div>
+            <p className="text-zinc-400 text-sm">Tài khoản</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4">{totalAccounts}</h2>
+            
+            <div>
+              <p className="text-zinc-400 text-sm">Bình quân mỗi bot</p>
+              <p className="text-2xl font-semibold mt-1">{averageAccountsPerBot}</p>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="border-zinc-800 bg-zinc-900/60 text-white">
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
           <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <div className="w-full">
-                <p className="text-zinc-400 text-sm">Lợi nhuận trung bình</p>
-                <h3 className="text-3xl font-bold mt-1 text-green-500">{totalProfit}</h3>
-                <div className="mt-4">
-                  <p className="text-zinc-400 text-xs">Tháng này</p>
-                  <p className="text-lg font-medium text-green-500">+8.5%</p>
-                </div>
-              </div>
+            <p className="text-zinc-400 text-sm">Hiệu suất</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4 text-green-500">{performanceRate}</h2>
+            
+            <div>
+              <p className="text-zinc-400 text-sm">Bot hiệu quả</p>
+              <p className="text-2xl font-semibold mt-1">{topPerformingRatio}</p>
             </div>
           </CardContent>
         </Card>
