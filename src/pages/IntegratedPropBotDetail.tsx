@@ -56,7 +56,8 @@ const propBotData = {
       balance: '$10,000',
       equity: '$10,245',
       profit: '+$245',
-      profitPercentage: '+2.45%'
+      profitPercentage: '+2.45%',
+      userId: 'USR-123456'
     }
   ],
   recentTrades: [
@@ -151,6 +152,10 @@ const IntegratedPropBotDetail = () => {
     toast("Cài đặt đã được thay đổi", {
       description: `Thay đổi cài đặt ${value}`,
     });
+  };
+
+  const handleViewUserDetails = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   return (
@@ -484,6 +489,7 @@ const IntegratedPropBotDetail = () => {
                         <th className="py-3 px-4 text-left font-medium">Vốn</th>
                         <th className="py-3 px-4 text-left font-medium">Lợi Nhuận</th>
                         <th className="py-3 px-4 text-left font-medium">Ngày Tạo</th>
+                        <th className="py-3 px-4 text-left font-medium">User ID</th>
                         <th className="py-3 px-4 text-left font-medium"></th>
                       </tr>
                     </thead>
@@ -502,6 +508,15 @@ const IntegratedPropBotDetail = () => {
                             {account.profit} ({account.profitPercentage})
                           </td>
                           <td className="py-3 px-4">{account.createdDate}</td>
+                          <td className="py-3 px-4">
+                            <Button 
+                              variant="ghost" 
+                              className="text-blue-600 hover:text-blue-800 p-0 h-auto font-medium"
+                              onClick={() => handleViewUserDetails(account.userId)}
+                            >
+                              {account.userId}
+                            </Button>
+                          </td>
                           <td className="py-3 px-4">
                             <Button variant="outline" size="sm" onClick={() => navigate(`/accounts/${account.id}`)}>
                               Chi Tiết

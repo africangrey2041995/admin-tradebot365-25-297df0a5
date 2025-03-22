@@ -34,6 +34,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
             status: 'Connected',
             createdDate: new Date(2023, 5, 15).toISOString(),
             lastUpdated: new Date(2023, 11, 20).toISOString(),
+            userId: 'USR-001'
           },
           {
             id: '2',
@@ -47,6 +48,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
             status: 'Connected',
             createdDate: new Date(2023, 6, 22).toISOString(),
             lastUpdated: new Date(2023, 10, 5).toISOString(),
+            userId: 'USR-001'
           },
           {
             id: '3',
@@ -60,6 +62,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
             status: 'Disconnected',
             createdDate: new Date(2023, 7, 10).toISOString(),
             lastUpdated: new Date(2023, 9, 18).toISOString(),
+            userId: 'USR-002'
           },
         ];
         setAccounts(mockAccounts);
@@ -72,6 +75,10 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
 
   const handleViewAccount = (accountId: string) => {
     navigate(`/accounts/${accountId}`);
+  };
+
+  const handleViewUserDetails = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
   };
 
   const getStatusBadge = (status: ConnectionStatus) => {
@@ -107,6 +114,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
           <TableHead>Account Profile</TableHead>
           <TableHead>Api</TableHead>
           <TableHead>Account Trading</TableHead>
+          <TableHead>User ID</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -126,6 +134,15 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
               <div className="font-medium">
                 {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
               </div>
+            </TableCell>
+            <TableCell>
+              <Button 
+                variant="ghost" 
+                className="text-blue-600 hover:text-blue-800 p-0 h-auto font-medium"
+                onClick={() => handleViewUserDetails(account.userId)}
+              >
+                {account.userId}
+              </Button>
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
