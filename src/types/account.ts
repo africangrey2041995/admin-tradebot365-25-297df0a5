@@ -22,6 +22,7 @@ export interface Account {
   name: string;
   userId: string;
   userEmail?: string;
+  userAccount?: string; // Added this property to match usage in components
   apiName: string;
   apiId?: string;
   tradingAccount: string;

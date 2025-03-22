@@ -1,104 +1,82 @@
+import { User, UserPlan, UserRole, UserStatus } from '@/types';
 
 /**
- * Các utility function cho quản lý người dùng
+ * Gets a display name for a user
  */
-import { UserStatus, UserPlan, UserRole, USER_ID_PREFIX, USER_ID_REGEX } from '@/constants/userConstants';
-import { User } from '@/types/admin-types';
-
-/**
- * Kiểm tra xem một userId có hợp lệ không
- * @param userId ID người dùng cần kiểm tra
- * @returns true nếu ID hợp lệ
- */
-export function isValidUserId(userId: string): boolean {
-  if (!userId) return false;
+export const getUserDisplayName = (user?: User | null): string => {
+  if (!user) return 'Unknown User';
   
-  return USER_ID_REGEX.test(userId);
-}
-
-/**
- * Tạo mới một ID người dùng
- * @param sequence Số thứ tự (nếu không cung cấp sẽ tạo ngẫu nhiên)
- * @returns ID người dùng mới
- */
-export function generateUserId(sequence?: number): string {
-  const seq = sequence || Math.floor(10000 + Math.random() * 90000);
-  return `${USER_ID_PREFIX}${seq}`;
-}
-
-/**
- * Đếm số lượng người dùng theo trạng thái
- * @param users Danh sách người dùng
- * @param status Trạng thái cần đếm
- * @returns Số lượng người dùng có trạng thái chỉ định
- */
-export function countUsersByStatus(users: User[], status: UserStatus): number {
-  return users.filter(user => user.status === status).length;
-}
-
-/**
- * Đếm số lượng người dùng theo gói dịch vụ
- * @param users Danh sách người dùng
- * @param plan Gói dịch vụ cần đếm
- * @returns Số lượng người dùng có gói dịch vụ chỉ định
- */
-export function countUsersByPlan(users: User[], plan: UserPlan): number {
-  return users.filter(user => user.plan === plan).length;
-}
-
-/**
- * Lọc người dùng theo nhiều tiêu chí
- * @param users Danh sách người dùng
- * @param filters Các tiêu chí lọc
- * @returns Danh sách người dùng đã lọc
- */
-export function filterUsers(users: User[], filters: {
-  searchTerm?: string;
-  status?: UserStatus | null;
-  plan?: UserPlan | null;
-}): User[] {
-  const { searchTerm, status, plan } = filters;
+  if (user.name) {
+    return user.name;
+  }
   
-  return users.filter(user => {
-    // Lọc theo từ khóa tìm kiếm
-    const matchesSearch = !searchTerm || 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Lọc theo trạng thái
-    const matchesStatus = !status || user.status === status;
-    
-    // Lọc theo gói dịch vụ
-    const matchesPlan = !plan || user.plan === plan;
-    
-    return matchesSearch && matchesStatus && matchesPlan;
-  });
-}
+  if (user.firstName && user.lastName) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  
+  if (user.firstName) {
+    return user.firstName;
+  }
+  
+  if (user.username) {
+    return user.username;
+  }
+  
+  return user.email.split('@')[0];
+};
 
 /**
- * Kiểm tra xem một người dùng có phải là admin không
- * @param user Người dùng cần kiểm tra
- * @returns true nếu người dùng là admin
+ * Formats a user's role for display
  */
-export function isAdmin(user: User): boolean {
-  return user.role === UserRole.ADMIN;
-}
+export const formatUserRole = (role: UserRole): string => {
+  switch (role) {
+    case UserRole.ADMIN:
+      return 'Admin';
+    case UserRole.SUPPORT:
+      return 'Support';
+    case UserRole.PARTNER:
+      return 'Partner';
+    case UserRole.AGENT:
+      return 'Agent';
+    default:
+      return 'User';
+  }
+};
 
 /**
- * Kiểm tra xem một người dùng có đang hoạt động không
- * @param user Người dùng cần kiểm tra
- * @returns true nếu người dùng đang hoạt động
+ * Formats a user's status for display
  */
-export function isActiveUser(user: User): boolean {
-  return user.status === UserStatus.ACTIVE;
-}
+export const formatUserStatus = (status: UserStatus): string => {
+  switch (status) {
+    case UserStatus.ACTIVE:
+      return 'Active';
+    case UserStatus.INACTIVE:
+      return 'Inactive';
+    case UserStatus.PENDING:
+      return 'Pending';
+    case UserStatus.SUSPENDED:
+      return 'Suspended';
+    default:
+      return 'Unknown';
+  }
+};
 
 /**
- * Kiểm tra xem một người dùng có đang bị khóa không
- * @param user Người dùng cần kiểm tra
- * @returns true nếu người dùng đang bị khóa
+ * Formats a user's plan for display
  */
-export function isSuspendedUser(user: User): boolean {
-  return user.status === UserStatus.SUSPENDED;
-}
+export const formatUserPlan = (plan: UserPlan): string => {
+  switch (plan) {
+    case UserPlan.FREE:
+      return 'Free';
+    case UserPlan.BASIC:
+      return 'Basic';
+    case UserPlan.PREMIUM:
+      return 'Premium';
+    case UserPlan.ENTERPRISE:
+      return 'Enterprise';
+    case UserPlan.TRIAL:
+      return 'Trial';
+    default:
+      return 'Unknown';
+  }
+};

@@ -34,6 +34,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.89',
       timestamp: '22/03/2024 15:45:23',
       details: 'Đăng ký qua email',
+      severity: 'info'
     },
     { 
       id: 'LOG1002',
@@ -45,6 +46,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.90',
       timestamp: '22/03/2024 15:42:18',
       details: 'Đăng nhập thành công',
+      severity: 'info'
     },
     { 
       id: 'LOG1003',
@@ -56,6 +58,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.91',
       timestamp: '22/03/2024 15:30:05',
       details: 'Đăng nhập thành công',
+      severity: 'info'
     },
     { 
       id: 'LOG1004',
@@ -67,6 +70,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.92',
       timestamp: '22/03/2024 15:00:00',
       details: 'Đã cập nhật thông tin cho PRE-002',
+      severity: 'info'
     },
     { 
       id: 'LOG1005',
@@ -78,6 +82,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.93',
       timestamp: '22/03/2024 14:58:32',
       details: 'Đăng nhập thành công',
+      severity: 'info'
     },
     { 
       id: 'LOG1006',
@@ -89,6 +94,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.94',
       timestamp: '22/03/2024 14:45:12',
       details: 'Đăng ký qua Google',
+      severity: 'info'
     },
     { 
       id: 'LOG1007',
@@ -100,6 +106,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.95',
       timestamp: '22/03/2024 14:30:44',
       details: 'Đã xóa BOT1267 do vi phạm điều khoản',
+      severity: 'warning'
     },
     { 
       id: 'LOG1008',
@@ -111,6 +118,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.96',
       timestamp: '22/03/2024 14:28:19',
       details: 'Đăng nhập thành công',
+      severity: 'info'
     },
     { 
       id: 'LOG1009',
@@ -122,6 +130,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.97',
       timestamp: '22/03/2024 14:15:01',
       details: 'Đã tạo PRE-005',
+      severity: 'info'
     },
     { 
       id: 'LOG1010',
@@ -133,6 +142,7 @@ const AdminLogs = () => {
       ipAddress: '123.45.67.98',
       timestamp: '22/03/2024 14:10:23',
       details: 'Đăng ký qua email',
+      severity: 'info'
     },
   ];
 

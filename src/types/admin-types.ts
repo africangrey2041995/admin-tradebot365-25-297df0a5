@@ -1,5 +1,4 @@
 
-import { User, PremiumBot, PropBot } from './index';
 import { BotStatus, BotType } from '@/constants/botTypes';
 import { UserStatus, UserPlan, UserRole } from '@/constants/userConstants';
 
@@ -8,7 +7,7 @@ import { UserStatus, UserPlan, UserRole } from '@/constants/userConstants';
  */
 
 // Thông tin user trong danh sách admin
-export interface AdminUserListItem extends Omit<User, 'password' | 'preferences' | 'billingInfo' | 'notifications'> {
+export interface AdminUserListItem {
   id: string;
   name: string;
   email: string;
@@ -93,9 +92,6 @@ export interface AdminDashboardStats {
   };
 }
 
-// Để duy trì tương thích ngược với code hiện tại
-export { User, PremiumBot, PropBot };
-
 // Type cho item trong danh sách user bots
 export interface UserBot {
   id: string;
@@ -105,4 +101,18 @@ export interface UserBot {
   status: string;
   accounts: number;
   createdDate: string;
+}
+
+// Fix re-exports with export type syntax
+export type { User } from './user';
+export type { PremiumBot, PropBot } from './bot';
+
+// Add UserWithRole type
+export interface UserWithRole {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+  createdAt: string;
 }

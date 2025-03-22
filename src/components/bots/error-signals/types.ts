@@ -35,3 +35,6 @@ export interface ErrorContextData {
   action?: string;
   recommendedAction?: string;
 }
+
+// Re-export the ExtendedSignal for local use
+export { ExtendedSignal };

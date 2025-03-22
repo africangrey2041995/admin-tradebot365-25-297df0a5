@@ -1,111 +1,81 @@
-
-import { UserStatus, UserPlan, UserRole, ActivityLevel } from '@/constants/userConstants';
-
 /**
  * Định nghĩa các types liên quan đến User
  */
+
+import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 
 // Thông tin cơ bản của user
 export interface User {
   id: string;
   email: string;
-  fullName: string;
-  displayName?: string;
+  name: string; // Added to match usage in components
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  postalCode?: string;
+  avatar?: string;
+  role: UserRole;
   status: UserStatus;
   plan: UserPlan;
-  role: UserRole;
-  avatar?: string;
-  joinDate: string;
+  createdAt: string;
+  updatedAt: string;
   lastLogin?: string;
-  bots: number;
-  activityLevel?: ActivityLevel;
-  verified: boolean;
-  phoneNumber?: string;
-  country?: string;
-  timezone?: string;
-  language?: string;
-  botTypes?: string[];
-}
-
-// Thông tin đăng nhập
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
-}
-
-// Thông tin đăng ký
-export interface RegisterData {
-  email: string;
-  password: string;
-  fullName: string;
-  confirmPassword: string;
-  agreeToTerms: boolean;
-}
-
-// Thông tin hồ sơ người dùng
-export interface UserProfile extends Omit<User, 'password'> {
+  emailVerified: boolean;
+  twoFactorEnabled: boolean;
+  apiKeys?: UserApiKey[];
   preferences?: UserPreferences;
   billingInfo?: BillingInfo;
-  notifications?: NotificationSettings;
+  notifications?: UserNotification[];
 }
 
-// Thiết lập người dùng
+// Thông tin API key của user
+export interface UserApiKey {
+  id: string;
+  userId: string;
+  key: string;
+  name: string;
+  createdAt: string;
+  lastUsed?: string;
+  permissions: string[];
+  isActive: boolean;
+}
+
+// Cài đặt ưu tiên của user
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   language: string;
-  timezone: string;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
+  notificationsEnabled: boolean;
+  emailNotificationsEnabled: boolean;
+  smsNotificationsEnabled: boolean;
 }
 
-// Thông tin thanh toán
+// Thông tin thanh toán của user
 export interface BillingInfo {
-  plan: UserPlan;
-  nextBillingDate?: string;
-  paymentMethod?: string;
-  billingAddress?: string;
-  invoices?: Invoice[];
+  paymentMethod: 'credit_card' | 'paypal' | 'bank_transfer';
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
+  paypalEmail?: string;
+  bankName?: string;
+  accountNumber?: string;
+  swiftCode?: string;
+  billingAddress: string;
+  billingCity: string;
+  billingCountry: string;
+  billingPostalCode: string;
 }
 
-// Hóa đơn
-export interface Invoice {
+// Thông báo của user
+export interface UserNotification {
   id: string;
-  date: string;
-  amount: number;
-  status: 'paid' | 'unpaid' | 'cancelled';
-  downloadUrl?: string;
-}
-
-// Thiết lập thông báo
-export interface NotificationSettings {
-  email: boolean;
-  push: boolean;
-  sms: boolean;
-  marketingEmails: boolean;
-  botAlerts: boolean;
-  securityAlerts: boolean;
-  productUpdates: boolean;
-}
-
-// Yêu cầu thay đổi mật khẩu
-export interface PasswordChangeRequest {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
-
-// Response cho thông tin user hiện tại
-export interface CurrentUserResponse {
-  user: User;
-  token?: string;
-  refreshToken?: string;
-}
-
-// Thông tin admin
-export interface AdminUser extends User {
-  adminLevel: 'full' | 'limited' | 'readonly';
-  permissions: string[];
-  managedUsers?: number;
-  lastActivity?: string;
+  userId: string;
+  type: 'info' | 'warning' | 'error' | 'success';
+  message: string;
+  timestamp: string;
+  read: boolean;
+  link?: string;
 }

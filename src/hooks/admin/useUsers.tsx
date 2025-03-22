@@ -1,230 +1,231 @@
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { User } from '@/types/admin-types';
-import { exportToCSV as exportDataToCSV, exportToExcel as exportDataToExcel } from '@/utils/exportUtils';
 
-const mockUsers: User[] = [
-  { 
-    id: 'USR-24051', 
-    name: 'Nguyễn Văn A', 
-    email: 'nguyenvana@example.com', 
-    role: 'user', 
-    status: 'active',
-    plan: 'premium',
-    bots: 3,
-    botTypes: ['trading', 'crypto'],
-    activity: 'high',
-    joinDate: '15/08/2023'
-  },
-  { 
-    id: 'USR-24052', 
-    name: 'Trần Thị B', 
-    email: 'tranthib@example.com', 
-    role: 'user', 
-    status: 'active',
-    plan: 'basic',
-    bots: 1,
-    botTypes: ['forex'],
-    activity: 'medium',
-    joinDate: '03/10/2023'
-  },
-  { 
-    id: 'USR-24053', 
-    name: 'Lê Minh C', 
-    email: 'leminhc@example.com', 
-    role: 'user', 
-    status: 'inactive',
-    plan: 'basic',
-    bots: 0,
-    botTypes: [],
-    activity: 'low',
-    joinDate: '22/11/2023'
-  },
-  { 
-    id: 'USR-24054', 
-    name: 'Phạm Đức D', 
-    email: 'phamducd@example.com', 
-    role: 'user', 
-    status: 'active',
-    plan: 'premium',
-    bots: 5,
-    botTypes: ['trading', 'crypto', 'forex'],
-    activity: 'high',
-    joinDate: '05/01/2024'
-  },
-  { 
-    id: 'USR-24055', 
-    name: 'Vũ Văn F', 
-    email: 'vuvanf@example.com', 
-    role: 'user', 
-    status: 'suspended',
-    plan: 'basic',
-    bots: 0,
-    botTypes: [],
-    activity: 'none',
-    joinDate: '30/03/2024'
-  },
-  { 
-    id: 'USR-24056', 
-    name: 'Đỗ Thị G', 
-    email: 'dothig@example.com', 
-    role: 'user', 
-    status: 'active',
-    plan: 'trial',
-    bots: 1,
-    botTypes: ['crypto'],
-    activity: 'medium',
-    joinDate: '12/04/2024'
-  }
-];
+import { useState, useEffect, useCallback } from 'react';
+import { User } from '@/types';
+import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 
-export const useUsers = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(mockUsers);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [planFilter, setPlanFilter] = useState<string | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10;
+interface UseUsersOptions {
+  initialPage?: number;
+  pageSize?: number;
+}
 
-  const totalUsers = users.length;
-  const activeUsers = users.filter(user => user.status === 'active').length;
-  const inactiveUsers = users.filter(user => user.status === 'inactive').length;
-  const suspendedUsers = users.filter(user => user.status === 'suspended').length;
+export const useUsers = (options: UseUsersOptions = {}) => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentPage, setCurrentPage] = useState(options.initialPage || 1);
+  const [pageSize] = useState(options.pageSize || 10);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   
-  const newUsersThisMonth = 2;
-
+  // Fetch users (mock data for now)
+  const fetchUsers = useCallback((page: number = currentPage) => {
+    setLoading(true);
+    
+    // Simulate API request
+    setTimeout(() => {
+      const mockUsers: User[] = [
+        {
+          id: 'USR-001',
+          email: 'john.doe@example.com',
+          name: 'John Doe',
+          role: UserRole.USER,
+          status: UserStatus.ACTIVE,
+          plan: UserPlan.PREMIUM,
+          createdAt: '2023-05-10T08:30:00Z',
+          updatedAt: '2023-11-15T14:22:30Z',
+          lastLogin: '2024-03-20T09:15:45Z',
+          emailVerified: true,
+          twoFactorEnabled: false,
+        },
+        {
+          id: 'USR-002',
+          email: 'jane.smith@example.com',
+          name: 'Jane Smith',
+          role: UserRole.USER,
+          status: UserStatus.ACTIVE,
+          plan: UserPlan.BASIC,
+          createdAt: '2023-06-20T10:15:00Z',
+          updatedAt: '2023-10-05T16:40:20Z',
+          lastLogin: '2024-03-19T11:30:15Z',
+          emailVerified: true,
+          twoFactorEnabled: true,
+        },
+        {
+          id: 'USR-003',
+          email: 'robert.johnson@example.com',
+          name: 'Robert Johnson',
+          role: UserRole.USER,
+          status: UserStatus.INACTIVE,
+          plan: UserPlan.BASIC,
+          createdAt: '2023-07-15T14:45:00Z',
+          updatedAt: '2023-09-10T12:30:45Z',
+          lastLogin: '2024-02-28T08:20:30Z',
+          emailVerified: true,
+          twoFactorEnabled: false,
+        },
+        {
+          id: 'USR-004',
+          email: 'emily.davis@example.com',
+          name: 'Emily Davis',
+          role: UserRole.USER,
+          status: UserStatus.ACTIVE,
+          plan: UserPlan.PREMIUM,
+          createdAt: '2023-08-05T09:20:00Z',
+          updatedAt: '2023-12-12T10:15:30Z',
+          lastLogin: '2024-03-21T07:45:10Z',
+          emailVerified: true,
+          twoFactorEnabled: true,
+        },
+        {
+          id: 'USR-005',
+          email: 'michael.brown@example.com',
+          name: 'Michael Brown',
+          role: UserRole.USER,
+          status: UserStatus.SUSPENDED,
+          plan: UserPlan.BASIC,
+          createdAt: '2023-09-25T16:30:00Z',
+          updatedAt: '2024-01-20T15:10:45Z',
+          lastLogin: '2024-02-10T13:25:50Z',
+          emailVerified: false,
+          twoFactorEnabled: false,
+        },
+        {
+          id: 'USR-006',
+          email: 'sarah.wilson@example.com',
+          name: 'Sarah Wilson',
+          role: UserRole.USER,
+          status: UserStatus.ACTIVE,
+          plan: UserPlan.TRIAL,
+          createdAt: '2023-10-15T11:45:00Z',
+          updatedAt: '2024-02-05T09:30:15Z',
+          lastLogin: '2024-03-18T16:40:25Z',
+          emailVerified: true,
+          twoFactorEnabled: false,
+        },
+      ];
+      
+      setUsers(mockUsers);
+      setTotalUsers(mockUsers.length);
+      setLoading(false);
+    }, 1000);
+  }, [currentPage, pageSize]);
+  
   useEffect(() => {
-    const result = users
-      .filter(user => 
-        (searchTerm === '' || 
-         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         user.id.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-      .filter(user => 
-        (filterStatus === null || user.status === filterStatus)
-      )
-      .filter(user => 
-        (planFilter === null || user.plan === planFilter)
-      );
+    fetchUsers();
+  }, [fetchUsers]);
+  
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchUsers(page);
+  };
+  
+  // Get user details
+  const getUserDetails = useCallback((userId: string) => {
+    setLoading(true);
     
-    setFilteredUsers(result);
-    setSelectedUsers([]);
-    setSelectAll(false);
-  }, [searchTerm, filterStatus, planFilter, users]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleFilterClick = (status: string | null) => {
-    setFilterStatus(status === filterStatus ? null : status);
-  };
-
-  const handleUserCheckbox = (userId: string) => {
-    if (selectedUsers.includes(userId)) {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId));
-    } else {
-      setSelectedUsers([...selectedUsers, userId]);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(filteredUsers.map(user => user.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const handleBulkAction = (action: string) => {
-    if (selectedUsers.length === 0) {
-      toast.error("Vui lòng chọn ít nhất một người dùng");
-      return;
-    }
-
-    switch (action) {
-      case 'activate':
-        toast.success(`Đã kích hoạt ${selectedUsers.length} tài khoản người dùng`);
-        break;
-      case 'suspend':
-        toast.success(`Đã tạm khóa ${selectedUsers.length} tài khoản người dùng`);
-        break;
-      case 'premium':
-        toast.success(`Đã nâng cấp ${selectedUsers.length} tài khoản lên gói Premium`);
-        break;
-      case 'basic':
-        toast.success(`Đã chuyển ${selectedUsers.length} tài khoản sang gói Basic`);
-        break;
-      default:
-        break;
-    }
+    // Simulate API request
+    setTimeout(() => {
+      const user = users.find(u => u.id === userId);
+      
+      if (user) {
+        setSelectedUser(user);
+      } else {
+        setSelectedUser(null);
+      }
+      
+      setLoading(false);
+    }, 500);
+  }, [users]);
+  
+  // Create new user
+  const createUser = useCallback((userData: Partial<User>) => {
+    setLoading(true);
     
-    setSelectedUsers([]);
-    setSelectAll(false);
-  };
-
-  const exportToCSV = () => {
-    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói dịch vụ', 'Số lượng bot', 'Ngày tham gia'];
+    // Simulate API request
+    setTimeout(() => {
+      const newUser: User = {
+        id: `USR-${Math.floor(Math.random() * 1000)}`,
+        email: userData.email || 'new.user@example.com',
+        name: userData.name || 'New User',
+        role: userData.role || UserRole.USER,
+        status: userData.status || UserStatus.ACTIVE,
+        plan: userData.plan || UserPlan.BASIC,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        emailVerified: false,
+        twoFactorEnabled: false,
+      };
+      
+      setUsers([...users, newUser]);
+      setTotalUsers(totalUsers + 1);
+      setLoading(false);
+      
+      return newUser;
+    }, 800);
+  }, [users, totalUsers]);
+  
+  // Update user
+  const updateUser = useCallback((userId: string, userData: Partial<User>) => {
+    setLoading(true);
     
-    const userDataCSV = filteredUsers.map(user => [
-      user.id,
-      user.name,
-      user.email,
-      user.status === 'active' ? 'Hoạt động' : user.status === 'inactive' ? 'Không hoạt động' : 'Đã khóa',
-      user.plan,
-      user.bots.toString(),
-      user.joinDate
-    ]);
+    // Simulate API request
+    setTimeout(() => {
+      const updatedUsers = users.map(user => {
+        if (user.id === userId) {
+          return {
+            ...user,
+            ...userData,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return user;
+      });
+      
+      setUsers(updatedUsers);
+      
+      if (selectedUser && selectedUser.id === userId) {
+        setSelectedUser({
+          ...selectedUser,
+          ...userData,
+          updatedAt: new Date().toISOString()
+        });
+      }
+      
+      setLoading(false);
+    }, 800);
+  }, [users, selectedUser]);
+  
+  // Delete user
+  const deleteUser = useCallback((userId: string) => {
+    setLoading(true);
     
-    exportDataToCSV(headers, userDataCSV, `user_data_${new Date().toISOString().slice(0, 10)}`);
-    toast.success('Đã xuất dữ liệu người dùng thành công');
-  };
-
-  const exportToExcel = () => {
-    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói dịch vụ', 'Số lượng bot', 'Ngày tham gia'];
-    
-    const userData = filteredUsers.map(user => [
-      user.id,
-      user.name,
-      user.email,
-      user.status === 'active' ? 'Hoạt động' : user.status === 'inactive' ? 'Không hoạt động' : 'Đã khóa',
-      user.plan,
-      user.bots.toString(),
-      user.joinDate
-    ]);
-    
-    exportDataToExcel(headers, userData, `user_data_${new Date().toISOString().slice(0, 10)}`, 'User Data');
-    toast.success('Đã xuất dữ liệu người dùng thành công');
-  };
-
+    // Simulate API request
+    setTimeout(() => {
+      const remainingUsers = users.filter(user => user.id !== userId);
+      
+      setUsers(remainingUsers);
+      setTotalUsers(totalUsers - 1);
+      
+      if (selectedUser && selectedUser.id === userId) {
+        setSelectedUser(null);
+      }
+      
+      setLoading(false);
+    }, 800);
+  }, [users, totalUsers, selectedUser]);
+  
   return {
-    users: filteredUsers,
+    users,
     totalUsers,
-    activeUsers,
-    inactiveUsers,
-    suspendedUsers,
-    newUsersThisMonth,
-    searchTerm,
-    filterStatus,
-    planFilter,
-    selectedUsers,
-    selectAll,
     currentPage,
-    usersPerPage,
-    setSearchTerm,
-    setPlanFilter,
-    setCurrentPage,
-    handleSearchChange,
-    handleFilterClick,
-    handleUserCheckbox,
-    handleSelectAll,
-    handleBulkAction,
-    exportToCSV,
-    exportToExcel
+    pageSize,
+    loading,
+    selectedUser,
+    fetchUsers,
+    handlePageChange,
+    getUserDetails,
+    createUser,
+    updateUser,
+    deleteUser
   };
 };

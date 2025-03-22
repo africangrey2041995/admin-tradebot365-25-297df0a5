@@ -1,4 +1,3 @@
-
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import { Account } from './account';
 
@@ -19,6 +18,7 @@ export interface BaseBot {
   imageUrl?: string;
   exchange?: string;
   performance?: BotPerformance;
+  botId?: string; // Added to match usage in components
 }
 
 // Bot của người dùng
@@ -40,12 +40,15 @@ export interface PremiumBot extends BaseBot {
   performanceAllTime: string;
   minCapital: string;
   subscribers: number;
+  users?: number; // Added to match usage in components
+  profit?: string; // Added to match usage in components
   colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;
   features?: string[];
   tradingStyle?: string;
   timeframe?: string;
   markets?: string[];
+  accounts?: Account[] | number; // Added to match usage in components
 }
 
 // Bot PropTrading

@@ -8,6 +8,12 @@ export enum BotType {
   USER_BOT = 'USER_BOT',
   PREMIUM_BOT = 'PREMIUM_BOT',
   PROP_BOT = 'PROP_BOT',
+  // Additional values used in the codebase
+  MOMENTUM = 'momentum',
+  GRID = 'grid',
+  FTMO = 'FTMO',
+  FUNDEDNEXT = 'FundedNext',
+  COINSTRAT_PRO = 'Coinstrat Pro'
 }
 
 // Cấu trúc ID prefix cho mỗi loại bot
@@ -62,5 +68,10 @@ export const BOT_RISK_DISPLAY: Record<BotRiskLevel, string> = {
 export const BOT_TYPE_DISPLAY: Record<BotType, string> = {
   [BotType.USER_BOT]: 'Bot Người Dùng',
   [BotType.PREMIUM_BOT]: 'Bot Premium',
-  [BotType.PROP_BOT]: 'Bot Prop Trading'
+  [BotType.PROP_BOT]: 'Bot Prop Trading',
+  [BotType.MOMENTUM]: 'Momentum',
+  [BotType.GRID]: 'Grid',
+  [BotType.FTMO]: 'FTMO',
+  [BotType.FUNDEDNEXT]: 'FundedNext',
+  [BotType.COINSTRAT_PRO]: 'Coinstrat Pro'
 };
