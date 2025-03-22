@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
@@ -92,6 +91,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   // Create specific defaultValues by processing the package data
   const getDefaultValues = (): FormValues => {
     if (pkg) {
+      // For editing an existing package
       return {
         ...pkg,
         limits: {
@@ -107,9 +107,10 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         isActive: pkg.isActive,
         isPopular: pkg.isPopular || false,
         isEnterprise: pkg.isEnterprise || false,
-      } as unknown as FormValues;
+      } as FormValues;
     }
 
+    // For creating a new package
     return {
       planId: UserPlan.BASIC,
       name: '',
