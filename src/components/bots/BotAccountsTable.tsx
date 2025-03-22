@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Account, ConnectionStatus } from '@/types';
+import { Account } from '@/types';
+import { ConnectionStatus } from '@/types/connection';
 
 interface BotAccountsTableProps {
   botId: string;

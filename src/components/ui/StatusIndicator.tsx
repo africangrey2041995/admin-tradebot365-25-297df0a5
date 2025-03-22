@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { ConnectionStatus } from '@/types';
 import { cn } from '@/lib/utils';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ConnectionStatus } from '@/types/connection';
 
 interface StatusIndicatorProps {
   status: ConnectionStatus;

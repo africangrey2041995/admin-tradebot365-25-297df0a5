@@ -1,5 +1,6 @@
 
-import { AccountSignalStatus, TradingAccountType } from '@/types';
+import { AccountSignalStatus } from '@/types';
+import { TradingAccountType } from '@/types/connection';
 import { BotType } from '@/constants/botTypes';
 
 /**

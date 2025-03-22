@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,7 @@ import {
 import { Search, RefreshCw, Link2Off, AlertOctagon } from 'lucide-react';
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { toast } from 'sonner';
-import { Connection } from '@/types';
+import { Connection } from '@/types/connection';
 
 const Connections = () => {
   const [searchTerm, setSearchTerm] = useState('');

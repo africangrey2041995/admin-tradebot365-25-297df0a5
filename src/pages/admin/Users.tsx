@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { UsersPagination } from '@/components/admin/users/UsersPagination';
 import { AddUserDialog } from '@/components/admin/users/AddUserDialog';
 import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
 import { useUsers } from '@/hooks/admin/useUsers';
+import { User } from '@/types/admin-types';
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -18,17 +18,6 @@ const AdminUsers = () => {
   const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  
-  // Stats
-  const activeUsers = 50;
-  const inactiveUsers = 20;
-  const suspendedUsers = 5;
-  const newUsersThisMonth = 10;
-  
-  // Filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [planFilter, setPlanFilter] = useState<string | null>(null);
   
   const {
     users,
@@ -44,7 +33,9 @@ const AdminUsers = () => {
     updateUser,
     deleteUser,
   } = useUsers();
-  
+
+  const adminUsers = users as User[];
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -76,7 +67,6 @@ const AdminUsers = () => {
   };
 
   const confirmBulkAction = () => {
-    // Logic for bulk actions would go here
     toast.success(`Bulk action applied to ${selectedUsers.length} users`);
     setSelectedUsers([]);
     setSelectAll(false);
@@ -121,7 +111,7 @@ const AdminUsers = () => {
         </CardHeader>
         <CardContent>
           <UsersTable
-            users={users}
+            users={adminUsers}
             selectedUsers={selectedUsers}
             selectAll={selectAll}
             onSelectAll={handleSelectAll}

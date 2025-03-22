@@ -1,3 +1,4 @@
+
 /**
  * Định nghĩa các types liên quan đến User
  */
@@ -30,8 +31,8 @@ export interface User {
   preferences?: UserPreferences;
   billingInfo?: BillingInfo;
   notifications?: UserNotification[];
-  bots?: number;
-  joinDate?: string;
+  bots: number; // Changed from optional to required to match admin-types
+  joinDate: string; // Added to match admin-types
   botTypes?: string[];
   activity?: string;
 }

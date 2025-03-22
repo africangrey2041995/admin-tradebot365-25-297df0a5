@@ -1,0 +1,24 @@
+
+/**
+ * Định nghĩa các types liên quan đến kết nối
+ */
+
+// Trạng thái kết nối
+export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Pending';
+
+// Loại tài khoản giao dịch
+export type TradingAccountType = 'Live' | 'Demo' | 'Practice';
+
+// Thông tin kết nối
+export interface Connection {
+  accountId: string;
+  connectionStatus: ConnectionStatus;
+  lastConnectionTime?: string;
+  lastDisconnectionTime?: string;
+  errorMessage?: string;
+  reconnectAttempts?: number;
+  healthStatus?: 'healthy' | 'warning' | 'critical';
+  successfulConnections?: number;
+  failedConnections?: number;
+}
+

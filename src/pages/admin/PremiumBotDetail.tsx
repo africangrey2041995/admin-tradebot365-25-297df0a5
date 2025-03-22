@@ -33,7 +33,7 @@ import {
   Save,
   CircleDollarSign
 } from 'lucide-react';
-import { PremiumBot } from '@/types';
+import { PremiumBot, BotType, BotRiskLevel, BotStatus } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import BotProfileTabs from '@/components/bots/BotProfileTabs';
 import { toast } from 'sonner';
@@ -55,7 +55,7 @@ const tradePerformanceData = [
 
 const monthlyPerformance = [
   { month: 'Jan', value: 12.5 },
-  { month: 'Feb', value: 8.3 },
+  { name: 'Feb', value: 8.3 },
   { name: 'Mar', value: -2.1 },
   { name: 'Apr', value: 5.7 },
   { name: 'May', value: 15.2 },
@@ -100,17 +100,19 @@ const AdminPremiumBotDetail = () => {
           name: 'Alpha Momentum',
           description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
           exchange: 'Coinstart Pro',
-          type: 'momentum',
+          type: BotType.PREMIUM_BOT,
           performanceLastMonth: '+18.5%',
           performanceAllTime: '+125.4%',
-          risk: 'medium',
+          risk: BotRiskLevel.MEDIUM,
           minCapital: '$500',
-          status: 'active',
+          status: BotStatus.ACTIVE,
           subscribers: 86,
           imageUrl: null,
           colorScheme: 'green',
           isIntegrated: true,
           botId: 'PRE7459',
+          createdDate: '2023-01-15T10:20:30Z',
+          lastUpdated: '2023-09-18T16:55:33Z',
         };
         
         setBot(mockBot);

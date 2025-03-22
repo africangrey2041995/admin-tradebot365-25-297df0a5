@@ -2,6 +2,7 @@
 import { BotStatus, BotType, BotRiskLevel } from '@/constants/botTypes';
 import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 import { Account } from './account';
+import { Bot, PremiumBot as BasePremiumBot, UserBot as BaseUserBot, PropBot as BasePropBot } from './bot';
 
 // Admin User Interface
 export interface User {
@@ -22,34 +23,17 @@ export interface User {
 export interface UserWithRole extends User {
   roleDescription?: string;
   permissions?: string[];
+  lastLogin?: string;
 }
 
+// Re-export bot types with the correct interfaces
+export type { BasePropBot as PropBot, BaseUserBot as UserBot };
+
 // Admin Premium Bot Interface
-export interface PremiumBot {
-  id: string;
-  name: string;
-  description?: string;
-  exchange?: string;
-  type: BotType.PREMIUM_BOT;
-  performanceLastMonth: string;
-  performanceAllTime: string;
-  risk: BotRiskLevel;
-  minCapital: string;
-  status: BotStatus;
-  subscribers: number;
-  imageUrl?: string | null;
-  colorScheme?: 'default' | 'red' | 'blue' | 'green' | 'purple';
-  isIntegrated?: boolean;
+export interface PremiumBot extends BasePremiumBot {
   botId?: string;
   users?: number;
   profit?: string;
-  createdDate: string;
-  lastUpdated?: string;
-  features?: string[];
-  tradingStyle?: string;
-  timeframe?: string;
-  markets?: string[];
-  accounts?: Account[] | number;
 }
 
 // BotProfileTabs component props

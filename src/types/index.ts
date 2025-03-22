@@ -3,6 +3,7 @@ export * from './user';
 export * from './bot';
 export * from './account';
 export * from './signal';
+export * from './connection';
 
 /**
  * Các types khác

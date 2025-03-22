@@ -1,8 +1,10 @@
 
+import { ConnectionStatus, TradingAccountType } from './connection';
+
 export interface Account {
   id: string;
   name: string;
-  status: string;
+  status: ConnectionStatus | string;
   createdDate: string;
   lastUpdated: string;
   userId: string;
