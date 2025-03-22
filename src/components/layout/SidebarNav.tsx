@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   LayoutDashboard,
@@ -8,7 +9,7 @@ import {
   Package,
   AlertTriangle,
   HelpCircle,
-  Logout,
+  LogOut, // Changed from Logout to LogOut
 } from "lucide-react";
 import { NavItem } from "@/types/nav";
 import { useAuth } from "@/hooks/use-auth";
@@ -149,7 +150,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ className }) => {
                 onClick={() => signOut()}
                 className="flex items-center space-x-2 rounded-md p-2 text-sm font-medium hover:bg-secondary hover:text-accent focus:outline-none"
               >
-                <Logout className="h-4 w-4" />
+                <LogOut className="h-4 w-4" />
                 <span>Đăng xuất</span>
               </button>
             </div>

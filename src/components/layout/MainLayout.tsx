@@ -5,7 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import SidebarNav from './SidebarNav';
+import { SidebarNav } from './SidebarNav';
 import BetaTag from '../common/BetaTag';
 
 interface MainLayoutProps {
