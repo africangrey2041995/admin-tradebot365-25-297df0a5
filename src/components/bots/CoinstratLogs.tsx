@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { CoinstratSignal } from '@/types';
+import { CoinstratSignal, ExtendedSignal } from '@/types';
 import { Check, X, Info, Eye, List, User } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -14,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom';
-import { ExtendedSignal } from './error-signals/types';
 
 interface CoinstratLogsProps {
   botId: string;
