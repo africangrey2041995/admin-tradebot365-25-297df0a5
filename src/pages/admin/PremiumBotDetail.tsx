@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -33,7 +34,8 @@ import {
   Save,
   CircleDollarSign
 } from 'lucide-react';
-import { PremiumBot, BotType, BotRiskLevel, BotStatus } from '@/types';
+import { PremiumBot } from '@/types';
+import { BotType, BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import BotProfileTabs from '@/components/bots/BotProfileTabs';
 import { toast } from 'sonner';

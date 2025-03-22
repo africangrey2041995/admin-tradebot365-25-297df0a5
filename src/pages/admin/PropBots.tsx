@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -30,6 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PropBot } from '@/types/admin-types';
+import { BotType, BotStatus } from '@/constants/botTypes';
 import * as XLSX from 'xlsx';
 
 const AdminPropBots = () => {
@@ -72,42 +72,46 @@ const AdminPropBots = () => {
     supportLong: true
   });
   
-  const bots: PropBot[] = [
-    { 
-      id: 'PROP-001', 
-      name: 'Prop Trading Master', 
-      status: 'active',
-      users: 12,
-      profit: '+22.5%',
-      createdDate: '05/01/2024',
-      type: 'FTMO'
+  const propBots: PropBot[] = [
+    {
+      id: 'ptb-001',
+      name: 'FTMO Challenge Bot',
+      status: BotStatus.ACTIVE,
+      createdDate: '2023-08-15',
+      users: 25,
+      profit: '+8.2%',
+      type: BotType.PROP_BOT,
+      propFirm: 'FTMO'
     },
-    { 
-      id: 'PROP-002', 
-      name: 'Prop FTMO Winner', 
-      status: 'active',
+    {
+      id: 'ptb-002',
+      name: 'FTMO Challenge Bot - Aggressive',
+      status: BotStatus.ACTIVE,
+      createdDate: '2023-09-10',
+      users: 15,
+      profit: '+12.5%',
+      type: BotType.PROP_BOT,
+      propFirm: 'FTMO'
+    },
+    {
+      id: 'ptb-003',
+      name: 'FundedNext Challenge Bot',
+      status: BotStatus.MAINTENANCE,
+      createdDate: '2023-07-22',
+      users: 18,
+      profit: '+6.8%',
+      type: BotType.PROP_BOT,
+      propFirm: 'FundedNext'
+    },
+    {
+      id: 'ptb-004',
+      name: 'Coinstrat Pro Challenge Bot',
+      status: BotStatus.INACTIVE,
+      createdDate: '2023-06-30',
       users: 8,
-      profit: '+17.3%',
-      createdDate: '20/02/2024',
-      type: 'FTMO'
-    },
-    { 
-      id: 'PROP-003', 
-      name: 'Prop Trading Elite', 
-      status: 'maintenance',
-      users: 5,
-      profit: '+9.1%',
-      createdDate: '15/03/2024',
-      type: 'FundedNext'
-    },
-    { 
-      id: 'PROP-004', 
-      name: 'Prop 100K Challenge', 
-      status: 'inactive',
-      users: 0,
-      profit: '0.0%',
-      createdDate: '05/04/2024',
-      type: 'Coinstrat Pro'
+      profit: '+3.2%',
+      type: BotType.PROP_BOT,
+      propFirm: 'Coinstrat Pro'
     }
   ];
 
@@ -287,7 +291,7 @@ const AdminPropBots = () => {
     );
   };
 
-  const filteredBots = bots
+  const filteredBots = propBots
     .filter(bot => 
       (searchTerm === '' || 
         bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -982,3 +986,4 @@ const BotStatusBadge = ({ status }: { status: string }) => {
 };
 
 export default AdminPropBots;
+

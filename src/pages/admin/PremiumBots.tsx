@@ -11,7 +11,7 @@ import { PremiumBotsPagination } from '@/components/admin/premium-bots/PremiumBo
 import { AddPremiumBotDialog } from '@/components/admin/premium-bots/AddPremiumBotDialog';
 import { BulkActionDialog } from '@/components/admin/premium-bots/BulkActionDialog';
 import { BotStatus, BotType, BotRiskLevel } from '@/constants/botTypes';
-import { PremiumBot } from '@/types/admin-types';
+import { PremiumBot } from '@/types';
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,7 +59,10 @@ const AdminPremiumBots = () => {
       risk: BotRiskLevel.MEDIUM,
       minCapital: '$500',
       subscribers: 48,
-      lastUpdated: '15/02/2024'
+      lastUpdated: '15/02/2024',
+      colorScheme: 'green',
+      exchange: 'Binance',
+      description: 'Premium bot for momentum trading'
     },
     { 
       id: 'PRE-002', 
@@ -74,7 +77,10 @@ const AdminPremiumBots = () => {
       risk: BotRiskLevel.MEDIUM,
       minCapital: '$800',
       subscribers: 32,
-      lastUpdated: '20/03/2024'
+      lastUpdated: '20/03/2024',
+      colorScheme: 'blue',
+      exchange: 'Bybit',
+      description: 'Premium bot for momentum trading'
     },
     { 
       id: 'PRE-003', 
@@ -89,7 +95,10 @@ const AdminPremiumBots = () => {
       risk: BotRiskLevel.HIGH,
       minCapital: '$1000',
       subscribers: 12,
-      lastUpdated: '10/03/2024'
+      lastUpdated: '10/03/2024',
+      colorScheme: 'red',
+      exchange: 'KuCoin',
+      description: 'Premium bot for momentum trading'
     },
     { 
       id: 'PRE-004', 
@@ -104,7 +113,10 @@ const AdminPremiumBots = () => {
       risk: BotRiskLevel.LOW,
       minCapital: '$300',
       subscribers: 56,
-      lastUpdated: '25/01/2024'
+      lastUpdated: '25/01/2024',
+      colorScheme: 'green',
+      exchange: 'Binance',
+      description: 'Premium bot for momentum trading'
     },
     { 
       id: 'PRE-005', 
@@ -119,7 +131,10 @@ const AdminPremiumBots = () => {
       risk: BotRiskLevel.MEDIUM,
       minCapital: '$600',
       subscribers: 22,
-      lastUpdated: '22/11/2023'
+      lastUpdated: '22/11/2023',
+      colorScheme: 'orange',
+      exchange: 'OKX',
+      description: 'Premium bot for momentum trading'
     }
   ];
 

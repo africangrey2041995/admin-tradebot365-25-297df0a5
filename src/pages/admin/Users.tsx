@@ -1,149 +1,229 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { UserPlus, Search, RefreshCw, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useNavigate } from 'react-router-dom';
-import { toast } from "sonner";
-import { UsersTable } from '@/components/admin/users/UsersTable';
-import { UsersPagination } from '@/components/admin/users/UsersPagination';
-import { AddUserDialog } from '@/components/admin/users/AddUserDialog';
-import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
-import { useUsers } from '@/hooks/admin/useUsers';
-import { User } from '@/types/admin-types';
 
-const AdminUsers = () => {
-  const navigate = useNavigate();
-  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
-  const [isBulkActionDialogOpen, setIsBulkActionDialogOpen] = useState(false);
-  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
+const Users = () => {
+  // Make sure these state hooks are properly defined
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   
-  const {
-    users,
-    totalUsers,
-    currentPage,
-    pageSize,
-    loading,
-    selectedUser,
-    fetchUsers,
-    handlePageChange,
-    getUserDetails,
-    createUser,
-    updateUser,
-    deleteUser,
-  } = useUsers();
+  const navigate = useNavigate();
 
-  const adminUsers = users as User[];
+  const mockUsers = [
+    {
+      id: "user-001",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      status: "active",
+      plan: "premium",
+      createdAt: "2023-01-15T10:20:30Z",
+      updatedAt: "2023-09-18T16:55:33Z",
+      emailVerified: true,
+      twoFactorEnabled: true,
+      bots: 3,
+      joinDate: "2023-01-15"
+    },
+    {
+      id: "user-002",
+      name: "Jane Smith",
+      email: "jane.smith@example.com",
+      status: "inactive",
+      plan: "free",
+      createdAt: "2023-02-20T14:30:45Z",
+      updatedAt: "2023-08-10T09:15:22Z",
+      emailVerified: true,
+      twoFactorEnabled: false,
+      bots: 1,
+      joinDate: "2023-02-20"
+    },
+    {
+      id: "user-003",
+      name: "Robert Johnson",
+      email: "robert.johnson@example.com",
+      status: "active",
+      plan: "premium",
+      createdAt: "2023-03-10T08:45:12Z",
+      updatedAt: "2023-09-01T11:20:33Z",
+      emailVerified: true,
+      twoFactorEnabled: true,
+      bots: 5,
+      joinDate: "2023-03-10"
+    },
+    {
+      id: "user-004",
+      name: "Alice Williams",
+      email: "alice.williams@example.com",
+      status: "active",
+      plan: "free",
+      createdAt: "2023-04-05T16:22:58Z",
+      updatedAt: "2023-07-25T14:58:17Z",
+      emailVerified: false,
+      twoFactorEnabled: false,
+      bots: 0,
+      joinDate: "2023-04-05"
+    },
+    {
+      id: "user-005",
+      name: "David Brown",
+      email: "david.brown@example.com",
+      status: "inactive",
+      plan: "premium",
+      createdAt: "2023-05-12T09:55:04Z",
+      updatedAt: "2023-08-18T10:30:29Z",
+      emailVerified: true,
+      twoFactorEnabled: true,
+      bots: 2,
+      joinDate: "2023-05-12"
+    }
+  ];
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const filteredUsers = mockUsers.filter(user => {
+    const searchRegex = new RegExp(searchTerm, 'i');
+    const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
+
+    const matchesStatus = filterStatus === "all" || user.status === filterStatus;
+
+    return matchesSearch && matchesStatus;
+  });
+  
+  // Add proper handlers for search and filter
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  const handleFilterClick = (status: string | null) => {
-    setFilterStatus(status);
+  
+  const handleFilterChange = (value: string) => {
+    setFilterStatus(value);
   };
-
-  const handleUserCheckbox = (userId: string) => {
-    if (selectedUsers.includes(userId)) {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId));
-    } else {
-      setSelectedUsers([...selectedUsers, userId]);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(users.map(user => user.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const handleBulkAction = (action: 'activate' | 'deactivate' | 'delete') => {
-    setBulkAction(action);
-    setIsBulkActionDialogOpen(true);
-  };
-
-  const confirmBulkAction = () => {
-    toast.success(`Bulk action applied to ${selectedUsers.length} users`);
-    setSelectedUsers([]);
-    setSelectAll(false);
-  };
-
-  const exportToCSV = () => {
-    toast.success("Exported users data to CSV");
-  };
-
-  const exportToExcel = () => {
-    toast.success("Exported users data to Excel");
-  };
-
-  const handleUserAdded = () => {
-    fetchUsers(1);
-    toast.success("User added successfully");
-  };
-
-  const handleViewUserDetails = (userId: string) => {
+  
+  const viewUserDetail = (userId: string) => {
     navigate(`/admin/users/${userId}`);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">Quản lý Người dùng</h1>
-        <Button 
-          className="bg-amber-500 hover:bg-amber-600 text-white"
-          onClick={() => setIsAddUserDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm Người dùng mới
-        </Button>
-      </div>
-
+    <div className="container mx-auto py-10">
       <Card className="border-zinc-800 bg-zinc-900 text-white">
         <CardHeader>
-          <CardTitle>Danh sách Người dùng</CardTitle>
+          <CardTitle>Quản lý Người dùng</CardTitle>
           <CardDescription className="text-zinc-400">
-            Quản lý tất cả người dùng trong hệ thống Trade Bot 365.
+            Quản lý và chỉnh sửa thông tin người dùng hệ thống.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UsersTable
-            users={adminUsers}
-            selectedUsers={selectedUsers}
-            selectAll={selectAll}
-            onSelectAll={handleSelectAll}
-            onSelectUser={handleUserCheckbox}
-            onViewUserDetails={handleViewUserDetails}
-          />
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex items-center">
+              <Search className="w-4 h-4 mr-2 text-zinc-500" />
+              <Input
+                type="text"
+                placeholder="Tìm kiếm người dùng..."
+                className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:ring-amber-500 focus:border-amber-500"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
 
-          <UsersPagination
-            totalUsers={totalUsers}
-            visibleUsers={users.length}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-          />
+            <div className="flex items-center">
+              <Label htmlFor="status" className="text-sm text-zinc-400 mr-2">
+                Lọc theo trạng thái:
+              </Label>
+              <Select value={filterStatus} onValueChange={handleFilterChange}>
+                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:ring-amber-500 focus:border-amber-500">
+                  <SelectValue placeholder="Tất cả" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  <SelectItem value="active">Hoạt động</SelectItem>
+                  <SelectItem value="inactive">Không hoạt động</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end">
+              <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Thêm người dùng
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-6 overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">ID</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Gói</TableHead>
+                  <TableHead>Ngày tham gia</TableHead>
+                  <TableHead className="text-right">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.id}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.status}</TableCell>
+                    <TableCell>{user.plan}</TableCell>
+                    <TableCell>{user.joinDate}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Hành động</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => viewUserDetail(user.id)}>
+                            Xem chi tiết
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+                          <DropdownMenuItem>Xóa</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
-      
-      <AddUserDialog 
-        open={isAddUserDialogOpen}
-        onOpenChange={setIsAddUserDialogOpen}
-        onUserAdded={handleUserAdded}
-      />
-      
-      <BulkActionDialog 
-        open={isBulkActionDialogOpen}
-        onOpenChange={setIsBulkActionDialogOpen}
-        selectedUsersCount={selectedUsers.length}
-        bulkAction={bulkAction}
-        onConfirm={confirmBulkAction}
-      />
     </div>
   );
 };
 
-export default AdminUsers;
+export default Users;

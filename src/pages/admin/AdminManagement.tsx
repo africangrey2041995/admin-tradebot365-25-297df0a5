@@ -20,7 +20,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { UserWithRole } from '@/types/admin-types';
-import { UserStatus } from '@/constants/userConstants';
+import { UserStatus, UserPlan } from '@/constants/userConstants';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface AdminUser extends Omit<UserWithRole, 'role' | 'permissions'> {
   role: 'admin' | 'superadmin';
@@ -37,97 +38,92 @@ interface AdminUser extends Omit<UserWithRole, 'role' | 'permissions'> {
   lastLogin?: string;
 }
 
+const mockAdminUsers: AdminUser[] = [
+  {
+    id: "admin-001",
+    name: "John Doe",
+    email: "john.doe@example.com",
+    status: UserStatus.ACTIVE,
+    plan: UserPlan.ENTERPRISE,
+    createdAt: "2023-01-15T10:20:30Z",
+    updatedAt: "2023-09-18T16:55:33Z",
+    emailVerified: true,
+    twoFactorEnabled: true,
+    joinDate: "2023-01-15",
+    roleDescription: "Super Admin",
+    permissions: {
+      manageUsers: true,
+      manageBots: true,
+      manageDatabase: true,
+      viewLogs: true,
+      manageNotifications: true,
+      manageEmail: true,
+      manageSettings: true,
+      manageAdmins: true
+    }
+  },
+  {
+    id: "admin-002",
+    name: "Jane Smith",
+    email: "jane.smith@example.com",
+    status: UserStatus.ACTIVE,
+    plan: UserPlan.ENTERPRISE,
+    createdAt: "2023-02-20T14:30:45Z",
+    updatedAt: "2023-08-10T09:15:22Z",
+    emailVerified: true,
+    twoFactorEnabled: false,
+    joinDate: "2023-02-20",
+    roleDescription: "Bot Manager",
+    permissions: {
+      manageUsers: false,
+      manageBots: true,
+      manageDatabase: false,
+      viewLogs: true,
+      manageNotifications: false,
+      manageEmail: false,
+      manageSettings: false,
+      manageAdmins: false
+    }
+  },
+  {
+    id: "admin-003",
+    name: "Robert Johnson",
+    email: "robert.johnson@example.com",
+    status: UserStatus.ACTIVE,
+    plan: UserPlan.ENTERPRISE,
+    createdAt: "2023-03-10T08:45:12Z",
+    updatedAt: "2023-09-01T11:20:33Z",
+    emailVerified: true,
+    twoFactorEnabled: true,
+    joinDate: "2023-03-10",
+    roleDescription: "User Manager",
+    permissions: {
+      manageUsers: true,
+      manageBots: false,
+      manageDatabase: false,
+      viewLogs: true,
+      manageNotifications: true,
+      manageEmail: true,
+      manageSettings: false,
+      manageAdmins: false
+    }
+  }
+];
+
 const AdminManagement = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false);
   const [isEditAdminDialogOpen, setIsEditAdminDialogOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
+  const [filterStatus, setFilterStatus] = useState('');
 
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([
-    {
-      id: 'adm1',
-      name: 'John Admin',
-      email: 'john@tradebot365.com',
-      role: 'admin',
-      status: UserStatus.ACTIVE, // Fixed enum usage
-      plan: 'enterprise',
-      createdAt: '2023-01-15T10:20:30Z',
-      updatedAt: '2023-06-10T15:45:22Z',
-      lastLogin: '2023-10-05T08:30:15Z',
-      emailVerified: true,
-      twoFactorEnabled: true,
-      permissions: {
-        manageUsers: true,
-        manageBots: true,
-        manageDatabase: false,
-        viewLogs: true,
-        manageNotifications: true,
-        manageEmail: false,
-        manageSettings: false,
-        manageAdmins: false,
-      },
-      roleDescription: 'Administrator',
-      bots: 0,
-      joinDate: '2023-01-15',
-    },
-    {
-      id: 'adm2',
-      name: 'Sarah Admin',
-      email: 'sarah@tradebot365.com',
-      role: 'admin',
-      status: UserStatus.ACTIVE, // Fixed enum usage
-      plan: 'enterprise',
-      createdAt: '2023-02-20T09:15:45Z',
-      updatedAt: '2023-07-12T11:30:18Z',
-      lastLogin: '2023-10-10T14:22:05Z',
-      emailVerified: true,
-      twoFactorEnabled: false,
-      permissions: {
-        manageUsers: true,
-        manageBots: true,
-        manageDatabase: true,
-        viewLogs: true,
-        manageNotifications: false,
-        manageEmail: true,
-        manageSettings: false,
-        manageAdmins: false,
-      },
-      roleDescription: 'Administrator',
-      bots: 0,
-      joinDate: '2023-02-20',
-    },
-    {
-      id: 'adm3',
-      name: 'Mike Super',
-      email: 'mike@tradebot365.com',
-      role: 'superadmin',
-      status: UserStatus.ACTIVE, // Fixed enum usage
-      plan: 'enterprise',
-      createdAt: '2022-11-05T08:40:12Z',
-      updatedAt: '2023-09-18T16:55:33Z',
-      lastLogin: '2023-10-15T10:05:45Z',
-      emailVerified: true,
-      twoFactorEnabled: true,
-      permissions: {
-        manageUsers: true,
-        manageBots: true,
-        manageDatabase: true,
-        viewLogs: true,
-        manageNotifications: true,
-        manageEmail: true,
-        manageSettings: true,
-        manageAdmins: true,
-      },
-      roleDescription: 'Super Administrator',
-      bots: 0,
-      joinDate: '2022-11-05',
-    }
-  ]);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>(mockAdminUsers);
 
   const filteredAdmins = adminUsers.filter(admin =>
     admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+    admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (filterStatus && admin.status === filterStatus)
   );
 
   const handleAddAdmin = () => {
@@ -175,6 +171,15 @@ const AdminManagement = () => {
     navigate(`/admin/users/${userId}`);
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+  };
+
+  const handleFilterChange = (status: string) => {
+    setFilterStatus(status);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -197,7 +202,7 @@ const AdminManagement = () => {
               placeholder="Tìm kiếm quản trị viên..."
               className="pl-10"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
           <ScrollArea>

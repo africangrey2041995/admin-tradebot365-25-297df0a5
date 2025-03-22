@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MoreHorizontal, Star, Mail, Link, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -16,6 +15,7 @@ import StatusIndicator from '@/components/ui/StatusIndicator';
 import { Account } from '@/types';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { ConnectionStatus } from '@/types/connection';
 
 interface AccountCardProps {
   account: Account;
@@ -154,7 +154,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </div>
       
       <div className="mt-4 flex justify-between items-center">
-        <StatusIndicator status={account.status} showLabel />
+        <StatusIndicator status={account.status as ConnectionStatus} showLabel />
         <Button variant="outline" size="sm" className="text-sm" onClick={handleViewProfile}>
           View Profile
         </Button>
