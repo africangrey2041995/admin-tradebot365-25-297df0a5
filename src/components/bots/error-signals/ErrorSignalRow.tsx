@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
+import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { User, CircleDollarSign, ExternalLink } from 'lucide-react';
-import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
+import { Button } from '@/components/ui/button';
+import { CheckCircle2 } from 'lucide-react';
+import { ExtendedSignal } from './types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
-import { useNavigate } from 'react-router-dom';
+import { useNavigation } from '@/hooks/useNavigation';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
@@ -14,86 +16,88 @@ interface ErrorSignalRowProps {
   onMarkAsRead: (signalId: string) => void;
 }
 
-const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMarkAsRead }) => {
-  const navigate = useNavigate();
-
-  const navigateToUserDetail = (userId: string) => {
-    if (userId) {
-      navigate(`/admin/users/${userId.replace('user_', '')}`);
+const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
+  signal, 
+  isUnread, 
+  onMarkAsRead 
+}) => {
+  const { navigateToBotDetail } = useNavigation();
+  
+  const handleBotClick = () => {
+    if (signal.botId) {
+      navigateToBotDetail(signal.botId);
+    } else {
+      console.warn('Cannot navigate: Bot ID is missing from signal');
     }
   };
-
-  const navigateToBotDetail = (botId: string) => {
-    if (botId) {
-      // Route to the appropriate bot detail page based on the bot ID prefix
-      if (botId.startsWith("BOT")) {
-        navigate(`/admin/user-bots/${botId}`);
-      } else if (botId.startsWith("PREMIUM")) {
-        navigate(`/admin/premium-bots/${botId}`);
-      } else if (botId.startsWith("PROP")) {
-        navigate(`/admin/prop-bots/${botId}`);
-      }
+  
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy HH:mm');
+    } catch (error) {
+      console.error(`Error formatting date: ${dateString}`, error);
+      return dateString;
     }
   };
-
+  
   return (
-    <TableRow 
-      className={`border-b border-red-100 dark:border-red-800/20 ${
-        isUnread ? 'bg-red-50/50 dark:bg-red-900/20' : ''
-      }`}
-    >
-      <TableCell className="font-medium text-red-700 dark:text-red-400">
-        <div className="flex items-center">
-          {signal.id}
-          {isUnread && (
-            <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
-          )}
-        </div>
+    <TableRow className={isUnread ? "bg-red-50/10" : ""}>
+      <TableCell className="font-mono text-xs">
+        {signal.id}
       </TableCell>
-      <TableCell>{signal.instrument}</TableCell>
       <TableCell>
-        {new Date(signal.timestamp).toLocaleString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })}
-      </TableCell>
-      <TableCell>{signal.amount}</TableCell>
-      <TableCell><ActionBadge action={signal.action} /></TableCell>
-      <TableCell>
-        <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400">
-          {signal.status}
+        <Badge variant="outline" className="font-medium">
+          {signal.instrument}
         </Badge>
       </TableCell>
-      <TableCell>
-        <button 
-          onClick={() => navigateToBotDetail(signal.botId || '')}
-          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
-        >
-          {signal.botId}
-          <ExternalLink className="h-3 w-3" />
-        </button>
-      </TableCell>
-      <TableCell className="font-mono text-xs">
-        <button 
-          onClick={() => navigateToUserDetail(signal.userId || '')}
-          className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors"
-        >
-          {signal.userId}
-        </button>
+      <TableCell className="text-sm">
+        {formatDate(signal.timestamp)}
       </TableCell>
       <TableCell>
-        <div className="text-sm">
-          <div className="flex items-center gap-1 mb-1">
-            <CircleDollarSign className="h-3 w-3 text-slate-500" />
-            {signal.tradingAccount} | {signal.tradingAccountType} | {signal.tradingAccountBalance}
-          </div>
-        </div>
+        {signal.amount}
       </TableCell>
-      <TableCell className="text-sm text-red-600 dark:text-red-400">
-        <ErrorDetailsTooltip signal={signal} onView={onMarkAsRead} />
+      <TableCell>
+        <ActionBadge action={signal.action} />
+      </TableCell>
+      <TableCell>
+        <Badge variant="destructive" className="bg-red-600">
+          Error
+        </Badge>
+      </TableCell>
+      <TableCell 
+        className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
+        onClick={handleBotClick}
+      >
+        {signal.botId || 'N/A'}
+      </TableCell>
+      <TableCell>
+        {signal.userId || 'N/A'}
+      </TableCell>
+      <TableCell>
+        {signal.tradingAccount || 'N/A'}
+      </TableCell>
+      <TableCell>
+        <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
+          <span className="text-red-500 cursor-help">
+            {signal.errorMessage 
+              ? (signal.errorMessage.length > 25 
+                ? `${signal.errorMessage.substring(0, 25)}...` 
+                : signal.errorMessage)
+              : 'Unknown error'
+            }
+          </span>
+        </ErrorDetailsTooltip>
+        {isUnread && (
+          <Button
+            size="sm" 
+            variant="ghost" 
+            onClick={() => onMarkAsRead(signal.id)}
+            className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+          >
+            <CheckCircle2 className="h-4 w-4 mr-1" />
+            <span className="text-xs">Mark as read</span>
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );
