@@ -1,219 +1,179 @@
-
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@/types';
 import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 
-interface UseUsersOptions {
-  initialPage?: number;
-  pageSize?: number;
+interface UseUsersProps {
+  initialUsers: User[];
+  initialTotalUsers: number;
 }
 
-export const useUsers = (options: UseUsersOptions = {}) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(options.initialPage || 1);
-  const [pageSize] = useState(options.pageSize || 10);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [loading, setLoading] = useState(true);
+interface UseUsersReturn {
+  users: User[];
+  totalUsers: number;
+  currentPage: number;
+  pageSize: number;
+  loading: boolean;
+  selectedUser: User | null;
+  fetchUsers: (page?: number) => void;
+  handlePageChange: (page: number) => void;
+  getUserDetails: (userId: string) => void;
+  createUser: (userData: Partial<User>) => void;
+  updateUser: (userId: string, userData: Partial<User>) => void;
+  deleteUser: (userId: string) => void;
+}
+
+const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersReturn => {
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [totalUsers, setTotalUsers] = useState<number>(initialTotalUsers);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize] = useState<number>(10);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
-  // Fetch users (mock data for now)
-  const fetchUsers = useCallback((page: number = currentPage) => {
-    setLoading(true);
-    
-    // Simulate API request
-    setTimeout(() => {
+
+  useEffect(() => {
+    // Simulate fetching users from an API
+    const fetchUsers = async (page: number = 1) => {
+      setLoading(true);
+      // const response = await fetch(`/api/users?page=${page}&limit=${pageSize}`);
+      // const data = await response.json();
+
+      // Mock data for demonstration
       const mockUsers: User[] = [
         {
-          id: 'USR-001',
-          email: 'john.doe@example.com',
+          id: 'user-1',
           name: 'John Doe',
+          email: 'john.doe@example.com',
           role: UserRole.USER,
           status: UserStatus.ACTIVE,
-          plan: UserPlan.PREMIUM,
-          createdAt: '2023-05-10T08:30:00Z',
-          updatedAt: '2023-11-15T14:22:30Z',
-          lastLogin: '2024-03-20T09:15:45Z',
+          plan: UserPlan.BASIC,
+          createdAt: '2023-01-01T00:00:00.000Z',
+          updatedAt: '2023-01-01T00:00:00.000Z',
           emailVerified: true,
           twoFactorEnabled: false,
         },
         {
-          id: 'USR-002',
-          email: 'jane.smith@example.com',
+          id: 'user-2',
           name: 'Jane Smith',
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
-          plan: UserPlan.BASIC,
-          createdAt: '2023-06-20T10:15:00Z',
-          updatedAt: '2023-10-05T16:40:20Z',
-          lastLogin: '2024-03-19T11:30:15Z',
-          emailVerified: true,
-          twoFactorEnabled: true,
-        },
-        {
-          id: 'USR-003',
-          email: 'robert.johnson@example.com',
-          name: 'Robert Johnson',
-          role: UserRole.USER,
+          email: 'jane.smith@example.com',
+          role: UserRole.ADMIN,
           status: UserStatus.INACTIVE,
-          plan: UserPlan.BASIC,
-          createdAt: '2023-07-15T14:45:00Z',
-          updatedAt: '2023-09-10T12:30:45Z',
-          lastLogin: '2024-02-28T08:20:30Z',
-          emailVerified: true,
-          twoFactorEnabled: false,
-        },
-        {
-          id: 'USR-004',
-          email: 'emily.davis@example.com',
-          name: 'Emily Davis',
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
           plan: UserPlan.PREMIUM,
-          createdAt: '2023-08-05T09:20:00Z',
-          updatedAt: '2023-12-12T10:15:30Z',
-          lastLogin: '2024-03-21T07:45:10Z',
+          createdAt: '2023-02-15T00:00:00.000Z',
+          updatedAt: '2023-02-15T00:00:00.000Z',
           emailVerified: true,
           twoFactorEnabled: true,
         },
         {
-          id: 'USR-005',
-          email: 'michael.brown@example.com',
-          name: 'Michael Brown',
-          role: UserRole.USER,
+          id: 'user-3',
+          name: 'Alice Johnson',
+          email: 'alice.johnson@example.com',
+          role: UserRole.SUPPORT,
           status: UserStatus.SUSPENDED,
-          plan: UserPlan.BASIC,
-          createdAt: '2023-09-25T16:30:00Z',
-          updatedAt: '2024-01-20T15:10:45Z',
-          lastLogin: '2024-02-10T13:25:50Z',
+          plan: UserPlan.TRIAL,
+          createdAt: '2023-03-10T00:00:00.000Z',
+          updatedAt: '2023-03-10T00:00:00.000Z',
           emailVerified: false,
           twoFactorEnabled: false,
         },
-        {
-          id: 'USR-006',
-          email: 'sarah.wilson@example.com',
-          name: 'Sarah Wilson',
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
-          plan: UserPlan.TRIAL,
-          createdAt: '2023-10-15T11:45:00Z',
-          updatedAt: '2024-02-05T09:30:15Z',
-          lastLogin: '2024-03-18T16:40:25Z',
-          emailVerified: true,
-          twoFactorEnabled: false,
-        },
       ];
-      
+
       setUsers(mockUsers);
-      setTotalUsers(mockUsers.length);
+      setTotalUsers(30); // Mock total number of users
       setLoading(false);
-    }, 1000);
+    };
+
+    fetchUsers(currentPage);
   }, [currentPage, pageSize]);
-  
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-  
-  // Handle page change
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchUsers(page);
   };
-  
-  // Get user details
-  const getUserDetails = useCallback((userId: string) => {
+
+  const getUserDetails = async (userId: string) => {
     setLoading(true);
-    
-    // Simulate API request
-    setTimeout(() => {
-      const user = users.find(u => u.id === userId);
-      
-      if (user) {
-        setSelectedUser(user);
-      } else {
-        setSelectedUser(null);
+    // const response = await fetch(`/api/users/${userId}`);
+    // const data = await response.json();
+
+    // Mock data for demonstration
+    const mockUser: User = {
+      id: userId,
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      role: UserRole.USER,
+      status: UserStatus.ACTIVE,
+      plan: UserPlan.BASIC,
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
+      emailVerified: true,
+      twoFactorEnabled: false,
+    };
+
+    setSelectedUser(mockUser);
+    setLoading(false);
+  };
+
+  const createUser = async (userData: Partial<User>) => {
+    setLoading(true);
+    // const response = await fetch('/api/users', {
+    //   method: 'POST',
+    //   body: JSON.stringify(userData),
+    // });
+    // const data = await response.json();
+
+    // Mock data for demonstration
+    const mockUser: User = {
+      id: 'new-user',
+      name: userData.name || 'New User',
+      email: userData.email || 'new.user@example.com',
+      role: UserRole.USER,
+      status: UserStatus.ACTIVE,
+      plan: UserPlan.FREE,
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
+      emailVerified: false,
+      twoFactorEnabled: false,
+    };
+
+    setUsers([...users, mockUser]);
+    setTotalUsers(totalUsers + 1);
+    setLoading(false);
+  };
+
+  const updateUser = async (userId: string, userData: Partial<User>) => {
+    setLoading(true);
+    // const response = await fetch(`/api/users/${userId}`, {
+    //   method: 'PUT',
+    //   body: JSON.stringify(userData),
+    // });
+    // const data = await response.json();
+
+    // Mock data for demonstration
+    const updatedUsers = users.map((user) => {
+      if (user.id === userId) {
+        return { ...user, ...userData };
       }
-      
-      setLoading(false);
-    }, 500);
-  }, [users]);
-  
-  // Create new user
-  const createUser = useCallback((userData: Partial<User>) => {
+      return user;
+    });
+
+    setUsers(updatedUsers);
+    setLoading(false);
+  };
+
+  const deleteUser = async (userId: string) => {
     setLoading(true);
-    
-    // Simulate API request
-    setTimeout(() => {
-      const newUser: User = {
-        id: `USR-${Math.floor(Math.random() * 1000)}`,
-        email: userData.email || 'new.user@example.com',
-        name: userData.name || 'New User',
-        role: userData.role || UserRole.USER,
-        status: userData.status || UserStatus.ACTIVE,
-        plan: userData.plan || UserPlan.BASIC,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        emailVerified: false,
-        twoFactorEnabled: false,
-      };
-      
-      setUsers([...users, newUser]);
-      setTotalUsers(totalUsers + 1);
-      setLoading(false);
-      
-      return newUser;
-    }, 800);
-  }, [users, totalUsers]);
-  
-  // Update user
-  const updateUser = useCallback((userId: string, userData: Partial<User>) => {
-    setLoading(true);
-    
-    // Simulate API request
-    setTimeout(() => {
-      const updatedUsers = users.map(user => {
-        if (user.id === userId) {
-          return {
-            ...user,
-            ...userData,
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return user;
-      });
-      
-      setUsers(updatedUsers);
-      
-      if (selectedUser && selectedUser.id === userId) {
-        setSelectedUser({
-          ...selectedUser,
-          ...userData,
-          updatedAt: new Date().toISOString()
-        });
-      }
-      
-      setLoading(false);
-    }, 800);
-  }, [users, selectedUser]);
-  
-  // Delete user
-  const deleteUser = useCallback((userId: string) => {
-    setLoading(true);
-    
-    // Simulate API request
-    setTimeout(() => {
-      const remainingUsers = users.filter(user => user.id !== userId);
-      
-      setUsers(remainingUsers);
-      setTotalUsers(totalUsers - 1);
-      
-      if (selectedUser && selectedUser.id === userId) {
-        setSelectedUser(null);
-      }
-      
-      setLoading(false);
-    }, 800);
-  }, [users, totalUsers, selectedUser]);
-  
+    // const response = await fetch(`/api/users/${userId}`, {
+    //   method: 'DELETE',
+    // });
+    // const data = await response.json();
+
+    // Mock data for demonstration
+    const updatedUsers = users.filter((user) => user.id !== userId);
+
+    setUsers(updatedUsers);
+    setTotalUsers(totalUsers - 1);
+    setLoading(false);
+  };
+
   return {
     users,
     totalUsers,
@@ -226,6 +186,8 @@ export const useUsers = (options: UseUsersOptions = {}) => {
     getUserDetails,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
   };
 };
+
+export default useUsers;

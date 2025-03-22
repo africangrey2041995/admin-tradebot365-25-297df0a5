@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
@@ -89,7 +88,8 @@ const Signals = () => {
         {
           accountId: 'client123',
           name: 'Tài Khoản Giao Dịch BTC',
-          timestamp: '2023-06-20T14:45:15Z'
+          timestamp: '2023-06-20T14:45:15Z',
+          status: 'success'
         }
       ],
       failedAccounts: []
@@ -109,7 +109,8 @@ const Signals = () => {
         {
           accountId: 'client123',
           name: 'Tài Khoản Giao Dịch BTC',
-          timestamp: '2023-06-22T10:30:15Z'
+          timestamp: '2023-06-22T10:30:15Z',
+          status: 'success'
         }
       ],
       failedAccounts: []
@@ -145,7 +146,8 @@ const Signals = () => {
           accountId: 'client789',
           name: 'Tài Khoản Giao Dịch Vàng',
           timestamp: '2023-06-23T09:45:15Z',
-          reason: 'Ký hiệu công cụ không hợp lệ'
+          reason: 'Ký hiệu công cụ không hợp lệ',
+          status: 'failed'
         }
       ],
       errorMessage: 'Ký hiệu công cụ không hợp lệ'

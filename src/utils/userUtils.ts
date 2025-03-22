@@ -1,4 +1,6 @@
-import { User, UserPlan, UserRole, UserStatus } from '@/types';
+
+import { User } from '@/types';
+import { UserPlan, UserRole, UserStatus } from '@/constants/userConstants';
 
 /**
  * Gets a display name for a user

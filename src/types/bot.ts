@@ -40,15 +40,16 @@ export interface PremiumBot extends BaseBot {
   performanceAllTime: string;
   minCapital: string;
   subscribers: number;
-  users?: number; // Added to match usage in components
-  profit?: string; // Added to match usage in components
+  users?: number; // Added for compatibility with existing components
+  profit?: string; // Added for compatibility with existing components
   colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;
   features?: string[];
   tradingStyle?: string;
   timeframe?: string;
   markets?: string[];
-  accounts?: Account[] | number; // Added to match usage in components
+  accounts?: Account[] | number; // Can be either a count or a list of accounts
+  botId?: string; // Added for compatibility with existing components
 }
 
 // Bot PropTrading

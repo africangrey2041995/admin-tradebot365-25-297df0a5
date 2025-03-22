@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -40,6 +39,11 @@ const Accounts = () => {
       createdDate: '2023-05-15T10:30:00Z',
       lastUpdated: '2023-06-20T14:45:00Z',
       expireDate: '2024-06-20T14:45:00Z',
+      userId: 'user123',
+      apiName: 'api123',
+      tradingAccount: 'trading123',
+      tradingAccountType: 'type123',
+      tradingAccountBalance: 'balance123',
     },
     {
       id: 'acc002',
@@ -52,6 +56,11 @@ const Accounts = () => {
       createdDate: '2023-06-10T08:15:00Z',
       lastUpdated: '2023-06-22T11:20:00Z',
       expireDate: '2024-06-22T11:20:00Z',
+      userId: 'user456',
+      apiName: 'api456',
+      tradingAccount: 'trading456',
+      tradingAccountType: 'type456',
+      tradingAccountBalance: 'balance456',
     },
     {
       id: 'acc003',
@@ -64,6 +73,11 @@ const Accounts = () => {
       createdDate: '2023-04-22T16:40:00Z',
       lastUpdated: '2023-06-18T09:10:00Z',
       expireDate: '2024-06-18T09:10:00Z',
+      userId: 'user789',
+      apiName: 'api789',
+      tradingAccount: 'trading789',
+      tradingAccountType: 'type789',
+      tradingAccountBalance: 'balance789',
     }
   ]);
 
@@ -85,6 +99,11 @@ const Accounts = () => {
       status: 'Pending',
       createdDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
+      userId: `user${Date.now()}`,
+      apiName: `api${Date.now()}`,
+      tradingAccount: `trading${Date.now()}`,
+      tradingAccountType: `type${Date.now()}`,
+      tradingAccountBalance: `balance${Date.now()}`,
     };
     
     setAccounts([...accounts, newAccountData]);

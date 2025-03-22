@@ -8,7 +8,7 @@ import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 export interface User {
   id: string;
   email: string;
-  name: string; // Added to match usage in components
+  name: string;
   firstName?: string;
   lastName?: string;
   username?: string;
@@ -30,6 +30,10 @@ export interface User {
   preferences?: UserPreferences;
   billingInfo?: BillingInfo;
   notifications?: UserNotification[];
+  bots?: number;
+  joinDate?: string;
+  botTypes?: string[];
+  activity?: string;
 }
 
 // Thông tin API key của user

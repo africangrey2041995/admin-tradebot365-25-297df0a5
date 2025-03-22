@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { PremiumBotsTable } from '@/components/admin/premium-bots/PremiumBotsTab
 import { PremiumBotsPagination } from '@/components/admin/premium-bots/PremiumBotsPagination';
 import { AddPremiumBotDialog } from '@/components/admin/premium-bots/AddPremiumBotDialog';
 import { BulkActionDialog } from '@/components/admin/premium-bots/BulkActionDialog';
+import { BotStatus } from '@/constants/botTypes';
 
 const AdminPremiumBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,7 +49,7 @@ const AdminPremiumBots = () => {
     { 
       id: 'PRE-001', 
       name: 'Premium DCA Bot', 
-      status: 'active',
+      status: BotStatus.ACTIVE,
       users: 48,
       profit: '+18.5%',
       createdDate: '10/02/2024'
@@ -57,7 +57,7 @@ const AdminPremiumBots = () => {
     { 
       id: 'PRE-002', 
       name: 'Premium Swing Trader', 
-      status: 'active',
+      status: BotStatus.ACTIVE,
       users: 32,
       profit: '+14.3%',
       createdDate: '15/03/2024'
@@ -65,7 +65,7 @@ const AdminPremiumBots = () => {
     { 
       id: 'PRE-003', 
       name: 'Premium Scalper Pro', 
-      status: 'inactive',
+      status: BotStatus.INACTIVE,
       users: 12,
       profit: '-2.1%',
       createdDate: '05/03/2024'
@@ -73,7 +73,7 @@ const AdminPremiumBots = () => {
     { 
       id: 'PRE-004', 
       name: 'Premium Grid Bot', 
-      status: 'active',
+      status: BotStatus.ACTIVE,
       users: 56,
       profit: '+9.7%',
       createdDate: '22/01/2024'
@@ -81,7 +81,7 @@ const AdminPremiumBots = () => {
     { 
       id: 'PRE-005', 
       name: 'Premium Crypto Master', 
-      status: 'maintenance',
+      status: BotStatus.MAINTENANCE,
       users: 22,
       profit: '+7.8%',
       createdDate: '18/11/2023'
@@ -94,11 +94,11 @@ const AdminPremiumBots = () => {
 
   const handleFilterClick = () => {
     if (!filterStatus) {
-      setFilterStatus('active');
-    } else if (filterStatus === 'active') {
-      setFilterStatus('inactive');
-    } else if (filterStatus === 'inactive') {
-      setFilterStatus('maintenance');
+      setFilterStatus(BotStatus.ACTIVE);
+    } else if (filterStatus === BotStatus.ACTIVE) {
+      setFilterStatus(BotStatus.INACTIVE);
+    } else if (filterStatus === BotStatus.INACTIVE) {
+      setFilterStatus(BotStatus.MAINTENANCE);
     } else {
       setFilterStatus(null);
     }

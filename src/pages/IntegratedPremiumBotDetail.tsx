@@ -1,138 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import MainLayout from '@/components/layout/MainLayout';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { 
-  ChartLine, 
-  Users, 
-  Gauge, 
-  Wallet, 
-  Bot, 
-  TrendingUp, 
-  Clock, 
-  CircuitBoard, 
-  BarChart4, 
-  LineChart, 
-  Sparkles,
-  CheckCircle,
-  Calendar,
-  ArrowRight,
+  RefreshCw, 
+  Info, 
+  ArrowLeft, 
+  Webhook, 
+  Key, 
+  ExternalLink,
+  Edit,
+  Check,
+  X,
   ChevronLeft,
-  CircleDollarSign,
+  Sparkles,
+  TrendingUp,
+  Bot,
+  CircuitBoard,
+  Wallet,
+  Calendar,
+  Users,
+  BarChart4,
+  LineChart,
   Activity,
   PieChart,
   Plus,
-  RefreshCw,
-  Settings,
-  Trash2,
-  AlertTriangle,
-  HelpCircle
+  Pencil,
+  Save,
+  CircleDollarSign
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Bar,
-  ComposedChart,
-  Legend
-} from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Account, PremiumBot, TradingViewSignal } from '@/types';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TradingViewLogs from '@/components/bots/TradingViewLogs';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
-import ErrorSignals from '@/components/bots/ErrorSignals';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { PremiumBot, Account } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import BotProfileTabs from '@/components/bots/BotProfileTabs';
-
-const integratedPremiumBots: PremiumBot[] = [
-  {
-    id: 'pb-001',
-    name: 'Alpha Momentum',
-    description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
-    exchange: 'Coinstart Pro',
-    type: 'momentum',
-    performanceLastMonth: '+18.5%',
-    performanceAllTime: '+125.4%',
-    risk: 'medium',
-    minCapital: '$500',
-    status: 'active',
-    subscribers: 86,
-    imageUrl: null,
-    colorScheme: 'green',
-    isIntegrated: true,
-    botId: 'PRE7459',
-    accounts: [
-      {
-        id: 'acc-001',
-        name: 'Binance Main',
-        status: 'Connected',
-        createdDate: '2023-10-15',
-        lastUpdated: '2023-11-10',
-        volumeMultiplier: '2',
-        apiName: 'Binance API',
-        apiId: 'BIN-001',
-        tradingAccount: '78459213',
-        tradingAccountType: 'Live',
-        tradingAccountBalance: '$1,245.50'
-      },
-      {
-        id: 'acc-002',
-        name: 'Bybit Demo',
-        status: 'Connected',
-        createdDate: '2023-10-20',
-        lastUpdated: '2023-11-10',
-        volumeMultiplier: '1',
-        apiName: 'Bybit API',
-        apiId: 'BYB-002',
-        tradingAccount: '65784123',
-        tradingAccountType: 'Demo',
-        tradingAccountBalance: '$10,000.00'
-      }
-    ]
-  },
-  {
-    id: 'pb-004',
-    name: 'Gamma Grid',
-    description: 'Bot grid trading với chiến lược phân bổ thanh khoản thông minh dựa trên biến động thị trường.',
-    exchange: 'Coinstart Pro',
-    type: 'grid',
-    performanceLastMonth: '+7.6%',
-    performanceAllTime: '+52.3%',
-    risk: 'low',
-    minCapital: '$300',
-    status: 'active',
-    subscribers: 98,
-    imageUrl: null,
-    colorScheme: 'purple',
-    isIntegrated: true,
-    botId: 'PRE8932',
-    accounts: [
-      {
-        id: 'acc-003',
-        name: 'Binance Main',
-        status: 'Connected',
-        createdDate: '2023-11-05',
-        lastUpdated: '2023-11-10',
-        volumeMultiplier: '1',
-        apiName: 'Binance API',
-        apiId: 'BIN-001',
-        tradingAccount: '78459213',
-        tradingAccountType: 'Live',
-        tradingAccountBalance: '$1,245.50'
-      }
-    ]
-  }
-];
+import { toast } from 'sonner';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar, ComposedChart, Legend } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 
 const tradePerformanceData = [
   { name: 'Jan', profit: 12.5, trades: 24 },
@@ -162,68 +69,114 @@ const monthlyPerformance = [
   { name: 'Dec', value: 0 },
 ];
 
-const IntegratedPremiumBotDetail = () => {
+const statisticsData = [
+  { name: 'Win Rate', value: '65%', icon: <Activity className="h-4 w-4 text-green-500" /> },
+  { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
+  { name: 'Max Drawdown', value: '8.5%', icon: <LineChart className="h-4 w-4 text-red-500" /> },
+  { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
+];
+
+const AdminPremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [bot, setBot] = useState<PremiumBot | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorSignals, setErrorSignals] = useState<TradingViewSignal[]>([]);
-  const [unreadErrorCount, setUnreadErrorCount] = useState<number>(0);
-
-  const bot = integratedPremiumBots.find(b => b.id === botId);
+  
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editableBot, setEditableBot] = useState<Partial<PremiumBot>>({});
+  
+  const fromUserDetail = location.state?.from === 'userDetail';
+  const userId = location.state?.userId;
 
   useEffect(() => {
-    const fetchErrorSignals = () => {
+    const fetchBotDetails = () => {
+      setIsLoading(true);
+      
       setTimeout(() => {
-        const mockErrorSignals: TradingViewSignal[] = [
-          {
-            id: 'CS-20354',
-            action: 'ENTER_LONG',
-            instrument: 'BTCUSDT',
-            timestamp: new Date().toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '1.5',
-            status: 'Failed',
-            errorMessage: 'API Authentication Error: Invalid credentials',
-          },
-          {
-            id: 'CS-20347',
-            action: 'EXIT_SHORT',
-            instrument: 'ETHUSDT',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '0.8',
-            status: 'Failed',
-            errorMessage: 'Insufficient balance for operation',
-          },
-          {
-            id: 'CS-20321',
-            action: 'ENTER_SHORT',
-            instrument: 'SOLUSDT',
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '10.2',
-            status: 'Failed',
-            errorMessage: 'Exchange rejected order: Market closed',
-          },
-        ];
+        const mockBot: PremiumBot = {
+          id: botId || 'pb-001',
+          name: 'Alpha Momentum',
+          description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
+          exchange: 'Coinstart Pro',
+          type: BotType.PREMIUM_BOT,
+          performanceLastMonth: '+18.5%',
+          performanceAllTime: '+125.4%',
+          risk: BotRiskLevel.MEDIUM,
+          minCapital: '$500',
+          status: BotStatus.ACTIVE,
+          subscribers: 86,
+          imageUrl: null,
+          colorScheme: 'green',
+          isIntegrated: true,
+          botId: 'PRE7459',
+        };
         
-        setErrorSignals(mockErrorSignals);
-        
-        setUnreadErrorCount(2);
-      }, 800);
+        setBot(mockBot);
+        setEditableBot(mockBot);
+        setIsLoading(false);
+      }, 500);
     };
-
-    fetchErrorSignals();
+    
+    fetchBotDetails();
   }, [botId]);
+
+  const goBack = () => {
+    if (fromUserDetail && userId) {
+      navigate(`/admin/users/${userId}`);
+    } else {
+      navigate('/admin/premium-bots');
+    }
+  };
+
+  const viewPublicBotProfile = () => {
+    window.open(`/premium-bots/${botId}`, '_blank');
+  };
+
+  const handleEditSection = (section: string) => {
+    setEditingSection(section);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSection(null);
+    setEditableBot(bot || {});
+  };
+
+  const handleSaveChanges = () => {
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      setBot({...bot, ...editableBot} as PremiumBot);
+      setEditingSection(null);
+      setIsLoading(false);
+      
+      toast.success('Thông tin bot đã được cập nhật!');
+    }, 500);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditableBot(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setEditableBot(prev => ({ ...prev, [name]: value }));
+  };
+
+  const refreshTabData = () => {
+    setIsLoading(true);
+    // Simulate API call with a timer
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success(`Đã làm mới dữ liệu tab ${
+        activeTab === "overview" ? "Tổng quan" : 
+        activeTab === "accounts" ? "Tài khoản" : 
+        activeTab === "trading-logs" ? "TB365 Logs" : "Coinstrat Logs"
+      }`);
+    }, 1000);
+  };
 
   const getRiskLabel = (risk: string) => {
     switch (risk) {
@@ -277,639 +230,548 @@ const IntegratedPremiumBotDetail = () => {
     }
   };
 
-  const statisticsData = [
-    { name: 'Win Rate', value: '65%', icon: <Activity className="h-4 w-4 text-green-500" /> },
-    { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
-    { name: 'Max Drawdown', value: '8.5%', icon: <ChartLine className="h-4 w-4 text-red-500" /> },
-    { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
-  ];
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-lg font-medium">Đang tải thông tin bot...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleAddAccount = (accountData: any) => {
-    console.log('Adding account:', accountData, 'to premium bot:', botId);
-    toast.success('Tài khoản đã được thêm thành công!');
-  };
-
-  const handleRemoveAccount = (accountId: string) => {
-    toast.success('Tài khoản đã được gỡ khỏi bot');
-  };
-
-  const handleManageBot = () => {
-    toast.success('Chuyển đến trang quản lý bot');
-  };
-
-  const refreshTabData = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success(`Đã làm mới dữ liệu tab ${
-        activeTab === "overview" ? "Tổng quan" : 
-        activeTab === "accounts" ? "Tài khoản" : 
-        activeTab === "trading-logs" ? "TB365 Logs" : "Coinstrat Logs"
-      }`);
-    }, 1000);
-  };
-
-  const markErrorAsRead = (signalId: string) => {
-    setUnreadErrorCount(prev => Math.max(0, prev - 1));
-  };
-
-  const getActionBadge = (action: string) => {
-    switch (action) {
-      case 'ENTER_LONG':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">{action}</Badge>;
-      case 'EXIT_LONG':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">{action}</Badge>;
-      case 'ENTER_SHORT':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">{action}</Badge>;
-      case 'EXIT_SHORT':
-        return <Badge variant="outline" className="bg-purple-50 text-purple-700 hover:bg-purple-50 border-purple-200">{action}</Badge>;
-      default:
-        return <Badge variant="outline">{action}</Badge>;
-    }
-  };
+  if (!bot) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <Info className="h-12 w-12 text-orange-500 mb-4" />
+          <h2 className="text-xl font-bold mb-2">Không Tìm Thấy Bot</h2>
+          <p className="text-muted-foreground mb-6">Chúng tôi không thể tìm thấy bot bạn đang tìm kiếm.</p>
+          <Button onClick={goBack}>Quay Lại Danh Sách Bot</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <MainLayout title={`${bot.name} - Chi tiết Bot Tích hợp`}>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/integrated-premium-bots')}
-              className="mr-2"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Quay lại
-            </Button>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
-              {bot.name}
-              <Sparkles className="h-5 w-5 text-yellow-500 ml-2" />
-            </h1>
-            <Badge className={getRiskColor(bot.risk)}>
-              Rủi ro: {getRiskLabel(bot.risk)}
-            </Badge>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
-              {bot.botId}
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleManageBot}>
-              <Settings className="mr-2 h-4 w-4" />
-              Quản lý Bot
-            </Button>
-            <Button variant="default" onClick={() => setIsAddAccountDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Thêm tài khoản
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button variant="white" size="sm" onClick={goBack}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Quay lại
+          </Button>
+          <h1 className="text-2xl font-bold text-white flex items-center">
+            {bot.name}
+            <Sparkles className="h-5 w-5 text-yellow-500 ml-2" />
+          </h1>
+          <Badge className={getRiskColor(bot.risk)}>
+            Rủi ro: {getRiskLabel(bot.risk)}
+          </Badge>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
+            {bot.botId}
+          </Badge>
         </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-            <TabsTrigger value="accounts">Tài khoản ({bot.accounts?.length || 0})</TabsTrigger>
-            <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
-            <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>Biểu đồ hiệu suất</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={refreshTabData} 
-                        disabled={isLoading}
-                        className="h-8 w-8"
-                      >
-                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                      </Button>
-                      <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
-                        <TabsList>
-                          <TabsTrigger value="week">Tuần</TabsTrigger>
-                          <TabsTrigger value="month">Tháng</TabsTrigger>
-                          <TabsTrigger value="year">Năm</TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[350px] w-full">
-                      <ChartContainer
-                        config={{
-                          profit: {
-                            label: "Profit",
-                            theme: {
-                              light: "#10b981",
-                              dark: "#34d399"
-                            }
-                          },
-                          loss: {
-                            label: "Loss",
-                            theme: {
-                              light: "#ef4444",
-                              dark: "#f87171"
-                            }
-                          },
-                          line: {
-                            label: "Performance Line",
-                            theme: {
-                              light: "#60a5fa",
-                              dark: "#3b82f6"
-                            }
-                          }
-                        }}
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart
-                            data={generateChartData()}
-                            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                          >
-                            <defs>
-                              <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                              </linearGradient>
-                              <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                            <XAxis 
-                              dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
-                              className="text-xs font-medium" 
-                            />
-                            <YAxis className="text-xs font-medium" />
-                            <ChartTooltip 
-                              content={
-                                <ChartTooltipContent 
-                                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
-                                />
-                              } 
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="value" 
-                              stroke="#10b981" 
-                              fillOpacity={1} 
-                              fill="url(#colorPositive)" 
-                              activeDot={{ r: 6 }} 
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </ChartContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>Chi tiết giao dịch</CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={refreshTabData} 
-                      disabled={isLoading}
-                      className="h-8 w-8"
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[350px]">
-                      <ChartContainer
-                        config={{
-                          profit: {
-                            label: "Profit",
-                            theme: {
-                              light: "#10b981",
-                              dark: "#34d399"
-                            }
-                          },
-                          trades: {
-                            label: "Trades",
-                            theme: {
-                              light: "#60a5fa",
-                              dark: "#3b82f6"
-                            }
-                          }
-                        }}
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart
-                            data={tradePerformanceData}
-                            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                          >
-                            <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                            <XAxis dataKey="name" scale="band" />
-                            <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
-                            <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
-                            <Tooltip />
-                            <Legend />
-                            <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
-                            <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </ChartContainer>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
-                      {statisticsData.map((stat, index) => (
-                        <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
-                          <div className="flex items-center gap-2 mb-1">
-                            {stat.icon}
-                            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                              {stat.name}
-                            </span>
-                          </div>
-                          <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                            {stat.value}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>Thông tin chung</CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={refreshTabData} 
-                      disabled={isLoading}
-                      className="h-8 w-8"
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Bot className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot.type)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <CircuitBoard className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot.exchange}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Wallet className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot.minCapital}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Bot ID</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot.botId}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Tài khoản kết nối</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot.accounts?.length || 0}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>Hiệu suất</CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={refreshTabData} 
-                      disabled={isLoading}
-                      className="h-8 w-8"
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
-                      </div>
-                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                        {bot.performanceLastMonth}
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <BarChart4 className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
-                      </div>
-                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                        {bot.performanceAllTime}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle>Quản lý tài khoản</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                      Bot này đã được tích hợp với {bot.accounts?.length || 0} tài khoản
-                    </p>
-                    <Button 
-                      onClick={() => setActiveTab("accounts")} 
-                      className="w-full mb-2"
-                    >
-                      Xem tài khoản đã tích hợp
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setIsAddAccountDialogOpen(true)} 
-                      className="w-full"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Thêm tài khoản mới
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="accounts">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Tài khoản đã tích hợp với {bot.name}</CardTitle>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={refreshTabData} 
-                    disabled={isLoading} 
-                    className="h-8"
-                  >
-                    <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-                    {isLoading ? 'Đang làm mới...' : 'Làm mới'}
-                  </Button>
-                  <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)} className="h-8">
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Thêm tài khoản
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {bot.accounts && bot.accounts.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Tên tài khoản</TableHead>
-                        <TableHead>API</TableHead>
-                        <TableHead>Tài khoản giao dịch</TableHead>
-                        <TableHead>Hệ số KL</TableHead>
-                        <TableHead>Ngày tích hợp</TableHead>
-                        <TableHead>Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {bot.accounts.map((account) => (
-                        <TableRow key={account.id}>
-                          <TableCell className="font-medium">{account.name}</TableCell>
-                          <TableCell>{account.apiName}</TableCell>
-                          <TableCell>
-                            <div>
-                              <div>{account.tradingAccount}</div>
-                              <div className="text-xs text-muted-foreground">{account.tradingAccountType} | {account.tradingAccountBalance}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                              x{account.volumeMultiplier}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{new Date(account.createdDate).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-8 w-8 p-0"
-                                onClick={() => navigate(`/accounts/${account.id}`)}
-                              >
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => handleRemoveAccount(account.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="py-10 text-center">
-                    <p className="text-muted-foreground mb-4">Chưa có tài khoản nào được tích hợp với bot này.</p>
-                    <Button onClick={() => setIsAddAccountDialogOpen(true)}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Thêm tài khoản
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="trading-logs">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>TB365 Signal Logs ({bot.botId})</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={refreshTabData} 
-                  disabled={isLoading} 
-                  className="h-8"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-                  {isLoading ? 'Đang làm mới...' : 'Làm mới'}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <TradingViewLogs botId={bot.id} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="coinstrat-logs">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Coinstrat Pro Logs</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={refreshTabData} 
-                  disabled={isLoading} 
-                  className="h-8"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-                  {isLoading ? 'Đang làm mới...' : 'Làm mới'}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <CoinstratLogs botId={bot.id} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Tín Hiệu Lỗi Cần Khắc Phục
-                  {unreadErrorCount > 0 && (
-                    <Badge className="bg-red-500 text-white">
-                      {unreadErrorCount} mới
-                    </Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Các tín hiệu lỗi cần được xử lý ngay để tránh ảnh hưởng tới hoạt động giao dịch
-                </CardDescription>
-              </div>
-              <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Làm mới
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {errorSignals.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-red-50 dark:bg-red-900/20">
-                      <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-                      <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {errorSignals.map((signal, index) => (
-                      <TableRow 
-                        key={signal.id} 
-                        className={`border-b border-red-100 dark:border-red-800/20 ${
-                          index < unreadErrorCount ? 'bg-red-50/50 dark:bg-red-900/20' : ''
-                        }`}
-                      >
-                        <TableCell className="font-medium text-red-700 dark:text-red-400">
-                          <div className="flex items-center">
-                            {signal.id}
-                            {index < unreadErrorCount && (
-                              <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>{signal.instrument}</TableCell>
-                        <TableCell>
-                          {new Date(signal.timestamp).toLocaleString('en-US', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </TableCell>
-                        <TableCell>{signal.amount}</TableCell>
-                        <TableCell>{getActionBadge(signal.action)}</TableCell>
-                        <TableCell>
-                          <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400">
-                            {signal.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm text-red-600 dark:text-red-400">
-                          <button 
-                            className="flex items-center"
-                            onClick={() => markErrorAsRead(signal.id)}
-                          >
-                            <HelpCircle className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
-                            <span className="ml-1 truncate max-w-[150px] text-xs">
-                              Chi tiết
-                            </span>
-                            <div className="absolute invisible group-hover:visible bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-800/30 p-4 rounded-lg shadow-lg max-w-md z-50 right-0 mt-2">
-                              <h4 className="font-medium text-red-700 dark:text-red-400 mb-1">Chi tiết lỗi</h4>
-                              <p className="text-red-600 dark:text-red-300 mb-2">{signal.errorMessage}</p>
-                              <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                                <span className="block">Signal Token: {signal.signalToken}</span>
-                                <span className="block">Max Lag: {signal.maxLag}</span>
-                              </div>
-                            </div>
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
-                  <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    <strong>Quan trọng:</strong> Các tín hiệu lỗi này cần xử lý ngay để đảm bảo hệ thống giao dịch hoạt động đúng cách.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="py-10 text-center">
-                <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
-                <p className="text-green-600 font-medium">Không có tín hiệu lỗi!</p>
-                <p className="text-muted-foreground mt-1">Tất cả tín hiệu đang xử lý bình thường.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={viewPublicBotProfile}>
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Xem trang người dùng
+          </Button>
+        </div>
       </div>
-      
-      <AddAccountDialog 
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot.id}
-        onAddAccount={handleAddAccount}
-      />
-    </MainLayout>
-  );
-};
 
-export default IntegratedPremiumBotDetail;
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
+          <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle>Biểu đồ hiệu suất</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={refreshTabData} 
+                      disabled={isLoading}
+                      className="h-8 w-8"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
+                    <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
+                      <TabsList>
+                        <TabsTrigger value="week">Tuần</TabsTrigger>
+                        <TabsTrigger value="month">Tháng</TabsTrigger>
+                        <TabsTrigger value="year">Năm</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px] w-full">
+                    <ChartContainer
+                      config={{
+                        profit: {
+                          label: "Profit",
+                          theme: {
+                            light: "#10b981",
+                            dark: "#34d399"
+                          }
+                        },
+                        loss: {
+                          label: "Loss",
+                          theme: {
+                            light: "#ef4444",
+                            dark: "#f87171"
+                          }
+                        },
+                        line: {
+                          label: "Performance Line",
+                          theme: {
+                            light: "#60a5fa",
+                            dark: "#3b82f6"
+                          }
+                        }
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={generateChartData()}
+                          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                          <XAxis 
+                            dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
+                            className="text-xs font-medium" 
+                          />
+                          <YAxis className="text-xs font-medium" />
+                          <ChartTooltip 
+                            content={
+                              <ChartTooltipContent 
+                                formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
+                              />
+                            } 
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke="#10b981" 
+                            fillOpacity={1} 
+                            fill="url(#colorPositive)" 
+                            activeDot={{ r: 6 }} 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle>Chi tiết giao dịch</CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={refreshTabData} 
+                    disabled={isLoading}
+                    className="h-8 w-8"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px]">
+                    <ChartContainer
+                      config={{
+                        profit: {
+                          label: "Profit",
+                          theme: {
+                            light: "#10b981",
+                            dark: "#34d399"
+                          }
+                        },
+                        trades: {
+                          label: "Trades",
+                          theme: {
+                            light: "#60a5fa",
+                            dark: "#3b82f6"
+                          }
+                        }
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart
+                          data={tradePerformanceData}
+                          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                        >
+                          <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
+                          <XAxis dataKey="name" scale="band" />
+                          <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
+                          <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
+                          <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
+                    {statisticsData.map((stat, index) => (
+                      <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          {stat.icon}
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                            {stat.name}
+                          </span>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {stat.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>Thông tin chung</CardTitle>
+                  {editingSection === 'general-info' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('general-info')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editingSection === 'general-info' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Tên Bot</label>
+                        <Input 
+                          name="name" 
+                          value={editableBot.name || ''} 
+                          onChange={handleInputChange} 
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Mô tả</label>
+                        <Textarea 
+                          name="description" 
+                          value={editableBot.description || ''} 
+                          onChange={handleInputChange} 
+                          className="mt-1 min-h-[100px]"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Loại Bot</label>
+                          <Select 
+                            value={editableBot.type || ''}
+                            onValueChange={(value) => handleSelectChange('type', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn loại bot" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="momentum">Momentum</SelectItem>
+                              <SelectItem value="scalping">Scalping</SelectItem>
+                              <SelectItem value="swing">Swing</SelectItem>
+                              <SelectItem value="grid">Grid</SelectItem>
+                              <SelectItem value="trend">Trend</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Sàn giao dịch</label>
+                          <Input 
+                            name="exchange" 
+                            value={editableBot.exchange || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Mức độ rủi ro</label>
+                          <Select 
+                            value={editableBot.risk || ''}
+                            onValueChange={(value) => handleSelectChange('risk', value as 'low' | 'medium' | 'high')}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn mức độ rủi ro" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">Thấp</SelectItem>
+                              <SelectItem value="medium">Trung bình</SelectItem>
+                              <SelectItem value="high">Cao</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Bot ID</label>
+                          <Input 
+                            name="botId" 
+                            value={editableBot.botId || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Vốn tối thiểu</label>
+                          <Input 
+                            name="minCapital" 
+                            value={editableBot.minCapital || ''} 
+                            onChange={handleInputChange} 
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Trạng thái</label>
+                          <Select 
+                            value={editableBot.status || ''}
+                            onValueChange={(value) => handleSelectChange('status', value as 'active' | 'inactive')}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Chọn trạng thái" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">Hoạt động</SelectItem>
+                              <SelectItem value="inactive">Không hoạt động</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Bot className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot.type)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <CircuitBoard className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.exchange}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Wallet className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.minCapital}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Bot ID</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.botId}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-slate-500" />
+                          <span className="text-slate-600 dark:text-slate-300">Subscribers</span>
+                        </div>
+                        <span className="font-medium text-slate-800 dark:text-white">{bot.subscribers}</span>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>Hiệu suất</CardTitle>
+                  {editingSection === 'performance' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('performance')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {editingSection === 'performance' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Hiệu suất tháng này</label>
+                        <Input 
+                          name="performanceLastMonth" 
+                          value={editableBot.performanceLastMonth || ''} 
+                          onChange={handleInputChange} 
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Hiệu suất tổng thời gian</label>
+                        <Input 
+                          name="performanceAllTime" 
+                          value={editableBot.performanceAllTime || ''} 
+                          onChange={handleInputChange} 
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="h-4 w-4 text-slate-500" />
+                          <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
+                        </div>
+                        <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                          {bot.performanceLastMonth}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <BarChart4 className="h-4 w-4 text-slate-500" />
+                          <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
+                        </div>
+                        <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                          {bot.performanceAllTime}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle>API Tích hợp</CardTitle>
+                  {editingSection === 'api' ? (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4 mr-1" />
+                        Hủy
+                      </Button>
+                      <Button size="sm" onClick={handleSaveChanges}>
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleEditSection('api')}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Chỉnh sửa
+                    </Button>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
+                      <Webhook className="h-4 w-4 text-primary" />
+                      Webhook URL
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-slate-50 p-3 rounded-md text-sm w-full font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        https://api.tradebot365.com/webhook/premium/{bot.id.toLowerCase()}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
+                      <Key className="h-4 w-4 text-red-400" />
+                      Signal Token
+                    </h3>
+                    {editingSection === 'api' ? (
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="text"
+                          className="font-mono"
+                          value="CSTYSPMEV8C-PREMIUM-TOKEN"
+                          readOnly={false}
+                        />
+                        <Button variant="outline" size="sm">
+                          Tạo mới
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="bg-slate-50 p-3 rounded-md text-sm w-full font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          ************************
+                        </div>
+                      </div>
+                    )}
+                    {!editingSection && <p className="text-xs text-slate-500 mt-1">Token đã được ẩn đi vì lý do bảo mật</p>}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="accounts">
+          <BotProfileTabs botId={bot.id}

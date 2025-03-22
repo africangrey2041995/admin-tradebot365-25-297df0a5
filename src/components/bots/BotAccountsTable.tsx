@@ -24,6 +24,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
         const mockAccounts: Account[] = [
           {
             id: '1',
+            name: 'Tài Khoản 1',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',
@@ -38,6 +39,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
           },
           {
             id: '2',
+            name: 'Tài Khoản 2',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',
@@ -52,6 +54,7 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
           },
           {
             id: '3',
+            name: 'Tài Khoản 3',
             userAccount: 'Tài Khoản 1',
             userEmail: 'dbtcompany17@gmail.com',
             apiName: 'API 1',

@@ -1,5 +1,5 @@
 
-import { ExtendedSignal, AccountSignalStatus, TradingAccountType } from '@/types';
+import { AccountSignalStatus, TradingAccountType } from '@/types';
 import { BotType } from '@/constants/botTypes';
 
 /**
@@ -37,4 +37,4 @@ export interface ErrorContextData {
 }
 
 // Re-export the ExtendedSignal for local use
-export { ExtendedSignal };
+export type { ExtendedSignal } from '@/types';

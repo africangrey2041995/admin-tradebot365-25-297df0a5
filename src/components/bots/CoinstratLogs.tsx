@@ -48,13 +48,15 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                 accountId: 'acc001', 
                 userId: 'USR001',
                 name: '24958130 | Live | $500', 
-                timestamp: new Date().toISOString() 
+                timestamp: new Date().toISOString(),
+                status: 'success'
               },
               { 
                 accountId: 'acc002', 
                 userId: 'USR002',
                 name: '24958131 | Live | $500', 
-                timestamp: new Date().toISOString() 
+                timestamp: new Date().toISOString(),
+                status: 'success'
               }
             ],
             failedAccounts: []
@@ -75,7 +77,8 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                 accountId: 'acc001', 
                 userId: 'USR001',
                 name: '24958130 | Live | $500', 
-                timestamp: new Date(Date.now() - 3600000).toISOString() 
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                status: 'success'
               }
             ],
             failedAccounts: [
@@ -84,7 +87,8 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                 userId: 'USR003',
                 name: '24958132 | Demo | $10000', 
                 timestamp: new Date(Date.now() - 3590000).toISOString(),
-                reason: 'Connection timeout'
+                reason: 'Connection timeout',
+                status: 'failed'
               }
             ]
           },
@@ -106,14 +110,16 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId }) => {
                 userId: 'USR001',
                 name: '24958130 | Live | $500', 
                 timestamp: new Date(Date.now() - 7200000).toISOString(),
-                reason: 'Invalid account configuration'
+                reason: 'Invalid account configuration',
+                status: 'failed'
               },
               { 
                 accountId: 'acc002', 
                 userId: 'USR002',
                 name: '24958131 | Live | $500', 
                 timestamp: new Date(Date.now() - 7190000).toISOString(),
-                reason: 'Invalid account configuration'
+                reason: 'Invalid account configuration',
+                status: 'failed'
               }
             ],
             errorMessage: 'Signal processing failed for all accounts'
