@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -774,4 +775,43 @@ const AdminPremiumBotDetail = () => {
         </TabsContent>
         
         <TabsContent value="accounts">
-          <BotProfileTabs botId={bot.id}
+          <BotProfileTabs botId={bot.id} />
+        </TabsContent>
+        
+        <TabsContent value="trading-logs">
+          <Card className="border-zinc-800 bg-zinc-900">
+            <CardHeader>
+              <CardTitle>TB365 Trading Logs</CardTitle>
+              <CardDescription className="text-zinc-400">
+                Logs giao dịch từ hệ thống TB365
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center py-10 text-zinc-500">
+                Không có dữ liệu logs giao dịch.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="coinstrat-logs">
+          <Card className="border-zinc-800 bg-zinc-900">
+            <CardHeader>
+              <CardTitle>Coinstrat Logs</CardTitle>
+              <CardDescription className="text-zinc-400">
+                Logs giao dịch từ Coinstrat
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center py-10 text-zinc-500">
+                Không có dữ liệu logs giao dịch từ Coinstrat.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdminPremiumBotDetail;
