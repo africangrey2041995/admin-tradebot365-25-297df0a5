@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -334,7 +333,7 @@ const AdminUsers = () => {
                     <SelectValue placeholder="Gói dịch vụ" />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectItem value="">Tất cả gói</SelectItem>
+                    <SelectItem value="all">Tất cả gói</SelectItem>
                     <SelectItem value="premium">Premium</SelectItem>
                     <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="trial">Trial</SelectItem>
@@ -346,7 +345,7 @@ const AdminUsers = () => {
                     <SelectValue placeholder="Loại bot" />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectItem value="">Tất cả loại</SelectItem>
+                    <SelectItem value="all">Tất cả loại</SelectItem>
                     <SelectItem value="trading">Trading</SelectItem>
                     <SelectItem value="crypto">Crypto</SelectItem>
                     <SelectItem value="forex">Forex</SelectItem>
@@ -358,7 +357,7 @@ const AdminUsers = () => {
                     <SelectValue placeholder="Mức độ hoạt động" />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectItem value="">Tất cả mức độ</SelectItem>
+                    <SelectItem value="all">Tất cả mức độ</SelectItem>
                     <SelectItem value="high">Cao</SelectItem>
                     <SelectItem value="medium">Trung bình</SelectItem>
                     <SelectItem value="low">Thấp</SelectItem>
@@ -636,3 +635,4 @@ export const PlanBadge = ({ plan }: { plan: string }) => {
 };
 
 export default AdminUsers;
+
