@@ -20,7 +20,7 @@ export const packageSchema = z.object({
   planId: z.nativeEnum(UserPlan),
   name: z.string().min(2, 'Tên gói phải có ít nhất 2 ký tự'),
   description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự'),
-  features: z.array(z.string().min(1, 'Tính năng không được để trống')),
+  features: z.array(z.object({ value: z.string().min(1, 'Tính năng không được để trống') })),
   limits: z.object({
     bots: z.number()
       .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
@@ -57,6 +57,7 @@ export const getDefaultValues = (pkg: Package | null): FormValues => {
     // For editing an existing package
     return {
       ...pkg,
+      features: pkg.features.map(feature => ({ value: feature })),
       limits: {
         bots: pkg.limits.bots === Infinity ? 0 : pkg.limits.bots,
         accounts: pkg.limits.accounts === Infinity ? 0 : pkg.limits.accounts,
@@ -78,7 +79,7 @@ export const getDefaultValues = (pkg: Package | null): FormValues => {
     planId: UserPlan.BASIC,
     name: '',
     description: '',
-    features: [''],  // Initialize with an empty string element
+    features: [{ value: '' }],  // Initialize with an object containing an empty string value
     limits: {
       bots: 1,
       accounts: 1,

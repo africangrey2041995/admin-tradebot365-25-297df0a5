@@ -38,6 +38,8 @@ export const PackageForm: React.FC<PackageFormProps> = ({
     // Process data before submitting
     const submittedData: Partial<Package> = {
       ...data,
+      // Extract feature values from objects
+      features: data.features.map(feature => feature.value),
       // Limits already transformed by Zod schema
       limits: {
         bots: data.limits.bots,

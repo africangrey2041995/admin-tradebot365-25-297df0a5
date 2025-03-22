@@ -16,7 +16,7 @@ import { FormValues } from './types';
 export function FeaturesSection() {
   const { control } = useFormContext<FormValues>();
   
-  // Use field array to manage dynamic features with correct generic type parameters
+  // Use field array to manage dynamic features
   const { fields, append, remove } = useFieldArray({
     name: 'features',
     control
@@ -24,7 +24,7 @@ export function FeaturesSection() {
 
   // Add new feature field
   const addFeature = () => {
-    append('');  // Append an empty string as a new feature
+    append({ value: '' });  // Append an object with empty value property
   };
 
   return (
@@ -35,7 +35,7 @@ export function FeaturesSection() {
           <div key={field.id} className="flex items-center gap-2">
             <FormField
               control={control}
-              name={`features.${index}`}
+              name={`features.${index}.value`}
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
