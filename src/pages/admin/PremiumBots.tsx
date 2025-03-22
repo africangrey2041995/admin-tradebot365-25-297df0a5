@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -187,10 +188,10 @@ const AdminPremiumBots = () => {
         <Card className="border-zinc-800 bg-zinc-900/80 text-white">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
-              <div>
+              <div className="w-full">
                 <p className="text-zinc-400 text-sm">Tổng Bot</p>
                 <h3 className="text-3xl font-bold mt-1">{totalBots}</h3>
-                <div className="flex justify-between mt-4">
+                <div className="flex justify-between space-x-6 mt-4">
                   <div>
                     <p className="text-green-400 text-xs">Hoạt động</p>
                     <p className="text-xl font-medium">{activeBots}</p>
@@ -208,7 +209,7 @@ const AdminPremiumBots = () => {
         <Card className="border-zinc-800 bg-zinc-900/80 text-white">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
-              <div>
+              <div className="w-full">
                 <p className="text-zinc-400 text-sm">Người dùng</p>
                 <h3 className="text-3xl font-bold mt-1">{totalUsers}</h3>
                 <div className="mt-4">
@@ -223,7 +224,7 @@ const AdminPremiumBots = () => {
         <Card className="border-zinc-800 bg-zinc-900/80 text-white">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
-              <div>
+              <div className="w-full">
                 <p className="text-zinc-400 text-sm">Hiệu suất</p>
                 <h3 className={`text-3xl font-bold mt-1 ${parseFloat(averageProfit) > 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {averageProfit}
