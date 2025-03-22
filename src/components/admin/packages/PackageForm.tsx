@@ -50,27 +50,27 @@ const packageSchema = z.object({
   features: z.array(z.string().min(1, 'Tính năng không được để trống')),
   limits: z.object({
     bots: z.union([
-      z.literal('Infinity').transform(() => Infinity as number),
-      z.number().min(0, 'Giới hạn bot phải là số dương hoặc không giới hạn'),
+      z.literal('Infinity'),
+      z.number().min(0),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
     accounts: z.union([
-      z.literal('Infinity').transform(() => Infinity as number),
-      z.number().min(0, 'Giới hạn tài khoản phải là số dương hoặc không giới hạn'),
+      z.literal('Infinity'),
+      z.number().min(0),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
   }),
   pricing: z.object({
     monthly: z.union([
-      z.number().min(0, 'Giá hàng tháng phải là số dương hoặc 0'),
+      z.number().min(0),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
     quarterly: z.union([
-      z.number().min(0, 'Giá hàng quý phải là số dương hoặc 0'),
+      z.number().min(0),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
     yearly: z.union([
-      z.number().min(0, 'Giá hàng năm phải là số dương hoặc 0'),
+      z.number().min(0),
       z.string().regex(/^\d+$/).transform(val => Number(val))
     ]),
     currency: z.string().default('VND'),
