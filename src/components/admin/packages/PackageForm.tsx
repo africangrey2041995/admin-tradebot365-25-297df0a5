@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
@@ -107,7 +108,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         isActive: pkg.isActive,
         isPopular: pkg.isPopular || false,
         isEnterprise: pkg.isEnterprise || false,
-      } as FormValues;
+      } as unknown as FormValues;
     }
 
     // For creating a new package
