@@ -1,44 +1,15 @@
 
 import React from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { z } from 'zod';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Package } from '@/types';
-import { UserPlan, USER_PLAN_DISPLAY } from '@/constants/userConstants';
-import { Loader2, Plus, X, Info } from 'lucide-react';
+import { FormStructure } from './form/FormStructure';
+import { BasicInfo } from './form/BasicInfo';
+import { FeaturesSection } from './form/FeaturesSection';
+import { LimitsSection } from './form/LimitsSection';
+import { PricingSection } from './form/PricingSection';
+import { SettingsSection } from './form/SettingsSection';
+import { packageSchema, getDefaultValues, FormValues } from './form/types';
 
 interface PackageFormProps {
   open: boolean;
@@ -48,54 +19,6 @@ interface PackageFormProps {
   isSubmitting: boolean;
 }
 
-// Helper function to transform limit values for storage
-const transformLimitValue = (value: number): number => {
-  // If value is 0 or greater than 999, treat as unlimited (Infinity)
-  return value === 0 || value > 999 ? Infinity : value;
-};
-
-// Helper function to display limit values in UI
-const displayLimitValue = (value: number): string => {
-  // If value is Infinity, display "0"
-  return value === Infinity ? "0" : value.toString();
-};
-
-// Define form schema using Zod
-const packageSchema = z.object({
-  planId: z.nativeEnum(UserPlan),
-  name: z.string().min(2, 'Tên gói phải có ít nhất 2 ký tự'),
-  description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự'),
-  features: z.array(z.string().min(1, 'Tính năng không được để trống')),
-  limits: z.object({
-    bots: z.number()
-      .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
-      .transform(transformLimitValue),
-    accounts: z.number()
-      .min(0, 'Giá trị phải lớn hơn hoặc bằng 0')
-      .transform(transformLimitValue),
-  }),
-  pricing: z.object({
-    monthly: z.union([
-      z.number().min(0),
-      z.string().regex(/^\d+$/).transform(val => Number(val))
-    ]),
-    quarterly: z.union([
-      z.number().min(0),
-      z.string().regex(/^\d+$/).transform(val => Number(val))
-    ]),
-    yearly: z.union([
-      z.number().min(0),
-      z.string().regex(/^\d+$/).transform(val => Number(val))
-    ]),
-    currency: z.string().default('VND'),
-  }),
-  isActive: z.boolean().default(true),
-  isPopular: z.boolean().default(false),
-  isEnterprise: z.boolean().default(false),
-});
-
-type FormValues = z.infer<typeof packageSchema>;
-
 export const PackageForm: React.FC<PackageFormProps> = ({
   open,
   onOpenChange,
@@ -103,66 +26,15 @@ export const PackageForm: React.FC<PackageFormProps> = ({
   package: pkg,
   isSubmitting
 }) => {
-  // Create specific defaultValues by processing the package data
-  const getDefaultValues = (): FormValues => {
-    if (pkg) {
-      // For editing an existing package
-      return {
-        ...pkg,
-        limits: {
-          bots: pkg.limits.bots === Infinity ? 0 : pkg.limits.bots,
-          accounts: pkg.limits.accounts === Infinity ? 0 : pkg.limits.accounts,
-        },
-        pricing: {
-          monthly: pkg.pricing.monthly,
-          quarterly: pkg.pricing.quarterly,
-          yearly: pkg.pricing.yearly,
-          currency: pkg.pricing.currency,
-        },
-        isActive: pkg.isActive,
-        isPopular: pkg.isPopular || false,
-        isEnterprise: pkg.isEnterprise || false,
-      };
-    }
-
-    // For creating a new package
-    return {
-      planId: UserPlan.BASIC,
-      name: '',
-      description: '',
-      features: [''],
-      limits: {
-        bots: 1,
-        accounts: 1,
-      },
-      pricing: {
-        monthly: 0,
-        quarterly: 0,
-        yearly: 0,
-        currency: 'VND',
-      },
-      isActive: true,
-      isPopular: false,
-      isEnterprise: false,
-    };
-  };
-
   const form = useForm<FormValues>({
     resolver: zodResolver(packageSchema),
-    defaultValues: getDefaultValues()
+    defaultValues: getDefaultValues(pkg || null)
   });
-
-  const { control, handleSubmit, setValue, watch } = form;
+  
   const isEdit = !!pkg;
 
-  // Use field array to manage dynamic features
-  const { fields, append, remove } = useFieldArray({
-    name: 'features',
-    control
-  });
-
   // Handle form submission
-  const onFormSubmit = (data: FormValues) => {
+  const handleFormSubmit = (data: FormValues) => {
     // Process data before submitting
     const submittedData: Partial<Package> = {
       ...data,
@@ -182,384 +54,24 @@ export const PackageForm: React.FC<PackageFormProps> = ({
     onSubmit(submittedData);
   };
 
-  // Add new feature field
-  const addFeature = () => {
-    append('');
-  };
-
-  // Handle plan change (auto-update name)
-  const watchPlanId = watch('planId');
-  React.useEffect(() => {
-    if (!isEdit && watchPlanId) {
-      setValue('name', USER_PLAN_DISPLAY[watchPlanId]);
-    }
-  }, [watchPlanId, setValue, isEdit]);
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? 'Chỉnh sửa gói dịch vụ' : 'Thêm gói dịch vụ mới'}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={control}
-                name="planId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Loại gói</FormLabel>
-                    <Select
-                      disabled={isEdit}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-zinc-800 border-zinc-700">
-                          <SelectValue placeholder="Chọn loại gói" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-zinc-900 border-zinc-800">
-                        {Object.values(UserPlan).map((plan) => (
-                          <SelectItem key={plan} value={plan}>
-                            {USER_PLAN_DISPLAY[plan]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tên gói</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Nhập tên gói"
-                        className="bg-zinc-800 border-zinc-700"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mô tả</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Mô tả chi tiết về gói dịch vụ"
-                      className="resize-none bg-zinc-800 border-zinc-700 min-h-[80px]"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div>
-              <FormLabel>Tính năng</FormLabel>
-              <div className="space-y-2 mt-2">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <FormField
-                      control={control}
-                      name={`features.${index}`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder={`Tính năng ${index + 1}`}
-                              className="bg-zinc-800 border-zinc-700"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => remove(index)}
-                      className="h-8 w-8 text-zinc-400 hover:text-white"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addFeature}
-                  className="mt-2 border-zinc-700 text-sm"
-                >
-                  <Plus className="h-4 w-4 mr-1" /> Thêm tính năng
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormLabel>Giới hạn</FormLabel>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <FormField
-                    control={control}
-                    name="limits.bots"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              min="0"
-                              placeholder="Số bot"
-                              className="bg-zinc-800 border-zinc-700 pl-10"
-                              value={displayLimitValue(field.value as number)}
-                              onChange={(e) => {
-                                // Parse to number, default to 0 if empty
-                                const numValue = e.target.value === '' ? 0 : Number(e.target.value);
-                                field.onChange(numValue);
-                              }}
-                            />
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
-                              Bots:
-                            </span>
-                          </div>
-                        </FormControl>
-                        <FormDescription className="text-xs flex items-center gap-1">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-3 w-3 cursor-help text-zinc-400" />
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-zinc-800 border-zinc-700 text-white">
-                                <p>Nhập 0 hoặc lớn hơn 999 để đặt không giới hạn</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <span>Nhập 0 hoặc &gt;999 cho không giới hạn</span>
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="limits.accounts"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              min="0"
-                              placeholder="Số tài khoản"
-                              className="bg-zinc-800 border-zinc-700 pl-10"
-                              value={displayLimitValue(field.value as number)}
-                              onChange={(e) => {
-                                // Parse to number, default to 0 if empty
-                                const numValue = e.target.value === '' ? 0 : Number(e.target.value);
-                                field.onChange(numValue);
-                              }}
-                            />
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
-                              Acc:
-                            </span>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <FormLabel>Giá (VND)</FormLabel>
-                <div className="grid grid-cols-1 gap-3 mt-2">
-                  <FormField
-                    control={control}
-                    name="pricing.monthly"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              type="number"
-                              min="0"
-                              placeholder="Giá hàng tháng"
-                              className="bg-zinc-800 border-zinc-700 pl-16"
-                            />
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
-                              Tháng:
-                            </span>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <FormField
-                      control={control}
-                      name="pricing.quarterly"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                {...field}
-                                type="number"
-                                min="0"
-                                placeholder="Giá hàng quý"
-                                className="bg-zinc-800 border-zinc-700 pl-12"
-                              />
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
-                                Quý:
-                              </span>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name="pricing.yearly"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                {...field}
-                                type="number"
-                                min="0"
-                                placeholder="Giá hàng năm"
-                                className="bg-zinc-800 border-zinc-700 pl-12"
-                              />
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
-                                Năm:
-                              </span>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-zinc-800 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Trạng thái</FormLabel>
-                      <FormDescription className="text-xs">
-                        Gói dịch vụ có hiển thị không?
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={control}
-                name="isPopular"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-zinc-800 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Phổ biến</FormLabel>
-                      <FormDescription className="text-xs">
-                        Đánh dấu là gói phổ biến nhất
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={control}
-                name="isEnterprise"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-zinc-800 p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Doanh nghiệp</FormLabel>
-                      <FormDescription className="text-xs">
-                        Đánh dấu là gói dành cho doanh nghiệp
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="border-zinc-700"
-              >
-                Hủy
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="bg-amber-500 hover:bg-amber-600 text-white"
-              >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? 'Cập nhật' : 'Tạo gói'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <FormStructure
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={handleFormSubmit}
+      form={form}
+      isEdit={isEdit}
+      isSubmitting={isSubmitting}
+    >
+      <BasicInfo isEdit={isEdit} />
+      <FeaturesSection />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <LimitsSection />
+        <PricingSection />
+      </div>
+      
+      <SettingsSection />
+    </FormStructure>
   );
 };
