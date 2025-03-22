@@ -72,6 +72,7 @@ type AdminFormValues = z.infer<typeof adminFormSchema>;
 // Define an admin user type that extends UserWithRole but ensures role is AdminRoleType
 interface AdminUser extends Omit<UserWithRole, 'role'> {
   role: AdminRoleType;
+  fullName: string; // Add the fullName property here
   permissions: {
     manageUsers: boolean;
     manageBots: boolean;

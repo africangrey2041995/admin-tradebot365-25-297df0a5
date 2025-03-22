@@ -47,7 +47,7 @@ export interface PremiumBot {
 
 export interface TradingViewSignal {
   id: string;
-  action: string;
+  action: SignalAction;
   instrument: string;
   timestamp: string;
   signalToken: string;
@@ -95,7 +95,8 @@ export interface Connection {
 // Add missing interface for UserWithRole
 export interface UserWithRole {
   id: string;
-  name: string;
+  name: string; // Keep this for backward compatibility
+  fullName?: string; // Add fullName property to make it compatible with AdminUser
   email: string;
   role: 'admin' | 'user' | 'moderator';
   status: 'active' | 'inactive' | 'pending';

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,7 @@ const Signals = () => {
   const mockTradingViewSignals: TradingViewSignal[] = [
     {
       id: '1',
-      action: 'ENTER_LONG',
+      action: 'ENTER_LONG' as SignalAction,
       instrument: 'BTCUSDT.P',
       timestamp: '2023-06-20T14:45:00Z',
       signalToken: 'Bot_number_1',
@@ -38,7 +39,7 @@ const Signals = () => {
     },
     {
       id: '2',
-      action: 'EXIT_LONG',
+      action: 'EXIT_LONG' as SignalAction,
       instrument: 'BTCUSDT.P',
       timestamp: '2023-06-22T10:30:00Z',
       signalToken: 'Bot_number_1',
@@ -49,7 +50,7 @@ const Signals = () => {
     },
     {
       id: '3',
-      action: 'ENTER_SHORT',
+      action: 'ENTER_SHORT' as SignalAction,
       instrument: 'ETHUSDT.P',
       timestamp: '2023-06-22T16:15:00Z',
       signalToken: 'Bot_number_2',
@@ -60,7 +61,7 @@ const Signals = () => {
     },
     {
       id: '4',
-      action: 'ENTER_LONG',
+      action: 'ENTER_LONG' as SignalAction,
       instrument: 'XAUUSD',
       timestamp: '2023-06-23T09:45:00Z',
       signalToken: 'Bot_number_3',
@@ -76,7 +77,7 @@ const Signals = () => {
     {
       id: '101',
       originalSignalId: '1',
-      action: 'ENTER_LONG',
+      action: 'ENTER_LONG' as SignalAction,
       instrument: 'BTCUSDT.P',
       timestamp: '2023-06-20T14:45:10Z',
       signalToken: 'Bot_number_1',
@@ -96,7 +97,7 @@ const Signals = () => {
     {
       id: '102',
       originalSignalId: '2',
-      action: 'EXIT_LONG',
+      action: 'EXIT_LONG' as SignalAction,
       instrument: 'BTCUSDT.P',
       timestamp: '2023-06-22T10:30:10Z',
       signalToken: 'Bot_number_1',
@@ -116,7 +117,7 @@ const Signals = () => {
     {
       id: '103',
       originalSignalId: '3',
-      action: 'ENTER_SHORT',
+      action: 'ENTER_SHORT' as SignalAction,
       instrument: 'ETHUSDT.P',
       timestamp: '2023-06-22T16:15:10Z',
       signalToken: 'Bot_number_2',
@@ -130,7 +131,7 @@ const Signals = () => {
     {
       id: '104',
       originalSignalId: '4',
-      action: 'ENTER_LONG',
+      action: 'ENTER_LONG' as SignalAction,
       instrument: 'XAUUSD',
       timestamp: '2023-06-23T09:45:10Z',
       signalToken: 'Bot_number_3',
