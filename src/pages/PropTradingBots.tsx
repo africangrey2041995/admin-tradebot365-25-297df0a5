@@ -99,7 +99,7 @@ const integratedPropBots = [
 const PropTradingBots = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [riskFilter, setRiskFilter] = useState('all');
+  const [riskFilter, setRiskFilter] = useState('all');  // Changed from '' to 'all'
   const [sortOption, setSortOption] = useState('performance');
   const [viewMode, setViewMode] = useState('available');
 

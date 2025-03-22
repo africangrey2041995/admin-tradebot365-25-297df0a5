@@ -38,13 +38,12 @@ const AdminUsers = () => {
   const [botTypeFilter, setBotTypeFilter] = useState<string | null>(null);
   const [activityFilter, setActivityFilter] = useState<string | null>(null);
   
-  // User statistics data
   const totalUsers = 6;
   const activeUsers = 4;
   const inactiveUsers = 1;
   const suspendedUsers = 1;
   const newUsersThisMonth = 2;
-  
+
   const users = [
     { 
       id: 'USR-24051', 
@@ -172,7 +171,6 @@ const AdminUsers = () => {
         break;
     }
     
-    // Đặt lại danh sách người dùng đã chọn sau khi thực hiện hành động
     setSelectedUsers([]);
     setSelectAll(false);
   };
@@ -180,7 +178,6 @@ const AdminUsers = () => {
   const exportToCSV = () => {
     const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói dịch vụ', 'Số lượng bot', 'Ngày tham gia'];
     
-    // Chuyển đổi dữ liệu người dùng thành định dạng CSV
     const userDataCSV = filteredUsers.map(user => [
       user.id,
       user.name,
@@ -191,13 +188,11 @@ const AdminUsers = () => {
       user.joinDate
     ]);
     
-    // Kết hợp headers và dữ liệu
     const csvContent = [
       headers.join(','),
       ...userDataCSV.map(row => row.join(','))
     ].join('\n');
     
-    // Tạo và tải xuống file CSV
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -326,7 +321,6 @@ const AdminUsers = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              {/* Bộ lọc bổ sung */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full sm:max-w-[600px]">
                 <Select value={planFilter || ""} onValueChange={(value) => setPlanFilter(value || null)}>
                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
@@ -366,7 +360,6 @@ const AdminUsers = () => {
                 </Select>
               </div>
               
-              {/* Các nút hành động hàng loạt */}
               <div className="flex gap-2 w-full sm:w-auto justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -541,7 +534,6 @@ const AdminUsers = () => {
   );
 };
 
-// Role Badge Component
 export const RoleBadge = ({ role }: { role: string }) => {
   switch(role) {
     case 'superadmin':
@@ -567,7 +559,6 @@ export const RoleBadge = ({ role }: { role: string }) => {
   }
 };
 
-// Status Badge Component
 export const StatusBadge = ({ status }: { status: string }) => {
   switch(status) {
     case 'active':
@@ -601,7 +592,6 @@ export const StatusBadge = ({ status }: { status: string }) => {
   }
 };
 
-// Plan Badge Component
 export const PlanBadge = ({ plan }: { plan: string }) => {
   switch(plan) {
     case 'premium':
@@ -635,4 +625,3 @@ export const PlanBadge = ({ plan }: { plan: string }) => {
 };
 
 export default AdminUsers;
-

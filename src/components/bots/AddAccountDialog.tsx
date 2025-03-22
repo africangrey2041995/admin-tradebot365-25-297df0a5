@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -43,22 +42,18 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     },
   });
 
-  // Mock data loading
   useEffect(() => {
-    // Mock users
     setUsers([
       { id: "user1", name: "Tài Khoản 1", email: "dbtcompany17@gmail.com" },
       { id: "user2", name: "Tài Khoản 2", email: "user2@example.com" },
     ]);
 
-    // Mock APIs
     setApis([
       { id: "api1", name: "API 1", userId: "user1" },
       { id: "api2", name: "API 2", userId: "user1" },
       { id: "api3", name: "API 1", userId: "user2" },
     ]);
 
-    // Mock trading accounts
     setTradingAccounts([
       { id: "acc1", number: "4056629", type: "Live", balance: "$500", apiId: "api1" },
       { id: "acc2", number: "4056789", type: "Live", balance: "$1000", apiId: "api1" },
@@ -84,17 +79,14 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     resetFormState();
   };
 
-  // Filter APIs by selected user
   const filteredApis = apis.filter(api => 
     form.watch("userAccount") ? api.userId === form.watch("userAccount") : true
   );
 
-  // Filter trading accounts by selected API
   const filteredTradingAccounts = tradingAccounts.filter(account => 
     form.watch("apiKey") ? account.apiId === form.watch("apiKey") : true
   );
 
-  // Volume multiplier options
   const volumeOptions = [
     { value: "0.5", label: "x0.5" },
     { value: "1", label: "x1" },
@@ -125,7 +117,6 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
-                      // Reset dependent fields
                       form.setValue("apiKey", "");
                       form.setValue("tradingAccount", "");
                     }}
@@ -158,7 +149,6 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
-                      // Reset dependent field
                       form.setValue("tradingAccount", "");
                     }}
                     value={field.value}
