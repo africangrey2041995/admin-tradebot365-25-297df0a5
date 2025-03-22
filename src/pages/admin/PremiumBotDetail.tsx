@@ -262,7 +262,7 @@ const AdminPremiumBotDetail = () => {
             <ChevronLeft className="h-4 w-4 mr-1" />
             Quay lại
           </Button>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
+          <h1 className="text-2xl font-bold text-white flex items-center">
             {bot.name}
             <Sparkles className="h-5 w-5 text-yellow-500 ml-2" />
           </h1>
