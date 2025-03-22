@@ -1,37 +1,13 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { UserPlus, Search, RefreshCw, MoreHorizontal, UsersIcon, UserCheck, UserX, TrendingUp } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { RefreshCw, UsersIcon } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { UsersStatsCards } from '@/components/admin/users/UsersStatsCards';
 import { useUsers } from '@/hooks/admin/useUsers';
+import { UsersSearchAndFilters } from '@/components/admin/users/UsersSearchAndFilters';
+import { UsersTable } from '@/components/admin/users/UsersTable';
+import { AddUserButton } from '@/components/admin/users/AddUserButton';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -139,6 +115,11 @@ const Users = () => {
     navigate(`/admin/users/${userId}`);
   };
 
+  const handleAddUser = () => {
+    // Logic to add a new user
+    console.log("Add user clicked");
+  };
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
@@ -161,88 +142,21 @@ const Users = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            <div className="flex items-center">
-              <Search className="w-4 h-4 mr-2 text-zinc-500" />
-              <Input
-                type="text"
-                placeholder="Tìm kiếm người dùng..."
-                className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:ring-amber-500 focus:border-amber-500"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-            </div>
+          <UsersSearchAndFilters
+            searchTerm={searchTerm}
+            filterStatus={filterStatus}
+            onSearchChange={handleSearch}
+            onFilterChange={handleFilterChange}
+          />
 
-            <div className="flex items-center">
-              <Label htmlFor="status" className="text-sm text-zinc-400 mr-2">
-                Lọc theo trạng thái:
-              </Label>
-              <Select value={filterStatus} onValueChange={handleFilterChange}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:ring-amber-500 focus:border-amber-500">
-                  <SelectValue placeholder="Tất cả" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="active">Hoạt động</SelectItem>
-                  <SelectItem value="inactive">Không hoạt động</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end">
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Thêm người dùng
-              </Button>
-            </div>
+          <div className="mt-4">
+            <AddUserButton onClick={handleAddUser} />
           </div>
 
-          <div className="mt-6 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">ID</TableHead>
-                  <TableHead>Tên</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead>Gói</TableHead>
-                  <TableHead>Ngày tham gia</TableHead>
-                  <TableHead className="text-right">Hành động</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.id}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell>{user.plan}</TableCell>
-                    <TableCell>{user.joinDate}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => viewUserDetail(user.id)}>
-                            Xem chi tiết
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                          <DropdownMenuItem>Xóa</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <UsersTable 
+            users={filteredUsers}
+            onViewUserDetail={viewUserDetail}
+          />
         </CardContent>
       </Card>
     </div>
