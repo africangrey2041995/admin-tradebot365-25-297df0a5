@@ -1,12 +1,12 @@
+
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { CircleDollarSign, ExternalLink } from 'lucide-react';
+import { User, CircleDollarSign, ExternalLink } from 'lucide-react';
 import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
@@ -16,56 +16,23 @@ interface ErrorSignalRowProps {
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMarkAsRead }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
+
+  const navigateToUserDetail = (userId: string) => {
+    if (userId) {
+      navigate(`/admin/users/${userId.replace('user_', '')}`);
+    }
+  };
 
   const navigateToBotDetail = (botId: string) => {
-    console.log("Navigating to bot with ID:", botId);
-    
-    if (!botId) {
-      console.error("No bot ID provided for navigation");
-      return;
-    }
-    
-    // Check if we're in admin area
-    const isAdminArea = location.pathname.startsWith('/admin');
-    console.log("Current path:", location.pathname, "Is admin area:", isAdminArea);
-    
-    // Handle different bot ID prefixes for routing
-    try {
-      // Strip MY- prefix if it exists
-      const actualBotId = botId.startsWith("MY-") ? botId.replace("MY-", "") : botId;
-      
-      if (botId.includes("BOT") || botId.startsWith("BOT")) {
-        const targetPath = isAdminArea ? `/admin/user-bots/${actualBotId}` : `/bots/${actualBotId}`;
-        console.log("Navigating to user bot:", targetPath);
-        navigate(targetPath);
-      } 
-      else if (botId.includes("PREMIUM") || botId.startsWith("PREMIUM")) {
-        const targetPath = isAdminArea ? `/admin/premium-bots/${actualBotId}` : `/integrated-premium-bots/${actualBotId}`;
-        console.log("Navigating to premium bot:", targetPath);
-        navigate(targetPath);
-      } 
-      else if (botId.includes("PROP") || botId.startsWith("PROP")) {
-        const targetPath = isAdminArea ? `/admin/prop-bots/${actualBotId}` : `/integrated-prop-bots/${actualBotId}`;
-        console.log("Navigating to prop bot:", targetPath);
-        navigate(targetPath);
-      } 
-      else {
-        console.log("Unknown bot type for ID:", botId);
-        toast({
-          variant: "destructive",
-          title: "Lỗi",
-          description: `Không thể xác định loại bot: ${botId}`
-        });
+    if (botId) {
+      // Route to the appropriate bot detail page based on the bot ID prefix
+      if (botId.startsWith("BOT")) {
+        navigate(`/admin/user-bots/${botId}`);
+      } else if (botId.startsWith("PREMIUM")) {
+        navigate(`/admin/premium-bots/${botId}`);
+      } else if (botId.startsWith("PROP")) {
+        navigate(`/admin/prop-bots/${botId}`);
       }
-    } catch (error) {
-      console.error("Error navigating to bot:", error);
-      toast({
-        variant: "destructive",
-        title: "Lỗi",
-        description: "Có lỗi khi chuyển hướng đến trang chi tiết bot"
-      });
     }
   };
 
@@ -102,15 +69,19 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
       </TableCell>
       <TableCell>
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigateToBotDetail(signal.botId || '');
-          }}
+          onClick={() => navigateToBotDetail(signal.botId || '')}
           className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
         >
-          {signal.botName || signal.botId}
+          {signal.botId}
           <ExternalLink className="h-3 w-3" />
+        </button>
+      </TableCell>
+      <TableCell className="font-mono text-xs">
+        <button 
+          onClick={() => navigateToUserDetail(signal.userId || '')}
+          className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-md border border-blue-200 hover:bg-blue-100 transition-colors"
+        >
+          {signal.userId}
         </button>
       </TableCell>
       <TableCell>

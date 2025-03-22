@@ -1,83 +1,229 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Bot, 
-  CreditCard, 
-  Settings, 
-  BarChart3, 
-  Package, 
-  Briefcase,
-  Users,
-  AlertTriangle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
-import BetaTag from '@/components/common/BetaTag';
+import React, { useState } from 'react';
+import UserProfileSection from './UserProfileSection';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Link } from 'react-router-dom';
+import { Search, Globe, Bell, BellDot, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-interface NavigationItem {
-  name: string;
-  href: string;
-  icon: React.ElementType;
-  badge?: string;
-  isBeta?: boolean;
-}
+const Navigation = () => {
+  const isMobile = useIsMobile();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hasNotifications, setHasNotifications] = useState(true);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: 'Bot #1 đã hoàn thành giao dịch', read: false },
+  ]);
 
-interface NavigationProps {
-  closeSidebar?: () => void;
-}
+  // Count unread notifications
+  const unreadCount = notifications.filter(notification => !notification.read).length;
 
-const Navigation: React.FC<NavigationProps> = ({ closeSidebar }) => {
-  const location = useLocation();
-  const pathname = location.pathname;
+  // Mark notification as read
+  const markAsRead = (id: number) => {
+    setNotifications(notifications.map(notification => 
+      notification.id === id ? { ...notification, read: true } : notification
+    ));
+  };
 
-  const navigation: NavigationItem[] = [
-    { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Bot của tôi', href: '/bots', icon: Bot },
-    { name: 'Premium Bots', href: '/premium-bots', icon: Package },
-    { name: 'Premium Đã Tích Hợp', href: '/integrated-premium-bots', icon: BarChart3, isBeta: true },
-    { name: 'Prop Trading Bots', href: '/prop-trading-bots', icon: Briefcase },
-    { name: 'Prop Đã Tích Hợp', href: '/integrated-prop-bots', icon: Users, isBeta: true },
-    { name: 'Lỗi Bot', href: '/bot-errors', icon: AlertTriangle, badge: '4' },
-    { name: 'Tài khoản', href: '/accounts', icon: CreditCard },
-    { name: 'Cài đặt', href: '/settings', icon: Settings }
-  ];
+  // Clear all notifications
+  const clearAllNotifications = () => {
+    setNotifications(notifications.map(notification => ({ ...notification, read: true })));
+    setHasNotifications(false);
+  };
 
   return (
-    <nav className="flex flex-col gap-1 p-2">
-      {navigation.map((item) => {
-        const isActive = 
-          pathname === item.href || 
-          (item.href !== '/' && pathname.startsWith(item.href));
-        
-        return (
-          <Link
-            key={item.name}
-            to={item.href}
-            onClick={closeSidebar}
-            className={cn(
-              buttonVariants({ variant: 'ghost' }),
-              isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50',
-              'justify-start gap-3 pl-3 mb-0.5'
-            )}
-          >
-            <item.icon className="h-4 w-4" />
-            {item.name}
-            {item.badge && (
-              <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-medium">
-                {item.badge}
-              </span>
-            )}
-            {item.isBeta && (
-              <div className="ml-auto">
-                <BetaTag />
-              </div>
-            )}
+    <header className="h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 shadow-sm">
+      <div className="h-full flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          {isMobile && <SidebarTrigger />}
+          <Link to="/" className="flex items-center">
+            {/* Image removed */}
           </Link>
-        );
-      })}
-    </nav>
+        </div>
+        
+        {/* Middle section with search bar and language selector */}
+        <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" />
+            <Input 
+              placeholder="Tìm kiếm..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          
+          <Select defaultValue="vi">
+            <SelectTrigger className="w-[110px] h-9 flex gap-1">
+              <Globe className="h-4 w-4" />
+              <SelectValue placeholder="Ngôn ngữ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="vi">Tiếng Việt</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ja">日本語</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Notification bell for mobile */}
+        <div className="md:hidden flex items-center mr-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                {unreadCount > 0 ? (
+                  <>
+                    <BellDot className="h-5 w-5" />
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
+                    >
+                      {unreadCount}
+                    </Badge>
+                  </>
+                ) : (
+                  <Bell className="h-5 w-5" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 max-h-[400px] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="font-semibold">Thông báo</h3>
+                {unreadCount > 0 && (
+                  <Button variant="ghost" size="sm" onClick={clearAllNotifications} className="text-xs">
+                    Đánh dấu tất cả đã đọc
+                  </Button>
+                )}
+              </div>
+              {notifications.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  Không có thông báo
+                </div>
+              ) : (
+                <div>
+                  {notifications.map((notification) => (
+                    <div 
+                      key={notification.id} 
+                      className={`p-3 border-b flex justify-between items-start hover:bg-muted transition-colors ${notification.read ? 'opacity-70' : 'bg-accent/5'}`}
+                    >
+                      <span className="text-sm">{notification.text}</span>
+                      {!notification.read && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        {/* User profile section with notification bell for desktop */}
+        <div className="flex items-center gap-2">
+          <div className="hidden md:block">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  {unreadCount > 0 ? (
+                    <>
+                      <BellDot className="h-5 w-5" />
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
+                      >
+                        {unreadCount}
+                      </Badge>
+                    </>
+                  ) : (
+                    <Bell className="h-5 w-5" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 max-h-[400px] overflow-y-auto">
+                <div className="flex items-center justify-between p-4 border-b">
+                  <h3 className="font-semibold">Thông báo</h3>
+                  {unreadCount > 0 && (
+                    <Button variant="ghost" size="sm" onClick={clearAllNotifications} className="text-xs">
+                      Đánh dấu tất cả đã đọc
+                    </Button>
+                  )}
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-muted-foreground">
+                    Không có thông báo
+                  </div>
+                ) : (
+                  <div>
+                    {notifications.map((notification) => (
+                      <div 
+                        key={notification.id} 
+                        className={`p-3 border-b flex justify-between items-start hover:bg-muted transition-colors ${notification.read ? 'opacity-70' : 'bg-accent/5'}`}
+                      >
+                        <span className="text-sm">{notification.text}</span>
+                        {!notification.read && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => markAsRead(notification.id)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
+          <UserProfileSection />
+        </div>
+      </div>
+
+      {/* Mobile search and language selector */}
+      {isMobile && (
+        <div className="px-4 py-2 border-b border-slate-200 dark:border-zinc-800 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" />
+            <Input 
+              placeholder="Tìm kiếm..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select defaultValue="vi">
+            <SelectTrigger className="w-[100px] h-9">
+              <Globe className="h-4 w-4 mr-1" />
+              <SelectValue placeholder="Ngôn ngữ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="vi">Tiếng Việt</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ja">日本語</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+    </header>
   );
 };
 

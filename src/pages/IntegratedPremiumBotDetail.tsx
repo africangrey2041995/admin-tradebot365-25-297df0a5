@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -50,6 +49,7 @@ import { Account, PremiumBot, TradingViewSignal } from '@/types';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import ErrorSignals from '@/components/bots/ErrorSignals';
 import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import BotProfileTabs from '@/components/bots/BotProfileTabs';
@@ -169,28 +169,61 @@ const IntegratedPremiumBotDetail = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorSignals, setErrorSignals] = useState<TradingViewSignal[]>([]);
+  const [unreadErrorCount, setUnreadErrorCount] = useState<number>(0);
 
-  console.log("Bot ID from params:", botId);
-  
-  // Find the bot by ID (could be either the id or botId property)
-  const bot = integratedPremiumBots.find(b => b.id === botId || b.botId === botId);
-  
-  console.log("Found bot:", bot);
+  const bot = integratedPremiumBots.find(b => b.id === botId);
 
-  // Early return with error UI if bot not found
-  if (!bot) {
-    return (
-      <MainLayout title="Bot Not Found">
-        <div className="flex flex-col items-center justify-center p-8 gap-4">
-          <h2 className="text-2xl font-bold">Bot không tồn tại</h2>
-          <p className="text-muted-foreground mb-4">Không tìm thấy bot với ID: {botId}</p>
-          <Button onClick={() => navigate('/integrated-premium-bots')}>
-            Quay lại danh sách Bot
-          </Button>
-        </div>
-      </MainLayout>
-    );
-  }
+  useEffect(() => {
+    const fetchErrorSignals = () => {
+      setTimeout(() => {
+        const mockErrorSignals: TradingViewSignal[] = [
+          {
+            id: 'CS-20354',
+            action: 'ENTER_LONG',
+            instrument: 'BTCUSDT',
+            timestamp: new Date().toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '1.5',
+            status: 'Failed',
+            errorMessage: 'API Authentication Error: Invalid credentials',
+          },
+          {
+            id: 'CS-20347',
+            action: 'EXIT_SHORT',
+            instrument: 'ETHUSDT',
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '0.8',
+            status: 'Failed',
+            errorMessage: 'Insufficient balance for operation',
+          },
+          {
+            id: 'CS-20321',
+            action: 'ENTER_SHORT',
+            instrument: 'SOLUSDT',
+            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '10.2',
+            status: 'Failed',
+            errorMessage: 'Exchange rejected order: Market closed',
+          },
+        ];
+        
+        setErrorSignals(mockErrorSignals);
+        
+        setUnreadErrorCount(2);
+      }, 800);
+    };
+
+    fetchErrorSignals();
+  }, [botId]);
 
   const getRiskLabel = (risk: string) => {
     switch (risk) {
@@ -260,6 +293,10 @@ const IntegratedPremiumBotDetail = () => {
     toast.success('Tài khoản đã được gỡ khỏi bot');
   };
 
+  const handleManageBot = () => {
+    toast.success('Chuyển đến trang quản lý bot');
+  };
+
   const refreshTabData = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -270,6 +307,10 @@ const IntegratedPremiumBotDetail = () => {
         activeTab === "trading-logs" ? "TB365 Logs" : "Coinstrat Logs"
       }`);
     }, 1000);
+  };
+
+  const markErrorAsRead = (signalId: string) => {
+    setUnreadErrorCount(prev => Math.max(0, prev - 1));
   };
 
   const getActionBadge = (action: string) => {
@@ -313,6 +354,10 @@ const IntegratedPremiumBotDetail = () => {
             </Badge>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleManageBot}>
+              <Settings className="mr-2 h-4 w-4" />
+              Quản lý Bot
+            </Button>
             <Button variant="default" onClick={() => setIsAddAccountDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Thêm tài khoản
@@ -744,14 +789,125 @@ const IntegratedPremiumBotDetail = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      
-        <AddAccountDialog 
-          open={isAddAccountDialogOpen}
-          onOpenChange={setIsAddAccountDialogOpen}
-          botId={bot.id}
-          onAddAccount={handleAddAccount}
-        />
+
+        <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Tín Hiệu Lỗi Cần Khắc Phục
+                  {unreadErrorCount > 0 && (
+                    <Badge className="bg-red-500 text-white">
+                      {unreadErrorCount} mới
+                    </Badge>
+                  )}
+                </CardTitle>
+                <CardDescription>
+                  Các tín hiệu lỗi cần được xử lý ngay để tránh ảnh hưởng tới hoạt động giao dịch
+                </CardDescription>
+              </div>
+              <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Làm mới
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {errorSignals.length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-red-50 dark:bg-red-900/20">
+                      <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
+                      <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {errorSignals.map((signal, index) => (
+                      <TableRow 
+                        key={signal.id} 
+                        className={`border-b border-red-100 dark:border-red-800/20 ${
+                          index < unreadErrorCount ? 'bg-red-50/50 dark:bg-red-900/20' : ''
+                        }`}
+                      >
+                        <TableCell className="font-medium text-red-700 dark:text-red-400">
+                          <div className="flex items-center">
+                            {signal.id}
+                            {index < unreadErrorCount && (
+                              <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{signal.instrument}</TableCell>
+                        <TableCell>
+                          {new Date(signal.timestamp).toLocaleString('en-US', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </TableCell>
+                        <TableCell>{signal.amount}</TableCell>
+                        <TableCell>{getActionBadge(signal.action)}</TableCell>
+                        <TableCell>
+                          <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400">
+                            {signal.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-red-600 dark:text-red-400">
+                          <button 
+                            className="flex items-center"
+                            onClick={() => markErrorAsRead(signal.id)}
+                          >
+                            <HelpCircle className="h-4 w-4 text-red-500 hover:text-red-700 cursor-pointer" />
+                            <span className="ml-1 truncate max-w-[150px] text-xs">
+                              Chi tiết
+                            </span>
+                            <div className="absolute invisible group-hover:visible bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-800/30 p-4 rounded-lg shadow-lg max-w-md z-50 right-0 mt-2">
+                              <h4 className="font-medium text-red-700 dark:text-red-400 mb-1">Chi tiết lỗi</h4>
+                              <p className="text-red-600 dark:text-red-300 mb-2">{signal.errorMessage}</p>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                <span className="block">Signal Token: {signal.signalToken}</span>
+                                <span className="block">Max Lag: {signal.maxLag}</span>
+                              </div>
+                            </div>
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
+                  <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    <strong>Quan trọng:</strong> Các tín hiệu lỗi này cần xử lý ngay để đảm bảo hệ thống giao dịch hoạt động đúng cách.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="py-10 text-center">
+                <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
+                <p className="text-green-600 font-medium">Không có tín hiệu lỗi!</p>
+                <p className="text-muted-foreground mt-1">Tất cả tín hiệu đang xử lý bình thường.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
+      
+      <AddAccountDialog 
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={bot.id}
+        onAddAccount={handleAddAccount}
+      />
     </MainLayout>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -15,8 +14,7 @@ import {
   TrendingUp,
   ChevronDown,
   Shield,
-  UserCircle,
-  AlertTriangle
+  UserCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -93,13 +91,6 @@ const SidebarNav = () => {
               label="Quản Lý Tài Khoản" 
               icon={Users} 
               isActive={isActive('/accounts')} 
-            />
-            <NavItem 
-              path="/bot-errors" 
-              label="Lỗi Bot" 
-              icon={AlertTriangle} 
-              isActive={isActive('/bot-errors')} 
-              badge="4"
             />
           </div>
         </div>
@@ -181,10 +172,9 @@ interface NavItemProps {
   label: string;
   icon: React.ElementType;
   isActive: boolean;
-  badge?: string;
 }
 
-const NavItem = ({ path, label, icon: Icon, isActive, badge }: NavItemProps) => {
+const NavItem = ({ path, label, icon: Icon, isActive }: NavItemProps) => {
   return (
     <Link
       to={path}
@@ -197,11 +187,6 @@ const NavItem = ({ path, label, icon: Icon, isActive, badge }: NavItemProps) => 
     >
       <Icon className="h-5 w-5 mr-3" />
       <span>{label}</span>
-      {badge && (
-        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-medium">
-          {badge}
-        </span>
-      )}
     </Link>
   );
 };
