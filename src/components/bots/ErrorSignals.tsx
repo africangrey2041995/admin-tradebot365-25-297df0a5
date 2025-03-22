@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { ErrorSignalsProps } from './error-signals/types';
 import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
 import { mockErrorSignals } from './error-signals/mockData';
+import { ExtendedSignal } from '@/types';
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
-  const [errorSignals, setErrorSignals] = useState([]);
+  const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
 

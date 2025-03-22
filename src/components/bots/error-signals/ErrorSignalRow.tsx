@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import ActionBadge from './ActionBadge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
-import { ExtendedSignal } from './types';
+import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
 

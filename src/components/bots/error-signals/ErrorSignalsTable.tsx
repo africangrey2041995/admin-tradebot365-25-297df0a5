@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ExtendedSignal } from './types';
+import { ExtendedSignal } from '@/types';
 import ErrorSignalRow from './ErrorSignalRow';
 import NoErrorsState from './NoErrorsState';
 
