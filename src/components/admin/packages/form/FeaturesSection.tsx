@@ -16,8 +16,8 @@ import { FormValues } from './types';
 export function FeaturesSection() {
   const { control } = useFormContext<FormValues>();
   
-  // Use field array to manage dynamic features with explicit typing
-  const { fields, append, remove } = useFieldArray<FormValues, 'features'>({
+  // Use field array to manage dynamic features with explicit typing including the 'id' type
+  const { fields, append, remove } = useFieldArray<FormValues, 'features', 'id'>({
     name: 'features',
     control
   });
