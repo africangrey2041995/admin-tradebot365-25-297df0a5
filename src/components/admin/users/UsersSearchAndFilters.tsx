@@ -19,7 +19,7 @@ export const UsersSearchAndFilters: React.FC<UsersSearchAndFiltersProps> = ({
   onFilterChange
 }) => {
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
       <div className="flex items-center">
         <Search className="w-4 h-4 mr-2 text-zinc-500" />
         <Input
@@ -43,6 +43,7 @@ export const UsersSearchAndFilters: React.FC<UsersSearchAndFiltersProps> = ({
             <SelectItem value="all">Tất cả</SelectItem>
             <SelectItem value="active">Hoạt động</SelectItem>
             <SelectItem value="inactive">Không hoạt động</SelectItem>
+            <SelectItem value="suspended">Tạm khóa</SelectItem>
           </SelectContent>
         </Select>
       </div>

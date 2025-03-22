@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,14 +26,41 @@ interface User {
 interface UsersTableProps {
   users: User[];
   onViewUserDetail: (userId: string) => void;
+  selectedUsers: string[];
+  onSelectUser: (userId: string, isSelected: boolean) => void;
+  onSelectAllUsers: (isSelected: boolean) => void;
 }
 
-export const UsersTable: React.FC<UsersTableProps> = ({ users, onViewUserDetail }) => {
+export const UsersTable: React.FC<UsersTableProps> = ({ 
+  users, 
+  onViewUserDetail, 
+  selectedUsers,
+  onSelectUser,
+  onSelectAllUsers
+}) => {
+  const allSelected = users.length > 0 && selectedUsers.length === users.length;
+  const someSelected = selectedUsers.length > 0 && selectedUsers.length < users.length;
+
+  const handleSelectAll = (checked: boolean) => {
+    onSelectAllUsers(checked);
+  };
+
+  const handleSelectUser = (userId: string, checked: boolean) => {
+    onSelectUser(userId, checked);
+  };
+
   return (
     <div className="mt-6 overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]">
+              <Checkbox 
+                checked={allSelected}
+                className="bg-zinc-800 border-zinc-700 data-[state=checked]:bg-amber-500"
+                onCheckedChange={handleSelectAll}
+              />
+            </TableHead>
             <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>Tên</TableHead>
             <TableHead>Email</TableHead>
@@ -45,6 +73,13 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onViewUserDetail 
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
+              <TableCell>
+                <Checkbox 
+                  checked={selectedUsers.includes(user.id)}
+                  className="bg-zinc-800 border-zinc-700 data-[state=checked]:bg-amber-500"
+                  onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                />
+              </TableCell>
               <TableCell className="font-medium">{user.id}</TableCell>
               <TableCell>{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>

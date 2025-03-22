@@ -8,10 +8,19 @@ import { useUsers } from '@/hooks/admin/useUsers';
 import { UsersSearchAndFilters } from '@/components/admin/users/UsersSearchAndFilters';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { AddUserButton } from '@/components/admin/users/AddUserButton';
+import { UserActions } from '@/components/admin/users/UserActions';
+import { UsersFilter } from '@/components/admin/users/UsersFilter';
+import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
+import { toast } from "sonner";
+import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [planFilter, setPlanFilter] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
+  const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   
   const navigate = useNavigate();
   const { totalUsers } = useUsers();
@@ -98,17 +107,22 @@ const Users = () => {
     const searchRegex = new RegExp(searchTerm, 'i');
     const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
 
-    const matchesStatus = filterStatus === "all" || user.status === filterStatus;
+    const matchesStatus = !filterStatus || user.status === filterStatus;
+    const matchesPlan = !planFilter || planFilter === 'all' || user.plan === planFilter;
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesPlan;
   });
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
   
-  const handleFilterChange = (value: string) => {
-    setFilterStatus(value);
+  const handleFilterClick = (status: string | null) => {
+    setFilterStatus(status === filterStatus ? null : status);
+  };
+  
+  const handlePlanFilterChange = (value: string | null) => {
+    setPlanFilter(value);
   };
   
   const viewUserDetail = (userId: string) => {
@@ -118,6 +132,86 @@ const Users = () => {
   const handleAddUser = () => {
     // Logic to add a new user
     console.log("Add user clicked");
+  };
+
+  // Chọn người dùng
+  const handleSelectUser = (userId: string, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedUsers([...selectedUsers, userId]);
+    } else {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+    }
+  };
+
+  const handleSelectAllUsers = (isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedUsers(filteredUsers.map(user => user.id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  // Thao tác hàng loạt
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action ${action} for users:`, selectedUsers);
+    
+    switch (action) {
+      case 'activate':
+        setBulkAction('activate');
+        break;
+      case 'suspend':
+        setBulkAction('deactivate');
+        break;
+      case 'delete':
+        setBulkAction('delete');
+        break;
+      default:
+        // Xử lý các hành động khác (nâng cấp premium, v.v.)
+        toast.info(`Đã thực hiện hành động "${action}" cho ${selectedUsers.length} người dùng`);
+        return;
+    }
+    
+    setBulkActionDialogOpen(true);
+  };
+
+  const handleConfirmBulkAction = () => {
+    console.log(`Confirmed bulk action ${bulkAction} for users:`, selectedUsers);
+    
+    // Sau khi xác nhận, làm mới danh sách và bỏ chọn người dùng
+    setSelectedUsers([]);
+    setBulkAction(null);
+    toast.success("Thao tác hàng loạt thành công!");
+  };
+
+  // Xuất dữ liệu
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
+    const data = filteredUsers.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.status,
+      user.plan,
+      user.joinDate
+    ]);
+    
+    exportToCSV(headers, data, 'danh-sach-nguoi-dung');
+    toast.success("Đã xuất dữ liệu ra file CSV");
+  };
+
+  const handleExportExcel = () => {
+    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
+    const data = filteredUsers.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.status,
+      user.plan,
+      user.joinDate
+    ]);
+    
+    exportToExcel(headers, data, 'danh-sach-nguoi-dung', 'Người dùng');
+    toast.success("Đã xuất dữ liệu ra file Excel");
   };
 
   return (
@@ -142,20 +236,41 @@ const Users = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UsersSearchAndFilters
+          {/* Bộ lọc nâng cao */}
+          <UsersFilter 
             searchTerm={searchTerm}
             filterStatus={filterStatus}
+            planFilter={planFilter}
             onSearchChange={handleSearch}
-            onFilterChange={handleFilterChange}
+            onFilterClick={handleFilterClick}
+            onPlanFilterChange={handlePlanFilterChange}
           />
 
-          <div className="mt-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <AddUserButton onClick={handleAddUser} />
+            
+            <UserActions 
+              selectedUsers={selectedUsers}
+              onBulkAction={handleBulkAction}
+              onExportCSV={handleExportCSV}
+              onExportExcel={handleExportExcel}
+            />
           </div>
 
           <UsersTable 
             users={filteredUsers}
             onViewUserDetail={viewUserDetail}
+            selectedUsers={selectedUsers}
+            onSelectUser={handleSelectUser}
+            onSelectAllUsers={handleSelectAllUsers}
+          />
+          
+          <BulkActionDialog
+            open={bulkActionDialogOpen}
+            onOpenChange={setBulkActionDialogOpen}
+            selectedUsersCount={selectedUsers.length}
+            bulkAction={bulkAction}
+            onConfirm={handleConfirmBulkAction}
           />
         </CardContent>
       </Card>
