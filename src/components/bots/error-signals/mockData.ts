@@ -23,9 +23,9 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       botId: botType === 'USER-BOTS' ? 'BOT7459' : 
              botType === 'PREMIUM-BOTS' ? 'PREMIUM7459' : 
              botType === 'PROP-BOTS' ? 'PROP001' :
-             botType === 'MY-USER-BOTS' ? 'BOT7459' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM7459' :
-             botType === 'MY-PROP-BOTS' ? 'PROP001' : 'UNKNOWN001',
+             botType === 'MY-USER-BOTS' ? 'MY-BOT7459' :
+             botType === 'MY-PREMIUM-BOTS' ? 'MY-PREMIUM7459' :
+             botType === 'MY-PROP-BOTS' ? 'MY-PROP001' : 'UNKNOWN001',
       botName: botType === 'USER-BOTS' ? 'Ultra 2in1' : 
                botType === 'PREMIUM-BOTS' ? 'Alpha Momentum' : 
                botType === 'PROP-BOTS' ? 'PropFX Master' :
@@ -53,9 +53,9 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       botId: botType === 'USER-BOTS' ? 'BOT8932' : 
              botType === 'PREMIUM-BOTS' ? 'PREMIUM8932' : 
              botType === 'PROP-BOTS' ? 'PROP002' :
-             botType === 'MY-USER-BOTS' ? 'BOT8932' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM8932' :
-             botType === 'MY-PROP-BOTS' ? 'PROP002' : 'UNKNOWN002',
+             botType === 'MY-USER-BOTS' ? 'MY-BOT8932' :
+             botType === 'MY-PREMIUM-BOTS' ? 'MY-PREMIUM8932' :
+             botType === 'MY-PROP-BOTS' ? 'MY-PROP002' : 'UNKNOWN002',
       botName: botType === 'USER-BOTS' ? 'Long Master' : 
                botType === 'PREMIUM-BOTS' ? 'Gamma Grid' : 
                botType === 'PROP-BOTS' ? 'PropFX Pro' :

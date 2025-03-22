@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +5,7 @@ import { CircleDollarSign, ExternalLink } from 'lucide-react';
 import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 interface ErrorSignalRowProps {
@@ -17,6 +16,7 @@ interface ErrorSignalRowProps {
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMarkAsRead }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   const navigateToBotDetail = (botId: string) => {
@@ -27,42 +27,35 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
       return;
     }
     
+    // Check if we're in admin area
+    const isAdminArea = location.pathname.startsWith('/admin');
+    console.log("Current path:", location.pathname, "Is admin area:", isAdminArea);
+    
     // Handle different bot ID prefixes for routing
     try {
-      if (botId.startsWith("BOT")) {
-        console.log("Navigating to user bot:", `/bots/${botId}`);
-        navigate(`/bots/${botId}`);
-      } else if (botId.startsWith("PREMIUM")) {
-        console.log("Navigating to premium bot:", `/integrated-premium-bots/${botId}`);
-        navigate(`/integrated-premium-bots/${botId}`);
-      } else if (botId.startsWith("PROP")) {
-        console.log("Navigating to prop bot:", `/integrated-prop-bots/${botId}`);
-        navigate(`/integrated-prop-bots/${botId}`);
-      } else if (botId.startsWith("MY-")) {
-        // Handle "MY-" prefixed bots by removing the "MY-" prefix and redirecting accordingly
-        const actualBotId = botId.replace("MY-", "");
-        if (botId.includes("USER") || botId.includes("BOT")) {
-          console.log("Navigating to user bot from MY prefix:", `/bots/${actualBotId}`);
-          navigate(`/bots/${actualBotId}`);
-        } else if (botId.includes("PREMIUM")) {
-          console.log("Navigating to premium bot from MY prefix:", `/integrated-premium-bots/${actualBotId}`);
-          navigate(`/integrated-premium-bots/${actualBotId}`);
-        } else if (botId.includes("PROP")) {
-          console.log("Navigating to prop bot from MY prefix:", `/integrated-prop-bots/${actualBotId}`);
-          navigate(`/integrated-prop-bots/${actualBotId}`);
-        } else {
-          console.log("Unknown MY- bot type for ID:", botId);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: `Không thể xác định loại bot: ${botId}`
-          });
-        }
-      } else {
+      // Strip MY- prefix if it exists
+      const actualBotId = botId.startsWith("MY-") ? botId.replace("MY-", "") : botId;
+      
+      if (botId.includes("BOT") || botId.startsWith("BOT")) {
+        const targetPath = isAdminArea ? `/admin/user-bots/${actualBotId}` : `/bots/${actualBotId}`;
+        console.log("Navigating to user bot:", targetPath);
+        navigate(targetPath);
+      } 
+      else if (botId.includes("PREMIUM") || botId.startsWith("PREMIUM")) {
+        const targetPath = isAdminArea ? `/admin/premium-bots/${actualBotId}` : `/integrated-premium-bots/${actualBotId}`;
+        console.log("Navigating to premium bot:", targetPath);
+        navigate(targetPath);
+      } 
+      else if (botId.includes("PROP") || botId.startsWith("PROP")) {
+        const targetPath = isAdminArea ? `/admin/prop-bots/${actualBotId}` : `/integrated-prop-bots/${actualBotId}`;
+        console.log("Navigating to prop bot:", targetPath);
+        navigate(targetPath);
+      } 
+      else {
         console.log("Unknown bot type for ID:", botId);
         toast({
           variant: "destructive",
-          title: "Error",
+          title: "Lỗi",
           description: `Không thể xác định loại bot: ${botId}`
         });
       }
@@ -70,7 +63,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ signal, isUnread, onMar
       console.error("Error navigating to bot:", error);
       toast({
         variant: "destructive",
-        title: "Error",
+        title: "Lỗi",
         description: "Có lỗi khi chuyển hướng đến trang chi tiết bot"
       });
     }
