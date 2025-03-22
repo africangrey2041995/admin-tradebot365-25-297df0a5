@@ -81,7 +81,12 @@ const AdminPropBots = () => {
       users: 25,
       profit: '+8.2%',
       type: BotType.PROP_BOT,
-      propFirm: 'FTMO'
+      propFirm: 'FTMO',
+      performanceLastMonth: '+5.1%', 
+      performanceAllTime: '+22.4%',
+      minCapital: '$10,000',
+      description: 'Specialized bot for FTMO challenges',
+      lastUpdated: '2023-08-25'
     },
     {
       id: 'ptb-002',
@@ -91,7 +96,12 @@ const AdminPropBots = () => {
       users: 15,
       profit: '+12.5%',
       type: BotType.PROP_BOT,
-      propFirm: 'FTMO'
+      propFirm: 'FTMO',
+      performanceLastMonth: '+8.2%',
+      performanceAllTime: '+35.7%',
+      minCapital: '$25,000',
+      description: 'Aggressive strategy for FTMO challenges',
+      lastUpdated: '2023-09-20'
     },
     {
       id: 'ptb-003',
@@ -101,7 +111,12 @@ const AdminPropBots = () => {
       users: 18,
       profit: '+6.8%',
       type: BotType.PROP_BOT,
-      propFirm: 'FundedNext'
+      propFirm: 'FundedNext',
+      performanceLastMonth: '+3.5%',
+      performanceAllTime: '+18.2%',
+      minCapital: '$15,000',
+      description: 'Optimized for FundedNext evaluation phases',
+      lastUpdated: '2023-07-30'
     },
     {
       id: 'ptb-004',
@@ -111,7 +126,12 @@ const AdminPropBots = () => {
       users: 8,
       profit: '+3.2%',
       type: BotType.PROP_BOT,
-      propFirm: 'Coinstrat Pro'
+      propFirm: 'Coinstrat Pro',
+      performanceLastMonth: '+1.2%',
+      performanceAllTime: '+7.5%',
+      minCapital: '$5,000',
+      description: 'Entry-level bot for Coinstrat Pro challenges',
+      lastUpdated: '2023-07-05'
     }
   ];
 
@@ -429,7 +449,7 @@ const AdminPropBots = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
-                  <DropdownMenuLabel>Xuất dữ liệu</DropdownMenuLabel>
+                  <DropdownMenuLabel>Xuất d�� liệu</DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-zinc-800" />
                   <DropdownMenuItem 
                     className="focus:bg-zinc-800 cursor-pointer"
@@ -986,4 +1006,3 @@ const BotStatusBadge = ({ status }: { status: string }) => {
 };
 
 export default AdminPropBots;
-

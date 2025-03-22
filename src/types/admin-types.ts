@@ -26,14 +26,45 @@ export interface UserWithRole extends User {
   lastLogin?: string;
 }
 
+// Admin User with admin-specific permissions
+export interface AdminUser extends Omit<UserWithRole, "role" | "permissions"> {
+  role: 'admin' | 'superadmin';
+  bots: number;
+  permissions: {
+    manageUsers: boolean;
+    manageBots: boolean;
+    manageDatabase: boolean;
+    viewLogs: boolean;
+    manageNotifications: boolean;
+    manageEmail: boolean;
+    manageSettings: boolean;
+    manageAdmins: boolean;
+  };
+  lastLogin?: string;
+}
+
 // Re-export bot types with the correct interfaces
-export type { BasePropBot as PropBot, BaseUserBot as UserBot };
+export interface UserBot extends BaseUserBot {
+  // Additional properties for UserBot in admin context
+}
 
 // Admin Premium Bot Interface
 export interface PremiumBot extends BasePremiumBot {
   botId?: string;
   users?: number;
   profit?: string;
+  colorScheme?: 'default' | 'blue' | 'green' | 'red' | 'purple';
+}
+
+// Admin Prop Bot Interface
+export interface PropBot extends BasePropBot {
+  users: number;
+  profit: string;
+  performanceLastMonth: string;
+  performanceAllTime: string;
+  minCapital: string;
+  description: string;
+  lastUpdated: string;
 }
 
 // BotProfileTabs component props

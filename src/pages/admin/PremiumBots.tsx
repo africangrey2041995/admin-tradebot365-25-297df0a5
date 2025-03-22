@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -132,7 +133,7 @@ const AdminPremiumBots = () => {
       minCapital: '$600',
       subscribers: 22,
       lastUpdated: '22/11/2023',
-      colorScheme: 'orange',
+      colorScheme: 'purple', // Changed from 'orange' to 'purple'
       exchange: 'OKX',
       description: 'Premium bot for momentum trading'
     }

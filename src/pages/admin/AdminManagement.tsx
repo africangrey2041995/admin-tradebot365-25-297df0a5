@@ -19,24 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { UserWithRole } from '@/types/admin-types';
 import { UserStatus, UserPlan } from '@/constants/userConstants';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-interface AdminUser extends Omit<UserWithRole, 'role' | 'permissions'> {
-  role: 'admin' | 'superadmin';
-  permissions: {
-    manageUsers: boolean;
-    manageBots: boolean;
-    manageDatabase: boolean;
-    viewLogs: boolean;
-    manageNotifications: boolean;
-    manageEmail: boolean;
-    manageSettings: boolean;
-    manageAdmins: boolean;
-  };
-  lastLogin?: string;
-}
+import { AdminUser } from '@/types/admin-types';
 
 const mockAdminUsers: AdminUser[] = [
   {
@@ -51,6 +36,8 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: true,
     joinDate: "2023-01-15",
     roleDescription: "Super Admin",
+    role: "superadmin",
+    bots: 3,
     permissions: {
       manageUsers: true,
       manageBots: true,
@@ -74,6 +61,8 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: false,
     joinDate: "2023-02-20",
     roleDescription: "Bot Manager",
+    role: "admin",
+    bots: 0,
     permissions: {
       manageUsers: false,
       manageBots: true,
@@ -97,6 +86,8 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: true,
     joinDate: "2023-03-10",
     roleDescription: "User Manager",
+    role: "admin",
+    bots: 0,
     permissions: {
       manageUsers: true,
       manageBots: false,

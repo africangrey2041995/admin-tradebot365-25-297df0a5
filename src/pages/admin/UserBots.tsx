@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
-import { DataTable } from "@/components/ui/data-table"
-import { UserBot } from '@/types/bot';
+import { DataTable } from "@/components/ui/data-table";
 import { BotStatus } from '@/constants/botTypes';
+import { UserBot } from '@/types/bot';
 
 interface UserBotColumn {
   accessorKey: string;
