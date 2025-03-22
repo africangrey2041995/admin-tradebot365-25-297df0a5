@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -188,31 +189,31 @@ const AdminLogs = () => {
     switch(type) {
       case 'user_registration':
         return (
-          <Badge className="bg-green-100 text-green-700 border-green-200">
-            Đăng ký mới
+          <Badge className="bg-green-100 text-green-700 border-green-200 px-2 py-0.5 text-xs font-medium">
+            Đăng ký
           </Badge>
         );
       case 'user_login':
         return (
-          <Badge className="bg-blue-100 text-blue-700 border-blue-200">
-            Đăng nhập
+          <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-2 py-0.5 text-xs font-medium">
+            Login
           </Badge>
         );
       case 'admin_login':
         return (
-          <Badge className="bg-purple-100 text-purple-700 border-purple-200">
-            Admin đăng nhập
+          <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-2 py-0.5 text-xs font-medium">
+            Admin
           </Badge>
         );
       case 'admin_action':
         return (
-          <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-            Hành động Admin
+          <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-2 py-0.5 text-xs font-medium">
+            Action
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline">
+          <Badge variant="outline" className="px-2 py-0.5 text-xs font-medium">
             {type}
           </Badge>
         );
