@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +6,7 @@ import { ExtendedSignal } from './types';
 import ActionBadge from './ActionBadge';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
