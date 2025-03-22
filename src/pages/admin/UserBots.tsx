@@ -20,6 +20,15 @@ const AdminUserBots = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const navigate = useNavigate();
   
+  // Statistics data
+  const totalBots = 5;
+  const activeBots = 3;
+  const inactiveBots = 2;
+  const totalAccounts = 8;
+  const averageAccountsPerBot = Math.round(totalAccounts / totalBots);
+  const performanceRate = "12.3%";
+  const topPerformingRatio = "4 / 5";
+  
   const bots = [
     { 
       id: 'BOT-3201', 
@@ -97,7 +106,8 @@ const AdminUserBots = () => {
       (searchTerm === '' || 
         bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bot.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bot.owner.toLowerCase().includes(searchTerm.toLowerCase()))
+        bot.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bot.ownerId.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(bot => 
       (filterStatus === null || bot.status === filterStatus)
@@ -107,6 +117,50 @@ const AdminUserBots = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">Quản lý Bot người dùng</h1>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
+          <CardContent className="p-6">
+            <p className="text-zinc-400 text-sm">Tổng Bot</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4">{totalBots}</h2>
+            
+            <div className="flex justify-between text-sm">
+              <div>
+                <p className="text-green-500">Hoạt động</p>
+                <p className="text-2xl font-semibold mt-1">{activeBots}</p>
+              </div>
+              <div>
+                <p className="text-yellow-500">Không hoạt động</p>
+                <p className="text-2xl font-semibold mt-1">{inactiveBots}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
+          <CardContent className="p-6">
+            <p className="text-zinc-400 text-sm">Tài khoản</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4">{totalAccounts}</h2>
+            
+            <div>
+              <p className="text-zinc-400 text-sm">Bình quân mỗi bot</p>
+              <p className="text-2xl font-semibold mt-1">{averageAccountsPerBot}</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-zinc-900 border-zinc-800 text-white">
+          <CardContent className="p-6">
+            <p className="text-zinc-400 text-sm">Hiệu suất</p>
+            <h2 className="text-4xl font-bold mt-2 mb-4 text-green-500">{performanceRate}</h2>
+            
+            <div>
+              <p className="text-zinc-400 text-sm">Bot hiệu quả</p>
+              <p className="text-2xl font-semibold mt-1">{topPerformingRatio}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="border-zinc-800 bg-zinc-900 text-white">
@@ -143,7 +197,7 @@ const AdminUserBots = () => {
                 <TableRow className="border-zinc-800">
                   <TableHead className="text-zinc-400 w-28">ID</TableHead>
                   <TableHead className="text-zinc-400">Tên Bot</TableHead>
-                  <TableHead className="text-zinc-400">Chủ sở hữu</TableHead>
+                  <TableHead className="text-zinc-400">User ID</TableHead>
                   <TableHead className="text-zinc-400">Trạng thái</TableHead>
                   <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
                   <TableHead className="text-zinc-400">Ngày tạo</TableHead>
@@ -156,7 +210,15 @@ const AdminUserBots = () => {
                     <TableRow key={bot.id} className="border-zinc-800">
                       <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
                       <TableCell className="font-medium">{bot.name}</TableCell>
-                      <TableCell>{bot.owner}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="link" 
+                          className="p-0 h-auto text-zinc-400 hover:text-white font-mono text-xs"
+                          onClick={() => viewUserDetail(bot.ownerId)}
+                        >
+                          {bot.ownerId}
+                        </Button>
+                      </TableCell>
                       <TableCell>
                         <BotStatusBadge status={bot.status} />
                       </TableCell>
@@ -277,4 +339,3 @@ const BotStatusBadge = ({ status }: { status: string }) => {
 };
 
 export default AdminUserBots;
-
