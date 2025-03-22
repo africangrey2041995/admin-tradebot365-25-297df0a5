@@ -48,14 +48,15 @@ interface PackageFormProps {
   isSubmitting: boolean;
 }
 
-// Helper function to transform limit values
+// Helper function to transform limit values for storage
 const transformLimitValue = (value: number): number => {
   // If value is 0 or greater than 999, treat as unlimited (Infinity)
   return value === 0 || value > 999 ? Infinity : value;
 };
 
-// Helper function to display limit values
+// Helper function to display limit values in UI
 const displayLimitValue = (value: number): string => {
+  // If value is Infinity, display "0"
   return value === Infinity ? "0" : value.toString();
 };
 
@@ -165,7 +166,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
     // Process data before submitting
     const submittedData: Partial<Package> = {
       ...data,
-      // No need for special handling since schema transformation already happens
+      // Limits already transformed by Zod schema
       limits: {
         bots: data.limits.bots,
         accounts: data.limits.accounts,
@@ -328,13 +329,16 @@ export const PackageForm: React.FC<PackageFormProps> = ({
                         <FormControl>
                           <div className="relative">
                             <Input
-                              {...field}
                               type="number"
                               min="0"
                               placeholder="Số bot"
                               className="bg-zinc-800 border-zinc-700 pl-10"
-                              onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
-                              value={displayLimitValue(field.value)}
+                              value={displayLimitValue(field.value as number)}
+                              onChange={(e) => {
+                                // Parse to number, default to 0 if empty
+                                const numValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                field.onChange(numValue);
+                              }}
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
                               Bots:
@@ -367,13 +371,16 @@ export const PackageForm: React.FC<PackageFormProps> = ({
                         <FormControl>
                           <div className="relative">
                             <Input
-                              {...field}
                               type="number"
                               min="0"
                               placeholder="Số tài khoản"
                               className="bg-zinc-800 border-zinc-700 pl-10"
-                              onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
-                              value={displayLimitValue(field.value)}
+                              value={displayLimitValue(field.value as number)}
+                              onChange={(e) => {
+                                // Parse to number, default to 0 if empty
+                                const numValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                field.onChange(numValue);
+                              }}
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">
                               Acc:
