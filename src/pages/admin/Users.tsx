@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -27,8 +26,6 @@ const AdminUsers = () => {
   const activeUsers = 4;
   const inactiveUsers = 1;
   const suspendedUsers = 1;
-  const totalBots = 10;
-  const botsPerUser = Math.round((totalBots / totalUsers) * 10) / 10; // rounded to 1 decimal
   const newUsersThisMonth = 2;
   
   const users = [
@@ -121,7 +118,7 @@ const AdminUsers = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="bg-zinc-900 border-zinc-800 text-white">
           <CardContent className="p-6">
             <p className="text-zinc-400 text-sm">Tổng người dùng</p>
@@ -140,18 +137,6 @@ const AdminUsers = () => {
                 <p className="text-red-500">Đã khóa</p>
                 <p className="text-2xl font-semibold mt-1">{suspendedUsers}</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardContent className="p-6">
-            <p className="text-zinc-400 text-sm">Bot</p>
-            <h2 className="text-4xl font-bold mt-2 mb-4">{totalBots}</h2>
-            
-            <div>
-              <p className="text-zinc-400 text-sm">Bình quân mỗi người dùng</p>
-              <p className="text-2xl font-semibold mt-1">{botsPerUser}</p>
             </div>
           </CardContent>
         </Card>
