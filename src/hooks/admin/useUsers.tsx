@@ -1,13 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { User } from '@/types';
 import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 
-interface UseUsersProps {
-  initialUsers: User[];
-  initialTotalUsers: number;
-}
-
-interface UseUsersReturn {
+export interface UseUsersReturn {
   users: User[];
   totalUsers: number;
   currentPage: number;
@@ -22,9 +18,10 @@ interface UseUsersReturn {
   deleteUser: (userId: string) => void;
 }
 
-const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersReturn => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
-  const [totalUsers, setTotalUsers] = useState<number>(initialTotalUsers);
+// Change the default export to a named export
+export const useUsers = (): UseUsersReturn => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,7 +29,7 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
 
   useEffect(() => {
     // Simulate fetching users from an API
-    const fetchUsers = async (page: number = 1) => {
+    const loadData = async (page: number = 1) => {
       setLoading(true);
       // const response = await fetch(`/api/users?page=${page}&limit=${pageSize}`);
       // const data = await response.json();
@@ -50,6 +47,8 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
           updatedAt: '2023-01-01T00:00:00.000Z',
           emailVerified: true,
           twoFactorEnabled: false,
+          bots: 3,
+          joinDate: '2023-01-01'
         },
         {
           id: 'user-2',
@@ -62,6 +61,8 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
           updatedAt: '2023-02-15T00:00:00.000Z',
           emailVerified: true,
           twoFactorEnabled: true,
+          bots: 5,
+          joinDate: '2023-02-15'
         },
         {
           id: 'user-3',
@@ -74,6 +75,8 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
           updatedAt: '2023-03-10T00:00:00.000Z',
           emailVerified: false,
           twoFactorEnabled: false,
+          bots: 0,
+          joinDate: '2023-03-10'
         },
       ];
 
@@ -82,8 +85,12 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
       setLoading(false);
     };
 
-    fetchUsers(currentPage);
+    loadData(currentPage);
   }, [currentPage, pageSize]);
+
+  const fetchUsers = (page: number = 1) => {
+    setCurrentPage(page);
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -106,6 +113,8 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
       updatedAt: '2023-01-01T00:00:00.000Z',
       emailVerified: true,
       twoFactorEnabled: false,
+      bots: 3,
+      joinDate: '2023-01-01'
     };
 
     setSelectedUser(mockUser);
@@ -132,6 +141,8 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
       updatedAt: '2023-01-01T00:00:00.000Z',
       emailVerified: false,
       twoFactorEnabled: false,
+      bots: 0,
+      joinDate: new Date().toISOString().split('T')[0]
     };
 
     setUsers([...users, mockUser]);
@@ -189,5 +200,3 @@ const useUsers = ({ initialUsers, initialTotalUsers }: UseUsersProps): UseUsersR
     deleteUser,
   };
 };
-
-export default useUsers;

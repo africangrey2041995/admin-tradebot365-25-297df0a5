@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
-import { User } from "@/types";
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { UsersPagination } from '@/components/admin/users/UsersPagination';
-import { AddUserDialog } from '@/components/admin/users/AddUserDialog';
 import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
-import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
+import { AddUserDialog } from '@/components/admin/users/AddUserDialog';
 import { useUsers } from '@/hooks/admin/useUsers';
 
 const AdminUsers = () => {
   const navigate = useNavigate();
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isBulkActionDialogOpen, setIsBulkActionDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
   
-  // Mock values for the missing properties
+  // Stats
   const activeUsers = 50;
   const inactiveUsers = 20;
   const suspendedUsers = 5;
   const newUsersThisMonth = 10;
-  const searchTerm = '';
-  const filterStatus = null;
-  const planFilter = null;
-  const selectedUsers: string[] = [];
-  const selectAll = false;
-  const usersPerPage = 10;
-
+  
+  // Filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [planFilter, setPlanFilter] = useState<string | null>(null);
+  
   const {
     users,
     totalUsers,
@@ -43,15 +45,55 @@ const AdminUsers = () => {
     deleteUser,
   } = useUsers();
   
-  const handleSearchChange = () => {};
-  const handleFilterClick = () => {};
-  const handleUserCheckbox = () => {};
-  const handleSelectAll = () => {};
-  const handleBulkAction = () => {};
-  const exportToCSV = () => {};
-  const exportToExcel = () => {};
-  const setPlanFilter = () => {};
-  const setCurrentPage = () => {};
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleFilterClick = (status: string | null) => {
+    setFilterStatus(status);
+  };
+
+  const handleUserCheckbox = (userId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedUsers([...selectedUsers, userId]);
+    } else {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedUsers(users.map(user => user.id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleBulkAction = (action: 'activate' | 'deactivate' | 'delete') => {
+    setBulkAction(action);
+    setIsBulkActionDialogOpen(true);
+  };
+
+  const confirmBulkAction = () => {
+    // Logic for bulk actions would go here
+    toast.success(`Bulk action applied to ${selectedUsers.length} users`);
+    setSelectedUsers([]);
+    setSelectAll(false);
+  };
+
+  const exportToCSV = () => {
+    toast.success("Exported users data to CSV");
+  };
+
+  const exportToExcel = () => {
+    toast.success("Exported users data to Excel");
+  };
+
+  const handleUserAdded = () => {
+    fetchUsers(1);
+    toast.success("User added successfully");
+  };
 
   return (
     <div className="space-y-6">
@@ -76,9 +118,6 @@ const AdminUsers = () => {
         <CardContent>
           <UsersTable
             users={users}
-            totalUsers={totalUsers}
-            currentPage={currentPage}
-            pageSize={pageSize}
             loading={loading}
             selectedUser={selectedUser}
             activeUsers={activeUsers}
@@ -90,7 +129,7 @@ const AdminUsers = () => {
             planFilter={planFilter}
             selectedUsers={selectedUsers}
             selectAll={selectAll}
-            usersPerPage={usersPerPage}
+            usersPerPage={pageSize}
             handleSearchChange={handleSearchChange}
             handleFilterClick={handleFilterClick}
             handleUserCheckbox={handleUserCheckbox}
@@ -99,12 +138,12 @@ const AdminUsers = () => {
             exportToCSV={exportToCSV}
             exportToExcel={exportToExcel}
             setPlanFilter={setPlanFilter}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={handlePageChange}
           />
 
           <UsersPagination
-            totalItems={totalUsers}
-            visibleItems={users.length}
+            totalUsers={totalUsers}
+            visibleUsers={users.length}
             currentPage={currentPage}
             pageSize={pageSize}
             onPageChange={handlePageChange}
@@ -115,14 +154,15 @@ const AdminUsers = () => {
       <AddUserDialog 
         open={isAddUserDialogOpen}
         onOpenChange={setIsAddUserDialogOpen}
+        onUserAdded={handleUserAdded}
       />
       
       <BulkActionDialog 
-        open={false}
-        onOpenChange={() => {}}
-        selectedUsersCount={0}
-        bulkAction={null}
-        onConfirm={() => {}}
+        open={isBulkActionDialogOpen}
+        onOpenChange={setIsBulkActionDialogOpen}
+        selectedUsersCount={selectedUsers.length}
+        bulkAction={bulkAction}
+        onConfirm={confirmBulkAction}
       />
     </div>
   );
