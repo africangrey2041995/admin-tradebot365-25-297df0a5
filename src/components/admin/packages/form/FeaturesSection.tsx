@@ -17,7 +17,7 @@ export function FeaturesSection() {
   const { control } = useFormContext<FormValues>();
   
   // Use field array to manage dynamic features with correct generic type parameters
-  const { fields, append, remove } = useFieldArray<FormValues, 'features', 'number'>({
+  const { fields, append, remove } = useFieldArray({
     name: 'features',
     control
   });
