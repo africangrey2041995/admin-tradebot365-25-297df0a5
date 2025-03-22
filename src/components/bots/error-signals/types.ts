@@ -8,6 +8,9 @@ export interface ExtendedSignal extends TradingViewSignal {
   tradingAccountType?: string;
   tradingAccountBalance?: string;
   botId?: string;
+  botName?: string;
+  exchange?: string;
+  processingTime?: string;
 }
 
 export interface ErrorSignalsProps {
