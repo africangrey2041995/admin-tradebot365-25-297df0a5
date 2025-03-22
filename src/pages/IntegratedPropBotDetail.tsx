@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, BarChart3, Settings, Info, PlayCircle, PauseCircle, RefreshCw, Users, Clock, Calendar, LineChart, Webhook, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, BarChart3, Settings, Info, PlayCircle, PauseCircle, RefreshCw, Users, Clock, Calendar, LineChart, Webhook, AlertTriangle, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
 // Mock data for the integrated prop trading bot
 const propBotData = {
@@ -57,6 +59,11 @@ const propBotData = {
       equity: '$10,245',
       profit: '+$245',
       profitPercentage: '+2.45%',
+      apiName: 'Coinstrat API',
+      apiId: 'CST-001',
+      tradingAccount: '78459213',
+      tradingAccountType: 'Demo',
+      tradingAccountBalance: '$10,000',
       userId: 'USR-123456'
     }
   ],
@@ -148,14 +155,14 @@ const IntegratedPropBotDetail = () => {
     }, 1500);
   };
 
-  const handleSettingsChange = (value: string) => {
-    toast("Cài đặt đã được thay đổi", {
-      description: `Thay đổi cài đặt ${value}`,
-    });
+  const handleAddAccount = (accountData: any) => {
+    console.log('Adding account:', accountData);
+    toast.success('Tài khoản đã được thêm thành công!');
   };
 
-  const handleViewUserDetails = (userId: string) => {
-    navigate(`/admin/users/${userId}`);
+  const handleRemoveAccount = (accountId: string) => {
+    console.log('Removing account:', accountId);
+    toast.success('Tài khoản đã được gỡ bỏ khỏi bot thành công!');
   };
 
   return (
@@ -280,13 +287,12 @@ const IntegratedPropBotDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Main Content Tabs */}
+        {/* Main Content Tabs - REMOVED "trades" and "settings" tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid grid-cols-4 md:w-[400px]">
+          <TabsList className="grid grid-cols-3 md:w-[400px]">
             <TabsTrigger value="overview">Tổng Quan</TabsTrigger>
-            <TabsTrigger value="trades">Giao Dịch</TabsTrigger>
             <TabsTrigger value="accounts">Tài Khoản</TabsTrigger>
-            <TabsTrigger value="settings">Cài Đặt</TabsTrigger>
+            <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
           </TabsList>
           
           {/* Overview Tab */}
@@ -413,265 +419,103 @@ const IntegratedPropBotDetail = () => {
             </div>
           </TabsContent>
           
-          {/* Trades Tab */}
-          <TabsContent value="trades">
-            <Card>
-              <CardHeader>
-                <CardTitle>Giao Dịch Gần Đây</CardTitle>
-                <CardDescription>
-                  Lịch sử các giao dịch được thực hiện bởi bot trong thời gian gần đây
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-slate-50 dark:bg-zinc-800">
-                        <th className="py-3 px-4 text-left font-medium">Cặp</th>
-                        <th className="py-3 px-4 text-left font-medium">Loại</th>
-                        <th className="py-3 px-4 text-left font-medium">Giá Vào</th>
-                        <th className="py-3 px-4 text-left font-medium">Giá Ra</th>
-                        <th className="py-3 px-4 text-left font-medium">Lợi Nhuận</th>
-                        <th className="py-3 px-4 text-left font-medium">Thời Gian</th>
-                        <th className="py-3 px-4 text-left font-medium">Trạng Thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bot.recentTrades.map((trade) => (
-                        <tr key={trade.id} className="border-b">
-                          <td className="py-3 px-4 font-medium">{trade.pair}</td>
-                          <td className="py-3 px-4">
-                            <Badge className={`${trade.type === 'Long' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
-                              {trade.type}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4">{trade.entry}</td>
-                          <td className="py-3 px-4">{trade.exit || '-'}</td>
-                          <td className={`py-3 px-4 ${trade.profit.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                            {trade.profit}
-                          </td>
-                          <td className="py-3 px-4">{trade.date}, {trade.time}</td>
-                          <td className="py-3 px-4">
-                            <Badge variant={trade.status === 'open' ? 'outline' : 'default'} className={trade.status === 'open' ? 'border-blue-300 text-blue-600' : ''}>
-                              {trade.status === 'open' ? 'Đang Mở' : 'Đã Đóng'}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm">Giao dịch trước đó</Button>
-                <Button variant="outline" size="sm">Giao dịch tiếp theo</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          {/* Accounts Tab */}
+          {/* Accounts Tab - Updated with the new column structure */}
           <TabsContent value="accounts">
             <Card>
-              <CardHeader>
-                <CardTitle>Tài Khoản Đã Kết Nối</CardTitle>
-                <CardDescription>
-                  Các tài khoản đã được kết nối với bot này
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Tài khoản đã kết nối</CardTitle>
+                <Button onClick={() => handleAddAccount({})}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Thêm tài khoản
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-slate-50 dark:bg-zinc-800">
-                        <th className="py-3 px-4 text-left font-medium">Tên</th>
-                        <th className="py-3 px-4 text-left font-medium">Trạng Thái</th>
-                        <th className="py-3 px-4 text-left font-medium">Số Dư</th>
-                        <th className="py-3 px-4 text-left font-medium">Vốn</th>
-                        <th className="py-3 px-4 text-left font-medium">Lợi Nhuận</th>
-                        <th className="py-3 px-4 text-left font-medium">Ngày Tạo</th>
-                        <th className="py-3 px-4 text-left font-medium">User ID</th>
-                        <th className="py-3 px-4 text-left font-medium"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                {bot.accounts && bot.accounts.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tên tài khoản</TableHead>
+                        <TableHead>API</TableHead>
+                        <TableHead>Tài khoản giao dịch</TableHead>
+                        <TableHead>Hệ số KL</TableHead>
+                        <TableHead>Ngày tích hợp</TableHead>
+                        <TableHead>Thao tác</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {bot.accounts.map((account) => (
-                        <tr key={account.id} className="border-b">
-                          <td className="py-3 px-4 font-medium">{account.name}</td>
-                          <td className="py-3 px-4">
-                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                              {account.status}
+                        <TableRow key={account.id}>
+                          <TableCell className="font-medium">{account.name}</TableCell>
+                          <TableCell>{account.apiName}</TableCell>
+                          <TableCell>
+                            <div>
+                              <div>{account.tradingAccount}</div>
+                              <div className="text-xs text-muted-foreground">{account.tradingAccountType} | {account.tradingAccountBalance}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400">
+                              x{account.volumeMultiplier}
                             </Badge>
-                          </td>
-                          <td className="py-3 px-4">{account.balance}</td>
-                          <td className="py-3 px-4">{account.equity}</td>
-                          <td className={`py-3 px-4 ${account.profit.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                            {account.profit} ({account.profitPercentage})
-                          </td>
-                          <td className="py-3 px-4">{account.createdDate}</td>
-                          <td className="py-3 px-4">
-                            <Button 
-                              variant="ghost" 
-                              className="text-blue-600 hover:text-blue-800 p-0 h-auto font-medium"
-                              onClick={() => handleViewUserDetails(account.userId)}
-                            >
-                              {account.userId}
-                            </Button>
-                          </td>
-                          <td className="py-3 px-4">
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/accounts/${account.id}`)}>
-                              Chi Tiết
-                            </Button>
-                          </td>
-                        </tr>
+                          </TableCell>
+                          <TableCell>{new Date(account.createdDate).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => navigate(`/accounts/${account.id}`)}
+                              >
+                                <Settings className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleRemoveAccount(account.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="py-10 text-center">
+                    <p className="text-muted-foreground mb-4">Chưa có tài khoản nào được kết nối với bot này</p>
+                    <Button onClick={() => handleAddAccount({})}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Thêm tài khoản
+                    </Button>
+                  </div>
+                )}
               </CardContent>
-              <CardFooter>
-                <Button onClick={() => navigate('/accounts')}>
-                  Kết Nối Tài Khoản Mới
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
           
-          {/* Settings Tab */}
-          <TabsContent value="settings">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Cài Đặt Bot
-                  </CardTitle>
-                  <CardDescription>
-                    Điều chỉnh cài đặt cho bot Prop Trading của bạn
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Kích Thước Vị Thế Tối Đa</label>
-                    <Select defaultValue="2" onValueChange={(v) => handleSettingsChange('Kích thước vị thế: ' + v + '%')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn kích thước" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1% tài khoản</SelectItem>
-                        <SelectItem value="2">2% tài khoản</SelectItem>
-                        <SelectItem value="3">3% tài khoản</SelectItem>
-                        <SelectItem value="5">5% tài khoản</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Rủi Ro Mỗi Giao Dịch</label>
-                    <Select defaultValue="1" onValueChange={(v) => handleSettingsChange('Rủi ro mỗi giao dịch: ' + v + '%')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn mức rủi ro" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0.5">0.5% tài khoản</SelectItem>
-                        <SelectItem value="1">1% tài khoản</SelectItem>
-                        <SelectItem value="1.5">1.5% tài khoản</SelectItem>
-                        <SelectItem value="2">2% tài khoản</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Thời Gian Giao Dịch</label>
-                    <Select defaultValue="market" onValueChange={(v) => handleSettingsChange('Thời gian giao dịch: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn thời gian" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="market">Giờ thị trường (9:30 - 16:00)</SelectItem>
-                        <SelectItem value="extended">Giờ mở rộng (4:00 - 20:00)</SelectItem>
-                        <SelectItem value="24h">24 giờ</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Cặp Tiền Được Phép</label>
-                    <Select defaultValue="major" onValueChange={(v) => handleSettingsChange('Cặp tiền được phép: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn cặp tiền" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="major">Chỉ các cặp chính</SelectItem>
-                        <SelectItem value="all">Tất cả các cặp</SelectItem>
-                        <SelectItem value="custom">Tùy chỉnh</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Lưu Cài Đặt</Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Webhook className="h-5 w-5" />
-                    Tích Hợp và Thông Báo
-                  </CardTitle>
-                  <CardDescription>
-                    Quản lý cách bot giao tiếp và gửi thông báo
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Thông Báo Email</label>
-                    <Select defaultValue="all" onValueChange={(v) => handleSettingsChange('Thông báo email: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn tần suất" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Mọi giao dịch</SelectItem>
-                        <SelectItem value="important">Chỉ giao dịch quan trọng</SelectItem>
-                        <SelectItem value="daily">Tóm tắt hàng ngày</SelectItem>
-                        <SelectItem value="none">Tắt</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Webhook URL</label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="text" 
-                        placeholder="https://your-webhook-url.com" 
-                        className="flex-1"
-                        disabled 
-                      />
-                      <Button variant="outline" size="sm">Kiểm Tra</Button>
-                    </div>
-                    <p className="text-xs text-slate-500">Nhận thông báo thông qua webhook để tích hợp với các dịch vụ khác</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Telegram Bot</label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="text" 
-                        placeholder="Bot Token" 
-                        className="flex-1"
-                        disabled
-                      />
-                      <Button variant="outline" size="sm">Kết Nối</Button>
-                    </div>
-                    <p className="text-xs text-slate-500">Kết nối với Telegram để nhận thông báo trực tiếp</p>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Lưu Thông Báo</Button>
-                </CardFooter>
-              </Card>
-            </div>
+          {/* Coinstrat Pro Logs Tab - New tab */}
+          <TabsContent value="coinstrat-logs">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle>Coinstrat Pro Logs</CardTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefresh} 
+                  disabled={refreshing} 
+                  className="h-8"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+                  {refreshing ? 'Đang làm mới...' : 'Làm mới'}
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <CoinstratLogs botId={bot.id} />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
