@@ -1,6 +1,9 @@
-import { ExtendedSignal } from './types';
 
-// Mock data for error signals
+import { ExtendedSignal } from './types';
+import { BotType } from '@/constants/botTypes';
+import { determineBotType, normalizeBotId } from '@/utils/botUtils';
+
+// Standardized mock data for error signals
 export const mockErrorSignals: ExtendedSignal[] = [
   {
     id: 'ERR1001',
@@ -20,7 +23,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     tradingAccountType: 'Live',
     tradingAccountBalance: '$500',
     botId: 'PRE-001',
-    botType: 'Premium',
+    botType: BotType.PREMIUM_BOT,
     botName: 'Alpha Momentum',
     exchange: 'Binance',
   },
@@ -42,7 +45,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     tradingAccountType: 'Demo',
     tradingAccountBalance: '$1000',
     botId: 'MY-002',
-    botType: 'User',
+    botType: BotType.USER_BOT,
     botName: 'CryptoBot',
     exchange: 'Coinbase',
   },
@@ -64,7 +67,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     tradingAccountType: 'Live',
     tradingAccountBalance: '$2000',
     botId: 'PROP-001',
-    botType: 'Prop',
+    botType: BotType.PROP_BOT,
     botName: 'PropBot',
     exchange: 'FTX',
   },
@@ -86,7 +89,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     tradingAccountType: 'Live',
     tradingAccountBalance: '$500',
     botId: 'PRE-001',
-    botType: 'Premium',
+    botType: BotType.PREMIUM_BOT,
     botName: 'Alpha Momentum',
     exchange: 'Binance',
   },
@@ -108,7 +111,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     tradingAccountType: 'Demo',
     tradingAccountBalance: '$1000',
     botId: 'MY-002',
-    botType: 'User',
+    botType: BotType.USER_BOT,
     botName: 'CryptoBot',
     exchange: 'Coinbase',
   },

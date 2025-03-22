@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, RefreshCw, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/ui/data-table";
-import { BotStatus } from '@/constants/botTypes';
+import { BotStatus, BotType } from '@/constants/botTypes';
 import { UserBot } from '@/types/bot';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -52,66 +51,76 @@ const columns: UserBotColumn[] = [
   },
 ];
 
-const mockUserBots = [
+const mockUserBots: UserBot[] = [
   {
     id: 'ub-001',
     name: 'My First Bot',
-    status: BotStatus.ACTIVE,
-    createdDate: '2023-08-15',
-    owner: 'John Doe',
-    accounts: 2,
     description: 'A simple bot for testing purposes',
-    strategy: 'DCA',
-    isActive: true,
+    status: BotStatus.ACTIVE,
+    type: BotType.USER_BOT,
+    createdDate: '2023-08-15',
+    lastUpdated: '2023-08-15',
+    owner: 'John Doe',
     ownerId: 'user-001',
+    accounts: 2,
+    strategy: 'DCA',
+    isActive: true
   },
   {
     id: 'ub-002',
     name: 'BTC Trader',
-    status: BotStatus.ACTIVE,
-    createdDate: '2023-09-10',
-    owner: 'Jane Smith',
-    accounts: 1,
     description: 'Trades BTC based on RSI',
-    strategy: 'RSI',
-    isActive: true,
+    status: BotStatus.ACTIVE,
+    type: BotType.USER_BOT,
+    createdDate: '2023-09-10',
+    lastUpdated: '2023-09-10',
+    owner: 'Jane Smith',
     ownerId: 'user-002',
+    accounts: 1,
+    strategy: 'RSI',
+    isActive: true
   },
   {
     id: 'ub-003',
     name: 'ETH Grid Bot',
-    status: BotStatus.INACTIVE,
-    createdDate: '2023-07-22',
-    owner: 'Robert Johnson',
-    accounts: 1,
     description: 'Grid trading bot for ETH',
-    strategy: 'Grid',
-    isActive: false,
+    status: BotStatus.INACTIVE,
+    type: BotType.USER_BOT,
+    createdDate: '2023-07-22',
+    lastUpdated: '2023-08-01',
+    owner: 'Robert Johnson',
     ownerId: 'user-003',
+    accounts: 1,
+    strategy: 'Grid',
+    isActive: false
   },
   {
     id: 'ub-004',
     name: 'Auto Trader Pro',
-    status: BotStatus.ACTIVE,
-    createdDate: '2023-06-30',
-    owner: 'Emma Wilson',
-    accounts: 3,
     description: 'Advanced auto trading bot',
-    strategy: 'AI',
-    isActive: true,
+    status: BotStatus.ACTIVE,
+    type: BotType.USER_BOT,
+    createdDate: '2023-06-30',
+    lastUpdated: '2023-07-15',
+    owner: 'Emma Wilson',
     ownerId: 'user-004',
+    accounts: 3,
+    strategy: 'AI',
+    isActive: true
   },
   {
     id: 'ub-005',
     name: 'Altcoin Hunter',
-    status: BotStatus.ACTIVE,
-    createdDate: '2023-05-12',
-    owner: 'Michael Brown',
-    accounts: 2,
     description: 'Hunts for promising altcoins',
-    strategy: 'Momentum',
-    isActive: true,
+    status: BotStatus.ACTIVE,
+    type: BotType.USER_BOT,
+    createdDate: '2023-05-12',
+    lastUpdated: '2023-06-20',
+    owner: 'Michael Brown',
     ownerId: 'user-005',
+    accounts: 2,
+    strategy: 'Momentum',
+    isActive: true
   }
 ];
 

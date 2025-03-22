@@ -6,6 +6,7 @@ import { ExtendedSignal, ErrorSignalsProps } from './types';
 import { mockErrorSignals } from './mockData';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
   const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
@@ -15,23 +16,23 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
   
   const { navigateToBotDetail } = useNavigation();
   
-  // Fetch error signals
+  // Fetch error signals with improved error handling
   const fetchErrorSignals = useCallback(() => {
     setLoading(true);
     setError(null);
     
     try {
-      // Giả lập API call với timeout
+      // Simulate API call with timeout
       setTimeout(() => {
         try {
-          // Lọc dữ liệu mẫu để phù hợp với bot ID
+          // Filter mock data to match bot ID
           const signals = mockErrorSignals.filter(signal => 
             !botId || signal.botId === botId
           );
           
           setErrorSignals(signals);
           
-          // Đặt tất cả lỗi là chưa đọc
+          // Set first two errors as unread
           const newUnread = new Set<string>();
           signals.slice(0, 2).forEach(signal => {
             if (signal.id) {
@@ -43,25 +44,25 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
           setLoading(false);
         } catch (innerError) {
           console.error('Error processing error signals:', innerError);
-          setError(innerError instanceof Error ? innerError : new Error('Unknown error processing signals'));
+          setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing signals'));
           setLoading(false);
-          toast.error('Đã xảy ra lỗi khi xử lý tín hiệu lỗi');
+          toast.error('An error occurred while processing error signals');
         }
       }, 800);
     } catch (err) {
       console.error('Error fetching error signals:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
       setLoading(false);
-      toast.error('Đã xảy ra lỗi khi tải tín hiệu lỗi');
+      toast.error('An error occurred while loading error signals');
     }
   }, [botId]);
   
-  // Load data khi component mount hoặc botId thay đổi
+  // Load data when component mounts or botId changes
   useEffect(() => {
     fetchErrorSignals();
   }, [fetchErrorSignals]);
   
-  // Xử lý đánh dấu lỗi đã đọc
+  // Handle marking errors as read
   const handleMarkAsRead = (signalId: string) => {
     try {
       setUnreadErrors(prev => {
@@ -69,32 +70,34 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         newSet.delete(signalId);
         return newSet;
       });
-      toast.success('Đã đánh dấu tín hiệu lỗi là đã đọc');
+      toast.success('Error signal marked as read');
     } catch (err) {
       console.error('Error marking signal as read:', err);
-      toast.error('Đã xảy ra lỗi khi đánh dấu tín hiệu lỗi là đã đọc');
+      toast.error('An error occurred while marking the signal as read');
     }
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Error Signals</CardTitle>
-        <CardDescription>
-          Signals that failed to process due to errors. Requires attention.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ErrorSignalsTable 
-          errorSignals={errorSignals}
-          unreadErrors={unreadErrors}
-          onMarkAsRead={handleMarkAsRead}
-          loading={loading}
-          error={error}
-          onRefresh={fetchErrorSignals}
-        />
-      </CardContent>
-    </Card>
+    <ErrorBoundary>
+      <Card>
+        <CardHeader>
+          <CardTitle>Error Signals</CardTitle>
+          <CardDescription>
+            Signals that failed to process due to errors. Requires attention.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ErrorSignalsTable 
+            errorSignals={errorSignals}
+            unreadErrors={unreadErrors}
+            onMarkAsRead={handleMarkAsRead}
+            loading={loading}
+            error={error}
+            onRefresh={fetchErrorSignals}
+          />
+        </CardContent>
+      </Card>
+    </ErrorBoundary>
   );
 };
 
