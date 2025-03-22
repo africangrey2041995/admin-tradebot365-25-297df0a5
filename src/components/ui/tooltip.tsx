@@ -74,23 +74,21 @@ export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({
   const handleMouseLeave = () => {
     setOpen(false);
   };
-  
+
+  // Fix: properly cast and handle events for cloned elements
   if (asChild && React.isValidElement(children)) {
-    // Type the cloned element properly to handle event props
-    return React.cloneElement(children as React.ReactElement<any>, {
+    const childProps = children.props as any;
+    const originalOnMouseEnter = childProps.onMouseEnter;
+    const originalOnMouseLeave = childProps.onMouseLeave;
+
+    return React.cloneElement(children, {
       onMouseEnter: (e: React.MouseEvent) => {
         handleMouseEnter(e);
-        // Call original onMouseEnter if it exists
-        if ((children as any).props.onMouseEnter) {
-          (children as any).props.onMouseEnter(e);
-        }
+        if (originalOnMouseEnter) originalOnMouseEnter(e);
       },
       onMouseLeave: (e: React.MouseEvent) => {
         handleMouseLeave();
-        // Call original onMouseLeave if it exists
-        if ((children as any).props.onMouseLeave) {
-          (children as any).props.onMouseLeave(e);
-        }
+        if (originalOnMouseLeave) originalOnMouseLeave(e);
       },
     });
   }

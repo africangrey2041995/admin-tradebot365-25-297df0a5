@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ToastProps } from "./toast";
 
+// Ensure Toast type includes id as required field
 interface Toast extends ToastProps {
   id: string;
 }
