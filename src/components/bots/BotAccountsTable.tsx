@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2, PencilIcon } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Account, ConnectionStatus } from '@/types';
 
@@ -153,13 +153,6 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
                   onClick={() => handleViewAccount(account.id)}
                 >
                   <Eye className="h-4 w-4" />
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-8 w-8 p-0"
-                >
-                  <PencilIcon className="h-4 w-4" />
                 </Button>
                 <Button 
                   size="sm" 

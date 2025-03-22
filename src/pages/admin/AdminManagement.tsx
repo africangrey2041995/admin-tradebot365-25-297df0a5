@@ -72,7 +72,8 @@ type AdminFormValues = z.infer<typeof adminFormSchema>;
 // Define an admin user type that extends UserWithRole but ensures role is AdminRoleType
 interface AdminUser extends Omit<UserWithRole, 'role'> {
   role: AdminRoleType;
-  fullName: string; // Add the fullName property here
+  name: string; // Add name property
+  fullName: string; // Keep fullName property
   permissions: {
     manageUsers: boolean;
     manageBots: boolean;
@@ -96,6 +97,7 @@ const AdminManagement = () => {
   const adminUsers: AdminUser[] = [
     { 
       id: '1', 
+      name: 'Nguyễn Văn Admin',
       fullName: 'Nguyễn Văn Admin', 
       email: 'admin@example.com', 
       role: 'superadmin', 
@@ -115,6 +117,7 @@ const AdminManagement = () => {
     },
     { 
       id: '2', 
+      name: 'Trần Thị Quản Lý',
       fullName: 'Trần Thị Quản Lý', 
       email: 'manager@example.com', 
       role: 'admin', 
@@ -134,6 +137,7 @@ const AdminManagement = () => {
     },
     { 
       id: '3', 
+      name: 'Lê Minh Hỗ Trợ',
       fullName: 'Lê Minh Hỗ Trợ', 
       email: 'support@example.com', 
       role: 'admin', 
