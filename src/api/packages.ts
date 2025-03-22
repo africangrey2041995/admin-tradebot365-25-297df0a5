@@ -1,12 +1,13 @@
 
 import { Package } from '@/types';
 import { ADMIN_API } from '@/constants/apiEndpoints';
+import { UserPlan } from '@/constants/userConstants';
 
 // Mock data
 const mockPackages: Package[] = [
   {
     id: '1',
-    planId: 'free',
+    planId: UserPlan.FREE,
     name: 'Miễn phí',
     description: 'Gói miễn phí với các tính năng cơ bản',
     features: ['1 Bot', '2 Tài khoản', 'Hỗ trợ cơ bản'],
@@ -26,7 +27,7 @@ const mockPackages: Package[] = [
   },
   {
     id: '2',
-    planId: 'basic',
+    planId: UserPlan.BASIC,
     name: 'Cơ bản',
     description: 'Gói cơ bản cho người mới bắt đầu',
     features: ['3 Bot', '5 Tài khoản', 'Hỗ trợ qua email'],
@@ -46,7 +47,7 @@ const mockPackages: Package[] = [
   },
   {
     id: '3',
-    planId: 'premium',
+    planId: UserPlan.PREMIUM,
     name: 'Cao cấp',
     description: 'Gói cao cấp cho trader chuyên nghiệp',
     features: ['10 Bot', '20 Tài khoản', 'Hỗ trợ ưu tiên 24/7', 'Chiến lược nâng cao'],
@@ -67,7 +68,7 @@ const mockPackages: Package[] = [
   },
   {
     id: '4',
-    planId: 'enterprise',
+    planId: UserPlan.ENTERPRISE,
     name: 'Doanh nghiệp',
     description: 'Gói doanh nghiệp với khả năng tùy chỉnh cao',
     features: ['Không giới hạn Bot', 'Không giới hạn tài khoản', 'Hỗ trợ riêng', 'API tùy chỉnh'],
@@ -88,7 +89,7 @@ const mockPackages: Package[] = [
   },
   {
     id: '5',
-    planId: 'trial',
+    planId: UserPlan.TRIAL,
     name: 'Dùng thử',
     description: 'Gói dùng thử 14 ngày',
     features: ['2 Bot', '3 Tài khoản', 'Hỗ trợ cơ bản'],

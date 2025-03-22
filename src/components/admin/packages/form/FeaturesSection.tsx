@@ -24,7 +24,7 @@ export function FeaturesSection() {
 
   // Add new feature field
   const addFeature = () => {
-    append('');
+    append('');  // This line was causing the error
   };
 
   return (
