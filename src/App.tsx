@@ -25,6 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
+import UserBotErrors from "./pages/UserBotErrors";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -99,6 +100,7 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/bot-errors" element={<UserBotErrors />} />
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
