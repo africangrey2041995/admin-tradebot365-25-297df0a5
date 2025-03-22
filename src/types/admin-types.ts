@@ -53,7 +53,7 @@ export interface PremiumBot extends BasePremiumBot {
   botId?: string;
   users?: number;
   profit?: string;
-  colorScheme?: 'default' | 'blue' | 'green' | 'red' | 'purple';
+  colorScheme: 'default' | 'blue' | 'green' | 'red' | 'purple'; // Removed the optional marker (?)
 }
 
 // Admin Prop Bot Interface
