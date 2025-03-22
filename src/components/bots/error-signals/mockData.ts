@@ -21,16 +21,16 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Spot',
       tradingAccountBalance: '$15,420',
       botId: botType === 'USER-BOTS' ? 'BOT7459' : 
-             botType === 'PREMIUM-BOTS' ? 'PREMIUM001' : 
+             botType === 'PREMIUM-BOTS' ? 'PRE7459' : 
              botType === 'PROP-BOTS' ? 'PROP001' :
              botType === 'MY-USER-BOTS' ? 'BOT7459' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM001' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PRE7459' :
              botType === 'MY-PROP-BOTS' ? 'PROP001' : 'UNKNOWN001',
       botName: botType === 'USER-BOTS' ? 'Ultra 2in1' : 
-               botType === 'PREMIUM-BOTS' ? 'Premium Alpha' : 
+               botType === 'PREMIUM-BOTS' ? 'Alpha Momentum' : 
                botType === 'PROP-BOTS' ? 'PropFX Master' :
                botType === 'MY-USER-BOTS' ? 'Ultra 2in1' :
-               botType === 'MY-PREMIUM-BOTS' ? 'Premium Alpha' :
+               botType === 'MY-PREMIUM-BOTS' ? 'Alpha Momentum' :
                botType === 'MY-PROP-BOTS' ? 'PropFX Master' : 'Unknown Bot',
       exchange: 'Binance',
       processingTime: '1.2s'
@@ -51,16 +51,16 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Spot',
       tradingAccountBalance: '$8,750',
       botId: botType === 'USER-BOTS' ? 'BOT8932' : 
-             botType === 'PREMIUM-BOTS' ? 'PREMIUM002' : 
+             botType === 'PREMIUM-BOTS' ? 'PRE8932' : 
              botType === 'PROP-BOTS' ? 'PROP002' :
              botType === 'MY-USER-BOTS' ? 'BOT8932' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM002' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PRE8932' :
              botType === 'MY-PROP-BOTS' ? 'PROP002' : 'UNKNOWN002',
       botName: botType === 'USER-BOTS' ? 'Long Master' : 
-               botType === 'PREMIUM-BOTS' ? 'Premium Beta' : 
+               botType === 'PREMIUM-BOTS' ? 'Gamma Grid' : 
                botType === 'PROP-BOTS' ? 'PropFX Pro' :
                botType === 'MY-USER-BOTS' ? 'Long Master' :
-               botType === 'MY-PREMIUM-BOTS' ? 'Premium Beta' :
+               botType === 'MY-PREMIUM-BOTS' ? 'Gamma Grid' :
                botType === 'MY-PROP-BOTS' ? 'PropFX Pro' : 'Unknown Bot',
       exchange: 'Coinbase',
       processingTime: '0.8s'
@@ -81,16 +81,16 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Margin',
       tradingAccountBalance: '$25,600',
       botId: botType === 'USER-BOTS' ? 'BOT2734' : 
-             botType === 'PREMIUM-BOTS' ? 'PREMIUM003' : 
+             botType === 'PREMIUM-BOTS' ? 'PRE8932' : 
              botType === 'PROP-BOTS' ? 'PROP003' :
              botType === 'MY-USER-BOTS' ? 'BOT2734' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM003' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PRE8932' :
              botType === 'MY-PROP-BOTS' ? 'PROP003' : 'UNKNOWN003',
       botName: botType === 'USER-BOTS' ? 'Gold Trading' : 
-               botType === 'PREMIUM-BOTS' ? 'Premium Gold' : 
+               botType === 'PREMIUM-BOTS' ? 'Gamma Grid' : 
                botType === 'PROP-BOTS' ? 'PropFX Gold' :
                botType === 'MY-USER-BOTS' ? 'Gold Trading' :
-               botType === 'MY-PREMIUM-BOTS' ? 'Premium Gold' :
+               botType === 'MY-PREMIUM-BOTS' ? 'Gamma Grid' :
                botType === 'MY-PROP-BOTS' ? 'PropFX Gold' : 'Unknown Bot',
       exchange: 'FXCM',
       processingTime: '1.5s'
@@ -111,16 +111,16 @@ export const getMockErrorSignals = (botType: string): ExtendedSignal[] => {
       tradingAccountType: 'Prop',
       tradingAccountBalance: '$50,000',
       botId: botType === 'USER-BOTS' ? 'BOT1267' : 
-             botType === 'PREMIUM-BOTS' ? 'PREMIUM004' : 
+             botType === 'PREMIUM-BOTS' ? 'PRE7459' : 
              botType === 'PROP-BOTS' ? 'PROP004' :
              botType === 'MY-USER-BOTS' ? 'BOT1267' :
-             botType === 'MY-PREMIUM-BOTS' ? 'PREMIUM004' :
+             botType === 'MY-PREMIUM-BOTS' ? 'PRE7459' :
              botType === 'MY-PROP-BOTS' ? 'PROP004' : 'UNKNOWN004',
       botName: botType === 'USER-BOTS' ? 'Forex Master' : 
-               botType === 'PREMIUM-BOTS' ? 'Premium FX' : 
+               botType === 'PREMIUM-BOTS' ? 'Alpha Momentum' : 
                botType === 'PROP-BOTS' ? 'PropFX EUR' :
                botType === 'MY-USER-BOTS' ? 'Forex Master' :
-               botType === 'MY-PREMIUM-BOTS' ? 'Premium FX' :
+               botType === 'MY-PREMIUM-BOTS' ? 'Alpha Momentum' :
                botType === 'MY-PROP-BOTS' ? 'PropFX EUR' : 'Unknown Bot',
       exchange: 'Oanda',
       processingTime: '0.7s'

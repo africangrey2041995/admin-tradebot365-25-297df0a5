@@ -170,7 +170,27 @@ const IntegratedPremiumBotDetail = () => {
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
   const [isLoading, setIsLoading] = useState(false);
 
-  const bot = integratedPremiumBots.find(b => b.id === botId);
+  console.log("Bot ID from params:", botId);
+  
+  // Find the bot by ID (could be either the id or botId property)
+  const bot = integratedPremiumBots.find(b => b.id === botId || b.botId === botId);
+  
+  console.log("Found bot:", bot);
+
+  // Early return with error UI if bot not found
+  if (!bot) {
+    return (
+      <MainLayout title="Bot Not Found">
+        <div className="flex flex-col items-center justify-center p-8 gap-4">
+          <h2 className="text-2xl font-bold">Bot không tồn tại</h2>
+          <p className="text-muted-foreground mb-4">Không tìm thấy bot với ID: {botId}</p>
+          <Button onClick={() => navigate('/integrated-premium-bots')}>
+            Quay lại danh sách Bot
+          </Button>
+        </div>
+      </MainLayout>
+    );
+  }
 
   const getRiskLabel = (risk: string) => {
     switch (risk) {
