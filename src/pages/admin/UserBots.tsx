@@ -1,18 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw, UserCircle } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
 import { DataTable } from "@/components/ui/data-table";
 import { BotStatus } from '@/constants/botTypes';
 import { UserBot } from '@/types/bot';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { useNavigation } from '@/hooks/useNavigation';
 
 interface UserBotColumn {
   accessorKey: string;
   header: string;
+  cell?: (value: any, row: any) => React.ReactNode;
 }
 
 const columns: UserBotColumn[] = [
@@ -27,6 +31,13 @@ const columns: UserBotColumn[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    cell: (value) => (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        value === BotStatus.ACTIVE ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+      }`}>
+        {value}
+      </span>
+    )
   },
   {
     accessorKey: 'createdDate',
@@ -107,9 +118,10 @@ const mockUserBots = [
 
 const AdminUserBots = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
-  const location = useLocation();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const { navigateToBotDetail } = useNavigation();
+  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -122,41 +134,98 @@ const AdminUserBots = () => {
   const addUserBot = () => {
     toast.success("Chức năng thêm User Bot đang được phát triển");
   };
+  
+  const handleRowClick = useCallback((row: UserBot) => {
+    navigateToBotDetail(row.id);
+  }, [navigateToBotDetail]);
+  
+  const handleRefreshData = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+    
+    // Simulate API call
+    setTimeout(() => {
+      // 10% chance of error for demonstration
+      if (Math.random() < 0.1) {
+        setError(new Error("Lỗi kết nối máy chủ khi lấy dữ liệu User Bots"));
+      }
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">Quản lý User Bots</h1>
-        <Button
-          className="bg-amber-500 hover:bg-amber-600 text-white"
-          onClick={addUserBot}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm User Bot mới
-        </Button>
-      </div>
+    <ErrorBoundary>
+      <div className="space-y-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/bots">Bots</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/user-bots">User Bots</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-2xl font-bold text-white">Quản lý User Bots</h1>
+          <Button
+            className="bg-amber-500 hover:bg-amber-600 text-white"
+            onClick={addUserBot}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm User Bot mới
+          </Button>
+        </div>
 
-      <Card className="border-zinc-800 bg-zinc-900 text-white">
-        <CardHeader>
-          <CardTitle>Danh sách User Bots</CardTitle>
-          <CardDescription className="text-zinc-400">
-            Quản lý tất cả User Bots trong hệ thống Trade Bot 365.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between py-2">
-            <Input
-              type="text"
-              placeholder="Tìm kiếm User Bots..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="max-w-md"
+        <Card className="border-zinc-800 bg-zinc-900 text-white">
+          <CardHeader>
+            <CardTitle>Danh sách User Bots</CardTitle>
+            <CardDescription className="text-zinc-400">
+              Quản lý tất cả User Bots trong hệ thống Trade Bot 365.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between py-2 mb-4">
+              <div className="flex items-center gap-2 flex-1">
+                <UserCircle className="h-5 w-5 text-amber-500" />
+                <Input
+                  type="text"
+                  placeholder="Tìm kiếm User Bots..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="max-w-md"
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRefreshData}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Làm mới
+              </Button>
+            </div>
+            
+            <DataTable 
+              columns={columns} 
+              data={filteredBots} 
+              isLoading={isLoading}
+              error={error}
+              onRetry={handleRefreshData}
+              onRowClick={handleRowClick}
+              emptyMessage="Không tìm thấy User Bot nào phù hợp với tiêu chí tìm kiếm."
             />
-          </div>
-          <DataTable columns={columns} data={filteredBots} />
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </ErrorBoundary>
   );
 };
 

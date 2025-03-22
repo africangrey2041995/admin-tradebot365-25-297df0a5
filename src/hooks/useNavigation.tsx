@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, USER_ROUTES } from '@/constants/routes';
 import { BotType } from '@/constants/botTypes';
 import { determineBotType, normalizeBotId, logBotIdInfo } from '@/utils/botUtils';
+import { toast } from 'sonner';
 
 /**
  * Hook tùy chỉnh để xử lý điều hướng thông minh trong ứng dụng
@@ -21,6 +22,7 @@ export function useNavigation() {
   const navigateToBotDetail = (botId: string) => {
     if (!botId) {
       console.error('Cannot navigate: Bot ID is empty');
+      toast.error('Không thể điều hướng: ID bot không hợp lệ');
       return;
     }
     
@@ -46,6 +48,7 @@ export function useNavigation() {
           default:
             // Fallback cho trường hợp không xác định được loại bot
             console.warn(`Unknown bot type for ID: ${botId}. Navigating to admin bots.`);
+            toast.warning('Không thể xác định loại bot. Chuyển hướng đến trang Bots');
             navigate(ADMIN_ROUTES.BOTS);
         }
       } else {
@@ -63,11 +66,13 @@ export function useNavigation() {
           default:
             // Fallback cho trường hợp không xác định được loại bot
             console.warn(`Unknown bot type for ID: ${botId}. Navigating to user bots.`);
+            toast.warning('Không thể xác định loại bot. Chuyển hướng đến trang Bots');
             navigate(USER_ROUTES.BOTS);
         }
       }
     } catch (error) {
       console.error(`Navigation error for bot ID ${botId}:`, error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
       // Fallback an toàn - chuyển đến trang bots chung
       navigate(isAdminContext ? ADMIN_ROUTES.BOTS : USER_ROUTES.BOTS);
     }
@@ -80,6 +85,7 @@ export function useNavigation() {
   const navigateToAccountDetail = (accountId: string) => {
     if (!accountId) {
       console.error('Cannot navigate: Account ID is empty');
+      toast.error('Không thể điều hướng: ID tài khoản không hợp lệ');
       return;
     }
     
@@ -92,6 +98,7 @@ export function useNavigation() {
       }
     } catch (error) {
       console.error(`Navigation error for account ID ${accountId}:`, error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
       navigate(isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME);
     }
   };
@@ -100,12 +107,35 @@ export function useNavigation() {
    * Quay lại trang trước đó
    */
   const goBack = () => {
-    navigate(-1);
+    try {
+      navigate(-1);
+    } catch (error) {
+      console.error('Error navigating back:', error);
+      navigate(isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME);
+    }
+  };
+
+  /**
+   * Điều hướng tới trang lỗi bot
+   */
+  const navigateToBotErrors = () => {
+    try {
+      if (isAdminContext) {
+        navigate(ADMIN_ROUTES.BOT_ERRORS);
+      } else {
+        // Trong context user, có thể không có trang riêng về lỗi bot
+        toast.info('Tính năng này chỉ có sẵn trong trang quản trị.');
+      }
+    } catch (error) {
+      console.error('Error navigating to bot errors:', error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
+    }
   };
   
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
+    navigateToBotErrors,
     goBack,
     isAdminContext
   };
