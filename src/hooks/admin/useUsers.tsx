@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { User } from '@/types/admin-types';
 
-const mockUsers = [
+const mockUsers: User[] = [
   { 
     id: 'USR-24051', 
     name: 'Nguyễn Văn A', 
