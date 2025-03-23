@@ -3,9 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { TradingViewSignal } from '@/types';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface CoinstratLogsProps {
   botId: string;
@@ -14,11 +21,16 @@ interface CoinstratLogsProps {
 
 interface ExtendedTradingViewSignal extends TradingViewSignal {
   userId?: string;
+  accountId?: string;
+  accountName?: string;
+  coinstratSignalId?: string;
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
   const [logs, setLogs] = useState<ExtendedTradingViewSignal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSignal, setSelectedSignal] = useState<ExtendedTradingViewSignal | null>(null);
+  const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
 
   const fetchLogs = () => {
     setLoading(true);
@@ -36,7 +48,10 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           investmentType: 'crypto',
           amount: '1.5',
           status: 'Processed',
-          userId: 'USR-001'
+          userId: 'USR-001',
+          accountId: 'ACC-001',
+          accountName: 'Binance Spot Account',
+          coinstratSignalId: 'CSP-78952364'
         },
         {
           id: 'SIG002',
@@ -48,7 +63,10 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           investmentType: 'crypto',
           amount: '2.3',
           status: 'Processed',
-          userId: 'USR-001'
+          userId: 'USR-001',
+          accountId: 'ACC-002',
+          accountName: 'Coinstart Pro Account',
+          coinstratSignalId: 'CSP-78956789'
         },
         {
           id: 'SIG003',
@@ -61,7 +79,10 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           amount: '3.7',
           status: 'Failed',
           errorMessage: 'Invalid account configuration',
-          userId: 'USR-002'
+          userId: 'USR-002',
+          accountId: 'ACC-003',
+          accountName: 'FTX Account',
+          coinstratSignalId: 'CSP-78959012'
         },
       ];
       
@@ -110,6 +131,11 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
     fetchLogs();
   };
 
+  const handleViewSignalDetails = (signal: ExtendedTradingViewSignal) => {
+    setSelectedSignal(signal);
+    setSignalDetailsOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="py-8 text-center text-muted-foreground">
@@ -142,7 +168,9 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
             <TableHead>Quantity</TableHead>
             <TableHead>Action</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Account</TableHead>
             <TableHead>Note</TableHead>
+            <TableHead>Details</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -162,8 +190,19 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
               <TableCell>{log.amount}</TableCell>
               <TableCell>{getActionBadge(log.action)}</TableCell>
               <TableCell>{getStatusBadge(log.status as string)}</TableCell>
+              <TableCell>{log.accountName || '-'}</TableCell>
               <TableCell className="text-sm text-muted-foreground">
                 {log.errorMessage || '-'}
+              </TableCell>
+              <TableCell>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => handleViewSignalDetails(log)}
+                  title="View Signal Details"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -175,6 +214,97 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           Refresh Logs
         </Button>
       </div>
+
+      <Dialog open={signalDetailsOpen} onOpenChange={setSignalDetailsOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Signal Details</DialogTitle>
+            <DialogDescription>
+              Detailed information about the signal and associated account
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedSignal && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">TradingView ID</h3>
+                  <p className="text-sm font-semibold">{selectedSignal.id}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Coinstrat Pro ID</h3>
+                  <p className="text-sm font-semibold">{selectedSignal.coinstratSignalId}</p>
+                </div>
+              </div>
+              
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-2">Account Information</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Account ID</h4>
+                    <p className="text-sm font-medium">{selectedSignal.accountId}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Account Name</h4>
+                    <p className="text-sm font-medium">{selectedSignal.accountName}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-2">Signal Information</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Instrument</h4>
+                    <p className="text-sm font-medium">{selectedSignal.instrument}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Action</h4>
+                    <p className="text-sm font-medium">{selectedSignal.action}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Amount</h4>
+                    <p className="text-sm font-medium">{selectedSignal.amount}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Status</h4>
+                    <p className="text-sm font-medium">{selectedSignal.status}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Signal Token</h4>
+                    <p className="text-sm font-medium break-all">{selectedSignal.signalToken}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs text-muted-foreground">Max Lag</h4>
+                    <p className="text-sm font-medium">{selectedSignal.maxLag}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {selectedSignal.errorMessage && (
+                <div className="border-t pt-4">
+                  <h3 className="text-sm font-medium text-red-600 mb-2">Error Information</h3>
+                  <p className="text-sm text-red-600">{selectedSignal.errorMessage}</p>
+                </div>
+              )}
+              
+              <div className="border-t pt-4">
+                <h4 className="text-xs text-muted-foreground">Timestamp</h4>
+                <p className="text-sm font-medium">
+                  {new Date(selectedSignal.timestamp).toLocaleString('en-US', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 /**
  * Định nghĩa các types liên quan đến Signal
  */
@@ -23,6 +22,9 @@ export interface TradingViewSignal {
   errorMessage?: string;
   source?: string;
   processingTime?: string;
+  accountId?: string;
+  accountName?: string;
+  coinstratSignalId?: string;
 }
 
 // Trạng thái xử lý tín hiệu cho từng tài khoản
