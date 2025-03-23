@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
 import { useClerk } from '@clerk/clerk-react';
@@ -39,26 +39,32 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
+import { toast } from 'sonner';
+import { useAdminNavigation } from '@/hooks/useAdminNavigation';
 
 const AdminLayout: React.FC = () => {
-  const { isAdmin } = useAdmin();
+  const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useClerk();
-  const { toast } = useToast();
+  const { toast: shadowToast } = useToast();
   const isMobile = useIsMobile();
+  const { exitAdminMode } = useAdminNavigation();
+
+  // Debug logs
+  console.log("AdminLayout rendered");
+  console.log("Admin status:", { isAdmin, loading });
+  console.log("Current location:", location.pathname);
 
   // Redirect non-admin users
-  React.useEffect(() => {
-    if (!isAdmin) {
-      toast({
-        variant: "destructive",
-        title: "Truy cập bị từ chối",
-        description: "Bạn không có quyền truy cập vào trang quản trị.",
-      });
+  useEffect(() => {
+    console.log("AdminLayout useEffect - isAdmin:", isAdmin, "loading:", loading);
+    if (!loading && !isAdmin) {
+      console.log("User is not admin, redirecting to home");
+      toast.error("Bạn không có quyền truy cập vào trang quản trị.");
       navigate('/');
     }
-  }, [isAdmin, navigate, toast]);
+  }, [isAdmin, loading, navigate]);
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -70,16 +76,28 @@ const AdminLayout: React.FC = () => {
   };
 
   const handleReturnToApp = () => {
-    navigate('/');
-    
-    toast({
-      title: "Quay lại ứng dụng chính",
-      description: "Bạn đã thoát khỏi hệ thống quản trị viên.",
-      duration: 3000,
-    });
+    exitAdminMode();
   };
 
-  if (!isAdmin) return null;
+  // Show loading state while checking admin status
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-amber-500 border-r-2 border-b-2 border-zinc-700 mx-auto mb-4"></div>
+          <p className="text-zinc-400">Đang kiểm tra quyền truy cập...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not admin after loading is complete, don't render anything
+  if (!isAdmin) {
+    console.log("Not rendering AdminLayout because user is not admin");
+    return null;
+  }
+
+  console.log("Rendering AdminLayout content - user is admin");
 
   return (
     <SidebarProvider>
