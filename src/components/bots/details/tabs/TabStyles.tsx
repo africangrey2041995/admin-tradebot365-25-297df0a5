@@ -1,5 +1,5 @@
-
 import { cn } from '@/lib/utils';
+import { Star, Target, Settings } from 'lucide-react';
 
 export const getTabsListClassName = (botType: 'premium' | 'prop' | 'user') => {
   switch (botType) {
