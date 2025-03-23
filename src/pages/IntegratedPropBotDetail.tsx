@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -18,7 +17,7 @@ import { useIntegratedBot } from '@/hooks/useIntegratedBot';
 
 // Tạo một hằng số để lưu trữ ID người dùng hiện tại
 // Trong ứng dụng thực tế, giá trị này sẽ được lấy từ context auth
-const CURRENT_USER_ID = 'USR-001';
+const CURRENT_USER_ID = 'USR-001'; // Chuẩn hóa thành USR-001
 
 const IntegratedPropBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();

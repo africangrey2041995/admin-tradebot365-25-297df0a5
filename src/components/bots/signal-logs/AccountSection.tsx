@@ -18,8 +18,21 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   titleClassName = '',
   userId
 }) => {
-  // Filter accounts by userId
-  const userAccounts = accounts.filter(account => account.userId === userId);
+  // Helper function to normalize userId for more reliable comparison
+  const normalizeUserId = (id: string): string => {
+    if (!id) return '';
+    return id.replace(/-/g, '').toLowerCase();
+  };
+  
+  // Filter accounts by userId with normalized comparison
+  const normalizedUserId = normalizeUserId(userId);
+  const userAccounts = accounts.filter(account => {
+    const accountNormalizedId = normalizeUserId(account.userId);
+    return accountNormalizedId === normalizedUserId;
+  });
+  
+  console.log(`AccountSection - Filtering accounts for userId: ${userId} (normalized: ${normalizedUserId})`);
+  console.log(`AccountSection - Found ${userAccounts.length} matching accounts out of ${accounts.length} total`);
   
   return (
     <div className="border-t pt-4">

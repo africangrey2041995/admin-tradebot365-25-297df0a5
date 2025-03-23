@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,7 +30,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR001'
+    userId: 'USR-001'
   },
   {
     id: 'ACC002',
@@ -44,7 +45,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR001'
+    userId: 'USR-001'
   }
 ];
 
@@ -63,7 +64,7 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR001',
+        userId: 'USR-001',
         name: 'Binance Spot Account',
         timestamp: new Date().toISOString(),
         status: 'success'
@@ -85,7 +86,7 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR001',
+        userId: 'USR-001',
         name: 'Binance Spot Account',
         timestamp: new Date(Date.now() - 3600000).toISOString(),
         status: 'success'

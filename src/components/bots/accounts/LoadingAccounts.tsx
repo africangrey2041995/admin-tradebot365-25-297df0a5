@@ -7,12 +7,13 @@ interface LoadingAccountsProps {
 }
 
 const LoadingAccounts: React.FC<LoadingAccountsProps> = ({ 
-  message = "Loading accounts..." 
+  message = "Đang tải tài khoản..." 
 }) => {
   return (
-    <div className="py-8 text-center text-muted-foreground">
-      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
-      <p>{message}</p>
+    <div className="py-8 text-center">
+      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
+      <p className="text-muted-foreground">{message}</p>
+      <p className="text-xs text-muted-foreground mt-2">Vui lòng đợi trong giây lát...</p>
     </div>
   );
 };

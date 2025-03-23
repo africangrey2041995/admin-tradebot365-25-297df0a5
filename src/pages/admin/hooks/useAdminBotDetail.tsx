@@ -56,7 +56,7 @@ export const useAdminBotDetail = (botId: string | undefined): UseAdminBotDetailR
             };
             
             const mockUserInfo = {
-              id: 'USR001',
+              id: 'USR-001', // Chuẩn hóa thành USR-001
               name: 'Nguyễn Văn A',
               email: 'dbtcompany17@gmail.com',
               phone: '+84 912 345 678',
