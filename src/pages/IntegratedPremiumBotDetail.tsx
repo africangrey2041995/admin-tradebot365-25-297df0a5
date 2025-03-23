@@ -9,6 +9,7 @@ import LoadingBotDetail from '@/components/bots/details/LoadingBotDetail';
 import PremiumBotTabs from '@/components/bots/details/premium/PremiumBotTabs';
 import PremiumBotOverviewTab from '@/components/bots/details/premium/PremiumBotOverviewTab';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
+import { BotType } from '@/constants/botTypes';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -50,6 +51,16 @@ const IntegratedPremiumBotDetail = () => {
     );
   }
 
+  // Create a simplified bot object that matches the expected type
+  const simplifiedBot = {
+    type: bot.type === BotType.PREMIUM_BOT ? 'premium' : 'user',
+    exchange: bot.exchange || '',
+    minCapital: bot.minCapital,
+    createdDate: bot.createdDate,
+    performanceLastMonth: bot.performanceLastMonth,
+    performanceAllTime: bot.performanceAllTime,
+  };
+
   return (
     <MainLayout title={`Bot tích hợp: ${bot.name}`}>
       <div className="space-y-6">
@@ -76,7 +87,7 @@ const IntegratedPremiumBotDetail = () => {
               onRefresh={refreshTabData}
               tradePerformanceData={tradePerformanceData}
               statisticsData={statisticsData}
-              bot={bot}
+              bot={simplifiedBot}
             />
           }
           signalSourceLabel="TB365 ID"

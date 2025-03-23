@@ -13,6 +13,7 @@ interface AccountsTabContentProps {
   title: string;
   description: string;
   accountsData?: Account[];
+  isLoading?: boolean;
 }
 
 const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
@@ -21,7 +22,8 @@ const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
   botType,
   title,
   description,
-  accountsData
+  accountsData,
+  isLoading = false
 }) => {
   return (
     <Card className={getCardClassName(botType)}>
