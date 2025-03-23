@@ -25,8 +25,8 @@ export function useUser() {
         id: 'USR-001',
         name: 'Nguyễn Văn A',
         email: 'user.a@example.com',
-        role: 'user',
-        isAdmin: false
+        role: 'admin',
+        isAdmin: true
       };
       
       setUser(mockUser);
