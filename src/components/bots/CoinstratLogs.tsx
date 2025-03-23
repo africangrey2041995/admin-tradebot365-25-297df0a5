@@ -13,14 +13,14 @@ interface CoinstratLogsProps {
   botId: string;
   userId: string;
   initialData?: CoinstratSignal[];
-  signalSourceLabel?: string; // Optional prop for customizing the column header
+  signalSourceLabel?: string; // Prop để tùy chỉnh nhãn hiển thị cho cột ID
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
   botId, 
   userId, 
   initialData = [],
-  signalSourceLabel = "TradingView ID" // Default to TradingView ID if not specified
+  signalSourceLabel = "TradingView ID" // Mặc định sử dụng "TradingView ID" nếu không được chỉ định
 }) => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
