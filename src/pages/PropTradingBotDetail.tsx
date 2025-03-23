@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -9,10 +8,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle } from 'lucide-react';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TradingViewLogs from '@/components/bots/TradingViewLogs';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
-import ErrorSignals from '@/components/bots/ErrorSignals';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 
 const propTradingBots = [
@@ -100,8 +95,6 @@ const PropTradingBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [unreadErrorCount, setUnreadErrorCount] = useState(3);
   
   const bot = propTradingBots.find(b => b.id === botId);
   
@@ -175,30 +168,6 @@ const PropTradingBotDetail = () => {
   
   const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
   
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-  
-  // Mark errors as read when viewing the error section
-  useEffect(() => {
-    // In a real app, this would be an API call to mark errors as read
-    const markErrorsAsRead = () => {
-      const errorSection = document.getElementById('error-signals');
-      if (errorSection && errorSection.getBoundingClientRect().top <= window.innerHeight) {
-        setUnreadErrorCount(0);
-      }
-    };
-
-    window.addEventListener('scroll', markErrorsAsRead);
-    
-    // Check on initial load too
-    markErrorsAsRead();
-    
-    return () => {
-      window.removeEventListener('scroll', markErrorsAsRead);
-    };
-  }, []);
-  
   return (
     <MainLayout title={bot.name}>
       <motion.div
@@ -257,17 +226,9 @@ const PropTradingBotDetail = () => {
                   </Badge>
                 </div>
                 
-                <Tabs 
-                  defaultValue="overview" 
-                  value={activeTab}
-                  onValueChange={handleTabChange}
-                  className="w-full"
-                >
-                  <TabsList className="w-full grid grid-cols-4">
-                    <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-                    <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
-                    <TabsTrigger value="tb365-logs">TB365 Logs</TabsTrigger>
-                    <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
+                <Tabs defaultValue="overview" className="w-full">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="overview" className="w-full">Tổng quan</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="overview" className="pt-4 space-y-6">
@@ -332,26 +293,6 @@ const PropTradingBotDetail = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="accounts" className="pt-4">
-                    <BotAccountsTable botId={botId || ''} />
-                    <div className="text-center py-8">
-                      <p className="text-slate-500 dark:text-slate-400 mb-4">
-                        Bạn chưa tích hợp bot này với tài khoản nào
-                      </p>
-                      <Button onClick={() => setIsSubscribeDialogOpen(true)}>
-                        Tích hợp với tài khoản
-                      </Button>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="tb365-logs" className="pt-4">
-                    <TradingViewLogs botId={botId || ''} />
-                  </TabsContent>
-                  
-                  <TabsContent value="coinstrat-logs" className="pt-4">
-                    <CoinstratLogs botId={botId || ''} />
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -424,33 +365,6 @@ const PropTradingBotDetail = () => {
               </CardContent>
             </Card>
           </div>
-        </div>
-        
-        {/* Error Signals Section - Now full width outside of the grid */}
-        <div id="error-signals" className="w-full">
-          {unreadErrorCount > 0 && (
-            <div className="flex items-center gap-2 mb-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 p-3 rounded-md">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <span className="text-red-700 dark:text-red-400 font-medium">
-                Có {unreadErrorCount} tín hiệu lỗi mới cần khắc phục
-              </span>
-            </div>
-          )}
-          
-          <Card className="border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                <AlertTriangle className="h-5 w-5" />
-                Tín Hiệu Lỗi Cần Khắc Phục
-              </CardTitle>
-              <CardDescription className="text-red-600/80 dark:text-red-400/80">
-                Các tín hiệu lỗi cần được xử lý để đảm bảo hệ thống hoạt động chính xác
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ErrorSignals botId={botId || ''} />
-            </CardContent>
-          </Card>
         </div>
       </motion.div>
       
