@@ -1,42 +1,23 @@
 
-import { AccountSignalStatus } from '@/types';
-import { TradingAccountType } from '@/types/connection';
-import { BotType } from '@/constants/botTypes';
-
-/**
- * Types cho ErrorSignals component
- */
+import { ExtendedSignal } from '@/types';
 
 export interface ErrorSignalsProps {
-  botId: string;
-  userId?: string; // Make userId optional for backward compatibility
-}
-
-/**
- * Thêm userId vào các đối tượng tài khoản trong CoinstratSignal
- */
-export interface AccountWithUser extends AccountSignalStatus {
-  accountId: string;
-  userId?: string;
-  name: string;
-  timestamp: string;
-  reason?: string;
-  errorCode?: string; // Mã lỗi
-}
-
-/**
- * Interface để hiển thị lỗi với ngữ cảnh đầy đủ
- */
-export interface ErrorContextData {
-  message: string;
-  timestamp: string;
   botId?: string;
-  accountId?: string;
+  limit?: number;
   userId?: string;
-  errorCode?: string;
-  action?: string;
-  recommendedAction?: string;
 }
 
-// Re-export the ExtendedSignal for local use
-export type { ExtendedSignal } from '@/types';
+export interface ErrorSignalsTableProps {
+  errorSignals: ExtendedSignal[];
+  unreadErrors: Set<string>;
+  onMarkAsRead: (signalId: string) => void;
+  loading: boolean;
+  onRefresh?: () => void;
+  error?: Error | null;
+}
+
+export interface ErrorSignalRowProps {
+  signal: ExtendedSignal;
+  isUnread: boolean;
+  onMarkAsRead: (signalId: string) => void;
+}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -14,7 +15,8 @@ import {
   TrendingUp,
   ChevronDown,
   Shield,
-  UserCircle
+  UserCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -22,6 +24,7 @@ import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/use-admin';
 import { useToast } from '@/hooks/use-toast';
+import { USER_ROUTES } from '@/constants/routes';
 
 const SidebarNav = () => {
   const location = useLocation();
@@ -91,6 +94,12 @@ const SidebarNav = () => {
               label="Quản Lý Tài Khoản" 
               icon={Users} 
               isActive={isActive('/accounts')} 
+            />
+            <NavItem 
+              path="/bot-errors" 
+              label="Quản Lý Lỗi Bot" 
+              icon={AlertTriangle} 
+              isActive={isActive('/bot-errors')} 
             />
           </div>
         </div>

@@ -22,6 +22,7 @@ export const USER_ROUTES = {
   PROFILE: '/profile',
   SIGNALS: '/signals',
   CONNECTIONS: '/connections',
+  BOT_ERRORS: '/bot-errors', // Add new route
 };
 
 // Admin Routes
@@ -63,4 +64,5 @@ export const SHARED_ROUTES = {
     }
   },
   SETTINGS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.SETTINGS : USER_ROUTES.SETTINGS,
+  BOT_ERRORS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.BOT_ERRORS : USER_ROUTES.BOT_ERRORS,
 };

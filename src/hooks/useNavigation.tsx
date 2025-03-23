@@ -1,6 +1,6 @@
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ADMIN_ROUTES, USER_ROUTES } from '@/constants/routes';
+import { ADMIN_ROUTES, USER_ROUTES, SHARED_ROUTES } from '@/constants/routes';
 import { BotType } from '@/constants/botTypes';
 import { determineBotType, normalizeBotId, logBotIdInfo } from '@/utils/botUtils';
 import { toast } from 'sonner';
@@ -56,10 +56,10 @@ export function useNavigation() {
         // Định tuyến trong context user
         switch (botType) {
           case BotType.PREMIUM_BOT:
-            navigate(USER_ROUTES.PREMIUM_BOT_DETAIL(normalizedId));
+            navigate(USER_ROUTES.INTEGRATED_PREMIUM_BOT_DETAIL(normalizedId));
             break;
           case BotType.PROP_BOT:
-            navigate(USER_ROUTES.PROP_BOT_DETAIL(normalizedId));
+            navigate(USER_ROUTES.INTEGRATED_PROP_BOT_DETAIL(normalizedId));
             break;
           case BotType.USER_BOT:
             navigate(USER_ROUTES.BOT_DETAIL(normalizedId));
@@ -124,12 +124,7 @@ export function useNavigation() {
    */
   const navigateToBotErrors = () => {
     try {
-      if (isAdminContext) {
-        navigate(ADMIN_ROUTES.BOT_ERRORS);
-      } else {
-        // Trong context user, có thể không có trang riêng về lỗi bot
-        toast.info('Tính năng này chỉ có sẵn trong trang quản trị.');
-      }
+      navigate(SHARED_ROUTES.BOT_ERRORS(isAdminContext));
     } catch (error) {
       console.error('Error navigating to bot errors:', error);
       toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');

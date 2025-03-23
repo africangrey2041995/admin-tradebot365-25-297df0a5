@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 const NoErrorsState: React.FC = () => {
   return (
     <div className="py-10 text-center">
-      <AlertTriangle className="h-10 w-10 text-green-500 mx-auto mb-3" />
-      <p className="text-green-600 font-medium">No error signals to fix!</p>
-      <p className="text-muted-foreground mt-1">All your signals are processing correctly.</p>
+      <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
+      <p className="text-green-600 dark:text-green-500 font-medium">Không có lỗi tín hiệu nào!</p>
+      <p className="text-muted-foreground mt-1">Tất cả tín hiệu của bạn đang được xử lý bình thường.</p>
     </div>
   );
 };
