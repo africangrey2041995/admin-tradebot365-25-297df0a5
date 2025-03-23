@@ -9,7 +9,7 @@ import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import BotProfileHeader from '@/components/bots/BotProfileHeader';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';
-import BotProfileTabs from '@/components/bots/BotProfileTabs';
+import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
 import { toast } from 'sonner';
 
 const BotProfile = () => {
@@ -17,10 +17,14 @@ const BotProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
+  const [refreshLoading, setRefreshLoading] = useState(false);
   
   // Using the new webhook URL format
   const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
   const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
+  
+  // Current user ID - in a real app this would come from auth context
+  const userId = 'USR-001';
   
   useEffect(() => {
     const fetchBotDetails = () => {
@@ -71,6 +75,14 @@ const BotProfile = () => {
     }
   };
 
+  const refreshData = () => {
+    setRefreshLoading(true);
+    setTimeout(() => {
+      setRefreshLoading(false);
+      toast.success('Đã làm mới dữ liệu');
+    }, 1000);
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -118,9 +130,12 @@ const BotProfile = () => {
           </div>
         </div>
         
-        <BotProfileTabs 
+        <UserBotDetailTabs 
           botId={bot.botId} 
-          onAddAccount={() => setIsAddAccountDialogOpen(true)} 
+          userId={userId}
+          onRefresh={refreshData}
+          isLoading={refreshLoading}
+          signalSourceLabel="TradingView ID"
         />
       </div>
       

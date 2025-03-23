@@ -17,6 +17,7 @@ interface UserBotDetailTabsProps {
   logsData?: CoinstratSignal[];
   onRefresh?: () => void;
   isLoading?: boolean;
+  signalSourceLabel?: string;
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
@@ -26,6 +27,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   logsData,
   onRefresh,
   isLoading = false,
+  signalSourceLabel = "TradingView ID",
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
 
@@ -95,7 +97,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               botId={botId} 
               userId={userId} 
               initialData={logsData}
-              signalSourceLabel="TradingView ID" 
+              signalSourceLabel={signalSourceLabel} 
             />
           </TabsContent>
         </Tabs>
