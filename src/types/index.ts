@@ -7,9 +7,13 @@ export * from './signal';
 export * from './connection';
 export * from './admin-types';
 
+// Direct import from constants to avoid circular dependencies
+import { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
+import { UserRole, UserStatus, UserPlan, USER_PLAN_DISPLAY, USER_PLAN_LIMITS } from '@/constants/userConstants';
+
 // Re-export bot-related enums from constants for convenience
-export { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
-export { UserRole, UserStatus, UserPlan, USER_PLAN_DISPLAY, USER_PLAN_LIMITS } from '@/constants/userConstants';
+export { BotRiskLevel, BotType, BotStatus };
+export { UserRole, UserStatus, UserPlan, USER_PLAN_DISPLAY, USER_PLAN_LIMITS };
 
 /**
  * System-wide types

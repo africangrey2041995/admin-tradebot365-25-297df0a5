@@ -4,9 +4,7 @@ import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 import { User as BaseUser } from './user';
 import { Bot, PremiumBot as BasePremiumBot, UserBot as BaseUserBot, PropBot as BasePropBot } from './bot';
 
-/**
- * Admin-specific user interfaces with extended properties
- */
+// Admin-specific user interfaces with extended properties
 
 // Admin User Interface - extends the base User type
 export interface AdminUser extends BaseUser {
