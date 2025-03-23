@@ -9,7 +9,7 @@ export * from './admin-types';
 
 // Re-export bot-related enums from constants for convenience
 export { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
-export { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
+export { UserRole, UserStatus, UserPlan, USER_PLAN_DISPLAY, USER_PLAN_LIMITS } from '@/constants/userConstants';
 
 /**
  * System-wide types

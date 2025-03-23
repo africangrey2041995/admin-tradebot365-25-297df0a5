@@ -84,6 +84,7 @@ export interface PremiumBot extends BaseBot {
   timeframe?: string;
   markets?: string[];
   accounts?: Account[] | number;
+  botId: string; // External identifier, now required
   users?: number; // Number of users for admin context
   profit?: string; // Profit in percentage for admin context
 }

@@ -17,7 +17,7 @@ export interface AdminUser extends BaseUser {
 
 // Admin User with admin-specific permissions
 export interface AdminSuperUser extends Omit<AdminUser, "role" | "permissions"> {
-  role: 'admin' | 'superadmin';
+  role: UserRole.ADMIN | UserRole.SUPERADMIN;
   permissions: {
     manageUsers: boolean;
     manageBots: boolean;
@@ -45,8 +45,8 @@ export interface AdminUserBot extends BaseUserBot {
 
 // Admin Premium Bot Interface - extends the base PremiumBot
 export interface AdminPremiumBot extends BasePremiumBot {
-  users?: number; // Number of users using this bot
-  profit?: string; // Total profit generated
+  users: number; // Number of users using this bot, required in admin context
+  profit: string; // Total profit generated, required in admin context
   colorScheme: 'default' | 'blue' | 'green' | 'red' | 'purple'; // Required in admin context
   adminSettings?: {
     isPromoted: boolean;
@@ -78,7 +78,10 @@ export function isAdminUser(user: BaseUser | AdminUser): user is AdminUser {
 }
 
 export function isAdminSuperUser(user: BaseUser | AdminUser | AdminSuperUser): user is AdminSuperUser {
-  return (user as AdminSuperUser).role === 'admin' || (user as AdminSuperUser).role === 'superadmin';
+  return (
+    (user as AdminSuperUser).role === UserRole.ADMIN || 
+    (user as AdminSuperUser).role === UserRole.SUPERADMIN
+  );
 }
 
 // Re-export the base types for convenience and backward compatibility
