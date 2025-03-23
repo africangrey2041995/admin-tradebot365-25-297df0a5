@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -15,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
-import { PremiumBot } from '@/types/admin-types';
+import { PremiumBot } from '@/types';
 import { Account } from '@/types';
 
 const integratedPremiumBots: PremiumBot[] = [
@@ -37,6 +36,8 @@ const integratedPremiumBots: PremiumBot[] = [
     botId: 'BOT7459',
     createdDate: '2023-10-15',
     lastUpdated: '2023-11-10',
+    users: 86,
+    profit: '+18.5%',
     accounts: [
       {
         id: 'acc-001',
@@ -86,6 +87,8 @@ const integratedPremiumBots: PremiumBot[] = [
     botId: 'BOT8932',
     createdDate: '2023-11-05',
     lastUpdated: '2023-11-10',
+    users: 98,
+    profit: '+7.6%',
     accounts: [
       {
         id: 'acc-003',

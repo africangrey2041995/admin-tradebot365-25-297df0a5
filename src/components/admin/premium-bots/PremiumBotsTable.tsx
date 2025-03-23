@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { BotStatusBadge } from './BotStatusBadge';
-import { PremiumBot } from "@/types/admin-types";
+import { PremiumBot } from "@/types";
 
 interface PremiumBotsTableProps {
   bots: PremiumBot[];

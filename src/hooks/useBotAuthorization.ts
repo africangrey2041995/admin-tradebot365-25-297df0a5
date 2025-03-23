@@ -44,10 +44,12 @@ export const useBotAuthorization = ({
           imageUrl: null,
           colorScheme: 'green',
           isIntegrated: true,
-          botId: 'PRE7459',
+          botId: 'PRE7459', // External ID used for display
           createdDate: '2023-10-15',
           lastUpdated: '2023-11-10',
-          ownerId: userId
+          ownerId: userId,
+          users: 86, // Added for admin context
+          profit: '+18.5%' // Added for admin context
         };
         
         // Check if the current user is the owner of this bot

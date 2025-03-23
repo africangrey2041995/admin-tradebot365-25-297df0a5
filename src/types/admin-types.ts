@@ -80,3 +80,6 @@ export function isAdminUser(user: BaseUser | AdminUser): user is AdminUser {
 export function isAdminSuperUser(user: BaseUser | AdminUser | AdminSuperUser): user is AdminSuperUser {
   return (user as AdminSuperUser).role === 'admin' || (user as AdminSuperUser).role === 'superadmin';
 }
+
+// Re-export the base types for convenience and backward compatibility
+export type { BasePremiumBot as PremiumBot, BasePropBot as PropBot };

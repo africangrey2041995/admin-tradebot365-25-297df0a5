@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { PremiumBot } from "@/types/admin-types";
+import { PremiumBot } from "@/types";
 
 interface PremiumBotStatsCardsProps {
   bots: PremiumBot[];
@@ -11,9 +11,9 @@ export const PremiumBotStatsCards: React.FC<PremiumBotStatsCardsProps> = ({ bots
   const totalBots = bots.length;
   const activeBots = bots.filter(bot => bot.status === 'active').length;
   const inactiveBots = bots.filter(bot => bot.status === 'inactive' || bot.status === 'maintenance').length;
-  const totalUsers = bots.reduce((sum, bot) => sum + bot.users, 0);
-  const positivePerformance = bots.filter(bot => parseFloat(bot.profit) > 0).length;
-  const averageProfit = (bots.reduce((sum, bot) => sum + parseFloat(bot.profit), 0) / totalBots).toFixed(1) + '%';
+  const totalUsers = bots.reduce((sum, bot) => sum + (bot.users || 0), 0);
+  const positivePerformance = bots.filter(bot => bot.profit && parseFloat(bot.profit) > 0).length;
+  const averageProfit = (bots.reduce((sum, bot) => sum + (bot.profit ? parseFloat(bot.profit) : 0), 0) / totalBots).toFixed(1) + '%';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

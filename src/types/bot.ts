@@ -55,6 +55,7 @@ export interface BaseBot {
   exchange?: string;
   performance?: BotPerformance;
   ownerId?: string; // Standardized ownerId field
+  botId?: string; // External identifier for the bot
 }
 
 // Bot của người dùng
@@ -76,13 +77,15 @@ export interface PremiumBot extends BaseBot {
   performanceAllTime: string;
   minCapital: string;
   subscribers: number;
-  colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
+  colorScheme?: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;
   features?: string[];
   tradingStyle?: string;
   timeframe?: string;
   markets?: string[];
   accounts?: Account[] | number;
+  users?: number; // Number of users for admin context
+  profit?: string; // Profit in percentage for admin context
 }
 
 // Bot PropTrading
