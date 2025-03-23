@@ -29,6 +29,9 @@ import { USER_ROUTES } from '@/constants/routes';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 
+// Mock current user ID (in a real app, this would come from an auth context)
+const CURRENT_USER_ID = 'USR-001';
+
 const tradePerformanceData = [
   { name: 'Jan', profit: 12.5, trades: 24 },
   { name: 'Feb', profit: 8.3, trades: 18 },
@@ -71,12 +74,15 @@ const IntegratedPremiumBotDetail = () => {
   const [bot, setBot] = useState<PremiumBot | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
+  const [isAuthorized, setIsAuthorized] = useState(false);
   
   useEffect(() => {
     const fetchBotDetails = () => {
       setIsLoading(true);
       
       setTimeout(() => {
+        // In a real implementation, this would be an API call that verifies
+        // the current user has access to this bot
         const mockBot: PremiumBot = {
           id: botId || 'pb-001',
           name: 'Alpha Momentum',
@@ -94,10 +100,24 @@ const IntegratedPremiumBotDetail = () => {
           isIntegrated: true,
           botId: 'PRE7459',
           createdDate: '2023-10-15',
-          lastUpdated: '2023-11-10'
+          lastUpdated: '2023-11-10',
+          // Adding an owner ID to verify authorization
+          ownerId: CURRENT_USER_ID
         };
         
-        setBot(mockBot);
+        // Check if the current user is the owner of this bot
+        // In a real implementation, this would be done server-side
+        const userIsOwner = mockBot.ownerId === CURRENT_USER_ID;
+        
+        if (userIsOwner) {
+          setBot(mockBot);
+          setIsAuthorized(true);
+        } else {
+          // If not authorized, don't set the bot data
+          setIsAuthorized(false);
+          toast.error('Bạn không có quyền truy cập bot này');
+        }
+        
         setIsLoading(false);
       }, 500);
     };
@@ -184,13 +204,13 @@ const IntegratedPremiumBotDetail = () => {
     );
   }
 
-  if (!bot) {
+  if (!isAuthorized || !bot) {
     return (
-      <MainLayout title="Bot không tồn tại">
+      <MainLayout title="Bot không tồn tại hoặc không có quyền truy cập">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <Info className="h-12 w-12 text-orange-500 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Không Tìm Thấy Bot</h2>
-          <p className="text-muted-foreground mb-6">Chúng tôi không thể tìm thấy bot bạn đang tìm kiếm.</p>
+          <h2 className="text-xl font-bold mb-2">Không Có Quyền Truy Cập</h2>
+          <p className="text-muted-foreground mb-6">Bạn không có quyền truy cập bot này hoặc bot không tồn tại.</p>
           <Button onClick={goBack}>Quay Lại Danh Sách Bot</Button>
         </div>
       </MainLayout>
@@ -467,7 +487,7 @@ const IntegratedPremiumBotDetail = () => {
                 <CardDescription>Quản lý các tài khoản được kết nối với bot này</CardDescription>
               </CardHeader>
               <CardContent>
-                <BotAccountsTable botId={botId || ""} />
+                <BotAccountsTable botId={botId || ""} userId={CURRENT_USER_ID} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -479,7 +499,7 @@ const IntegratedPremiumBotDetail = () => {
                 <CardDescription>Xem lịch sử các tín hiệu đã được xử lý bởi Coinstrat Pro</CardDescription>
               </CardHeader>
               <CardContent>
-                <CoinstratLogs botId={botId || ""} />
+                <CoinstratLogs botId={botId || ""} userId={CURRENT_USER_ID} />
               </CardContent>
             </Card>
           </TabsContent>

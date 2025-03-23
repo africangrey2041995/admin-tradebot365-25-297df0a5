@@ -10,9 +10,9 @@ import { toast } from 'sonner';
 
 interface BotAccountsTableProps {
   botId: string;
+  userId: string;
 }
 
-// Standardized mock accounts data
 const mockAccounts: Account[] = [
   {
     id: 'ACC001',
@@ -61,7 +61,7 @@ const mockAccounts: Account[] = [
   },
 ];
 
-const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
+const BotAccountsTable = ({ botId, userId }: BotAccountsTableProps) => {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,11 +72,10 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
     setError(null);
     
     try {
-      // Simulate API call
       setTimeout(() => {
         try {
-          // Filter accounts by botId in a real implementation
-          setAccounts(mockAccounts);
+          const filteredAccounts = mockAccounts.filter(account => account.userId === userId);
+          setAccounts(filteredAccounts);
           setLoading(false);
         } catch (innerError) {
           console.error('Error processing accounts data:', innerError);
@@ -91,18 +90,18 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
       setLoading(false);
       toast.error('Error fetching account information');
     }
-  }, [botId]);
+  }, [botId, userId]);
 
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
 
-  const handleViewUserDetails = (userId: string) => {
+  const handleViewUserDetails = () => {
     try {
-      navigate(`/admin/users/${userId}`);
+      navigate('/profile');
     } catch (error) {
       console.error('Navigation error:', error);
-      toast.error('Error navigating to user details');
+      toast.error('Error navigating to profile');
     }
   };
 
@@ -163,7 +162,6 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
             <TableHead>Api</TableHead>
             <TableHead>Account Trading</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>User ID</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -186,15 +184,6 @@ const BotAccountsTable = ({ botId }: BotAccountsTableProps) => {
               </TableCell>
               <TableCell>
                 {getStatusBadge(account.status as ConnectionStatus)}
-              </TableCell>
-              <TableCell>
-                <Button 
-                  variant="ghost" 
-                  className="text-blue-600 hover:text-blue-800 p-0 h-auto font-medium"
-                  onClick={() => handleViewUserDetails(account.userId)}
-                >
-                  {account.userId}
-                </Button>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

@@ -8,29 +8,34 @@ import { mockErrorSignals } from './error-signals/mockData';
 import { toast } from 'sonner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 
-const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
+interface EnhancedErrorSignalsProps extends ErrorSignalsProps {
+  userId: string; // Add userId prop
+}
+
+const ErrorSignals: React.FC<EnhancedErrorSignalsProps> = ({ botId, userId }) => {
   const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  // Fetch error signals
+  
+  // Fetch error signals with improved error handling
   const fetchErrorSignals = useCallback(() => {
     setLoading(true);
     setError(null);
     
     try {
-      // Giả lập API call với timeout
+      // Simulate API call with timeout
       setTimeout(() => {
         try {
-          // Lọc dữ liệu mẫu để phù hợp với bot ID
+          // Filter mock data to match bot ID AND userId
           const signals = mockErrorSignals.filter(signal => 
-            !botId || signal.botId === botId
+            (!botId || signal.botId === botId) && 
+            signal.userId === userId // Add user filtering
           );
           
           setErrorSignals(signals);
           
-          // Đặt tất cả lỗi là chưa đọc
+          // Set first two errors as unread
           const newUnread = new Set<string>();
           signals.slice(0, 2).forEach(signal => {
             if (signal.id) {
@@ -40,27 +45,27 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
           setUnreadErrors(newUnread);
           
           setLoading(false);
-        } catch (innerErr) {
-          console.error('Error processing signals:', innerErr);
-          setError(innerErr instanceof Error ? innerErr : new Error('Unknown error processing signals'));
+        } catch (innerError) {
+          console.error('Error processing error signals:', innerError);
+          setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing signals'));
           setLoading(false);
-          toast.error('Đã xảy ra lỗi khi xử lý dữ liệu tín hiệu lỗi');
+          toast.error('An error occurred while processing error signals');
         }
       }, 800);
     } catch (err) {
       console.error('Error fetching error signals:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
       setLoading(false);
-      toast.error('Đã xảy ra lỗi khi tải dữ liệu tín hiệu lỗi');
+      toast.error('An error occurred while loading error signals');
     }
-  }, [botId]);
+  }, [botId, userId]);
   
-  // Load data khi component mount hoặc botId thay đổi
+  // Load data when component mounts or botId/userId changes
   useEffect(() => {
     fetchErrorSignals();
   }, [fetchErrorSignals]);
-
-  // Xử lý đánh dấu lỗi đã đọc
+  
+  // Handle marking errors as read
   const handleMarkAsRead = (signalId: string) => {
     try {
       setUnreadErrors(prev => {
@@ -68,13 +73,13 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         newSet.delete(signalId);
         return newSet;
       });
-      toast.success('Đã đánh dấu tín hiệu lỗi là đã đọc');
+      toast.success('Error signal marked as read');
     } catch (err) {
       console.error('Error marking signal as read:', err);
-      toast.error('Đã xảy ra lỗi khi đánh dấu tín hiệu lỗi là đã đọc');
+      toast.error('An error occurred while marking the signal as read');
     }
   };
-
+  
   return (
     <ErrorBoundary>
       <Card>
@@ -86,8 +91,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
         </CardHeader>
         <CardContent>
           <ErrorSignalsTable 
-            errorSignals={errorSignals} 
-            unreadErrors={unreadErrors} 
+            errorSignals={errorSignals}
+            unreadErrors={unreadErrors}
             onMarkAsRead={handleMarkAsRead}
             loading={loading}
             error={error}
