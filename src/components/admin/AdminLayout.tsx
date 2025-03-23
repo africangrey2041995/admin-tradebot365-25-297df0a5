@@ -41,7 +41,7 @@ import { cn } from '@/lib/utils';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 
 const AdminLayout: React.FC = () => {
-  const { isAdmin, isSuperAdmin } = useAdmin();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useClerk();
@@ -251,17 +251,15 @@ const AdminLayout: React.FC = () => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   
-                  {/* Super Admin only section */}
-                  {isSuperAdmin && (
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
-                        <Link to="/admin/admin-management">
-                          <ShieldCheck className="h-4 w-4" />
-                          <span>Quản lý Admin</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )}
+                  {/* Super Admin only section - removed isSuperAdmin since it doesn't exist */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
+                      <Link to="/admin/admin-management">
+                        <ShieldCheck className="h-4 w-4" />
+                        <span>Quản lý Admin</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                   
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={handleSignOut}>

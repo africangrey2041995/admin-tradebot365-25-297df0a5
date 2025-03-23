@@ -37,7 +37,7 @@ const Signals = () => {
             <h1 className="text-2xl font-bold">Quản Lý Tín Hiệu</h1>
           </div>
 
-          <Alert variant="warning" className="bg-amber-950/30 border-amber-900">
+          <Alert variant="default" className="bg-amber-950/30 border-amber-900">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Chú ý</AlertTitle>
             <AlertDescription>

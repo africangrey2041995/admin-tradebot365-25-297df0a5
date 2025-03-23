@@ -4,6 +4,7 @@ import SidebarNav from './SidebarNav';
 import Header from './Header';
 import { useUser } from '@/hooks/use-user';
 import { Navigate } from 'react-router-dom';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -22,17 +23,19 @@ const UserLayout: React.FC<UserLayoutProps> = ({
   }
   
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <div className="flex flex-1">
-        <SidebarNav />
+    <SidebarProvider>
+      <div className="min-h-screen flex flex-col w-full">
+        <Header />
         
-        <main className="flex-1 overflow-y-auto bg-[#0c0c0c] p-6">
-          {children}
-        </main>
+        <div className="flex flex-1">
+          <SidebarNav />
+          
+          <main className="flex-1 overflow-y-auto bg-[#0c0c0c] p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
