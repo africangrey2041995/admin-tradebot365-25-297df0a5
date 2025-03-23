@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -30,7 +31,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001'
+    userId: 'USR001'
   },
   {
     id: 'ACC002',
@@ -45,7 +46,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001'
+    userId: 'USR001'
   },
   {
     id: 'ACC003',
@@ -60,7 +61,7 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    userId: 'USR-002'
+    userId: 'USR002'
   },
 ];
 
@@ -70,24 +71,34 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Helper function to normalize userId for comparison (removing hyphens)
+  const normalizeUserId = (id: string): string => {
+    return id.replace(/-/g, '');
+  };
+
   const fetchAccounts = useCallback(() => {
     console.log(`BotAccountsTable - Fetching accounts for userId: ${userId}`);
     setLoading(true);
     setError(null);
     
     try {
-      const timeoutId = setTimeout(() => {
+      const safetyTimeoutId = setTimeout(() => {
         console.log('BotAccountsTable - Safety timeout reached, forcing loading to false');
         setLoading(false);
       }, 3000);
       
       setTimeout(() => {
         try {
-          clearTimeout(timeoutId);
+          clearTimeout(safetyTimeoutId);
+          
+          // Normalize the userId for comparison
+          const normalizedUserId = normalizeUserId(userId);
+          console.log(`BotAccountsTable - Normalized userId for comparison: ${normalizedUserId}`);
           
           if (initialData && initialData.length > 0) {
             console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
-            const filteredAccounts = initialData.filter(account => account.userId === userId);
+            // Use normalized comparison
+            const filteredAccounts = initialData.filter(account => normalizeUserId(account.userId) === normalizedUserId);
             console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
             setAccounts(filteredAccounts);
             setLoading(false);
@@ -95,17 +106,19 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
           }
           
           console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
-          console.log(`BotAccountsTable - Looking for userId: ${userId} in mockAccounts`);
+          console.log(`BotAccountsTable - Looking for normalized userId: ${normalizedUserId} in mockAccounts`);
           
-          const filteredAccounts = mockAccounts.filter(account => account.userId === userId);
+          // Use normalized comparison
+          const filteredAccounts = mockAccounts.filter(account => normalizeUserId(account.userId) === normalizedUserId);
           console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
           console.log(`BotAccountsTable - Account userId samples: ${mockAccounts.map(a => a.userId).join(', ')}`);
           
           setAccounts(filteredAccounts);
-          setLoading(false);
         } catch (innerError) {
           console.error('Error processing accounts data:', innerError);
           setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing accounts'));
+        } finally {
+          // Always set loading to false regardless of success or error
           setLoading(false);
         }
       }, 800);
