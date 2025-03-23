@@ -20,6 +20,7 @@ export interface BaseBot {
   exchange?: string;
   performance?: BotPerformance;
   botId?: string;
+  ownerId?: string; // Add ownerId to BaseBot so all bot types inherit it
 }
 
 // Bot của người dùng

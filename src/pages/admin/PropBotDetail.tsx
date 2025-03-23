@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -1034,7 +1033,7 @@ const PropBotDetail: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <BotAccountsTable botId={botId || ''} />
+              <BotAccountsTable botId={botId || ''} userId="ADMIN-001" />
             </CardContent>
           </Card>
         </TabsContent>
@@ -1060,7 +1059,7 @@ const PropBotDetail: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CoinstratLogs botId={botId || ''} />
+              <CoinstratLogs botId={botId || ''} userId="ADMIN-001" />
             </CardContent>
           </Card>
         </TabsContent>

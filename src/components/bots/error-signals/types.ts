@@ -9,6 +9,7 @@ import { BotType } from '@/constants/botTypes';
 
 export interface ErrorSignalsProps {
   botId: string;
+  userId?: string; // Make userId optional for backward compatibility
 }
 
 /**

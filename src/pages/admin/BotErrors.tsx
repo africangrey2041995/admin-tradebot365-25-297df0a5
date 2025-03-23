@@ -7,6 +7,9 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import ErrorSignals from '@/components/bots/ErrorSignals';
 
+// Mock admin user ID for admin pages
+const ADMIN_USER_ID = 'ADMIN-001';
+
 const BotErrors = () => {
   const [activeTab, setActiveTab] = useState('user-bots');
 
@@ -62,15 +65,15 @@ const BotErrors = () => {
               </TabsList>
 
               <TabsContent value="user-bots" className="mt-0">
-                <ErrorSignals botId="USER-BOTS" />
+                <ErrorSignals botId="USER-BOTS" userId={ADMIN_USER_ID} />
               </TabsContent>
 
               <TabsContent value="premium-bots" className="mt-0">
-                <ErrorSignals botId="PREMIUM-BOTS" />
+                <ErrorSignals botId="PREMIUM-BOTS" userId={ADMIN_USER_ID} />
               </TabsContent>
 
               <TabsContent value="prop-bots" className="mt-0">
-                <ErrorSignals botId="PROP-BOTS" />
+                <ErrorSignals botId="PROP-BOTS" userId={ADMIN_USER_ID} />
               </TabsContent>
             </Tabs>
           </CardContent>
