@@ -20,7 +20,6 @@ export interface User {
   postalCode?: string;
   avatar?: string;
   role: UserRole;
-  isAdmin?: boolean; // Add isAdmin property to match usage in code
   status: UserStatus;
   plan: UserPlan;
   createdAt: string;

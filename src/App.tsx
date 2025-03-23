@@ -19,35 +19,33 @@ import IntegratedPremiumBotDetail from "./pages/IntegratedPremiumBotDetail";
 import PropTradingBots from "./pages/PropTradingBots";
 import IntegratedPropBots from "./pages/IntegratedPropBots";
 import IntegratedPropBotDetail from "./pages/IntegratedPropBotDetail";
+import PropTradingBotDetail from "./pages/PropTradingBotDetail";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-import BotErrors from "./pages/BotErrors";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
-
-// Import Admin pages from their correct locations
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminUserDetail from "./pages/admin/UserDetail";
 import AdminBots from "./pages/admin/Bots";
-import AdminBotErrors from "./pages/admin/BotErrors";
-import AdminPremiumBots from "./pages/admin/PremiumBots";
-import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
-import AdminPropBots from "./pages/admin/PropBots";
-import AdminPropBotDetail from "./pages/admin/PropBotDetail";
-import AdminUserBots from "./pages/admin/UserBots";
-import AdminUserBotDetail from "./pages/admin/UserBotDetail";
-import AdminPackages from "./pages/admin/Packages";
 import AdminDatabase from "./pages/admin/Database";
 import AdminLogs from "./pages/admin/Logs";
 import AdminNotifications from "./pages/admin/Notifications";
 import AdminEmail from "./pages/admin/Email";
 import AdminSettings from "./pages/admin/Settings";
 import AdminManagement from "./pages/admin/AdminManagement";
+import AdminPremiumBots from "./pages/admin/PremiumBots";
+import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
+import AdminPropBots from "./pages/admin/PropBots";
+import AdminPropBotDetail from "./pages/admin/PropBotDetail";
+import AdminUserBots from "./pages/admin/UserBots";
+import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+import AdminBotErrors from "./pages/admin/BotErrors";
+import AdminPackages from "./pages/admin/Packages";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -97,7 +95,7 @@ const App = () => (
                 <Route path="/prop-trading-bots" element={<PropTradingBots />} />
                 <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
                 <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
-                <Route path="/bot-errors" element={<BotErrors />} />
+                <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />

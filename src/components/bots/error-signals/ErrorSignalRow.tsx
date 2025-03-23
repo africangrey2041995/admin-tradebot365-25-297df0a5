@@ -10,27 +10,23 @@ import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
-import { BotType } from '@/constants/botTypes';
 
 interface ErrorSignalRowProps {
   signal: ExtendedSignal;
   isUnread: boolean;
   onMarkAsRead: (signalId: string) => void;
-  botType?: BotType;
 }
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
   signal, 
   isUnread, 
-  onMarkAsRead,
-  botType
+  onMarkAsRead 
 }) => {
   const { navigateToBotDetail } = useNavigation();
   
   const handleBotClick = () => {
     if (signal.botId) {
       try {
-        // Use the botType to determine which detail page to navigate to
         navigateToBotDetail(signal.botId);
       } catch (error) {
         console.error('Error navigating to bot details:', error);
@@ -93,6 +89,9 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
         {signal.botId || 'N/A'}
       </TableCell>
       <TableCell>
+        {signal.userId || 'N/A'}
+      </TableCell>
+      <TableCell>
         {signal.tradingAccount || 'N/A'}
       </TableCell>
       <TableCell>
@@ -114,7 +113,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
             className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
-            <span className="text-xs">Đánh dấu đã đọc</span>
+            <span className="text-xs">Mark as read</span>
           </Button>
         )}
       </TableCell>

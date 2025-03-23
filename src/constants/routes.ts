@@ -16,7 +16,6 @@ export const USER_ROUTES = {
   PROP_BOT_DETAIL: (botId: string) => `/prop-trading-bots/${botId}`,
   INTEGRATED_PROP_BOTS: '/integrated-prop-bots',
   INTEGRATED_PROP_BOT_DETAIL: (botId: string) => `/integrated-prop-bots/${botId}`,
-  BOT_ERRORS: '/bot-errors', // Add new route for Bot Errors
   ACCOUNTS: '/accounts',
   ACCOUNT_DETAIL: (accountId: string) => `/accounts/${accountId}`,
   SETTINGS: '/settings',
@@ -40,8 +39,6 @@ export const ADMIN_ROUTES = {
   USER_BOT_DETAIL: (botId: string) => `/admin/user-bots/${botId}`,
   ADMIN_MANAGEMENT: '/admin/admin-management',
   SYSTEM_LOGS: '/admin/logs',
-  PACKAGES: '/admin/packages', // Add missing PACKAGES route
-  LOGS: '/admin/logs', // Add missing LOGS route explicitly
   NOTIFICATIONS: '/admin/notifications',
   EMAIL: '/admin/email',
   DATABASE: '/admin/database',

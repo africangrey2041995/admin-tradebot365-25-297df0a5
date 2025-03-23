@@ -1,4 +1,3 @@
-
 /**
  * Định nghĩa các types liên quan đến Signal
  */
@@ -65,7 +64,7 @@ export interface ExtendedSignal extends TradingViewSignal {
   tradingAccountType?: string;
   tradingAccountBalance?: string;
   botId?: string;
-  botType?: string | BotType;  // Make compatible with string or BotType enum
+  botType?: string;
   botName?: string;
   exchange?: string;
   errorCode?: string;
@@ -100,6 +99,3 @@ export interface TradingStrategy {
   exitConditions: string[];
   riskManagement: string[];
 }
-
-// Import BotType to make sure ExtendedSignal works
-import { BotType } from '@/constants/botTypes';
