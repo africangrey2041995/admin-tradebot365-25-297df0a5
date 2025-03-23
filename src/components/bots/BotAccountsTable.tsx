@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -9,12 +10,14 @@ import LoadingAccounts from './accounts/LoadingAccounts';
 import EmptyAccountsState from './accounts/EmptyAccountsState';
 import ErrorState from './accounts/ErrorState';
 import { normalizeUserId } from '@/utils/normalizeUserId';
+import { useSafeLoading } from '@/hooks/useSafeLoading';
 
 interface BotAccountsTableProps {
   botId: string;
   userId: string;
   initialData?: Account[];
   refreshTrigger?: boolean;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 const mockAccounts: Account[] = [
@@ -65,31 +68,35 @@ const mockAccounts: Account[] = [
   },
 ];
 
-const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = false }: BotAccountsTableProps) => {
+const BotAccountsTable = ({ 
+  botId, 
+  userId, 
+  initialData = [], 
+  refreshTrigger = false,
+  botType = 'user'
+}: BotAccountsTableProps) => {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Use our safe loading hook instead of raw useState
+  const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 3000,
+    initialState: true,
+    debugComponent: 'BotAccountsTable'
+  });
 
   const fetchAccounts = useCallback(() => {
     console.log(`BotAccountsTable - Fetching accounts for userId: ${userId}`);
-    setLoading(true);
+    startLoading();
     setError(null);
-    
-    // Safety timer to ensure loading state doesn't get stuck
-    const safetyTimeoutId = setTimeout(() => {
-      console.log('BotAccountsTable - Safety timeout reached, forcing loading to false');
-      setLoading(false);
-    }, 3000);
     
     try {
       setTimeout(() => {
         try {
-          clearTimeout(safetyTimeoutId);
-          
           if (!userId) {
             console.error('BotAccountsTable - No userId provided for filtering accounts');
-            setLoading(false);
+            stopLoading();
             setAccounts([]);
             return;
           }
@@ -105,60 +112,57 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
           
           console.log(`BotAccountsTable - Available userIds: ${availableUserIds.join(', ')}`);
           
-          if (initialData && initialData.length > 0) {
-            console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
-            
-            // Use normalized comparison with our utility
-            const filteredAccounts = initialData.filter(account => {
-              const normalizedAccountUserId = normalizeUserId(account.userId);
-              const match = normalizedAccountUserId === normalizedInputUserId;
-              console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-              return match;
-            });
-            
-            console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
-            setAccounts(filteredAccounts);
-          } else {
-            console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
-            
-            // Use normalized comparison with our utility
-            const filteredAccounts = mockAccounts.filter(account => {
-              const normalizedAccountUserId = normalizeUserId(account.userId);
-              const match = normalizedAccountUserId === normalizedInputUserId;
-              console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-              return match;
-            });
-            
-            console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
-            setAccounts(filteredAccounts);
+          try {
+            if (initialData && initialData.length > 0) {
+              console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
+              
+              // Use normalized comparison with our utility
+              const filteredAccounts = initialData.filter(account => {
+                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const match = normalizedAccountUserId === normalizedInputUserId;
+                console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                return match;
+              });
+              
+              console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
+              setAccounts(filteredAccounts);
+            } else {
+              console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
+              
+              // Use normalized comparison with our utility
+              const filteredAccounts = mockAccounts.filter(account => {
+                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const match = normalizedAccountUserId === normalizedInputUserId;
+                console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                return match;
+              });
+              
+              console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
+              setAccounts(filteredAccounts);
+            }
+          } catch (filterErr) {
+            console.error('Error filtering accounts:', filterErr);
+            setError(filterErr instanceof Error ? filterErr : new Error('Error filtering accounts data'));
+            setAccounts([]);
           }
         } catch (innerError) {
           console.error('Error processing accounts data:', innerError);
           setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing accounts'));
+          setAccounts([]);
         } finally {
           // Always set loading to false regardless of success or error
-          setLoading(false);
+          stopLoading();
         }
       }, 800);
     } catch (err) {
       console.error('Error fetching accounts:', err);
       setError(err instanceof Error ? err : new Error('An unknown error occurred'));
-      setLoading(false);
-      clearTimeout(safetyTimeoutId);
+      stopLoading();
     }
-  }, [botId, userId, initialData]);
+  }, [botId, userId, initialData, startLoading, stopLoading]);
 
   useEffect(() => {
     fetchAccounts();
-    
-    const safetyTimer = setTimeout(() => {
-      if (loading) {
-        console.log('BotAccountsTable - Safety timer expired, forcing loading state to false');
-        setLoading(false);
-      }
-    }, 5000);
-    
-    return () => clearTimeout(safetyTimer);
   }, [fetchAccounts]);
 
   useEffect(() => {
@@ -193,7 +197,7 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
   }
 
   if (!accounts || accounts.length === 0) {
-    return <EmptyAccountsState />;
+    return <EmptyAccountsState onRefresh={handleRefresh} botType={botType} />;
   }
 
   return (

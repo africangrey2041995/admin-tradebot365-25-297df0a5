@@ -9,6 +9,7 @@ import SignalLogsTable from './signal-logs/SignalLogsTable';
 import LoadingSignalLogs from './signal-logs/LoadingSignalLogs';
 import EmptySignalLogs from './signal-logs/EmptySignalLogs';
 import { normalizeUserId } from '@/utils/normalizeUserId';
+import { useSafeLoading } from '@/hooks/useSafeLoading';
 
 interface CoinstratLogsProps {
   botId: string;
@@ -16,6 +17,7 @@ interface CoinstratLogsProps {
   initialData?: CoinstratSignal[];
   signalSourceLabel?: string;
   refreshTrigger?: boolean;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
@@ -23,16 +25,24 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   userId, 
   initialData = [],
   signalSourceLabel = "TradingView ID",
-  refreshTrigger = false
+  refreshTrigger = false,
+  botType = 'user'
 }) => {
+  // Use our safe loading hook instead of raw useState
+  const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 3000,
+    debugComponent: 'CoinstratLogs'
+  });
+  
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
   const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchLogs = () => {
     console.log(`CoinstratLogs - Fetching logs for userId: ${userId}, botId: ${botId}`);
-    setLoading(true);
+    startLoading();
+    setError(null);
     
     try {
       // Normalize the input userId for consistent comparison
@@ -41,22 +51,29 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
       
       // If initialData is provided, filter and use it
       if (initialData && initialData.length > 0) {
-        const filteredLogs = initialData.filter(log => {
-          // Check both processed and failed accounts with normalized comparison
-          const hasProcessedAccountsForUser = log.processedAccounts.some(account => 
-            normalizeUserId(account.userId) === normalizedInputUserId
-          );
+        try {
+          const filteredLogs = initialData.filter(log => {
+            // Check both processed and failed accounts with normalized comparison
+            const hasProcessedAccountsForUser = log.processedAccounts.some(account => 
+              normalizeUserId(account.userId) === normalizedInputUserId
+            );
+            
+            const hasFailedAccountsForUser = log.failedAccounts.some(account => 
+              normalizeUserId(account.userId) === normalizedInputUserId
+            );
+            
+            return hasProcessedAccountsForUser || hasFailedAccountsForUser;
+          });
           
-          const hasFailedAccountsForUser = log.failedAccounts.some(account => 
-            normalizeUserId(account.userId) === normalizedInputUserId
-          );
-          
-          return hasProcessedAccountsForUser || hasFailedAccountsForUser;
-        });
-        
-        console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length} of ${initialData.length}`);
-        setLogs(filteredLogs);
-        setLoading(false);
+          console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length} of ${initialData.length}`);
+          setLogs(filteredLogs);
+        } catch (err) {
+          console.error('Error filtering initialData logs:', err);
+          setError(err instanceof Error ? err : new Error('Failed to filter logs data'));
+          setLogs([]);
+        } finally {
+          stopLoading();
+        }
         return;
       }
       
@@ -151,39 +168,47 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
             },
           ];
           
-          const filteredLogs = mockLogs.filter(log => {
-            // Check processed accounts with normalized comparison
-            const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
-              const normalizedAccountUserId = normalizeUserId(account.userId);
-              const match = normalizedAccountUserId === normalizedInputUserId;
-              console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-              return match;
+          try {
+            const filteredLogs = mockLogs.filter(log => {
+              // Check processed accounts with normalized comparison
+              const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const match = normalizedAccountUserId === normalizedInputUserId;
+                console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                return match;
+              });
+              
+              // Check failed accounts with normalized comparison
+              const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const match = normalizedAccountUserId === normalizedInputUserId;
+                console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                return match;
+              });
+              
+              return hasProcessedAccountsForUser || hasFailedAccountsForUser;
             });
             
-            // Check failed accounts with normalized comparison
-            const hasFailedAccountsForUser = log.failedAccounts.some(account => {
-              const normalizedAccountUserId = normalizeUserId(account.userId);
-              const match = normalizedAccountUserId === normalizedInputUserId;
-              console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-              return match;
-            });
-            
-            return hasProcessedAccountsForUser || hasFailedAccountsForUser;
-          });
-          
-          console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length}`);
-          setLogs(filteredLogs);
-          setLoading(false);
-        } catch (error) {
-          console.error('Error processing logs:', error);
+            console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length}`);
+            setLogs(filteredLogs);
+          } catch (filterErr) {
+            console.error('Error filtering mock logs data:', filterErr);
+            setError(filterErr instanceof Error ? filterErr : new Error('Failed to filter mock logs data'));
+            setLogs([]);
+          }
+        } catch (mockErr) {
+          console.error('Error processing mock logs:', mockErr);
+          setError(mockErr instanceof Error ? mockErr : new Error('Failed to process mock logs data'));
           setLogs([]);
-          setLoading(false);
+        } finally {
+          stopLoading();
         }
       }, 800);
     } catch (error) {
       console.error('Error in fetchLogs:', error);
+      setError(error instanceof Error ? error : new Error('An unexpected error occurred fetching logs'));
       setLogs([]);
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -212,8 +237,28 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
     return <LoadingSignalLogs />;
   }
 
+  if (error) {
+    return (
+      <div className="py-8 rounded-md text-center border border-red-200 bg-red-50/30 dark:border-red-800/30 dark:bg-red-900/10">
+        <div className="max-w-md mx-auto">
+          <RefreshCw className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2 text-red-700">Đã xảy ra lỗi khi tải dữ liệu</h3>
+          <p className="text-sm text-red-600 mb-4">{error.message}</p>
+          <Button 
+            variant="outline" 
+            onClick={handleRefresh}
+            className="border-red-300 hover:bg-red-50"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Thử lại
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (logs.length === 0) {
-    return <EmptySignalLogs onRefresh={handleRefresh} />;
+    return <EmptySignalLogs onRefresh={handleRefresh} botType={botType} />;
   }
 
   return (

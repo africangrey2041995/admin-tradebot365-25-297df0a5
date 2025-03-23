@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +38,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
   signalSourceLabel = "TradingView ID",
   botType = 'user', // Default to 'user' for backward compatibility
 }) => {
-  // Conditional tab labels and descriptions based on botType
   const getTabLabels = () => {
     switch (botType) {
       case 'premium':
@@ -70,10 +68,8 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get the appropriate labels based on botType
   const tabLabels = getTabLabels();
   
-  // Get icons based on bot type
   const getBotIcon = () => {
     switch (botType) {
       case 'premium':
@@ -86,7 +82,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Tab-specific icons
   const getTabIcon = (tab: string) => {
     if (tab === 'overview') {
       switch (botType) {
@@ -102,7 +97,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     return null;
   };
   
-  // Get container styles based on bot type
   const getContainerClassName = () => {
     switch (botType) {
       case 'premium':
@@ -115,7 +109,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get header background based on bot type
   const getCardHeaderClassName = () => {
     switch (botType) {
       case 'premium':
@@ -128,7 +121,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get card styles based on bot type
   const getCardClassName = () => {
     switch (botType) {
       case 'premium':
@@ -141,7 +133,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get tabs list styles based on bot type
   const getTabsListClassName = () => {
     switch (botType) {
       case 'premium':
@@ -154,7 +145,6 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get tab trigger styles based on bot type
   const getTabTriggerClassName = () => {
     switch (botType) {
       case 'premium':
@@ -167,10 +157,8 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
     }
   };
 
-  // Get empty state component based on bot type
   const getEmptyStateComponent = () => {
-    // For now, using the same component but could be customized per bot type in the future
-    return <EmptyAccountsState />;
+    return <EmptyAccountsState botType={botType} />;
   };
 
   return (
@@ -210,7 +198,8 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
               <BotAccountsTable 
                 botId={botId} 
                 userId={userId} 
-                initialData={accountsData} 
+                initialData={accountsData}
+                botType={botType}
               />
             )}
           </CardContent>
@@ -232,6 +221,7 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
               userId={userId}
               initialData={logsData}
               signalSourceLabel={signalSourceLabel}
+              botType={botType}
             />
           </CardContent>
         </Card>

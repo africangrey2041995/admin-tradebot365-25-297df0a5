@@ -7,24 +7,39 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { normalizeUserId } from '@/utils/normalizeUserId';
+import { useSafeLoading } from '@/hooks/useSafeLoading';
+import BotEmptyState from './common/BotEmptyState';
 
 interface TradingViewLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 interface ExtendedTradingViewSignal extends TradingViewSignal {
   userId?: string;
 }
 
-const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refreshTrigger = false }) => {
+const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ 
+  botId, 
+  userId, 
+  refreshTrigger = false,
+  botType = 'user'
+}) => {
   const [logs, setLogs] = useState<ExtendedTradingViewSignal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  // Use our safe loading hook instead of raw useState
+  const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 3000,
+    debugComponent: 'TradingViewLogs'
+  });
 
   const fetchLogs = () => {
     console.log(`TradingViewLogs - Fetching logs for userId: ${userId}`);
-    setLoading(true);
+    startLoading();
+    setError(null);
     
     setTimeout(() => {
       try {
@@ -68,24 +83,31 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refres
           },
         ];
         
-        // Use normalizeUserId for consistent comparison
-        const normalizedInputUserId = normalizeUserId(userId);
-        console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
-        
-        const filteredLogs = mockLogs.filter(log => {
-          const normalizedLogUserId = normalizeUserId(log.userId || '');
-          const match = normalizedLogUserId === normalizedInputUserId;
-          console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-          return match;
-        });
-        
-        console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
-        setLogs(filteredLogs);
-        setLoading(false);
+        try {
+          // Use normalizeUserId for consistent comparison
+          const normalizedInputUserId = normalizeUserId(userId);
+          console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+          
+          const filteredLogs = mockLogs.filter(log => {
+            const normalizedLogUserId = normalizeUserId(log.userId || '');
+            const match = normalizedLogUserId === normalizedInputUserId;
+            console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+            return match;
+          });
+          
+          console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
+          setLogs(filteredLogs);
+        } catch (filterErr) {
+          console.error('Error filtering logs:', filterErr);
+          setError(filterErr instanceof Error ? filterErr : new Error('Error filtering logs data'));
+          setLogs([]);
+        }
       } catch (error) {
         console.error('Error processing logs:', error);
+        setError(error instanceof Error ? error : new Error('Error processing logs data'));
         setLogs([]);
-        setLoading(false);
+      } finally {
+        stopLoading();
       }
     }, 800);
   };
@@ -143,16 +165,35 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refres
     );
   }
 
+  if (error) {
+    return (
+      <div className="py-8 rounded-md text-center border border-red-200 bg-red-50/30 dark:border-red-800/30 dark:bg-red-900/10">
+        <div className="max-w-md mx-auto">
+          <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2 text-red-700">Đã xảy ra lỗi khi tải dữ liệu</h3>
+          <p className="text-sm text-red-600 mb-4">{error.message}</p>
+          <Button 
+            variant="outline" 
+            onClick={handleRefresh}
+            className="border-red-300 hover:bg-red-50"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Thử lại
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (logs.length === 0) {
     return (
-      <div className="py-10 text-center">
-        <AlertCircle className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground mb-4">No logs available for this bot yet.</p>
-        <Button variant="outline" onClick={handleRefresh}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
-      </div>
+      <BotEmptyState
+        botType={botType}
+        dataType="logs"
+        onRefresh={handleRefresh}
+        title="Không có TradingView logs"
+        message="Chưa có log TradingView nào được ghi nhận cho bot này"
+      />
     );
   }
 
