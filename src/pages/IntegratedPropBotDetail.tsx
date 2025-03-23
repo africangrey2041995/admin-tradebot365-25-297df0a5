@@ -164,6 +164,7 @@ const IntegratedPropBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [refreshLoading, setRefreshLoading] = useState(false);
   
   // Sử dụng các hooks được tách ra để quản lý logic
   const { isLoading, isAuthorized, bot } = useBotAuthorization({ 
@@ -175,10 +176,10 @@ const IntegratedPropBotDetail = () => {
   const { tradePerformanceData, statisticsData } = useBotStatistics();
 
   const refreshTabData = () => {
-    setIsLoading(true);
+    setRefreshLoading(true);
     // Mô phỏng API call bằng bộ hẹn giờ
     setTimeout(() => {
-      setIsLoading(false);
+      setRefreshLoading(false);
       toast.success(`Đã làm mới dữ liệu tab ${
         activeTab === "overview" ? "Tổng quan" : 
         activeTab === "connected-accounts" ? "Tài khoản kết nối" : "Coinstrat Logs"
@@ -211,14 +212,14 @@ const IntegratedPropBotDetail = () => {
           period={selectedPeriod}
           onPeriodChange={setSelectedPeriod}
           chartData={chartData}
-          isLoading={isLoading}
+          isLoading={refreshLoading}
           onRefresh={refreshTabData}
         />
 
         <TradeDetails 
           tradeData={tradePerformanceData}
           statData={statisticsData}
-          isLoading={isLoading}
+          isLoading={refreshLoading}
           onRefresh={refreshTabData}
         />
       </div>
@@ -255,7 +256,7 @@ const IntegratedPropBotDetail = () => {
           userId={CURRENT_USER_ID}
           botId={botId || ""}
           onRefresh={refreshTabData}
-          isLoading={isLoading}
+          isLoading={refreshLoading}
           overviewContent={overviewContent}
           accountsData={mockAccounts}
           logsData={mockLogs}
