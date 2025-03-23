@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -15,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
-// Mock data for the integrated prop trading bot
+const CURRENT_USER_ID = 'USR-123456';
+
 const propBotData = {
   id: 'ptb-001',
   name: 'Prop Master',
@@ -112,15 +112,48 @@ const IntegratedPropBotDetail = () => {
   const [botRunning, setBotRunning] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [timeframe, setTimeframe] = useState('1d');
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Find the bot data based on the botId
-  const bot = propBotData; // In a real app, you'd filter based on botId
+  useEffect(() => {
+    const fetchBotData = () => {
+      setIsLoading(true);
+      
+      setTimeout(() => {
+        const bot = propBotData;
+        
+        const ownerId = bot.accounts[0]?.userId;
+        
+        if (ownerId === CURRENT_USER_ID) {
+          setIsAuthorized(true);
+        } else {
+          setIsAuthorized(false);
+          toast.error("Bạn không có quyền truy cập bot này");
+        }
+        
+        setIsLoading(false);
+      }, 500);
+    };
+    
+    fetchBotData();
+  }, [botId]);
 
-  if (!bot) {
+  if (isLoading) {
     return (
-      <MainLayout title="Bot Not Found">
+      <MainLayout title="Đang tải...">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-lg font-medium">Đang tải thông tin bot...</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <MainLayout title="Không có quyền truy cập">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold mb-4">Bot không tồn tại</h2>
+          <h2 className="text-2xl font-bold mb-4">Bạn không có quyền truy cập bot này</h2>
           <Button onClick={() => navigate('/integrated-prop-bots')}>
             Quay lại danh sách Bot
           </Button>
@@ -128,6 +161,12 @@ const IntegratedPropBotDetail = () => {
       </MainLayout>
     );
   }
+
+  const bot = propBotData;
+
+  const handleViewAccount = (accountId: string) => {
+    navigate(`/accounts/${accountId}`);
+  };
 
   const toggleBotStatus = () => {
     setBotRunning(!botRunning);
@@ -154,14 +193,9 @@ const IntegratedPropBotDetail = () => {
     });
   };
 
-  const handleViewUserDetails = (userId: string) => {
-    navigate(`/admin/users/${userId}`);
-  };
-
   return (
     <MainLayout title={`Chi tiết Bot - ${bot.name}`}>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center">
             <Button 
@@ -227,7 +261,6 @@ const IntegratedPropBotDetail = () => {
           </div>
         </div>
 
-        {/* Challenge Progress Card */}
         <Card className="bg-gradient-to-br from-blue-50/80 to-blue-100/80 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -280,7 +313,6 @@ const IntegratedPropBotDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="grid grid-cols-4 md:w-[400px]">
             <TabsTrigger value="overview">Tổng Quan</TabsTrigger>
@@ -289,11 +321,9 @@ const IntegratedPropBotDetail = () => {
             <TabsTrigger value="settings">Cài Đặt</TabsTrigger>
           </TabsList>
           
-          {/* Overview Tab */}
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2 space-y-6">
-                {/* Performance Chart */}
                 <Card>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-center">
@@ -319,7 +349,6 @@ const IntegratedPropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Rules Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -343,9 +372,7 @@ const IntegratedPropBotDetail = () => {
                 </Card>
               </div>
               
-              {/* Stats Column */}
               <div className="space-y-6">
-                {/* Stats Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Thống Kê Bot</CardTitle>
@@ -378,7 +405,6 @@ const IntegratedPropBotDetail = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Alert Card */}
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>Cảnh Báo</AlertTitle>
@@ -387,7 +413,6 @@ const IntegratedPropBotDetail = () => {
                   </AlertDescription>
                 </Alert>
                 
-                {/* Info Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Thông Tin Bot</CardTitle>
@@ -413,7 +438,6 @@ const IntegratedPropBotDetail = () => {
             </div>
           </TabsContent>
           
-          {/* Trades Tab */}
           <TabsContent value="trades">
             <Card>
               <CardHeader>
@@ -469,7 +493,6 @@ const IntegratedPropBotDetail = () => {
             </Card>
           </TabsContent>
           
-          {/* Accounts Tab */}
           <TabsContent value="accounts">
             <Card>
               <CardHeader>
@@ -494,7 +517,7 @@ const IntegratedPropBotDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {bot.accounts.map((account) => (
+                      {bot.accounts.filter(account => account.userId === CURRENT_USER_ID).map((account) => (
                         <tr key={account.id} className="border-b">
                           <td className="py-3 px-4 font-medium">{account.name}</td>
                           <td className="py-3 px-4">
@@ -508,17 +531,9 @@ const IntegratedPropBotDetail = () => {
                             {account.profit} ({account.profitPercentage})
                           </td>
                           <td className="py-3 px-4">{account.createdDate}</td>
+                          <td className="py-3 px-4">{account.userId}</td>
                           <td className="py-3 px-4">
-                            <Button 
-                              variant="ghost" 
-                              className="text-blue-600 hover:text-blue-800 p-0 h-auto font-medium"
-                              onClick={() => handleViewUserDetails(account.userId)}
-                            >
-                              {account.userId}
-                            </Button>
-                          </td>
-                          <td className="py-3 px-4">
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/accounts/${account.id}`)}>
+                            <Button variant="outline" size="sm" onClick={() => handleViewAccount(account.id)}>
                               Chi Tiết
                             </Button>
                           </td>
@@ -536,7 +551,6 @@ const IntegratedPropBotDetail = () => {
             </Card>
           </TabsContent>
           
-          {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>

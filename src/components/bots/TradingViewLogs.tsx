@@ -1,67 +1,82 @@
-
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { TradingViewSignal } from '@/types';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface TradingViewLogsProps {
   botId: string;
+  userId: string;
 }
 
-const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId }) => {
-  const [logs, setLogs] = useState<TradingViewSignal[]>([]);
+interface ExtendedTradingViewSignal extends TradingViewSignal {
+  userId?: string;
+}
+
+const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId }) => {
+  const [logs, setLogs] = useState<ExtendedTradingViewSignal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Mock data loading
-    const fetchLogs = () => {
-      setLoading(true);
-      setTimeout(() => {
-        // Mock TradingView signal logs
-        const mockLogs: TradingViewSignal[] = [
-          {
-            id: 'SIG001',
-            action: 'ENTER_LONG',
-            instrument: 'BTCUSDT',
-            timestamp: new Date().toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '1.5',
-            status: 'Processed',
-          },
-          {
-            id: 'SIG002',
-            action: 'EXIT_LONG',
-            instrument: 'ETHUSDT',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '2.3',
-            status: 'Processed',
-          },
-          {
-            id: 'SIG003',
-            action: 'ENTER_SHORT',
-            instrument: 'SOLUSDT',
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '3.7',
-            status: 'Failed',
-            errorMessage: 'Invalid account configuration',
-          },
-        ];
-        
-        setLogs(mockLogs);
-        setLoading(false);
-      }, 800);
-    };
+  const fetchLogs = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const mockLogs: ExtendedTradingViewSignal[] = [
+        {
+          id: 'SIG001',
+          action: 'ENTER_LONG',
+          instrument: 'BTCUSDT',
+          timestamp: new Date().toISOString(),
+          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+          maxLag: '5s',
+          investmentType: 'crypto',
+          amount: '1.5',
+          status: 'Processed',
+          userId: 'USR-001'
+        },
+        {
+          id: 'SIG002',
+          action: 'EXIT_LONG',
+          instrument: 'ETHUSDT',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+          maxLag: '5s',
+          investmentType: 'crypto',
+          amount: '2.3',
+          status: 'Processed',
+          userId: 'USR-001'
+        },
+        {
+          id: 'SIG003',
+          action: 'ENTER_SHORT',
+          instrument: 'SOLUSDT',
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+          maxLag: '5s',
+          investmentType: 'crypto',
+          amount: '3.7',
+          status: 'Failed',
+          errorMessage: 'Invalid account configuration',
+          userId: 'USR-002'
+        },
+      ];
+      
+      const filteredLogs = mockLogs.filter(log => log.userId === userId);
+      
+      setLogs(filteredLogs);
+      setLoading(false);
+    }, 800);
+  };
 
+  useEffect(() => {
     fetchLogs();
-  }, [botId]);
+  }, [botId, userId]);
+
+  const handleRefresh = () => {
+    toast.info('Refreshing logs...');
+    fetchLogs();
+  };
 
   const getActionBadge = (action: string) => {
     switch (action) {
@@ -92,54 +107,71 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId }) => {
   };
 
   if (loading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading logs...</div>;
+    return (
+      <div className="py-8 text-center text-muted-foreground">
+        <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
+        <p>Loading logs...</p>
+      </div>
+    );
   }
 
   if (logs.length === 0) {
     return (
       <div className="py-10 text-center">
-        <p className="text-muted-foreground">No logs available for this bot yet.</p>
+        <p className="text-muted-foreground mb-4">No logs available for this bot yet.</p>
+        <Button variant="outline" onClick={handleRefresh}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </Button>
       </div>
     );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Symbol</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Quantity</TableHead>
-          <TableHead>Action</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Note</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {logs.map((log) => (
-          <TableRow key={log.id}>
-            <TableCell className="font-medium">{log.id}</TableCell>
-            <TableCell>{log.instrument}</TableCell>
-            <TableCell>
-              {new Date(log.timestamp).toLocaleString('en-US', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </TableCell>
-            <TableCell>{log.amount}</TableCell>
-            <TableCell>{getActionBadge(log.action)}</TableCell>
-            <TableCell>{getStatusBadge(log.status)}</TableCell>
-            <TableCell className="text-sm text-muted-foreground">
-              {log.errorMessage || '-'}
-            </TableCell>
+    <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Symbol</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Action</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Note</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {logs.map((log) => (
+            <TableRow key={log.id}>
+              <TableCell className="font-medium">{log.id}</TableCell>
+              <TableCell>{log.instrument}</TableCell>
+              <TableCell>
+                {new Date(log.timestamp).toLocaleString('en-US', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </TableCell>
+              <TableCell>{log.amount}</TableCell>
+              <TableCell>{getActionBadge(log.action)}</TableCell>
+              <TableCell>{getStatusBadge(log.status)}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {log.errorMessage || '-'}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <div className="mt-4 flex justify-end">
+        <Button variant="outline" size="sm" onClick={handleRefresh}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh Logs
+        </Button>
+      </div>
+    </div>
   );
 };
 
