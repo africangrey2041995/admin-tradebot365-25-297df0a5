@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { TradingViewSignal } from '@/types';
+import { CoinstratSignal, AccountSignalStatus } from '@/types/signal';
 import { RefreshCw, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -16,30 +16,24 @@ import {
 
 interface CoinstratLogsProps {
   botId: string;
-  userId: string; // Add userId prop
-}
-
-interface ExtendedTradingViewSignal extends TradingViewSignal {
-  userId?: string;
-  accountId?: string;
-  accountName?: string;
-  coinstratSignalId?: string;
+  userId: string;
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
-  const [logs, setLogs] = useState<ExtendedTradingViewSignal[]>([]);
+  const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSignal, setSelectedSignal] = useState<ExtendedTradingViewSignal | null>(null);
+  const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
   const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
 
   const fetchLogs = () => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
-      // Mock data for Coinstrat logs
-      const mockLogs: ExtendedTradingViewSignal[] = [
+      // Mock data for Coinstrat logs - using CoinstratSignal structure
+      const mockLogs: CoinstratSignal[] = [
         {
-          id: 'SIG001',
+          id: 'CSP-78952364',
+          originalSignalId: 'SIG001',
           action: 'ENTER_LONG',
           instrument: 'BTCUSDT',
           timestamp: new Date().toISOString(),
@@ -48,13 +42,27 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           investmentType: 'crypto',
           amount: '1.5',
           status: 'Processed',
-          userId: 'USR-001',
-          accountId: 'ACC-001',
-          accountName: 'Binance Spot Account',
-          coinstratSignalId: 'CSP-78952364'
+          processedAccounts: [
+            {
+              accountId: 'ACC-001',
+              userId: 'USR-001',
+              name: 'Binance Spot Account',
+              timestamp: new Date().toISOString(),
+              status: 'success'
+            },
+            {
+              accountId: 'ACC-002',
+              userId: 'USR-001',
+              name: 'Coinstart Pro Account',
+              timestamp: new Date().toISOString(),
+              status: 'success'
+            }
+          ],
+          failedAccounts: []
         },
         {
-          id: 'SIG002',
+          id: 'CSP-78956789',
+          originalSignalId: 'SIG002',
           action: 'EXIT_LONG',
           instrument: 'ETHUSDT',
           timestamp: new Date(Date.now() - 3600000).toISOString(),
@@ -63,13 +71,20 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           investmentType: 'crypto',
           amount: '2.3',
           status: 'Processed',
-          userId: 'USR-001',
-          accountId: 'ACC-002',
-          accountName: 'Coinstart Pro Account',
-          coinstratSignalId: 'CSP-78956789'
+          processedAccounts: [
+            {
+              accountId: 'ACC-001',
+              userId: 'USR-001',
+              name: 'Binance Spot Account',
+              timestamp: new Date(Date.now() - 3600000).toISOString(),
+              status: 'success'
+            }
+          ],
+          failedAccounts: []
         },
         {
-          id: 'SIG003',
+          id: 'CSP-78959012',
+          originalSignalId: 'SIG003',
           action: 'ENTER_SHORT',
           instrument: 'SOLUSDT',
           timestamp: new Date(Date.now() - 7200000).toISOString(),
@@ -78,16 +93,36 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           investmentType: 'crypto',
           amount: '3.7',
           status: 'Failed',
-          errorMessage: 'Invalid account configuration',
-          userId: 'USR-002',
-          accountId: 'ACC-003',
-          accountName: 'FTX Account',
-          coinstratSignalId: 'CSP-78959012'
+          processedAccounts: [],
+          failedAccounts: [
+            {
+              accountId: 'ACC-003',
+              userId: 'USR-001',
+              name: 'FTX Account',
+              timestamp: new Date(Date.now() - 7200000).toISOString(),
+              reason: 'Invalid account configuration',
+              status: 'failed'
+            },
+            {
+              accountId: 'ACC-004',
+              userId: 'USR-001',
+              name: 'Bybit Account',
+              timestamp: new Date(Date.now() - 7200000).toISOString(),
+              reason: 'API key expired',
+              status: 'failed'
+            }
+          ],
+          errorMessage: 'Invalid account configuration'
         },
       ];
       
       // Filter logs by userId
-      const filteredLogs = mockLogs.filter(log => log.userId === userId);
+      const filteredLogs = mockLogs.filter(log => {
+        const processedAccountsForUser = log.processedAccounts.filter(account => account.userId === userId);
+        const failedAccountsForUser = log.failedAccounts.filter(account => account.userId === userId);
+        
+        return processedAccountsForUser.length > 0 || failedAccountsForUser.length > 0;
+      });
       
       setLogs(filteredLogs);
       setLoading(false);
@@ -126,12 +161,40 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
     }
   };
 
+  const getAccountStatusSummary = (signal: CoinstratSignal) => {
+    // Filter accounts for current user
+    const userProcessedAccounts = signal.processedAccounts.filter(account => account.userId === userId);
+    const userFailedAccounts = signal.failedAccounts.filter(account => account.userId === userId);
+    
+    const total = userProcessedAccounts.length + userFailedAccounts.length;
+    const succeeded = userProcessedAccounts.length;
+    const failed = userFailedAccounts.length;
+    
+    return (
+      <div className="flex flex-col gap-2">
+        {succeeded > 0 && (
+          <Badge variant="outline" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200">
+            {succeeded} tài khoản thành công
+          </Badge>
+        )}
+        {failed > 0 && (
+          <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">
+            {failed} tài khoản thất bại
+          </Badge>
+        )}
+        {total === 0 && (
+          <span className="text-muted-foreground text-sm">Không có tài khoản</span>
+        )}
+      </div>
+    );
+  };
+
   const handleRefresh = () => {
     toast.info('Refreshing logs...');
     fetchLogs();
   };
 
-  const handleViewSignalDetails = (signal: ExtendedTradingViewSignal) => {
+  const handleViewSignalDetails = (signal: CoinstratSignal) => {
     setSelectedSignal(signal);
     setSignalDetailsOpen(true);
   };
@@ -162,13 +225,13 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            <TableHead>TradingView ID</TableHead>
             <TableHead>Symbol</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Action</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Account</TableHead>
+            <TableHead>Accounts</TableHead>
             <TableHead>Note</TableHead>
             <TableHead>Details</TableHead>
           </TableRow>
@@ -176,7 +239,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
         <TableBody>
           {logs.map((log) => (
             <TableRow key={log.id}>
-              <TableCell className="font-medium">{log.id}</TableCell>
+              <TableCell className="font-medium">{log.originalSignalId}</TableCell>
               <TableCell>{log.instrument}</TableCell>
               <TableCell>
                 {new Date(log.timestamp).toLocaleString('en-US', {
@@ -190,7 +253,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
               <TableCell>{log.amount}</TableCell>
               <TableCell>{getActionBadge(log.action)}</TableCell>
               <TableCell>{getStatusBadge(log.status as string)}</TableCell>
-              <TableCell>{log.accountName || '-'}</TableCell>
+              <TableCell>{getAccountStatusSummary(log)}</TableCell>
               <TableCell className="text-sm text-muted-foreground">
                 {log.errorMessage || '-'}
               </TableCell>
@@ -220,7 +283,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
           <DialogHeader>
             <DialogTitle>Signal Details</DialogTitle>
             <DialogDescription>
-              Detailed information about the signal and associated account
+              Detailed information about the signal and associated accounts
             </DialogDescription>
           </DialogHeader>
           
@@ -229,25 +292,11 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">TradingView ID</h3>
-                  <p className="text-sm font-semibold">{selectedSignal.id}</p>
+                  <p className="text-sm font-semibold">{selectedSignal.originalSignalId}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Coinstrat Pro ID</h3>
-                  <p className="text-sm font-semibold">{selectedSignal.coinstratSignalId}</p>
-                </div>
-              </div>
-              
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium mb-2">Account Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-xs text-muted-foreground">Account ID</h4>
-                    <p className="text-sm font-medium">{selectedSignal.accountId}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs text-muted-foreground">Account Name</h4>
-                    <p className="text-sm font-medium">{selectedSignal.accountName}</p>
-                  </div>
+                  <p className="text-sm font-semibold">{selectedSignal.id}</p>
                 </div>
               </div>
               
@@ -279,6 +328,104 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
                     <p className="text-sm font-medium">{selectedSignal.maxLag}</p>
                   </div>
                 </div>
+              </div>
+              
+              {/* Processed Accounts Section */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-2 text-emerald-600">Processed Accounts</h3>
+                {selectedSignal.processedAccounts.filter(account => account.userId === userId).length > 0 ? (
+                  <div className="space-y-3">
+                    {selectedSignal.processedAccounts
+                      .filter(account => account.userId === userId)
+                      .map((account, index) => (
+                        <div key={`processed-${account.accountId}-${index}`} className="bg-emerald-50 border border-emerald-100 p-3 rounded-md">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Account Name</h4>
+                              <p className="text-sm font-medium">{account.name}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Account ID</h4>
+                              <p className="text-sm font-medium">{account.accountId}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Processing Time</h4>
+                              <p className="text-sm font-medium">
+                                {new Date(account.timestamp).toLocaleString('en-US', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Status</h4>
+                              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 mt-1">
+                                Success
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No processed accounts found</p>
+                )}
+              </div>
+              
+              {/* Failed Accounts Section */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-2 text-red-600">Failed Accounts</h3>
+                {selectedSignal.failedAccounts.filter(account => account.userId === userId).length > 0 ? (
+                  <div className="space-y-3">
+                    {selectedSignal.failedAccounts
+                      .filter(account => account.userId === userId)
+                      .map((account, index) => (
+                        <div key={`failed-${account.accountId}-${index}`} className="bg-red-50 border border-red-100 p-3 rounded-md">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Account Name</h4>
+                              <p className="text-sm font-medium">{account.name}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Account ID</h4>
+                              <p className="text-sm font-medium">{account.accountId}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Processing Time</h4>
+                              <p className="text-sm font-medium">
+                                {new Date(account.timestamp).toLocaleString('en-US', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs text-muted-foreground">Status</h4>
+                              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 mt-1">
+                                Failed
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <h4 className="text-xs text-muted-foreground">Error Reason</h4>
+                            <p className="text-sm text-red-600 mt-1">{account.reason || 'Unknown error'}</p>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No failed accounts found</p>
+                )}
               </div>
               
               {selectedSignal.errorMessage && (
