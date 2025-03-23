@@ -110,7 +110,7 @@ const IntegratedPropBotDetail = () => {
                 <div>
                   <CardTitle className="text-xl">{bot.name}</CardTitle>
                   <CardDescription className="mt-1">
-                    Bot đã tích hợp cho tài khoản Prop Trading của bạn
+                    Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.
                   </CardDescription>
                 </div>
               </div>
@@ -132,6 +132,83 @@ const IntegratedPropBotDetail = () => {
               </Badge>
             </div>
             
+            <div className="mt-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="border-blue-200 dark:border-blue-800/30">
+                  <CardHeader className="bg-blue-50 dark:bg-blue-900/10 pb-3">
+                    <CardTitle className="text-base">Tính năng</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <ul className="space-y-2">
+                      <li className="flex items-start">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>Tối ưu hóa để vượt qua các bài kiểm tra Prop Trading</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>Quản lý rủi ro tự động theo yêu cầu của Coinstrat Pro</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>Báo cáo hiệu suất chi tiết theo các tiêu chí đánh giá Prop Trading</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>Chiến lược giao dịch nhất quán với tỷ lệ win cao</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-amber-200 dark:border-amber-800/30">
+                  <CardHeader className="bg-amber-50 dark:bg-amber-900/10 pb-3">
+                    <CardTitle className="text-base">Yêu cầu</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <ul className="space-y-2">
+                      <li className="flex items-start">
+                        <span className="text-amber-500 mr-2">•</span>
+                        <span>Vốn tối thiểu $500</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-amber-500 mr-2">•</span>
+                        <span>Tài khoản Coinstrat Pro đã xác minh</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-amber-500 mr-2">•</span>
+                        <span>Phù hợp với giai đoạn Challenger hoặc Verification</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="mt-6 border-blue-200 dark:border-blue-800/30">
+                <CardHeader className="bg-blue-50 dark:bg-blue-900/10 pb-3">
+                  <CardTitle className="text-base flex items-center">
+                    <BarChart className="h-4 w-4 mr-2 text-blue-500" />
+                    Hiệu suất
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-blue-50/50 dark:bg-blue-900/5 rounded-lg p-4">
+                      <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Hiệu suất tháng trước</div>
+                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center">
+                        +11.2% <span className="text-green-500 ml-1">↗</span>
+                      </div>
+                    </div>
+                    <div className="bg-blue-50/50 dark:bg-blue-900/5 rounded-lg p-4">
+                      <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Hiệu suất từ đầu</div>
+                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center">
+                        +45.8% <span className="text-green-500 ml-1">↗</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
             <PerformanceOverview 
               period={selectedPeriod}
               onPeriodChange={setSelectedPeriod}
@@ -151,6 +228,70 @@ const IntegratedPropBotDetail = () => {
       </div>
 
       <div className="space-y-6">
+        <Card className="border-blue-200 dark:border-blue-800/30">
+          <CardHeader className="bg-blue-50 dark:bg-blue-900/10 pb-3">
+            <CardTitle className="text-base">Đăng ký Bot</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white">
+              Tích hợp với tài khoản
+            </Button>
+            
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Khi tích hợp bot này, bạn sẽ nhận được:
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-start text-sm">
+                  <span className="text-blue-500 mr-2">•</span>
+                  <span>Tín hiệu giao dịch tự động 24/7</span>
+                </li>
+                <li className="flex items-start text-sm">
+                  <span className="text-blue-500 mr-2">•</span>
+                  <span>Quản lý rủi ro theo tiêu chuẩn Prop Trading</span>
+                </li>
+                <li className="flex items-start text-sm">
+                  <span className="text-blue-500 mr-2">•</span>
+                  <span>Báo cáo hiệu suất chi tiết</span>
+                </li>
+                <li className="flex items-start text-sm">
+                  <span className="text-blue-500 mr-2">•</span>
+                  <span>Hỗ trợ kỹ thuật ưu tiên</span>
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-200 dark:border-blue-800/30">
+          <CardHeader className="bg-blue-50 dark:bg-blue-900/10 pb-3">
+            <CardTitle className="text-base">Thông tin Bot</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 space-y-4">
+            <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-slate-600 dark:text-slate-400">Sàn giao dịch</span>
+              <span className="font-medium">Coinstrat Pro</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-slate-600 dark:text-slate-400">Loại bot</span>
+              <span className="font-medium">Prop Trading</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-slate-600 dark:text-slate-400">Trạng thái</span>
+              <div className="flex items-center">
+                <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <span className="font-medium">Đang hoạt động</span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-slate-600 dark:text-slate-400">ID Bot</span>
+              <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                {bot.botId || bot.id}
+              </code>
+            </div>
+          </CardContent>
+        </Card>
+
         <BotInformation 
           botType={bot.type}
           exchange={bot.exchange || 'Coinstrat Pro'}
@@ -162,55 +303,12 @@ const IntegratedPropBotDetail = () => {
           lastMonthPerformance={bot.performanceLastMonth}
           allTimePerformance={bot.performanceAllTime}
         />
-        
-        <Card className={`${colors.border} border`}>
-          <CardHeader className={`${colors.bg} border-b ${colors.border}`}>
-            <CardTitle className="text-base flex items-center">
-              <BarChart className="h-4 w-4 mr-2 text-blue-500" />
-              Thông tin Bot
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-4">
-            <div>
-              <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Sàn giao dịch
-              </div>
-              <div className="mt-1">{bot.exchange || 'Coinstrat Pro'}</div>
-            </div>
-            
-            <div>
-              <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Loại bot
-              </div>
-              <div className="mt-1">Prop Trading</div>
-            </div>
-            
-            <div>
-              <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Trạng thái
-              </div>
-              <div className="mt-1 flex items-center">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                Đang hoạt động
-              </div>
-            </div>
-            
-            <div>
-              <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                ID Bot
-              </div>
-              <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
-                {bot.botId || bot.id}
-              </code>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
 
   return (
-    <MainLayout title={`Bot tích hợp: ${bot.name}`}>
+    <MainLayout title={`Chi Tiết Prop Trading Bot: ${bot.name}`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -240,7 +338,7 @@ const IntegratedPropBotDetail = () => {
           overviewContent={overviewContent}
           accountsData={mockAccounts}
           logsData={mockLogs}
-          // Use "TB365 ID" label for the source column in logs
+          // Change "TB365 ID" label for the source column in logs
           signalSourceLabel="TB365 ID"
           botType="prop" // Set botType to "prop" to get proper styling
         />
