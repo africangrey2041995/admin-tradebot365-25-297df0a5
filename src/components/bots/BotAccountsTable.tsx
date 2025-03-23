@@ -76,10 +76,17 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
     setError(null);
     
     try {
+      const timeoutId = setTimeout(() => {
+        console.log('BotAccountsTable - Safety timeout reached, forcing loading to false');
+        setLoading(false);
+      }, 3000);
+      
       setTimeout(() => {
         try {
-          // Check if we have initialData first
+          clearTimeout(timeoutId);
+          
           if (initialData && initialData.length > 0) {
+            console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
             const filteredAccounts = initialData.filter(account => account.userId === userId);
             console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
             setAccounts(filteredAccounts);
@@ -87,9 +94,13 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
             return;
           }
           
-          // Otherwise use mock data
+          console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
+          console.log(`BotAccountsTable - Looking for userId: ${userId} in mockAccounts`);
+          
           const filteredAccounts = mockAccounts.filter(account => account.userId === userId);
           console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
+          console.log(`BotAccountsTable - Account userId samples: ${mockAccounts.map(a => a.userId).join(', ')}`);
+          
           setAccounts(filteredAccounts);
           setLoading(false);
         } catch (innerError) {
@@ -107,11 +118,20 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
 
   useEffect(() => {
     fetchAccounts();
+    
+    const safetyTimer = setTimeout(() => {
+      if (loading) {
+        console.log('BotAccountsTable - Safety timer expired, forcing loading state to false');
+        setLoading(false);
+      }
+    }, 5000);
+    
+    return () => clearTimeout(safetyTimer);
   }, [fetchAccounts]);
 
-  // Handle refresh trigger from parent
   useEffect(() => {
     if (refreshTrigger) {
+      console.log('BotAccountsTable - Refresh triggered from parent');
       fetchAccounts();
     }
   }, [refreshTrigger, fetchAccounts]);
@@ -129,6 +149,8 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
     toast.info('Refreshing accounts data...');
     fetchAccounts();
   };
+
+  console.log(`BotAccountsTable - Render state: loading=${loading}, accounts=${accounts.length}, error=${error !== null}`);
 
   if (loading) {
     return <LoadingAccounts />;

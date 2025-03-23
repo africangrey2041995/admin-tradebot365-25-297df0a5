@@ -35,9 +35,17 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   useEffect(() => {
     // Sync refreshLoading with parent isLoading
     setRefreshLoading(isLoading);
+    
+    // Safety timeout to ensure refreshLoading is eventually reset
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setRefreshLoading(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
   }, [isLoading]);
 
-  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}`);
+  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}`);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -49,12 +57,14 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   };
 
   const handleRefresh = () => {
+    console.log("UserBotDetailTabs - handleRefresh called, setting refreshLoading to true");
     setRefreshLoading(true);
     if (onRefresh) {
       onRefresh();
     }
     // In case the parent doesn't reset the loading state
     setTimeout(() => {
+      console.log("UserBotDetailTabs - Resetting refreshLoading to false after timeout");
       setRefreshLoading(false);
     }, 1500);
   };
