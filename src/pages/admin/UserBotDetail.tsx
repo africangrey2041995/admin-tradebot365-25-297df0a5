@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,15 +5,18 @@ import { RefreshCw, Info, ExternalLink, Webhook, Key, Mail, Phone, User } from '
 import { Button } from "@/components/ui/button";
 import { BotCardProps } from '@/components/bots/BotCard';
 import BotInfoCard from '@/components/bots/BotInfoCard';
-import BotProfileTabs from '@/components/bots/BotProfileTabs';
+import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
+import { CoinstratSignal } from '@/types/signal';
+import { Account } from '@/types';
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const { goBack, navigateTo } = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshLoading, setRefreshLoading] = useState(false);
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [userInfo, setUserInfo] = useState<{
     id: string;
@@ -24,12 +26,91 @@ const AdminUserBotDetail = () => {
     status: 'active' | 'inactive' | 'suspended';
   } | null>(null);
   
+  const mockAccounts: Account[] = [
+    {
+      id: 'ACC001',
+      name: 'Trading Account 1',
+      userAccount: 'Primary Account',
+      userEmail: 'user@example.com',
+      apiName: 'Binance API',
+      apiId: 'API001',
+      tradingAccount: '4056629',
+      tradingAccountType: 'Live',
+      tradingAccountBalance: '$500',
+      status: 'Connected',
+      createdDate: new Date(2023, 5, 15).toISOString(),
+      lastUpdated: new Date(2023, 11, 20).toISOString(),
+      userId: 'USR001'
+    },
+    {
+      id: 'ACC002',
+      name: 'Trading Account 2',
+      userAccount: 'Secondary Account',
+      userEmail: 'user@example.com',
+      apiName: 'Binance API',
+      apiId: 'API001',
+      tradingAccount: '4056789',
+      tradingAccountType: 'Live',
+      tradingAccountBalance: '$1000',
+      status: 'Connected',
+      createdDate: new Date(2023, 6, 22).toISOString(),
+      lastUpdated: new Date(2023, 10, 5).toISOString(),
+      userId: 'USR001'
+    }
+  ];
+
+  const mockLogs: CoinstratSignal[] = [
+    {
+      id: 'CSP-78952364',
+      originalSignalId: 'SIG001',
+      action: 'ENTER_LONG',
+      instrument: 'BTCUSDT',
+      timestamp: new Date().toISOString(),
+      signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
+      maxLag: '5s',
+      investmentType: 'crypto',
+      amount: '1.5',
+      status: 'Processed',
+      processedAccounts: [
+        {
+          accountId: 'ACC-001',
+          userId: 'USR001',
+          name: 'Binance Spot Account',
+          timestamp: new Date().toISOString(),
+          status: 'success'
+        }
+      ],
+      failedAccounts: []
+    },
+    {
+      id: 'CSP-78956789',
+      originalSignalId: 'SIG002',
+      action: 'EXIT_LONG',
+      instrument: 'ETHUSDT',
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
+      maxLag: '5s',
+      investmentType: 'crypto',
+      amount: '2.3',
+      status: 'Processed',
+      processedAccounts: [
+        {
+          accountId: 'ACC-001',
+          userId: 'USR001',
+          name: 'Binance Spot Account',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          status: 'success'
+        }
+      ],
+      failedAccounts: []
+    }
+  ];
+  
   useEffect(() => {
     const fetchBotDetails = () => {
       setIsLoading(true);
       
       try {
-        // Mock data - in a real app, this would be an API call
         setTimeout(() => {
           try {
             const mockBot: BotCardProps = {
@@ -54,7 +135,6 @@ const AdminUserBotDetail = () => {
               status: 'Active',
             };
             
-            // Mock user info
             const mockUserInfo = {
               id: 'USR001',
               name: 'Nguyễn Văn A',
@@ -86,15 +166,12 @@ const AdminUserBotDetail = () => {
     goBack();
   };
 
-  const handleAddAccount = () => {
-    try {
-      // This would open an add account dialog in a real implementation
-      console.log('Opening add account dialog');
-      toast.info('Đang mở hộp thoại thêm tài khoản');
-    } catch (error) {
-      console.error('Error opening add account dialog:', error);
-      toast.error('Không thể mở hộp thoại thêm tài khoản');
-    }
+  const refreshData = () => {
+    setRefreshLoading(true);
+    setTimeout(() => {
+      setRefreshLoading(false);
+      toast.success('Đã làm mới dữ liệu');
+    }, 1000);
   };
 
   const viewPublicBotProfile = () => {
@@ -290,7 +367,14 @@ const AdminUserBotDetail = () => {
           </CardContent>
         </Card>
 
-        <BotProfileTabs botId={botId || ''} onAddAccount={handleAddAccount} />
+        <UserBotDetailTabs 
+          botId={botId || ''} 
+          userId={userInfo?.id || ''}
+          accountsData={mockAccounts}
+          logsData={mockLogs}
+          onRefresh={refreshData}
+          isLoading={refreshLoading}
+        />
       </div>
     </ErrorBoundary>
   );
