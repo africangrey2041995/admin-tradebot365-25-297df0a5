@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -117,6 +118,7 @@ const IntegratedPropBotDetail = () => {
           logsData={mockLogs}
           // Đối với prop bot, sử dụng label "TB365 ID" cho cột ID
           signalSourceLabel="TB365 ID"
+          botType="prop" // Add the required botType prop
         />
       </div>
     </MainLayout>

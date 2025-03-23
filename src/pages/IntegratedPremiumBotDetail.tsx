@@ -120,6 +120,7 @@ const IntegratedPremiumBotDetail = () => {
           overviewContent={overviewContent}
           // Đối với premium bot, sử dụng label "TB365 ID" cho cột ID
           signalSourceLabel="TB365 ID"
+          botType="premium" // Add the required botType prop
         />
       </div>
     </MainLayout>
