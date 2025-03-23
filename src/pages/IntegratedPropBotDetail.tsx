@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, BarChart3, Settings, Info, PlayCircle, PauseCircle, RefreshCw, Users, Clock, Calendar, LineChart, Webhook, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, BarChart3, Info, PlayCircle, PauseCircle, RefreshCw, Users, Clock, Calendar, LineChart, Webhook, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,8 +12,9 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
 
 const CURRENT_USER_ID = 'USR-123456';
 
@@ -60,41 +62,6 @@ const propBotData = {
       userId: 'USR-123456'
     }
   ],
-  recentTrades: [
-    { 
-      id: 'trade-001', 
-      pair: 'BTC/USDT', 
-      type: 'Long', 
-      entry: '$41,250', 
-      exit: '$41,780', 
-      profit: '+$53', 
-      date: '2023-11-20', 
-      time: '14:23',
-      status: 'closed'
-    },
-    { 
-      id: 'trade-002', 
-      pair: 'ETH/USDT', 
-      type: 'Short', 
-      entry: '$2,340', 
-      exit: '$2,310', 
-      profit: '+$30', 
-      date: '2023-11-20', 
-      time: '16:45',
-      status: 'closed'
-    },
-    { 
-      id: 'trade-003', 
-      pair: 'SOL/USDT', 
-      type: 'Long', 
-      entry: '$62.5', 
-      exit: null, 
-      profit: '-$12', 
-      date: '2023-11-21', 
-      time: '09:15',
-      status: 'open'
-    }
-  ],
   rules: [
     'Minimum 10 trading days required',
     'Maximum daily drawdown: 4%',
@@ -114,6 +81,7 @@ const IntegratedPropBotDetail = () => {
   const [timeframe, setTimeframe] = useState('1d');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     const fetchBotData = () => {
@@ -164,10 +132,6 @@ const IntegratedPropBotDetail = () => {
 
   const bot = propBotData;
 
-  const handleViewAccount = (accountId: string) => {
-    navigate(`/accounts/${accountId}`);
-  };
-
   const toggleBotStatus = () => {
     setBotRunning(!botRunning);
     toast(botRunning ? "Bot đã tạm dừng" : "Bot đã được kích hoạt", {
@@ -185,12 +149,6 @@ const IntegratedPropBotDetail = () => {
         description: "Dữ liệu bot đã được cập nhật thành công",
       });
     }, 1500);
-  };
-
-  const handleSettingsChange = (value: string) => {
-    toast("Cài đặt đã được thay đổi", {
-      description: `Thay đổi cài đặt ${value}`,
-    });
   };
 
   return (
@@ -313,12 +271,11 @@ const IntegratedPropBotDetail = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid grid-cols-4 md:w-[400px]">
+        <Tabs defaultValue="overview" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-3 md:w-[400px]">
             <TabsTrigger value="overview">Tổng Quan</TabsTrigger>
-            <TabsTrigger value="trades">Giao Dịch</TabsTrigger>
-            <TabsTrigger value="accounts">Tài Khoản</TabsTrigger>
-            <TabsTrigger value="settings">Cài Đặt</TabsTrigger>
+            <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
+            <TabsTrigger value="connected-accounts">Tài khoản kết nối</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">
@@ -438,254 +395,32 @@ const IntegratedPropBotDetail = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="trades">
+          <TabsContent value="coinstrat-logs">
             <Card>
               <CardHeader>
-                <CardTitle>Giao Dịch Gần Đây</CardTitle>
+                <CardTitle>Coinstrat Pro Logs</CardTitle>
                 <CardDescription>
-                  Lịch sử các giao dịch được thực hiện bởi bot trong thời gian gần đây
+                  Xem lịch sử các tín hiệu đã được xử lý bởi Coinstrat Pro
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-slate-50 dark:bg-zinc-800">
-                        <th className="py-3 px-4 text-left font-medium">Cặp</th>
-                        <th className="py-3 px-4 text-left font-medium">Loại</th>
-                        <th className="py-3 px-4 text-left font-medium">Giá Vào</th>
-                        <th className="py-3 px-4 text-left font-medium">Giá Ra</th>
-                        <th className="py-3 px-4 text-left font-medium">Lợi Nhuận</th>
-                        <th className="py-3 px-4 text-left font-medium">Thời Gian</th>
-                        <th className="py-3 px-4 text-left font-medium">Trạng Thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bot.recentTrades.map((trade) => (
-                        <tr key={trade.id} className="border-b">
-                          <td className="py-3 px-4 font-medium">{trade.pair}</td>
-                          <td className="py-3 px-4">
-                            <Badge className={`${trade.type === 'Long' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
-                              {trade.type}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4">{trade.entry}</td>
-                          <td className="py-3 px-4">{trade.exit || '-'}</td>
-                          <td className={`py-3 px-4 ${trade.profit.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                            {trade.profit}
-                          </td>
-                          <td className="py-3 px-4">{trade.date}, {trade.time}</td>
-                          <td className="py-3 px-4">
-                            <Badge variant={trade.status === 'open' ? 'outline' : 'default'} className={trade.status === 'open' ? 'border-blue-300 text-blue-600' : ''}>
-                              {trade.status === 'open' ? 'Đang Mở' : 'Đã Đóng'}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <CoinstratLogs botId={botId || ""} userId={CURRENT_USER_ID} />
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm">Giao dịch trước đó</Button>
-                <Button variant="outline" size="sm">Giao dịch tiếp theo</Button>
-              </CardFooter>
             </Card>
           </TabsContent>
           
-          <TabsContent value="accounts">
+          <TabsContent value="connected-accounts">
             <Card>
               <CardHeader>
-                <CardTitle>Tài Khoản Đã Kết Nối</CardTitle>
+                <CardTitle>Tài khoản kết nối</CardTitle>
                 <CardDescription>
-                  Các tài khoản đã được kết nối với bot này
+                  Quản lý các tài khoản được kết nối với bot này
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-slate-50 dark:bg-zinc-800">
-                        <th className="py-3 px-4 text-left font-medium">Tên</th>
-                        <th className="py-3 px-4 text-left font-medium">Trạng Thái</th>
-                        <th className="py-3 px-4 text-left font-medium">Số Dư</th>
-                        <th className="py-3 px-4 text-left font-medium">Vốn</th>
-                        <th className="py-3 px-4 text-left font-medium">Lợi Nhuận</th>
-                        <th className="py-3 px-4 text-left font-medium">Ngày Tạo</th>
-                        <th className="py-3 px-4 text-left font-medium">User ID</th>
-                        <th className="py-3 px-4 text-left font-medium"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bot.accounts.filter(account => account.userId === CURRENT_USER_ID).map((account) => (
-                        <tr key={account.id} className="border-b">
-                          <td className="py-3 px-4 font-medium">{account.name}</td>
-                          <td className="py-3 px-4">
-                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                              {account.status}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4">{account.balance}</td>
-                          <td className="py-3 px-4">{account.equity}</td>
-                          <td className={`py-3 px-4 ${account.profit.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                            {account.profit} ({account.profitPercentage})
-                          </td>
-                          <td className="py-3 px-4">{account.createdDate}</td>
-                          <td className="py-3 px-4">{account.userId}</td>
-                          <td className="py-3 px-4">
-                            <Button variant="outline" size="sm" onClick={() => handleViewAccount(account.id)}>
-                              Chi Tiết
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <BotAccountsTable botId={botId || ""} userId={CURRENT_USER_ID} />
               </CardContent>
-              <CardFooter>
-                <Button onClick={() => navigate('/accounts')}>
-                  Kết Nối Tài Khoản Mới
-                </Button>
-              </CardFooter>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="settings">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Cài Đặt Bot
-                  </CardTitle>
-                  <CardDescription>
-                    Điều chỉnh cài đặt cho bot Prop Trading của bạn
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Kích Thước Vị Thế Tối Đa</label>
-                    <Select defaultValue="2" onValueChange={(v) => handleSettingsChange('Kích thước vị thế: ' + v + '%')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn kích thước" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1% tài khoản</SelectItem>
-                        <SelectItem value="2">2% tài khoản</SelectItem>
-                        <SelectItem value="3">3% tài khoản</SelectItem>
-                        <SelectItem value="5">5% tài khoản</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Rủi Ro Mỗi Giao Dịch</label>
-                    <Select defaultValue="1" onValueChange={(v) => handleSettingsChange('Rủi ro mỗi giao dịch: ' + v + '%')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn mức rủi ro" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0.5">0.5% tài khoản</SelectItem>
-                        <SelectItem value="1">1% tài khoản</SelectItem>
-                        <SelectItem value="1.5">1.5% tài khoản</SelectItem>
-                        <SelectItem value="2">2% tài khoản</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Thời Gian Giao Dịch</label>
-                    <Select defaultValue="market" onValueChange={(v) => handleSettingsChange('Thời gian giao dịch: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn thời gian" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="market">Giờ thị trường (9:30 - 16:00)</SelectItem>
-                        <SelectItem value="extended">Giờ mở rộng (4:00 - 20:00)</SelectItem>
-                        <SelectItem value="24h">24 giờ</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Cặp Tiền Được Phép</label>
-                    <Select defaultValue="major" onValueChange={(v) => handleSettingsChange('Cặp tiền được phép: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn cặp tiền" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="major">Chỉ các cặp chính</SelectItem>
-                        <SelectItem value="all">Tất cả các cặp</SelectItem>
-                        <SelectItem value="custom">Tùy chỉnh</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Lưu Cài Đặt</Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Webhook className="h-5 w-5" />
-                    Tích Hợp và Thông Báo
-                  </CardTitle>
-                  <CardDescription>
-                    Quản lý cách bot giao tiếp và gửi thông báo
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Thông Báo Email</label>
-                    <Select defaultValue="all" onValueChange={(v) => handleSettingsChange('Thông báo email: ' + v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn tần suất" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Mọi giao dịch</SelectItem>
-                        <SelectItem value="important">Chỉ giao dịch quan trọng</SelectItem>
-                        <SelectItem value="daily">Tóm tắt hàng ngày</SelectItem>
-                        <SelectItem value="none">Tắt</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Webhook URL</label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="text" 
-                        placeholder="https://your-webhook-url.com" 
-                        className="flex-1"
-                        disabled 
-                      />
-                      <Button variant="outline" size="sm">Kiểm Tra</Button>
-                    </div>
-                    <p className="text-xs text-slate-500">Nhận thông báo thông qua webhook để tích hợp với các dịch vụ khác</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Telegram Bot</label>
-                    <div className="flex items-center space-x-2">
-                      <Input 
-                        type="text" 
-                        placeholder="Bot Token" 
-                        className="flex-1"
-                        disabled
-                      />
-                      <Button variant="outline" size="sm">Kết Nối</Button>
-                    </div>
-                    <p className="text-xs text-slate-500">Kết nối với Telegram để nhận thông báo trực tiếp</p>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Lưu Thông Báo</Button>
-                </CardFooter>
-              </Card>
-            </div>
           </TabsContent>
         </Tabs>
       </div>
