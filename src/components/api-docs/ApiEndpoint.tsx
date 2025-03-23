@@ -1,7 +1,7 @@
 
 import React, { ReactNode } from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Check, ShieldAlert, Info } from "lucide-react";
+import { ShieldAlert, Info } from "lucide-react";
 
 interface ApiEndpointProps {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
