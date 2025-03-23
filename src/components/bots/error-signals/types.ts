@@ -23,4 +23,4 @@ export interface ErrorSignalRowProps {
 }
 
 // Re-export ExtendedSignal to make it available to components importing from this file
-export { ExtendedSignal };
+export type { ExtendedSignal };
