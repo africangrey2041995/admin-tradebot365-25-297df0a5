@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { 
@@ -18,7 +17,6 @@ import {
   Calendar,
   ArrowRight,
   ChevronLeft,
-  CircleDollarSign,
   Activity,
   PieChart,
   Plus,
@@ -26,9 +24,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   AreaChart, 
   Area, 
@@ -43,11 +40,6 @@ import {
 } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
-import { Account } from '@/types';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TradingViewLogs from '@/components/bots/TradingViewLogs';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
 
 const premiumBots = [
   {
@@ -102,27 +94,174 @@ Bot này phù hợp cho các nhà đầu tư muốn tận dụng các xu hướn
       'Đa dạng cặp tiền'
     ],
     createdDate: '2023-04-15',
-    isIntegrated: true,
-    accounts: [
-      {
-        id: 'acc-001',
-        name: 'Binance Main',
-        status: 'Connected',
-        createdDate: '2023-10-15',
-        lastUpdated: '2023-11-10',
-        volumeMultiplier: '2'
-      },
-      {
-        id: 'acc-002',
-        name: 'Bybit Demo',
-        status: 'Connected',
-        createdDate: '2023-10-20',
-        lastUpdated: '2023-11-10',
-        volumeMultiplier: '1'
-      }
-    ]
+    isIntegrated: false,
+    accounts: []
   },
-  // ... other premium bots
+  {
+    id: 'pb-002',
+    name: 'Dynamic Scalper Pro',
+    description: 'Bot chuyên giao dịch scalping với khả năng thích ứng cao với biến động thị trường.',
+    longDescription: `Dynamic Scalper Pro là một bot giao dịch scalping được thiết kế để tận dụng các biến động giá nhỏ trong thị trường tiền điện tử.
+
+Bot sử dụng các chỉ báo kỹ thuật và thuật toán phức tạp để xác định các cơ hội giao dịch ngắn hạn. Khi một cơ hội được xác định, bot sẽ mở và đóng vị thế trong vài giây hoặc phút để kiếm lợi nhuận nhỏ.
+
+Các tính năng chính:
+- Xác định cơ hội giao dịch ngắn hạn
+- Quản lý rủi ro nâng cao
+- Tốc độ giao dịch cực nhanh
+- Hoạt động 24/7
+- Báo cáo chi tiết
+
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhận rủi ro cao.`,
+    exchange: 'Binance',
+    type: 'scalping',
+    performanceLastMonth: '+22.1%',
+    performanceAllTime: '+148.9%',
+    risk: 'high',
+    minCapital: '$300',
+    status: 'active',
+    subscribers: 62,
+    imageUrl: null,
+    colorScheme: 'red',
+    botId: 'PRE8261',
+    monthlyPerformance: [
+      { month: 'Jan', value: 15.2 },
+      { month: 'Feb', value: 11.5 },
+      { month: 'Mar', value: -3.8 },
+      { month: 'Apr', value: 7.9 },
+      { month: 'May', value: 18.7 },
+      { month: 'Jun', value: 12.3 },
+      { month: 'Jul', value: 6.8 },
+      { month: 'Aug', value: -4.5 },
+      { month: 'Sep', value: 11.2 },
+      { month: 'Oct', value: 22.1 },
+      { month: 'Nov', value: 0 },
+      { month: 'Dec', value: 0 },
+    ],
+    pairs: ['BTC/USDT', 'ETH/USDT', 'LTC/USDT', 'XRP/USDT', 'ADA/USDT'],
+    features: [
+      'Phân tích kỹ thuật nâng cao',
+      'Quản lý rủi ro tự động',
+      'Tốc độ giao dịch cực nhanh',
+      'Hoạt động 24/7',
+      'Báo cáo chi tiết',
+      'Cài đặt tùy chỉnh',
+      'Hỗ trợ đa sàn'
+    ],
+    createdDate: '2023-05-20',
+    isIntegrated: false,
+    accounts: []
+  },
+  {
+    id: 'pb-003',
+    name: 'Trend Follower Elite',
+    description: 'Bot giao dịch theo xu hướng dài hạn, phù hợp cho nhà đầu tư kiên nhẫn.',
+    longDescription: `Trend Follower Elite là một bot giao dịch theo xu hướng được thiết kế để xác định và tận dụng các xu hướng dài hạn trong thị trường tiền điện tử.
+
+Bot sử dụng các chỉ báo kỹ thuật và phân tích cơ bản để xác định các xu hướng mạnh. Khi một xu hướng được xác định, bot sẽ mở vị thế và giữ nó trong vài tuần hoặc tháng để kiếm lợi nhuận lớn.
+
+Các tính năng chính:
+- Xác định xu hướng dài hạn
+- Quản lý vốn thông minh
+- Giao dịch tự động
+- Hoạt động 24/7
+- Báo cáo toàn diện
+
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các xu hướng dài hạn và có khả năng chấp nhận rủi ro trung bình.`,
+    exchange: 'Coinbase Pro',
+    type: 'trend',
+    performanceLastMonth: '+15.8%',
+    performanceAllTime: '+98.2%',
+    risk: 'medium',
+    minCapital: '$1000',
+    status: 'active',
+    subscribers: 48,
+    imageUrl: null,
+    colorScheme: 'purple',
+    botId: 'PRE9147',
+    monthlyPerformance: [
+      { month: 'Jan', value: 10.2 },
+      { month: 'Feb', value: 7.5 },
+      { month: 'Mar', value: -1.2 },
+      { month: 'Apr', value: 4.8 },
+      { month: 'May', value: 12.3 },
+      { month: 'Jun', value: 8.9 },
+      { month: 'Jul', value: 4.2 },
+      { month: 'Aug', value: -2.5 },
+      { month: 'Sep', value: 7.6 },
+      { month: 'Oct', value: 15.8 },
+      { month: 'Nov', value: 0 },
+      { month: 'Dec', value: 0 },
+    ],
+    pairs: ['BTC/USD', 'ETH/USD', 'LTC/USD', 'XRP/USD', 'BCH/USD'],
+    features: [
+      'Phân tích xu hướng dài hạn',
+      'Quản lý vốn thông minh',
+      'Giao dịch tự động',
+      'Hoạt động 24/7',
+      'Báo cáo toàn diện',
+      'Cài đặt tùy chỉnh',
+      'Hỗ trợ đa sàn'
+    ],
+    createdDate: '2023-06-10',
+    isIntegrated: false,
+    accounts: []
+  },
+  {
+    id: 'pb-004',
+    name: 'Grid Master Bot',
+    description: 'Bot giao dịch lưới, tối ưu hóa lợi nhuận trong thị trường đi ngang.',
+    longDescription: `Grid Master Bot là một bot giao dịch lưới được thiết kế để tạo ra lợi nhuận trong thị trường đi ngang hoặc ít biến động.
+
+Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lưới, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra lợi nhuận nhỏ từ mỗi giao dịch.
+
+Các tính năng chính:
+- Tạo lợi nhuận trong thị trường đi ngang
+- Tự động hóa hoàn toàn
+- Quản lý rủi ro tích hợp
+- Hoạt động 24/7
+- Báo cáo chi tiết
+
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ thị trường đi ngang và có khả năng chấp nhận rủi ro thấp.`,
+    exchange: 'KuCoin',
+    type: 'grid',
+    performanceLastMonth: '+9.5%',
+    performanceAllTime: '+62.7%',
+    risk: 'low',
+    minCapital: '$200',
+    status: 'active',
+    subscribers: 35,
+    imageUrl: null,
+    colorScheme: 'blue',
+    botId: 'PRE6529',
+    monthlyPerformance: [
+      { month: 'Jan', value: 6.8 },
+      { month: 'Feb', value: 5.2 },
+      { month: 'Mar', value: -0.5 },
+      { month: 'Apr', value: 3.1 },
+      { month: 'May', value: 8.4 },
+      { month: 'Jun', value: 6.2 },
+      { month: 'Jul', value: 3.5 },
+      { month: 'Aug', value: -1.8 },
+      { month: 'Sep', value: 5.9 },
+      { month: 'Oct', value: 9.5 },
+      { month: 'Nov', value: 0 },
+      { month: 'Dec', value: 0 },
+    ],
+    pairs: ['BTC/USDT', 'ETH/USDT', 'LTC/USDT', 'XRP/USDT', 'ADA/USDT'],
+    features: [
+      'Tạo lợi nhuận trong thị trường đi ngang',
+      'Tự động hóa hoàn toàn',
+      'Quản lý rủi ro tích hợp',
+      'Hoạt động 24/7',
+      'Báo cáo chi tiết',
+      'Cài đặt tùy chỉnh',
+      'Hỗ trợ đa sàn'
+    ],
+    createdDate: '2023-07-01',
+    isIntegrated: false,
+    accounts: []
+  }
 ];
 
 const PremiumBotDetail = () => {
@@ -130,8 +269,6 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
-  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -239,11 +376,6 @@ const PremiumBotDetail = () => {
     { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
   ];
 
-  const handleAddAccount = (accountData: any) => {
-    console.log('Adding account:', accountData, 'to premium bot:', botId);
-    toast.success('Account added successfully!');
-  };
-
   return (
     <MainLayout title={bot?.name || "Premium Bot Detail"}>
       <div className="space-y-6">
@@ -271,378 +403,301 @@ const PremiumBotDetail = () => {
             </Badge>
           </div>
           <div className="flex gap-2">
-            {bot.isIntegrated ? (
-              <Button variant="outline" onClick={() => setIsAddAccountDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Thêm tài khoản
-              </Button>
-            ) : (
-              <Button onClick={handleSubscribe}>
-                Đăng Ký Sử Dụng
-              </Button>
-            )}
+            <Button onClick={handleSubscribe}>
+              Đăng Ký Sử Dụng
+            </Button>
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-            <TabsTrigger value="accounts">Tài khoản ({bot.accounts?.length || 0})</TabsTrigger>
-            <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
-            <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Giới thiệu</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose max-w-none dark:prose-invert">
-                      <p className="text-slate-600 dark:text-slate-300 whitespace-pre-line">
-                        {bot?.longDescription}
-                      </p>
-                    </div>
-                    <div className="mt-6">
-                      <h4 className="font-medium text-slate-800 dark:text-white mb-2">Các cặp tiền giao dịch</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {bot?.pairs.map((pair, index) => (
-                          <Badge key={index} variant="outline">{pair}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>Biểu đồ hiệu suất</CardTitle>
-                    <Tabs defaultValue="month" value={selectedChartPeriod} onValueChange={setSelectedChartPeriod} className="w-[250px]">
-                      <TabsList>
-                        <TabsTrigger value="week">Tuần</TabsTrigger>
-                        <TabsTrigger value="month">Tháng</TabsTrigger>
-                        <TabsTrigger value="year">Năm</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[350px] w-full">
-                      <ChartContainer
-                        config={{
-                          profit: {
-                            label: "Profit",
-                            theme: {
-                              light: "#10b981",
-                              dark: "#34d399"
-                            }
-                          },
-                          loss: {
-                            label: "Loss",
-                            theme: {
-                              light: "#ef4444",
-                              dark: "#f87171"
-                            }
-                          },
-                          line: {
-                            label: "Performance Line",
-                            theme: {
-                              light: "#60a5fa",
-                              dark: "#3b82f6"
-                            }
-                          }
-                        }}
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart
-                            data={generateChartData()}
-                            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                          >
-                            <defs>
-                              <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                              </linearGradient>
-                              <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                            <XAxis 
-                              dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
-                              className="text-xs font-medium" 
-                            />
-                            <YAxis className="text-xs font-medium" />
-                            <ChartTooltip 
-                              content={
-                                <ChartTooltipContent 
-                                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
-                                />
-                              } 
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="value" 
-                              stroke="#10b981" 
-                              fillOpacity={1} 
-                              fill="url(#colorPositive)" 
-                              activeDot={{ r: 6 }} 
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </ChartContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Chi tiết giao dịch</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[350px]">
-                      <ChartContainer
-                        config={{
-                          profit: {
-                            label: "Profit",
-                            theme: {
-                              light: "#10b981",
-                              dark: "#34d399"
-                            }
-                          },
-                          trades: {
-                            label: "Trades",
-                            theme: {
-                              light: "#60a5fa",
-                              dark: "#3b82f6"
-                            }
-                          }
-                        }}
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart
-                            data={tradePerformanceData}
-                            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                          >
-                            <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                            <XAxis dataKey="name" scale="band" />
-                            <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
-                            <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
-                            <Tooltip />
-                            <Legend />
-                            <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
-                            <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </ChartContainer>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
-                      {statisticsData.map((stat, index) => (
-                        <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
-                          <div className="flex items-center gap-2 mb-1">
-                            {stat.icon}
-                            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                              {stat.name}
-                            </span>
-                          </div>
-                          <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                            {stat.value}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Tính năng</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {bot?.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                          <span className="text-slate-700 dark:text-slate-300">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Thông tin chung</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Bot className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot?.type)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <CircuitBoard className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot?.exchange}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Wallet className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot?.minCapital}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Người dùng</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot?.subscribers}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-slate-500" />
-                        <span className="text-slate-600 dark:text-slate-300">Ngày tạo</span>
-                      </div>
-                      <span className="font-medium text-slate-800 dark:text-white">{bot?.createdDate}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Hiệu suất</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
-                      </div>
-                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                        {bot?.performanceLastMonth}
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <BarChart4 className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
-                      </div>
-                      <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                        {bot?.performanceAllTime}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle>
-                      {bot.isIntegrated ? "Quản lý tài khoản" : "Đăng ký sử dụng"}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {bot.isIntegrated ? (
-                      <>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                          Bot này đã được tích hợp với {bot.accounts?.length || 0} tài khoản
-                        </p>
-                        <Button 
-                          onClick={() => setActiveTab("accounts")} 
-                          className="w-full mb-2"
-                        >
-                          Xem tài khoản đã tích hợp
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          onClick={() => setIsAddAccountDialogOpen(true)} 
-                          className="w-full"
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Thêm tài khoản mới
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                          Đăng ký sử dụng {bot?.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
-                        </p>
-                        <Button onClick={handleSubscribe} className="w-full">
-                          Đăng Ký Ngay
-                        </Button>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="accounts">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Tài khoản đã tích hợp</CardTitle>
+              <CardHeader>
+                <CardTitle>Giới thiệu</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="prose max-w-none dark:prose-invert">
+                  <p className="text-slate-600 dark:text-slate-300 whitespace-pre-line">
+                    {bot?.longDescription}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  <h4 className="font-medium text-slate-800 dark:text-white mb-2">Các cặp tiền giao dịch</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {bot?.pairs.map((pair, index) => (
+                      <Badge key={index} variant="outline">{pair}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle>Biểu đồ hiệu suất</CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                    <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                    Làm mới
+                  <Button 
+                    variant={selectedChartPeriod === "week" ? "secondary" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedChartPeriod("week")}
+                  >
+                    Tuần
                   </Button>
-                  <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)} className="h-8">
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Thêm tài khoản
+                  <Button 
+                    variant={selectedChartPeriod === "month" ? "secondary" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedChartPeriod("month")}
+                  >
+                    Tháng
+                  </Button>
+                  <Button 
+                    variant={selectedChartPeriod === "year" ? "secondary" : "outline"} 
+                    size="sm"
+                    onClick={() => setSelectedChartPeriod("year")}
+                  >
+                    Năm
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <BotAccountsTable botId={bot.id} />
+                <div className="h-[350px] w-full">
+                  <ChartContainer
+                    config={{
+                      profit: {
+                        label: "Profit",
+                        theme: {
+                          light: "#10b981",
+                          dark: "#34d399"
+                        }
+                      },
+                      loss: {
+                        label: "Loss",
+                        theme: {
+                          light: "#ef4444",
+                          dark: "#f87171"
+                        }
+                      },
+                      line: {
+                        label: "Performance Line",
+                        theme: {
+                          light: "#60a5fa",
+                          dark: "#3b82f6"
+                        }
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={generateChartData()}
+                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                        <XAxis 
+                          dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
+                          className="text-xs font-medium" 
+                        />
+                        <YAxis className="text-xs font-medium" />
+                        <ChartTooltip 
+                          content={
+                            <ChartTooltipContent 
+                              formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
+                            />
+                          } 
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke="#10b981" 
+                          fillOpacity={1} 
+                          fill="url(#colorPositive)" 
+                          activeDot={{ r: 6 }} 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="trading-logs">
+
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>TB365 Signal Logs</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                  <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                  Làm mới
-                </Button>
+              <CardHeader>
+                <CardTitle>Chi tiết giao dịch</CardTitle>
               </CardHeader>
               <CardContent>
-                <TradingViewLogs botId={bot.id} />
+                <div className="h-[350px]">
+                  <ChartContainer
+                    config={{
+                      profit: {
+                        label: "Profit",
+                        theme: {
+                          light: "#10b981",
+                          dark: "#34d399"
+                        }
+                      },
+                      trades: {
+                        label: "Trades",
+                        theme: {
+                          light: "#60a5fa",
+                          dark: "#3b82f6"
+                        }
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart
+                        data={tradePerformanceData}
+                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      >
+                        <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
+                        <XAxis dataKey="name" scale="band" />
+                        <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
+                        <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
+                        <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
+                  {statisticsData.map((stat, index) => (
+                    <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                      <div className="flex items-center gap-2 mb-1">
+                        {stat.icon}
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                          {stat.name}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                        {stat.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="coinstrat-logs">
+
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Coinstrat Logs</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => {}} className="h-8">
-                  <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                  Làm mới
-                </Button>
+              <CardHeader>
+                <CardTitle>Tính năng</CardTitle>
               </CardHeader>
               <CardContent>
-                <CoinstratLogs botId={bot.id} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {bot?.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span className="text-slate-700 dark:text-slate-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Thông tin chung</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-4 w-4 text-slate-500" />
+                    <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
+                  </div>
+                  <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot?.type)}</span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <CircuitBoard className="h-4 w-4 text-slate-500" />
+                    <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
+                  </div>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.exchange}</span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="h-4 w-4 text-slate-500" />
+                    <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
+                  </div>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.minCapital}</span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-slate-500" />
+                    <span className="text-slate-600 dark:text-slate-300">Người dùng</span>
+                  </div>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.subscribers}</span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-slate-500" />
+                    <span className="text-slate-600 dark:text-slate-300">Ngày tạo</span>
+                  </div>
+                  <span className="font-medium text-slate-800 dark:text-white">{bot?.createdDate}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Hiệu suất</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <TrendingUp className="h-4 w-4 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
+                  </div>
+                  <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                    {bot?.performanceLastMonth}
+                  </div>
+                </div>
+                
+                <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <BarChart4 className="h-4 w-4 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
+                  </div>
+                  <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                    {bot?.performanceAllTime}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>
+                  Đăng ký sử dụng
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                  Đăng ký sử dụng {bot?.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
+                </p>
+                <Button onClick={handleSubscribe} className="w-full">
+                  Đăng Ký Ngay
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
       
       <SubscribePremiumBotDialog
@@ -651,13 +706,6 @@ const PremiumBotDetail = () => {
         botId={bot?.id || ''}
         botName={bot?.name || ''}
         onSubscribe={confirmSubscription}
-      />
-      
-      <AddAccountDialog 
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot?.id || ''}
-        onAddAccount={handleAddAccount}
       />
     </MainLayout>
   );
