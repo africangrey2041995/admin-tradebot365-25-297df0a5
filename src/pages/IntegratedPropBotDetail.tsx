@@ -15,8 +15,200 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
+import { Account } from '@/types/account';
+import { CoinstratSignal, AccountSignalStatus, SignalAction } from '@/types/signal';
 
 const CURRENT_USER_ID = 'USR-123456';
+
+// Sample data for accounts connected to this bot
+const mockPropBotAccounts: Account[] = [
+  {
+    id: 'ACC-56789',
+    name: 'Coinstrat Pro - Challenge Phase 1',
+    status: 'Connected',
+    createdDate: '2023-11-15',
+    lastUpdated: '2023-12-05',
+    userId: 'USR-123456',
+    apiName: 'Coinstrat Pro API',
+    apiId: 'API-78901',
+    tradingAccount: '78901234',
+    tradingAccountType: 'Prop Challenge',
+    tradingAccountBalance: '$10,000',
+    volumeMultiplier: '1.0',
+    clientId: 'CPT123456',
+    secretId: 'hidden',
+    accessToken: 'hidden',
+    ctidTraderAccountId: 'CTID789012',
+    expireDate: '2024-05-15',
+    userAccount: 'Challenge Account',
+    userEmail: 'user@example.com'
+  },
+  {
+    id: 'ACC-67890',
+    name: 'Coinstrat Prop Demo',
+    status: 'Connected',
+    createdDate: '2023-10-20',
+    lastUpdated: '2023-12-10',
+    userId: 'USR-123456',
+    apiName: 'Coinstrat Demo API',
+    apiId: 'API-89012',
+    tradingAccount: '89012345',
+    tradingAccountType: 'Demo',
+    tradingAccountBalance: '$100,000',
+    volumeMultiplier: '0.5',
+    clientId: 'CPD789012',
+    secretId: 'hidden',
+    accessToken: 'hidden',
+    ctidTraderAccountId: 'CTID890123',
+    expireDate: '2024-04-20',
+    userAccount: 'Demo Account',
+    userEmail: 'user@example.com'
+  }
+];
+
+// Sample data for Coinstrat Pro logs
+const mockCoinstratLogs: CoinstratSignal[] = [
+  {
+    id: 'CSP-12345678',
+    originalSignalId: 'TV-87654321',
+    action: 'ENTER_LONG',
+    instrument: 'BTCUSDT',
+    timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    signalToken: 'CST123456789ABCDEF',
+    maxLag: '5s',
+    investmentType: 'crypto',
+    amount: '0.15',
+    status: 'Processed',
+    processedAccounts: [
+      {
+        accountId: 'ACC-56789',
+        userId: 'USR-123456',
+        name: 'Coinstrat Pro - Challenge Phase 1',
+        timestamp: new Date(Date.now() - 3550000).toISOString(),
+        status: 'success'
+      }
+    ],
+    failedAccounts: [],
+    botId: 'ptb-001',
+    botName: 'Prop Master'
+  },
+  {
+    id: 'CSP-23456789',
+    originalSignalId: 'TV-76543210',
+    action: 'EXIT_LONG',
+    instrument: 'BTCUSDT',
+    timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    signalToken: 'CST234567890ABCDEF',
+    maxLag: '5s',
+    investmentType: 'crypto',
+    amount: '0.15',
+    status: 'Processed',
+    processedAccounts: [
+      {
+        accountId: 'ACC-56789',
+        userId: 'USR-123456',
+        name: 'Coinstrat Pro - Challenge Phase 1',
+        timestamp: new Date(Date.now() - 86350000).toISOString(),
+        status: 'success'
+      }
+    ],
+    failedAccounts: [],
+    botId: 'ptb-001',
+    botName: 'Prop Master'
+  },
+  {
+    id: 'CSP-34567890',
+    originalSignalId: 'TV-65432109',
+    action: 'ENTER_SHORT',
+    instrument: 'ETHUSDT',
+    timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    signalToken: 'CST345678901ABCDEF',
+    maxLag: '5s',
+    investmentType: 'crypto',
+    amount: '1.2',
+    status: 'Failed',
+    processedAccounts: [],
+    failedAccounts: [
+      {
+        accountId: 'ACC-56789',
+        userId: 'USR-123456',
+        name: 'Coinstrat Pro - Challenge Phase 1',
+        timestamp: new Date(Date.now() - 172750000).toISOString(),
+        reason: 'Insufficient margin',
+        errorCode: 'MARGIN_ERROR',
+        status: 'failed'
+      }
+    ],
+    errorMessage: 'Insufficient margin for operation',
+    botId: 'ptb-001',
+    botName: 'Prop Master'
+  },
+  {
+    id: 'CSP-45678901',
+    originalSignalId: 'TV-54321098',
+    action: 'ENTER_LONG',
+    instrument: 'SOLUSDT',
+    timestamp: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+    signalToken: 'CST456789012ABCDEF',
+    maxLag: '5s',
+    investmentType: 'crypto',
+    amount: '25',
+    status: 'Processed',
+    processedAccounts: [
+      {
+        accountId: 'ACC-56789',
+        userId: 'USR-123456',
+        name: 'Coinstrat Pro - Challenge Phase 1',
+        timestamp: new Date(Date.now() - 259150000).toISOString(),
+        status: 'success'
+      },
+      {
+        accountId: 'ACC-67890',
+        userId: 'USR-123456',
+        name: 'Coinstrat Prop Demo',
+        timestamp: new Date(Date.now() - 259140000).toISOString(),
+        status: 'success'
+      }
+    ],
+    failedAccounts: [],
+    botId: 'ptb-001',
+    botName: 'Prop Master'
+  },
+  {
+    id: 'CSP-56789012',
+    originalSignalId: 'TV-43210987',
+    action: 'EXIT_LONG',
+    instrument: 'SOLUSDT',
+    timestamp: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+    signalToken: 'CST567890123ABCDEF',
+    maxLag: '5s',
+    investmentType: 'crypto',
+    amount: '25',
+    status: 'Partially Processed',
+    processedAccounts: [
+      {
+        accountId: 'ACC-56789',
+        userId: 'USR-123456',
+        name: 'Coinstrat Pro - Challenge Phase 1',
+        timestamp: new Date(Date.now() - 345550000).toISOString(),
+        status: 'success'
+      }
+    ],
+    failedAccounts: [
+      {
+        accountId: 'ACC-67890',
+        userId: 'USR-123456',
+        name: 'Coinstrat Prop Demo',
+        timestamp: new Date(Date.now() - 345540000).toISOString(),
+        reason: 'Position already closed',
+        errorCode: 'POSITION_CLOSED',
+        status: 'failed'
+      }
+    ],
+    botId: 'ptb-001',
+    botName: 'Prop Master'
+  }
+];
 
 const propBotData = {
   id: 'ptb-001',
@@ -82,6 +274,8 @@ const IntegratedPropBotDetail = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [mockAccounts, setMockAccounts] = useState<Account[]>([]);
+  const [mockLogs, setMockLogs] = useState<CoinstratSignal[]>([]);
 
   useEffect(() => {
     const fetchBotData = () => {
@@ -94,6 +288,9 @@ const IntegratedPropBotDetail = () => {
         
         if (ownerId === CURRENT_USER_ID) {
           setIsAuthorized(true);
+          // Set mock data for connected accounts and logs
+          setMockAccounts(mockPropBotAccounts);
+          setMockLogs(mockCoinstratLogs);
         } else {
           setIsAuthorized(false);
           toast.error("Bạn không có quyền truy cập bot này");
@@ -149,6 +346,26 @@ const IntegratedPropBotDetail = () => {
         description: "Dữ liệu bot đã được cập nhật thành công",
       });
     }, 1500);
+  };
+
+  // Mock implementation for the BotAccountsTable component
+  const MockBotAccountsTable = ({ botId, userId }: { botId: string, userId: string }) => {
+    return (
+      <BotAccountsTable 
+        botId={botId} 
+        userId={userId} 
+      />
+    );
+  };
+
+  // Mock implementation for the CoinstratLogs component
+  const MockCoinstratLogs = ({ botId, userId }: { botId: string, userId: string }) => {
+    return (
+      <CoinstratLogs 
+        botId={botId} 
+        userId={userId} 
+      />
+    );
   };
 
   return (
