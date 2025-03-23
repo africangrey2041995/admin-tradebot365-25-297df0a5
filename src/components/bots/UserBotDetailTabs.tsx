@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
@@ -30,6 +30,14 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   signalSourceLabel = "TradingView ID",
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
+  const [refreshLoading, setRefreshLoading] = useState(false);
+
+  useEffect(() => {
+    // Sync refreshLoading with parent isLoading
+    setRefreshLoading(isLoading);
+  }, [isLoading]);
+
+  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}`);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -41,9 +49,14 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   };
 
   const handleRefresh = () => {
+    setRefreshLoading(true);
     if (onRefresh) {
       onRefresh();
     }
+    // In case the parent doesn't reset the loading state
+    setTimeout(() => {
+      setRefreshLoading(false);
+    }, 1500);
   };
 
   return (
@@ -58,10 +71,10 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          disabled={isLoading}
+          disabled={refreshLoading}
           onClick={handleRefresh}
         >
-          {isLoading ? (
+          {refreshLoading ? (
             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
           ) : (
             <RefreshCw className="h-4 w-4 mr-2" />
@@ -82,13 +95,15 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               botId={botId} 
               userId={userId} 
               initialData={accountsData} 
+              refreshTrigger={refreshLoading}
             />
           </TabsContent>
           
           <TabsContent value="tradingview-logs">
             <TradingViewLogs 
               botId={botId} 
-              userId={userId} 
+              userId={userId}
+              refreshTrigger={refreshLoading}
             />
           </TabsContent>
           
@@ -97,7 +112,8 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               botId={botId} 
               userId={userId} 
               initialData={logsData}
-              signalSourceLabel={signalSourceLabel} 
+              signalSourceLabel={signalSourceLabel}
+              refreshTrigger={refreshLoading}
             />
           </TabsContent>
         </Tabs>

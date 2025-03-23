@@ -1,77 +1,94 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { TradingViewSignal } from '@/types';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 interface TradingViewLogsProps {
   botId: string;
   userId: string;
+  refreshTrigger?: boolean;
 }
 
 interface ExtendedTradingViewSignal extends TradingViewSignal {
   userId?: string;
 }
 
-const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId }) => {
+const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refreshTrigger = false }) => {
   const [logs, setLogs] = useState<ExtendedTradingViewSignal[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchLogs = () => {
+    console.log(`TradingViewLogs - Fetching logs for userId: ${userId}`);
     setLoading(true);
+    
     setTimeout(() => {
-      const mockLogs: ExtendedTradingViewSignal[] = [
-        {
-          id: 'SIG001',
-          action: 'ENTER_LONG',
-          instrument: 'BTCUSDT',
-          timestamp: new Date().toISOString(),
-          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-          maxLag: '5s',
-          investmentType: 'crypto',
-          amount: '1.5',
-          status: 'Processed',
-          userId: 'USR-001'
-        },
-        {
-          id: 'SIG002',
-          action: 'EXIT_LONG',
-          instrument: 'ETHUSDT',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-          maxLag: '5s',
-          investmentType: 'crypto',
-          amount: '2.3',
-          status: 'Processed',
-          userId: 'USR-001'
-        },
-        {
-          id: 'SIG003',
-          action: 'ENTER_SHORT',
-          instrument: 'SOLUSDT',
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
-          signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-          maxLag: '5s',
-          investmentType: 'crypto',
-          amount: '3.7',
-          status: 'Failed',
-          errorMessage: 'Invalid account configuration',
-          userId: 'USR-002'
-        },
-      ];
-      
-      const filteredLogs = mockLogs.filter(log => log.userId === userId);
-      
-      setLogs(filteredLogs);
-      setLoading(false);
+      try {
+        const mockLogs: ExtendedTradingViewSignal[] = [
+          {
+            id: 'SIG001',
+            action: 'ENTER_LONG',
+            instrument: 'BTCUSDT',
+            timestamp: new Date().toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '1.5',
+            status: 'Processed',
+            userId: 'USR-001'
+          },
+          {
+            id: 'SIG002',
+            action: 'EXIT_LONG',
+            instrument: 'ETHUSDT',
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '2.3',
+            status: 'Processed',
+            userId: 'USR-001'
+          },
+          {
+            id: 'SIG003',
+            action: 'ENTER_SHORT',
+            instrument: 'SOLUSDT',
+            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
+            maxLag: '5s',
+            investmentType: 'crypto',
+            amount: '3.7',
+            status: 'Failed',
+            errorMessage: 'Invalid account configuration',
+            userId: 'USR-002'
+          },
+        ];
+        
+        const filteredLogs = mockLogs.filter(log => log.userId === userId);
+        console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length}`);
+        setLogs(filteredLogs);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error processing logs:', error);
+        setLogs([]);
+        setLoading(false);
+      }
     }, 800);
   };
 
   useEffect(() => {
     fetchLogs();
   }, [botId, userId]);
+
+  // Handle refresh trigger from parent
+  useEffect(() => {
+    if (refreshTrigger) {
+      fetchLogs();
+    }
+  }, [refreshTrigger]);
 
   const handleRefresh = () => {
     toast.info('Refreshing logs...');
@@ -118,6 +135,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId }) => {
   if (logs.length === 0) {
     return (
       <div className="py-10 text-center">
+        <AlertCircle className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
         <p className="text-muted-foreground mb-4">No logs available for this bot yet.</p>
         <Button variant="outline" onClick={handleRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />

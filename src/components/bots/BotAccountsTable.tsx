@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -14,6 +13,7 @@ interface BotAccountsTableProps {
   botId: string;
   userId: string;
   initialData?: Account[];
+  refreshTrigger?: boolean;
 }
 
 const mockAccounts: Account[] = [
@@ -64,47 +64,57 @@ const mockAccounts: Account[] = [
   },
 ];
 
-const BotAccountsTable = ({ botId, userId, initialData = [] }: BotAccountsTableProps) => {
+const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = false }: BotAccountsTableProps) => {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchAccounts = useCallback(() => {
+    console.log(`BotAccountsTable - Fetching accounts for userId: ${userId}`);
     setLoading(true);
     setError(null);
-    
-    if (initialData && initialData.length > 0) {
-      const filteredAccounts = initialData.filter(account => account.userId === userId);
-      setAccounts(filteredAccounts);
-      setLoading(false);
-      return;
-    }
     
     try {
       setTimeout(() => {
         try {
+          // Check if we have initialData first
+          if (initialData && initialData.length > 0) {
+            const filteredAccounts = initialData.filter(account => account.userId === userId);
+            console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
+            setAccounts(filteredAccounts);
+            setLoading(false);
+            return;
+          }
+          
+          // Otherwise use mock data
           const filteredAccounts = mockAccounts.filter(account => account.userId === userId);
+          console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
           setAccounts(filteredAccounts);
           setLoading(false);
         } catch (innerError) {
           console.error('Error processing accounts data:', innerError);
           setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing accounts'));
           setLoading(false);
-          toast.error('Error loading account information');
         }
       }, 800);
     } catch (err) {
       console.error('Error fetching accounts:', err);
       setError(err instanceof Error ? err : new Error('An unknown error occurred'));
       setLoading(false);
-      toast.error('Error fetching account information');
     }
   }, [botId, userId, initialData]);
 
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
+
+  // Handle refresh trigger from parent
+  useEffect(() => {
+    if (refreshTrigger) {
+      fetchAccounts();
+    }
+  }, [refreshTrigger, fetchAccounts]);
 
   const handleViewUserDetails = () => {
     try {

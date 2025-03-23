@@ -76,10 +76,12 @@ const BotProfile = () => {
   };
 
   const refreshData = () => {
+    console.log("BotProfile - Starting refresh data");
     setRefreshLoading(true);
     setTimeout(() => {
       setRefreshLoading(false);
       toast.success('Đã làm mới dữ liệu');
+      console.log("BotProfile - Finished refresh data");
     }, 1000);
   };
 
