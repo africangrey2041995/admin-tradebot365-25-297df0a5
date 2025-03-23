@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -14,9 +15,15 @@ interface CoinstratLogsProps {
   botId: string;
   userId: string;
   initialData?: CoinstratSignal[];
+  signalSourceLabel?: string; // New prop for customizing the column header
 }
 
-const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId, initialData = [] }) => {
+const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
+  botId, 
+  userId, 
+  initialData = [],
+  signalSourceLabel = "TradingView ID" // Default to TradingView ID if not specified
+}) => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
@@ -179,7 +186,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId, initialDat
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>TradingView ID</TableHead>
+            <TableHead>{signalSourceLabel}</TableHead>
             <TableHead>Symbol</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Quantity</TableHead>
