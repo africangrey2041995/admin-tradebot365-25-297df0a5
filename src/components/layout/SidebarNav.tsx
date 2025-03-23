@@ -16,8 +16,7 @@ import {
   ChevronDown,
   Shield,
   UserCircle,
-  AlertTriangle,
-  FileText
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -101,12 +100,6 @@ const SidebarNav = () => {
               label="Quản Lý Lỗi Bot" 
               icon={AlertTriangle} 
               isActive={isActive('/bot-errors')} 
-            />
-            <NavItem 
-              path="/api-docs" 
-              label="Tài Liệu API" 
-              icon={FileText} 
-              isActive={isActive('/api-docs')} 
             />
           </div>
         </div>

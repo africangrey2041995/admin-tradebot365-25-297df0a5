@@ -25,8 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-import BotErrors from "./pages/BotErrors"; 
-import ApiDocs from "./pages/ApiDocs"; // Import the new API Docs page
+import BotErrors from "./pages/BotErrors"; // Add import for the new page
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -102,8 +101,7 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/bot-errors" element={<BotErrors />} /> 
-                <Route path="/api-docs" element={<ApiDocs />} /> {/* Add new route for API Docs */}
+                <Route path="/bot-errors" element={<BotErrors />} /> {/* Add new route */}
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
