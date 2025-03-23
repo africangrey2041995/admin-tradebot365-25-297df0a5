@@ -18,6 +18,7 @@ import { useBotAuthorization } from '@/hooks/useBotAuthorization';
 import { useChartData } from '@/hooks/useChartData';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useIntegratedBot } from '@/hooks/useIntegratedBot';
+import { cn } from '@/lib/utils';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001'; 
@@ -151,7 +152,10 @@ const IntegratedPropBotDetail = () => {
                   <span>Tiến Độ</span>
                   <span>{challengeData.progress}%</span>
                 </div>
-                <Progress value={challengeData.progress} className="h-2 bg-blue-200 dark:bg-blue-800/50" indicatorClassName="bg-green-500" />
+                <Progress 
+                  value={challengeData.progress} 
+                  className="h-2 bg-blue-200 dark:bg-blue-800/50" 
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
