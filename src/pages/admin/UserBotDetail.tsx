@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,8 +13,8 @@ import UserBotDetailHeader from './components/UserBotDetailHeader';
 import UserInfoCard from './components/UserInfoCard';
 import BotIntegrationInfo from './components/BotIntegrationInfo';
 import { useAdminBotDetail } from './hooks/useAdminBotDetail';
+import { toast } from 'sonner';
 
-// Mock data cho accounts và logs
 const mockAccounts: Account[] = [
   {
     id: 'ACC001',
@@ -100,7 +99,6 @@ const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const { goBack, navigateTo } = useNavigation();
   
-  // Sử dụng hook tách riêng để quản lý trạng thái và dữ liệu
   const { 
     isLoading, 
     refreshLoading, 
