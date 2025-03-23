@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,9 +18,7 @@ import {
   BarChart4,
   Activity,
   PieChart,
-  LineChart,
-  Settings,
-  Table
+  LineChart 
 } from 'lucide-react';
 import { PremiumBot } from '@/types';
 import { toast } from 'sonner';
@@ -28,6 +26,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import { USER_ROUTES } from '@/constants/routes';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
 
 const tradePerformanceData = [
   { name: 'Jan', profit: 12.5, trades: 24 },
@@ -62,14 +62,6 @@ const statisticsData = [
   { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
   { name: 'Max Drawdown', value: '8.5%', icon: <LineChart className="h-4 w-4 text-red-500" /> },
   { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
-];
-
-const recentTradesData = [
-  { id: 1, pair: 'BTC/USDT', type: 'Long', entry: '41250.00', exit: '42100.50', profit: '+2.06%', date: '2023-11-22 14:30' },
-  { id: 2, pair: 'ETH/USDT', type: 'Short', entry: '2250.75', exit: '2180.25', profit: '+3.13%', date: '2023-11-21 09:45' },
-  { id: 3, pair: 'SOL/USDT', type: 'Long', entry: '105.50', exit: '112.25', profit: '+6.40%', date: '2023-11-20 16:15' },
-  { id: 4, pair: 'BNB/USDT', type: 'Long', entry: '235.75', exit: '230.50', profit: '-2.23%', date: '2023-11-19 11:30' },
-  { id: 5, pair: 'XRP/USDT', type: 'Short', entry: '0.6150', exit: '0.5975', profit: '+2.85%', date: '2023-11-18 19:20' },
 ];
 
 const IntegratedPremiumBotDetail = () => {
@@ -176,8 +168,7 @@ const IntegratedPremiumBotDetail = () => {
       setIsLoading(false);
       toast.success(`Đã làm mới dữ liệu tab ${
         activeTab === "overview" ? "Tổng quan" : 
-        activeTab === "trades" ? "Giao dịch" : 
-        activeTab === "connected-accounts" ? "Tài khoản kết nối" : "Cài đặt"
+        activeTab === "connected-accounts" ? "Tài khoản kết nối" : "Coinstrat Logs"
       }`);
     }, 1000);
   };
@@ -228,11 +219,10 @@ const IntegratedPremiumBotDetail = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-            <TabsTrigger value="trades">Giao dịch</TabsTrigger>
             <TabsTrigger value="connected-accounts">Tài khoản kết nối</TabsTrigger>
-            <TabsTrigger value="settings">Cài đặt</TabsTrigger>
+            <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
@@ -470,55 +460,6 @@ const IntegratedPremiumBotDetail = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="trades">
-            <Card>
-              <CardHeader>
-                <CardTitle>Giao dịch gần đây</CardTitle>
-                <CardDescription>Các giao dịch được thực hiện bởi bot trong thời gian gần đây</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="border rounded-md overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-slate-50 dark:bg-slate-800">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Cặp giao dịch</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Kiểu</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Giá vào</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Giá ra</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Lợi nhuận</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400">Thời gian</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {recentTradesData.map((trade) => (
-                        <tr key={trade.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                          <td className="px-4 py-3 text-sm font-medium">{trade.pair}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <Badge variant="outline" className={trade.type === 'Long' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400'}>
-                              {trade.type}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3 text-sm">{trade.entry}</td>
-                          <td className="px-4 py-3 text-sm">{trade.exit}</td>
-                          <td className="px-4 py-3 text-sm font-medium" style={{ color: trade.profit.startsWith('+') ? '#10b981' : '#ef4444' }}>
-                            {trade.profit}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{trade.date}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button variant="outline" size="sm" className="gap-1">
-                  <Table className="h-4 w-4 mr-1" />
-                  Xem tất cả giao dịch
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
           <TabsContent value="connected-accounts">
             <Card>
               <CardHeader>
@@ -526,48 +467,19 @@ const IntegratedPremiumBotDetail = () => {
                 <CardDescription>Quản lý các tài khoản được kết nối với bot này</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-10">
-                  <p className="text-slate-500 dark:text-slate-400 mb-4">Không có tài khoản nào được kết nối với bot này</p>
-                  <Button size="sm">
-                    Kết nối tài khoản
-                  </Button>
-                </div>
+                <BotAccountsTable botId={botId || ""} />
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="settings">
+          <TabsContent value="coinstrat-logs">
             <Card>
               <CardHeader>
-                <CardTitle>Cài đặt Bot</CardTitle>
-                <CardDescription>Quản lý các thiết lập cho bot</CardDescription>
+                <CardTitle>Coinstrat Pro Logs</CardTitle>
+                <CardDescription>Xem lịch sử các tín hiệu đã được xử lý bởi Coinstrat Pro</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="border p-4 rounded-lg">
-                  <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-primary" />
-                    Cài đặt giao dịch
-                  </h3>
-                  <div className="space-y-4 mt-4">
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <span>Thông báo giao dịch</span>
-                      <Badge variant="outline">Đang bật</Badge>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <span>Báo cáo hiệu suất hàng tuần</span>
-                      <Badge variant="outline">Đang bật</Badge>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                      <span>Giao dịch tự động</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400">Đang hoạt động</Badge>
-                    </div>
-                    <div className="flex justify-end mt-4">
-                      <Button size="sm">
-                        Chỉnh sửa cài đặt
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+              <CardContent>
+                <CoinstratLogs botId={botId || ""} />
               </CardContent>
             </Card>
           </TabsContent>
