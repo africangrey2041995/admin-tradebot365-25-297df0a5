@@ -1,55 +1,16 @@
 
-import React, { ReactNode, useEffect } from 'react';
-import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdmin } from '@/hooks/use-admin';
-import { useClerk } from '@clerk/clerk-react';
-import { useToast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarProvider, 
-  SidebarTrigger,
-  SidebarSeparator,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent
-} from '@/components/ui/sidebar';
-import {
-  Users,
-  Bot,
-  BarChart3,
-  Settings,
-  Database,
-  Mail,
-  Bell,
-  LogOut,
-  ArrowLeft,
-  FileText,
-  ShieldCheck,
-  Crown,
-  Briefcase,
-  UserCircle,
-  AlertTriangle,
-  Package
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import TradeBotLogo from '@/components/common/TradeBotLogo';
+import { Sidebar, SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
-import { useAdminNavigation } from '@/hooks/useAdminNavigation';
+import AdminSidebar from './layout/AdminSidebar';
+import AdminHeader from './layout/AdminHeader';
 
 const AdminLayout: React.FC = () => {
   const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
-  const { signOut } = useClerk();
-  const { toast: shadowToast } = useToast();
-  const isMobile = useIsMobile();
-  const { exitAdminMode } = useAdminNavigation();
 
   // Debug logs
   console.log("AdminLayout rendered");
@@ -65,19 +26,6 @@ const AdminLayout: React.FC = () => {
       navigate('/');
     }
   }, [isAdmin, loading, navigate]);
-
-  const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/sign-in');
-  };
-
-  const handleReturnToApp = () => {
-    exitAdminMode();
-  };
 
   // Show loading state while checking admin status
   if (loading) {
@@ -104,200 +52,13 @@ const AdminLayout: React.FC = () => {
       <div className="flex min-h-screen w-full">
         {/* Admin Sidebar */}
         <Sidebar className="border-r border-zinc-800">
-          <SidebarContent className="bg-[#0a0a0a] text-white h-full">
-            <div className={cn("flex justify-center items-center py-4")}>
-              <div className="flex flex-col items-center">
-                <TradeBotLogo size={isMobile ? "medium" : "large"} className="mx-auto" />
-                <span className="text-xs font-medium text-amber-500 mt-1">Admin Panel</span>
-              </div>
-            </div>
-            
-            <SidebarSeparator className="bg-zinc-800" />
-            
-            <div className="mt-6 px-4 mb-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleReturnToApp}
-                className="w-full text-xs border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white"
-              >
-                <ArrowLeft className="mr-1 h-3 w-3" />
-                Quay lại ứng dụng
-              </Button>
-            </div>
-            
-            <SidebarSeparator className="bg-zinc-800 my-4" />
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Quản lý chung</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin')}>
-                      <Link to="/admin">
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Tổng quan</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/users')}>
-                      <Link to="/admin/users">
-                        <Users className="h-4 w-4" />
-                        <span>Quản lý người dùng</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/packages')}>
-                      <Link to="/admin/packages">
-                        <Package className="h-4 w-4" />
-                        <span>Quản lý gói dịch vụ</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Quản lý Bot</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/premium-bots')}>
-                      <Link to="/admin/premium-bots">
-                        <Crown className="h-4 w-4" />
-                        <span>Premium Bots</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/prop-bots')}>
-                      <Link to="/admin/prop-bots">
-                        <Briefcase className="h-4 w-4" />
-                        <span>Prop Trading Bots</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/user-bots')}>
-                      <Link to="/admin/user-bots">
-                        <UserCircle className="h-4 w-4" />
-                        <span>Bot người dùng</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/bot-errors')}>
-                      <Link to="/admin/bot-errors">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span>Quản lý lỗi Bot</span>
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 ml-auto text-xs font-medium">8</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Hệ thống</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/database')}>
-                      <Link to="/admin/database">
-                        <Database className="h-4 w-4" />
-                        <span>Cơ sở dữ liệu</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/logs')}>
-                      <Link to="/admin/logs">
-                        <FileText className="h-4 w-4" />
-                        <span>Nhật ký hệ thống</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Thông báo</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/notifications')}>
-                      <Link to="/admin/notifications">
-                        <Bell className="h-4 w-4" />
-                        <span>Quản lý thông báo</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/email')}>
-                      <Link to="/admin/email">
-                        <Mail className="h-4 w-4" />
-                        <span>Mẫu email</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Tài khoản</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/settings')}>
-                      <Link to="/admin/settings">
-                        <Settings className="h-4 w-4" />
-                        <span>Cài đặt hệ thống</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  {/* Super Admin only section - removed isSuperAdmin since it doesn't exist */}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/admin-management')}>
-                      <Link to="/admin/admin-management">
-                        <ShieldCheck className="h-4 w-4" />
-                        <span>Quản lý Admin</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleSignOut}>
-                      <LogOut className="h-4 w-4" />
-                      <span>Đăng xuất</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+          <AdminSidebar />
         </Sidebar>
         
         {/* Main Content */}
         <div className="flex flex-col flex-1 h-screen overflow-y-auto bg-zinc-950">
           {/* Top Bar */}
-          <div className="h-14 border-b border-zinc-800 bg-zinc-900 flex items-center px-4">
-            <SidebarTrigger className="mr-4 text-zinc-400" />
-            <h1 className="text-lg font-medium text-white">Hệ thống quản trị Trade Bot 365</h1>
-          </div>
+          <AdminHeader />
           
           {/* Admin Content */}
           <div className="flex-1 p-6">
