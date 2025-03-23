@@ -8,6 +8,7 @@ import ErrorSignalRow from './ErrorSignalRow';
 import NoErrorsState from './NoErrorsState';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { toast } from 'sonner';
+import { BotType } from '@/constants/botTypes';
 
 interface ErrorSignalsTableProps {
   errorSignals: ExtendedSignal[];
@@ -16,6 +17,7 @@ interface ErrorSignalsTableProps {
   loading: boolean;
   onRefresh?: () => void;
   error?: Error | null;
+  botType?: BotType; // Add botType prop to determine navigation target
 }
 
 const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({ 
@@ -24,7 +26,8 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   onMarkAsRead, 
   loading,
   onRefresh,
-  error
+  error,
+  botType
 }) => {
   const handleRefresh = () => {
     if (onRefresh) {
@@ -86,9 +89,8 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
               <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Account Trading</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
             </TableRow>
           </TableHeader>
@@ -99,6 +101,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
                 signal={signal} 
                 isUnread={unreadErrors.has(signal.id)}
                 onMarkAsRead={onMarkAsRead}
+                botType={botType || (signal.botType as BotType)}
               />
             ))}
           </TableBody>
@@ -106,7 +109,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
           <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
             <AlertTriangle className="h-4 w-4 mr-2" />
-            <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
+            <strong>Lưu ý:</strong> Các tín hiệu lỗi này cần được xử lý ngay để đảm bảo hệ thống giao dịch hoạt động chính xác.
           </p>
           {onRefresh && (
             <div className="mt-2 flex justify-end">

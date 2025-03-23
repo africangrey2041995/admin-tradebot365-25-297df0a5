@@ -16,6 +16,7 @@ export const USER_ROUTES = {
   PROP_BOT_DETAIL: (botId: string) => `/prop-trading-bots/${botId}`,
   INTEGRATED_PROP_BOTS: '/integrated-prop-bots',
   INTEGRATED_PROP_BOT_DETAIL: (botId: string) => `/integrated-prop-bots/${botId}`,
+  BOT_ERRORS: '/bot-errors', // Add new route for Bot Errors
   ACCOUNTS: '/accounts',
   ACCOUNT_DETAIL: (accountId: string) => `/accounts/${accountId}`,
   SETTINGS: '/settings',

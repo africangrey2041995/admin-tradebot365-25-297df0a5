@@ -1,266 +1,110 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarSeparator,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
+
+import React from 'react';
+import { NavGroup } from './sidebar/NavGroup';
+import { NavMenuItem } from './sidebar/NavMenuItem';
+import { CollapsibleMenuItem } from './sidebar/CollapsibleMenuItem';
 import { 
-  Home, 
-  CircuitBoard, 
-  Users, 
-  Sparkles,
-  TrendingUp,
-  ChevronDown,
-  Shield,
-  UserCircle
+  LayoutDashboard, Bot, AlertTriangle, Users, 
+  Settings, Briefcase, LineChart, ShieldCheck, Database
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { User } from '@/types';
+import { USER_ROUTES, ADMIN_ROUTES } from '@/constants/routes';
 import { cn } from '@/lib/utils';
-import TradeBotLogo from '@/components/common/TradeBotLogo';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useAdmin } from '@/hooks/use-admin';
-import { useToast } from '@/hooks/use-toast';
+
+// Mock current user - this would come from auth context in a real app
+const CURRENT_USER: Partial<User> = {
+  id: 'USR-001',
+  role: 'user',
+  isAdmin: false
+};
 
 const SidebarNav = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const { isAdmin } = useAdmin();
-  const { toast } = useToast();
+  // Determine if user is admin
+  const isAdmin = CURRENT_USER.isAdmin || CURRENT_USER.role === 'admin';
   
-  // State for collapsible sections
-  const [premiumOpen, setPremiumOpen] = useState(false);
-  const [propTradingOpen, setPropTradingOpen] = useState(false);
+  console.log("Is admin:", isAdmin);
+  console.log("Is admin in profile:", CURRENT_USER.isAdmin);
+  console.log("Is admin in profile:", CURRENT_USER.role === 'admin');
   
-  // Check if a path is active
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === path;
-    }
-    return location.pathname.startsWith(path);
-  };
-
-  const navigateToAdmin = () => {
-    navigate("/admin");
-    
-    toast({
-      title: "Chuyển sang bảng điều khiển Admin",
-      description: "Bạn đang sử dụng hệ thống quản trị viên.",
-      duration: 3000,
-    });
-  };
-
-  console.log("Is admin:", isAdmin); // Debug log
-
-  return (
-    <Sidebar className="border-r-0">
-      <SidebarContent className="bg-[#111111] text-white h-full">
-        {/* Logo - Using our new component with better contrast and positioning */}
-        <div className={cn(
-          "flex justify-center items-center bg-[#111111]",
-          isMobile ? "py-4" : "py-6 px-4"
-        )}>
-          <TradeBotLogo 
-            size={isMobile ? "medium" : "large"} 
-            className="mx-auto"
-            showBetaTag={true}
-          />
+  // Show admin sidebar if user is admin
+  if (isAdmin) {
+    return (
+      <aside className="hidden lg:flex w-[260px] border-r border-slate-200 dark:border-zinc-800 flex-col h-screen fixed left-0 top-0 bg-white dark:bg-zinc-950 z-30">
+        <div className="p-6">
+          <h1 className="text-xl font-semibold flex items-center">
+            <Bot className="inline-block mr-2 h-5 w-5 text-green-500" /> 
+            <span>TradingBot</span>
+            <span className="text-green-500">Admin</span>
+          </h1>
         </div>
         
-        <SidebarSeparator className="bg-zinc-800" />
-        
-        {/* Main Navigation */}
-        <div className="mt-4">
-          <div className="px-4 mb-2">
-            <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-              Tổng Quan
-            </span>
-          </div>
+        <div className="overflow-y-auto flex-1 py-4">
+          <NavGroup title="Dashboard">
+            <NavMenuItem icon={<LayoutDashboard size={18} />} href={ADMIN_ROUTES.DASHBOARD} label="Dashboard" />
+          </NavGroup>
           
-          <div className="space-y-1 px-2">
-            <NavItem 
-              path="/" 
-              label="Bảng Điều Khiển" 
-              icon={Home} 
-              isActive={isActive('/')} 
-            />
-            <NavItem 
-              path="/accounts" 
-              label="Quản Lý Tài Khoản" 
-              icon={Users} 
-              isActive={isActive('/accounts')} 
-            />
-          </div>
-        </div>
-        
-        {/* Premium Section */}
-        <div className="mt-6">
-          <div className="px-4 mb-2">
-            <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-              Premium
-            </span>
-          </div>
-          
-          <div className="space-y-1 px-2">
-            <NavItem 
-              path="/bots" 
-              label="Bot Người Dùng" 
-              icon={UserCircle} 
-              isActive={isActive('/bots')} 
+          <NavGroup title="Management">
+            <NavMenuItem icon={<Users size={18} />} href={ADMIN_ROUTES.USERS} label="Người dùng" />
+            <NavMenuItem icon={<Bot size={18} />} href={ADMIN_ROUTES.BOTS} label="Tất cả Bot" />
+            <NavMenuItem icon={<AlertTriangle size={18} />} href={ADMIN_ROUTES.BOT_ERRORS} label="Lỗi Bot" />
+            
+            <CollapsibleMenuItem 
+              icon={<LineChart size={18} />} 
+              label="Bot Marketplace"
+              items={[
+                { href: ADMIN_ROUTES.PREMIUM_BOTS, label: "Premium Bots" },
+                { href: ADMIN_ROUTES.PROP_BOTS, label: "Prop Trading Bots" },
+                { href: ADMIN_ROUTES.USER_BOTS, label: "User Bots" }
+              ]}
             />
             
-            <CollapsibleNavItem
-              path="/premium-bots"
-              label="Bot Premium"
-              icon={Sparkles}
-              isActive={isActive('/premium-bots')}
-              isOpen={premiumOpen}
-              onToggle={() => setPremiumOpen(!premiumOpen)}
-              subItems={[
-                { 
-                  path: "/integrated-premium-bots", 
-                  label: "Đã Tích Hợp" 
-                }
-              ]}
-              currentPath={location.pathname}
-            />
-            
-            <CollapsibleNavItem
-              path="/prop-trading-bots"
-              label="Bot Prop Trading"
-              icon={TrendingUp}
-              isActive={isActive('/prop-trading-bots')}
-              isOpen={propTradingOpen}
-              onToggle={() => setPropTradingOpen(!propTradingOpen)}
-              subItems={[
-                { 
-                  path: "/integrated-prop-bots", 
-                  label: "Đã Tích Hợp" 
-                }
-              ]}
-              currentPath={location.pathname}
-            />
-          </div>
+            <NavMenuItem icon={<Briefcase size={18} />} href={ADMIN_ROUTES.PACKAGES} label="Gói dịch vụ" />
+          </NavGroup>
+          
+          <NavGroup title="System">
+            <NavMenuItem icon={<Database size={18} />} href={ADMIN_ROUTES.DATABASE} label="Database" />
+            <NavMenuItem icon={<AlertTriangle size={18} />} href={ADMIN_ROUTES.LOGS} label="Logs" />
+            <NavMenuItem icon={<Settings size={18} />} href={ADMIN_ROUTES.SETTINGS} label="Cài đặt" />
+            <NavMenuItem icon={<ShieldCheck size={18} />} href={ADMIN_ROUTES.ADMIN_MANAGEMENT} label="Quản lý Admin" />
+          </NavGroup>
         </div>
-      </SidebarContent>
-      
-      {/* Admin Navigation Footer - Only visible for admin users */}
-      {isAdmin && (
-        <SidebarFooter className="bg-[#111111] border-t border-zinc-800 p-2">
-          <button
-            onClick={navigateToAdmin}
-            className={cn(
-              "flex w-full items-center px-3 py-2 text-sm rounded-md transition-colors",
-              isActive('/admin') 
-                ? "bg-amber-700/70 text-white" 
-                : "text-amber-400 hover:text-white hover:bg-amber-700/50"
-            )}
-          >
-            <Shield className="h-5 w-5 mr-3" />
-            <span>Chuyển sang Trang Admin</span>
-          </button>
-        </SidebarFooter>
-      )}
-    </Sidebar>
-  );
-};
-
-interface NavItemProps {
-  path: string;
-  label: string;
-  icon: React.ElementType;
-  isActive: boolean;
-}
-
-const NavItem = ({ path, label, icon: Icon, isActive }: NavItemProps) => {
+      </aside>
+    );
+  }
+  
+  // User sidebar
   return (
-    <Link
-      to={path}
-      className={cn(
-        "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-        isActive 
-          ? "bg-zinc-800 text-white" 
-          : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-      )}
-    >
-      <Icon className="h-5 w-5 mr-3" />
-      <span>{label}</span>
-    </Link>
-  );
-};
-
-interface SubItem {
-  path: string;
-  label: string;
-}
-
-interface CollapsibleNavItemProps extends NavItemProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  subItems: SubItem[];
-  currentPath: string;
-}
-
-const CollapsibleNavItem = ({ 
-  path, 
-  label, 
-  icon: Icon, 
-  isActive,
-  isOpen,
-  onToggle,
-  subItems,
-  currentPath
-}: CollapsibleNavItemProps) => {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center">
-        <Link
-          to={path}
-          className={cn(
-            "flex flex-1 items-center px-3 py-2 text-sm rounded-md transition-colors",
-            isActive 
-              ? "bg-zinc-800 text-white" 
-              : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-          )}
-        >
-          <Icon className="h-5 w-5 mr-3" />
-          <span className="truncate">{label}</span>
-        </Link>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            onToggle();
-          }}
-          className="px-2 py-2 text-zinc-400 hover:text-white"
-        >
-          <ChevronDown className={cn(
-            "h-4 w-4 transition-transform",
-            isOpen ? "transform rotate-180" : ""
-          )} />
-        </button>
+    <aside className="hidden lg:flex w-[260px] border-r border-slate-200 dark:border-zinc-800 flex-col h-screen fixed left-0 top-0 bg-white dark:bg-zinc-950 z-30">
+      <div className="p-6">
+        <h1 className="text-xl font-semibold flex items-center">
+          <Bot className="inline-block mr-2 h-5 w-5 text-green-500" /> 
+          <span>TradingBot</span>
+        </h1>
       </div>
       
-      {isOpen && (
-        <div className="pl-10 space-y-1">
-          {subItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "block px-3 py-2 text-sm rounded-md transition-colors",
-                currentPath === item.path
-                  ? "bg-zinc-800 text-white" 
-                  : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+      <div className="overflow-y-auto flex-1 py-4">
+        <NavGroup title="Tổng quan">
+          <NavMenuItem icon={<LayoutDashboard size={18} />} href={USER_ROUTES.HOME} label="Dashboard" />
+        </NavGroup>
+        
+        <NavGroup title="Bot của tôi">
+          <NavMenuItem icon={<Bot size={18} />} href={USER_ROUTES.BOTS} label="Bot Người Dùng" />
+          <NavMenuItem icon={<Bot size={18} />} href={USER_ROUTES.INTEGRATED_PREMIUM_BOTS} label="Bot Premium Đã Tích Hợp" />
+          <NavMenuItem icon={<Bot size={18} />} href={USER_ROUTES.INTEGRATED_PROP_BOTS} label="Prop Trading Đã Tích Hợp" />
+          <NavMenuItem icon={<AlertTriangle size={18} />} href={USER_ROUTES.BOT_ERRORS} label="Quản Lý Lỗi Bot" />
+        </NavGroup>
+        
+        <NavGroup title="Marketplace">
+          <NavMenuItem icon={<LineChart size={18} />} href={USER_ROUTES.PREMIUM_BOTS} label="Premium Bots" />
+          <NavMenuItem icon={<LineChart size={18} />} href={USER_ROUTES.PROP_BOTS} label="Prop Trading Bots" />
+        </NavGroup>
+        
+        <NavGroup title="Tài khoản">
+          <NavMenuItem icon={<Users size={18} />} href={USER_ROUTES.ACCOUNTS} label="Tài khoản giao dịch" />
+          <NavMenuItem icon={<Settings size={18} />} href={USER_ROUTES.SETTINGS} label="Cài đặt" />
+        </NavGroup>
+      </div>
+    </aside>
   );
 };
 
