@@ -59,12 +59,12 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   };
   
   return (
-    <TableRow className={isUnread ? "bg-red-50/10" : ""}>
+    <TableRow className={isUnread ? "bg-red-50/10 dark:bg-red-900/10" : ""}>
       <TableCell className="font-mono text-xs">
         {signal.id}
       </TableCell>
       <TableCell>
-        <Badge variant="outline" className="font-medium">
+        <Badge variant="outline" className="font-medium bg-background dark:bg-zinc-800">
           {signal.instrument}
         </Badge>
       </TableCell>
@@ -78,12 +78,12 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
         <ActionBadge action={signal.action} />
       </TableCell>
       <TableCell>
-        <Badge variant="destructive" className="bg-red-600">
+        <Badge variant="destructive" className="bg-red-600 dark:bg-red-700 text-white">
           Error
         </Badge>
       </TableCell>
       <TableCell 
-        className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
+        className="cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium"
         onClick={handleBotClick}
       >
         {signal.botId || 'N/A'}
@@ -96,7 +96,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       </TableCell>
       <TableCell>
         <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
-          <span className="text-red-500 cursor-help">
+          <span className="text-red-600 dark:text-red-400 cursor-help">
             {signal.errorMessage 
               ? (signal.errorMessage.length > 25 
                 ? `${signal.errorMessage.substring(0, 25)}...` 
@@ -110,7 +110,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
             size="sm" 
             variant="ghost" 
             onClick={handleMarkAsRead}
-            className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+            className="ml-2 h-6 px-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20"
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
             <span className="text-xs">Mark as read</span>

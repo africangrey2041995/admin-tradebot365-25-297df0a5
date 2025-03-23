@@ -51,12 +51,12 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   // Xử lý trạng thái lỗi
   if (error) {
     return (
-      <div className="py-8 text-center text-red-500 bg-red-50/10 rounded-md border border-red-200/30 p-6">
-        <AlertTriangle className="h-10 w-10 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Đã xảy ra lỗi khi tải dữ liệu</h3>
-        <p className="mb-4 text-sm text-red-400">{error.message}</p>
+      <div className="py-8 text-center bg-red-500/5 dark:bg-red-900/10 rounded-md border border-red-200/30 dark:border-red-800/30 p-6">
+        <AlertTriangle className="h-10 w-10 mx-auto mb-4 text-red-500" />
+        <h3 className="text-lg font-semibold mb-2 text-red-600 dark:text-red-400">Đã xảy ra lỗi khi tải dữ liệu</h3>
+        <p className="mb-4 text-sm text-red-500 dark:text-red-400">{error.message}</p>
         {onRefresh && (
-          <Button variant="outline" className="border-red-300" onClick={handleRefresh}>
+          <Button variant="outline" className="bg-background border-red-300 dark:border-red-700/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Thử lại
           </Button>
@@ -79,17 +79,17 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-red-50 dark:bg-red-900/20">
-              <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Note</TableHead>
+            <TableRow className="bg-red-500/5 dark:bg-red-900/20">
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Symbol</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Date</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Quantity</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Action</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Status</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Bot ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">User ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Account</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400 font-medium">Note</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -103,14 +103,19 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
             ))}
           </TableBody>
         </Table>
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
+        <div className="mt-4 p-3 bg-red-500/5 dark:bg-red-900/20 border border-red-200/30 dark:border-red-800/30 rounded-md">
           <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
             <AlertTriangle className="h-4 w-4 mr-2" />
             <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
           </p>
           {onRefresh && (
             <div className="mt-2 flex justify-end">
-              <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRefresh} 
+                className="text-xs bg-background border-red-300 dark:border-red-700/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Làm mới dữ liệu
               </Button>

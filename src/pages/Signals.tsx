@@ -31,24 +31,25 @@ const Signals = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
+        className="space-y-6"
       >
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Quản Lý Tín Hiệu</h1>
+            <h1 className="text-2xl font-bold text-white">Quản Lý Tín Hiệu</h1>
           </div>
 
-          <Alert variant="default" className="bg-amber-950/30 border-amber-900">
+          <Alert variant="default" className="bg-amber-950/30 border-amber-800/50 text-amber-200">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Chú ý</AlertTitle>
-            <AlertDescription>
+            <AlertDescription className="text-amber-300/90">
               Các tín hiệu lỗi cần được giám sát và xử lý để đảm bảo bot giao dịch hoạt động ổn định.
             </AlertDescription>
           </Alert>
 
-          <Card>
+          <Card className="border-zinc-800 bg-zinc-900">
             <CardHeader className="pb-3">
-              <CardTitle>Quản Lý Tín Hiệu</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Quản Lý Tín Hiệu</CardTitle>
+              <CardDescription className="text-zinc-400">
                 Giám sát và quản lý các tín hiệu giao dịch từ hệ thống
               </CardDescription>
             </CardHeader>
@@ -97,16 +98,16 @@ const Signals = () => {
                 </TabsContent>
 
                 <TabsContent value="all" className="mt-0">
-                  <div className="py-12 text-center text-muted-foreground">
+                  <div className="py-12 text-center text-zinc-400 bg-zinc-800/20 rounded-lg border border-zinc-700/50">
                     <p>Tính năng đang được phát triển.</p>
-                    <p className="text-sm">Tất cả tín hiệu sẽ được hiển thị tại đây.</p>
+                    <p className="text-sm mt-2">Tất cả tín hiệu sẽ được hiển thị tại đây.</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="filtered" className="mt-0">
-                  <div className="py-12 text-center text-muted-foreground">
+                  <div className="py-12 text-center text-zinc-400 bg-zinc-800/20 rounded-lg border border-zinc-700/50">
                     <p>Tính năng đang được phát triển.</p>
-                    <p className="text-sm">Bộ lọc tìm kiếm nâng cao sẽ được thêm tại đây.</p>
+                    <p className="text-sm mt-2">Bộ lọc tìm kiếm nâng cao sẽ được thêm tại đây.</p>
                   </div>
                 </TabsContent>
               </Tabs>

@@ -24,13 +24,13 @@ const UserLayout: React.FC<UserLayoutProps> = ({
   
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full">
+      <div className="min-h-screen flex flex-col w-full bg-[#0a0a0a]">
         <Header />
         
         <div className="flex flex-1">
           <SidebarNav />
           
-          <main className="flex-1 overflow-y-auto bg-[#0c0c0c] p-6">
+          <main className="flex-1 overflow-y-auto bg-[#0a0a0a] p-6">
             {children}
           </main>
         </div>
