@@ -1,2656 +1,3593 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import MainLayout from "@/components/layout/MainLayout";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, Search, ArrowRight, Code, RefreshCw, Key, Database, Shield, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect, useRef } from 'react';
+import MainLayout from '@/components/layout/MainLayout';
+import { 
+  Input, 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger, 
+  ScrollArea,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent  
+} from '@/components/ui';
+import { Search, ArrowRight, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const ApiDocs = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeSection, setActiveSection] = useState('overview');
-  const [openCollapsibles, setOpenCollapsibles] = useState<Record<string, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSection, setActiveSection] = useState('auth');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    auth: true,
+    users: false,
+    dashboard: false,
+    bots: false,
+    premium_bots: false,
+    prop_bots: false,
+    accounts: false,
+    signals: false,
+    settings: false
+  });
+  const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
+  
+  const sectionRefs = {
+    auth: useRef<HTMLDivElement>(null),
+    users: useRef<HTMLDivElement>(null),
+    dashboard: useRef<HTMLDivElement>(null),
+    bots: useRef<HTMLDivElement>(null),
+    premium_bots: useRef<HTMLDivElement>(null),
+    prop_bots: useRef<HTMLDivElement>(null),
+    accounts: useRef<HTMLDivElement>(null),
+    signals: useRef<HTMLDivElement>(null),
+    settings: useRef<HTMLDivElement>(null),
+  };
 
-  const toggleCollapsible = (id: string) => {
-    setOpenCollapsibles(prev => ({
+  // Scroll to section when activeSection changes
+  useEffect(() => {
+    if (activeSection && sectionRefs[activeSection as keyof typeof sectionRefs]?.current) {
+      sectionRefs[activeSection as keyof typeof sectionRefs].current?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [activeSection]);
+
+  // Filter documentation based on search term
+  const filterDocs = (content: string) => {
+    if (!searchTerm) return true;
+    return content.toLowerCase().includes(searchTerm.toLowerCase());
+  };
+
+  // Toggle section expansion
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
       ...prev,
-      [id]: !prev[id]
+      [section]: !prev[section]
     }));
   };
 
-  // Filter content based on search query
-  const filterContent = (content: string) => {
-    if (!searchQuery) return true;
-    return content.toLowerCase().includes(searchQuery.toLowerCase());
+  // Copy endpoint to clipboard
+  const copyToClipboard = (endpoint: string) => {
+    navigator.clipboard.writeText(endpoint);
+    setCopiedEndpoint(endpoint);
+    setTimeout(() => setCopiedEndpoint(null), 2000);
   };
 
   return (
-    <MainLayout title="API Documentation">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Sidebar - TOC */}
-        <div className="lg:col-span-3">
-          <Card className="sticky top-6">
-            <CardHeader className="pb-3">
-              <CardTitle>API Documentation</CardTitle>
-              <CardDescription>TradeBot365 REST API</CardDescription>
-              <div className="relative mt-2">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search documentation..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+    <MainLayout>
+      <div className="container mx-auto py-8 px-4 md:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Sidebar - Table of Contents */}
+            <div className="md:w-1/4 lg:w-1/5">
+              <div className="sticky top-24">
+                <Card className="bg-[#111111] border-zinc-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle>API Reference</CardTitle>
+                    <CardDescription>
+                      Documentation for TradeBOT365 API
+                    </CardDescription>
+                    <div className="relative mt-2">
+                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search documentation..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-8 bg-zinc-900 border-zinc-700"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-0 py-0">
+                    <ScrollArea className="h-[calc(100vh-280px)]">
+                      <div className="px-6 py-2">
+                        <ul className="space-y-2">
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'auth' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('auth')}
+                            >
+                              Authentication
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'users' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('users')}
+                            >
+                              User Profile
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'dashboard' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('dashboard')}
+                            >
+                              Dashboard
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'bots' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('bots')}
+                            >
+                              User Bots
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'premium_bots' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('premium_bots')}
+                            >
+                              Premium Bots
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'prop_bots' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('prop_bots')}
+                            >
+                              Prop Trading Bots
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'accounts' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('accounts')}
+                            >
+                              Trading Accounts
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'signals' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('signals')}
+                            >
+                              Signals & Logs
+                            </Button>
+                          </li>
+                          <li>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-medium text-sm",
+                                activeSection === 'settings' ? "text-[#04ce91] bg-zinc-800/50" : "text-zinc-400"
+                              )}
+                              onClick={() => setActiveSection('settings')}
+                            >
+                              User Settings
+                            </Button>
+                          </li>
+                        </ul>
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
               </div>
-            </CardHeader>
-            <CardContent className="pb-6">
-              <ScrollArea className="h-[calc(100vh-280px)]">
-                <div className="space-y-1">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup heading="Getting Started">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('overview')}
-                          className={cn(
-                            activeSection === 'overview' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Overview
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('authentication')}
-                          className={cn(
-                            activeSection === 'authentication' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Authentication
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('errors')}
-                          className={cn(
-                            activeSection === 'errors' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Error Handling
-                        </CommandItem>
-                      </CommandGroup>
-                      
-                      <CommandGroup heading="User Resources">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('user-profile')}
-                          className={cn(
-                            activeSection === 'user-profile' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          User Profile
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('dashboard')}
-                          className={cn(
-                            activeSection === 'dashboard' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Dashboard
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('settings')}
-                          className={cn(
-                            activeSection === 'settings' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          User Settings
-                        </CommandItem>
-                      </CommandGroup>
-                      
-                      <CommandGroup heading="Bot Management">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('user-bots')}
-                          className={cn(
-                            activeSection === 'user-bots' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          User Bots
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('premium-bots')}
-                          className={cn(
-                            activeSection === 'premium-bots' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Premium Bots
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('prop-bots')}
-                          className={cn(
-                            activeSection === 'prop-bots' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Prop Trading Bots
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('bot-errors')}
-                          className={cn(
-                            activeSection === 'bot-errors' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Bot Errors
-                        </CommandItem>
-                      </CommandGroup>
-                      
-                      <CommandGroup heading="Account Management">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('accounts')}
-                          className={cn(
-                            activeSection === 'accounts' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Trading Accounts
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('connections')}
-                          className={cn(
-                            activeSection === 'connections' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Connections
-                        </CommandItem>
-                      </CommandGroup>
-                      
-                      <CommandGroup heading="Signals & Logs">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('signals')}
-                          className={cn(
-                            activeSection === 'signals' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Trading Signals
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('logs')}
-                          className={cn(
-                            activeSection === 'logs' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Bot Logs
-                        </CommandItem>
-                      </CommandGroup>
-                      
-                      <CommandGroup heading="System">
-                        <CommandItem 
-                          onSelect={() => setActiveSection('system-status')}
-                          className={cn(
-                            activeSection === 'system-status' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          System Status
-                        </CommandItem>
-                        <CommandItem 
-                          onSelect={() => setActiveSection('notifications')}
-                          className={cn(
-                            activeSection === 'notifications' ? 'bg-accent text-accent-foreground' : ''
-                          )}
-                        >
-                          Notifications
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
-                  </Command>
+            </div>
+
+            {/* Main Content */}
+            <div className="md:w-3/4 lg:w-4/5">
+              <Tabs defaultValue="rest" className="w-full">
+                <div className="flex justify-between items-center mb-6">
+                  <h1 className="text-3xl font-bold">TradeBOT365 API Documentation</h1>
+                  <TabsList className="bg-zinc-900">
+                    <TabsTrigger value="rest">RESTful API</TabsTrigger>
+                    <TabsTrigger value="graphql" disabled>GraphQL</TabsTrigger>
+                  </TabsList>
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Main Content */}
-        <div className="lg:col-span-9">
-          <Tabs defaultValue="rest" className="mb-6">
-            <TabsList>
-              <TabsTrigger value="rest">REST API</TabsTrigger>
-              <TabsTrigger value="graphql" disabled>GraphQL API (Coming Soon)</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="rest" className="space-y-6">
-              {/* Overview Section */}
-              {filterContent('overview') && activeSection === 'overview' && (
-                <ApiDocSection
-                  title="Overview"
-                  icon={<Code className="h-5 w-5" />}
-                  description="TradeBot365 REST API documentation for frontend and backend developers."
-                >
-                  <p className="text-muted-foreground mb-4">
-                    This documentation provides a comprehensive guide to the TradeBot365 API. All API endpoints are designed to ensure secure and efficient communication between the frontend and backend systems.
-                  </p>
-                  
-                  <h3 className="text-lg font-semibold mb-2">Base URL</h3>
-                  <code className="bg-muted px-2 py-1 rounded text-sm block mb-4">
-                    https://api.tradebot365.com/v1
-                  </code>
-                  
-                  <h3 className="text-lg font-semibold mb-2">API Conventions</h3>
-                  <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
-                    <li>All endpoints return data in JSON format</li>
-                    <li>Timestamps are in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)</li>
-                    <li>All IDs follow standardized naming conventions</li>
-                    <li>Error responses include detailed error messages and codes</li>
-                    <li>Authentication is required for most endpoints</li>
-                  </ul>
-                  
-                  <h3 className="text-lg font-semibold mb-2">ID Format Standards</h3>
-                  <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-                    <li><strong>User IDs:</strong> Format <code>USR-XXX</code> or <code>user-XXX</code></li>
-                    <li><strong>User Bot IDs:</strong> Format <code>BOT-XXX</code> or <code>ub-XXX</code></li>
-                    <li><strong>Premium Bot IDs:</strong> Format <code>pb-XXX</code></li>
-                    <li><strong>Prop Trading Bot IDs:</strong> Format <code>ptb-XXX</code></li>
-                    <li><strong>Account IDs:</strong> Format <code>ACC-XXX</code></li>
-                  </ul>
-                </ApiDocSection>
-              )}
-              
-              {/* Authentication Section */}
-              {filterContent('authentication') && activeSection === 'authentication' && (
-                <ApiDocSection
-                  title="Authentication"
-                  icon={<Key className="h-5 w-5" />}
-                  description="Secure your API requests with authentication."
-                >
-                  <p className="text-muted-foreground mb-4">
-                    All API requests must be authenticated using Bearer token authentication. Tokens are obtained through the authentication endpoints.
-                  </p>
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/auth/login"
-                    description="Authenticate a user and get an access token"
-                    isOpen={openCollapsibles['auth-login']}
-                    onToggle={() => toggleCollapsible('auth-login')}
-                    request={{
-                      body: {
-                        email: "user@example.com",
-                        password: "********"
-                      }
-                    }}
-                    response={{
-                      accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                      expiresIn: 3600,
-                      userId: "USR-123"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/auth/refresh"
-                    description="Refresh an access token"
-                    isOpen={openCollapsibles['auth-refresh']}
-                    onToggle={() => toggleCollapsible('auth-refresh')}
-                    request={{
-                      body: {
-                        refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                      }
-                    }}
-                    response={{
-                      accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                      expiresIn: 3600
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/auth/register"
-                    description="Register a new user"
-                    isOpen={openCollapsibles['auth-register']}
-                    onToggle={() => toggleCollapsible('auth-register')}
-                    request={{
-                      body: {
-                        email: "newuser@example.com",
-                        password: "********",
-                        name: "New User",
-                        country: "Vietnam",
-                        acceptTerms: true
-                      }
-                    }}
-                    response={{
-                      userId: "USR-456",
-                      email: "newuser@example.com",
-                      name: "New User",
-                      message: "User registered successfully"
-                    }}
-                  />
-                  
-                  <h3 className="text-lg font-semibold mt-6 mb-2">Using Authentication</h3>
-                  <p className="text-muted-foreground mb-2">
-                    Include the JWT token in the Authorization header:
-                  </p>
-                  <code className="bg-muted px-2 py-1 rounded text-sm block mb-4">
-                    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  </code>
-                </ApiDocSection>
-              )}
-              
-              {/* Error Handling Section */}
-              {filterContent('errors') && activeSection === 'errors' && (
-                <ApiDocSection
-                  title="Error Handling"
-                  icon={<AlertCircle className="h-5 w-5" />}
-                  description="Understanding API error responses and codes."
-                >
-                  <p className="text-muted-foreground mb-4">
-                    The API uses conventional HTTP response codes to indicate the success or failure of a request. 
-                    Codes in the 2xx range indicate success, codes in the 4xx range indicate an error with the 
-                    provided information, and codes in the 5xx range indicate an error with the server.
-                  </p>
-                  
-                  <h3 className="text-lg font-semibold mb-2">Error Response Format</h3>
-                  <code className="bg-muted px-4 py-3 rounded text-sm block mb-4 whitespace-pre">
+
+                <TabsContent value="rest" className="mt-0">
+                  <div className="space-y-12">
+                    {/* API Overview */}
+                    <Card className="bg-[#111111] border-zinc-800">
+                      <CardHeader>
+                        <CardTitle>API Overview</CardTitle>
+                        <CardDescription>
+                          Base URL: <code className="bg-zinc-800 p-1 rounded text-[#04ce91]">https://api.tradebot365.com/v1</code>
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-zinc-400 mb-4">
+                          All API requests require authentication using a JWT token in the Authorization header. 
+                          The token is obtained through the authentication endpoints.
+                        </p>
+                        <div className="bg-zinc-900 p-4 rounded-md">
+                          <code className="text-sm text-zinc-300">
+                            <div>Authorization: Bearer {'{your_jwt_token}'}</div>
+                          </code>
+                        </div>
+                        <div className="mt-6">
+                          <h3 className="text-lg font-medium mb-2">Response Format</h3>
+                          <p className="text-zinc-400 mb-2">
+                            All responses follow a standard format:
+                          </p>
+                          <div className="bg-zinc-900 p-4 rounded-md">
+                            <pre className="text-sm text-zinc-300">
 {`{
-  "error": {
-    "code": "INVALID_CREDENTIALS",
-    "message": "The provided credentials are invalid",
-    "status": 401,
-    "details": { ... }
+  "success": true|false,
+  "data": { /* response data */ },
+  "message": "Success or error message",
+  "errors": [] // Array of errors if success is false
+}`}
+                            </pre>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Authentication Section */}
+                    {filterDocs('Authentication login register token refresh') && (
+                      <div ref={sectionRefs.auth}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('auth')}>
+                            <div>
+                              <CardTitle>Authentication</CardTitle>
+                              <CardDescription>Endpoints for user authentication and session management</CardDescription>
+                            </div>
+                            {expandedSections.auth ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.auth && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* Login Endpoint */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/auth/login</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/auth/login')}
+                                    >
+                                      {copiedEndpoint === '/auth/login' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "user_123",
+      "email": "user@example.com",
+      "name": "User Name",
+      "role": "user",
+      "createdAt": "2023-09-15T10:30:00Z"
+    }
+  },
+  "message": "Login successful"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Register Endpoint */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/auth/register</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/auth/register')}
+                                    >
+                                      {copiedEndpoint === '/auth/register' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "email": "user@example.com",
+  "password": "securePassword123",
+  "name": "User Name"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "user_123",
+      "email": "user@example.com",
+      "name": "User Name",
+      "role": "user",
+      "createdAt": "2023-09-15T10:30:00Z"
+    }
+  },
+  "message": "User registered successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Refresh Token Endpoint */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/auth/refresh</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/auth/refresh')}
+                                    >
+                                      {copiedEndpoint === '/auth/refresh' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  "message": "Token refreshed successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Logout Endpoint */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/auth/logout</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/auth/logout')}
+                                    >
+                                      {copiedEndpoint === '/auth/logout' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "message": "Logged out successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+
+                    {/* User Profile Section */}
+                    {filterDocs('User Profile details update') && (
+                      <div ref={sectionRefs.users}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('users')}>
+                            <div>
+                              <CardTitle>User Profile</CardTitle>
+                              <CardDescription>Endpoints for managing user profile information</CardDescription>
+                            </div>
+                            {expandedSections.users ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.users && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* Get User Profile */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/users/profile</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/users/profile')}
+                                    >
+                                      {copiedEndpoint === '/users/profile' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Description</h4>
+                                    <p className="text-zinc-400 text-sm mb-4">
+                                      Returns the current user's profile information.
+                                    </p>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "user_123",
+    "email": "user@example.com",
+    "name": "User Name",
+    "profilePicture": "https://example.com/profile.jpg",
+    "role": "user",
+    "planType": "premium",
+    "planExpiry": "2023-12-31T23:59:59Z",
+    "createdAt": "2023-09-15T10:30:00Z",
+    "updatedAt": "2023-09-15T10:30:00Z"
+  },
+  "message": "User profile retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update User Profile */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/users/profile</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/users/profile')}
+                                    >
+                                      {copiedEndpoint === '/users/profile' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "name": "Updated User Name",
+  "profilePicture": "https://example.com/new-profile.jpg"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "user_123",
+    "email": "user@example.com",
+    "name": "Updated User Name",
+    "profilePicture": "https://example.com/new-profile.jpg",
+    "role": "user",
+    "planType": "premium",
+    "planExpiry": "2023-12-31T23:59:59Z",
+    "createdAt": "2023-09-15T10:30:00Z",
+    "updatedAt": "2023-09-16T14:22:00Z"
+  },
+  "message": "User profile updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Change Password */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/users/change-password</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/users/change-password')}
+                                    >
+                                      {copiedEndpoint === '/users/change-password' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "currentPassword": "currentSecurePassword",
+  "newPassword": "newSecurePassword"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "message": "Password changed successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* Dashboard Section */}
+                    {filterDocs('Dashboard stats overview') && (
+                      <div ref={sectionRefs.dashboard}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('dashboard')}>
+                            <div>
+                              <CardTitle>Dashboard</CardTitle>
+                              <CardDescription>Endpoints for dashboard data and statistics</CardDescription>
+                            </div>
+                            {expandedSections.dashboard ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.dashboard && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* Dashboard Overview */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/dashboard/overview</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/dashboard/overview')}
+                                    >
+                                      {copiedEndpoint === '/dashboard/overview' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Description</h4>
+                                    <p className="text-zinc-400 text-sm mb-4">
+                                      Returns overview statistics for the user's dashboard.
+                                    </p>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "activeBots": 5,
+    "totalAccounts": 8,
+    "tradingVolume": 15243.78,
+    "totalProfitLoss": 824.35,
+    "recentActivity": [
+      {
+        "type": "BOT_STARTED",
+        "botId": "bot_456",
+        "botName": "ETH Trend Follower",
+        "timestamp": "2023-09-16T12:30:00Z"
+      },
+      {
+        "type": "ACCOUNT_ADDED",
+        "accountId": "acc_789",
+        "accountName": "Binance #2",
+        "timestamp": "2023-09-15T10:15:00Z"
+      }
+    ]
+  },
+  "message": "Dashboard overview retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Performance Metrics */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/dashboard/performance</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/dashboard/performance')}
+                                    >
+                                      {copiedEndpoint === '/dashboard/performance' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">timeframe</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Timeframe for metrics (day, week, month, year)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "timeframe": "month",
+    "profitLossTimeline": [
+      { "date": "2023-09-01", "value": 120.45 },
+      { "date": "2023-09-02", "value": 95.22 },
+      // Additional timeline data...
+    ],
+    "botPerformance": [
+      {
+        "botId": "bot_456",
+        "botName": "ETH Trend Follower",
+        "profitLoss": 324.56,
+        "tradesWon": 15,
+        "tradesLost": 7
+      },
+      // Additional bot performance data...
+    ],
+    "summary": {
+      "totalProfitLoss": 824.35,
+      "winRate": 68.2,
+      "averageTradeProfit": 12.45
+    }
+  },
+  "message": "Performance metrics retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* System Status */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/dashboard/system-status</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/dashboard/system-status')}
+                                    >
+                                      {copiedEndpoint === '/dashboard/system-status' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Description</h4>
+                                    <p className="text-zinc-400 text-sm mb-4">
+                                      Returns the current system status and maintenance information.
+                                    </p>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "status": "operational",
+    "components": [
+      {
+        "name": "Trading API",
+        "status": "operational"
+      },
+      {
+        "name": "Signal Processing",
+        "status": "operational"
+      },
+      {
+        "name": "Account Connections",
+        "status": "operational"
+      }
+    ],
+    "plannedMaintenance": {
+      "scheduled": false,
+      "startTime": null,
+      "endTime": null,
+      "description": null
+    },
+    "incidents": []
+  },
+  "message": "System status retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* User Bots Section */}
+                    {filterDocs('Bots create list delete update') && (
+                      <div ref={sectionRefs.bots}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('bots')}>
+                            <div>
+                              <CardTitle>User Bots</CardTitle>
+                              <CardDescription>Endpoints for managing user-created bots</CardDescription>
+                            </div>
+                            {expandedSections.bots ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.bots && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* List User Bots */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/bots</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots')}
+                                    >
+                                      {copiedEndpoint === '/bots' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">page</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Page number for pagination (default: 1)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">limit</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Number of items per page (default: 10)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">status</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by bot status (active, inactive, error)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "bots": [
+      {
+        "id": "bot_123",
+        "name": "BTC Trend Follower",
+        "description": "Follows BTC trends and executes trades",
+        "status": "active",
+        "tradingPair": "BTC/USDT",
+        "strategy": "trend_following",
+        "createdAt": "2023-09-15T10:30:00Z",
+        "updatedAt": "2023-09-15T10:30:00Z",
+        "performance": {
+          "profitLoss": 245.67,
+          "tradesExecuted": 18,
+          "winRate": 72.2
+        }
+      },
+      // Additional bots...
+    ],
+    "pagination": {
+      "total": 25,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 3
+    }
+  },
+  "message": "Bots retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Single Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/bots/:botId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots/:botId')}
+                                    >
+                                      {copiedEndpoint === '/bots/:botId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the bot to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "bot_123",
+    "name": "BTC Trend Follower",
+    "description": "Follows BTC trends and executes trades",
+    "status": "active",
+    "tradingPair": "BTC/USDT",
+    "strategy": "trend_following",
+    "createdAt": "2023-09-15T10:30:00Z",
+    "updatedAt": "2023-09-15T10:30:00Z",
+    "settings": {
+      "timeframe": "1h",
+      "entryConditions": {
+        "indicator": "RSI",
+        "condition": "crossAbove",
+        "value": 30
+      },
+      "exitConditions": {
+        "indicator": "RSI",
+        "condition": "crossBelow",
+        "value": 70
+      },
+      "riskManagement": {
+        "stopLoss": 5,
+        "takeProfit": 10,
+        "maxPositionSize": 0.1
+      }
+    },
+    "performance": {
+      "profitLoss": 245.67,
+      "tradesExecuted": 18,
+      "winRate": 72.2,
+      "trades": [
+        {
+          "id": "trade_456",
+          "timestamp": "2023-09-15T12:30:00Z",
+          "type": "buy",
+          "price": 26540.75,
+          "amount": 0.05,
+          "status": "closed",
+          "profitLoss": 32.45
+        },
+        // Additional trades...
+      ]
+    },
+    "connectedAccounts": [
+      {
+        "id": "acc_789",
+        "name": "Binance Account",
+        "exchange": "binance"
+      }
+    ]
+  },
+  "message": "Bot retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Create Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/bots</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots')}
+                                    >
+                                      {copiedEndpoint === '/bots' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "name": "New Trading Bot",
+  "description": "My new trading bot description",
+  "tradingPair": "ETH/USDT",
+  "strategy": "trend_following",
+  "settings": {
+    "timeframe": "1h",
+    "entryConditions": {
+      "indicator": "RSI",
+      "condition": "crossAbove",
+      "value": 30
+    },
+    "exitConditions": {
+      "indicator": "RSI",
+      "condition": "crossBelow",
+      "value": 70
+    },
+    "riskManagement": {
+      "stopLoss": 5,
+      "takeProfit": 10,
+      "maxPositionSize": 0.1
+    }
+  },
+  "accountIds": ["acc_789"]
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "bot_123",
+    "name": "New Trading Bot",
+    "description": "My new trading bot description",
+    "status": "inactive",
+    "tradingPair": "ETH/USDT",
+    "strategy": "trend_following",
+    "createdAt": "2023-09-16T15:30:00Z",
+    "updatedAt": "2023-09-16T15:30:00Z",
+    "settings": {
+      "timeframe": "1h",
+      "entryConditions": {
+        "indicator": "RSI",
+        "condition": "crossAbove",
+        "value": 30
+      },
+      "exitConditions": {
+        "indicator": "RSI",
+        "condition": "crossBelow",
+        "value": 70
+      },
+      "riskManagement": {
+        "stopLoss": 5,
+        "takeProfit": 10,
+        "maxPositionSize": 0.1
+      }
+    },
+    "connectedAccounts": [
+      {
+        "id": "acc_789",
+        "name": "Binance Account",
+        "exchange": "binance"
+      }
+    ]
+  },
+  "message": "Bot created successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/bots/:botId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots/:botId')}
+                                    >
+                                      {copiedEndpoint === '/bots/:botId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the bot to update</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "name": "Updated Bot Name",
+  "description": "Updated description",
+  "settings": {
+    "timeframe": "4h",
+    "entryConditions": {
+      "indicator": "RSI",
+      "condition": "crossAbove",
+      "value": 25
+    },
+    "exitConditions": {
+      "indicator": "RSI",
+      "condition": "crossBelow",
+      "value": 75
+    },
+    "riskManagement": {
+      "stopLoss": 3,
+      "takeProfit": 12,
+      "maxPositionSize": 0.15
+    }
   }
 }`}
-                  </code>
-                  
-                  <h3 className="text-lg font-semibold mb-2">Common Error Codes</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2 px-4">Status Code</th>
-                          <th className="text-left py-2 px-4">Error Code</th>
-                          <th className="text-left py-2 px-4">Description</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">400</td>
-                          <td className="py-2 px-4">INVALID_REQUEST</td>
-                          <td className="py-2 px-4">The request was malformed or invalid</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">401</td>
-                          <td className="py-2 px-4">UNAUTHORIZED</td>
-                          <td className="py-2 px-4">Authentication is required or has failed</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">403</td>
-                          <td className="py-2 px-4">FORBIDDEN</td>
-                          <td className="py-2 px-4">You don't have permission to access this resource</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">404</td>
-                          <td className="py-2 px-4">NOT_FOUND</td>
-                          <td className="py-2 px-4">The requested resource was not found</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">409</td>
-                          <td className="py-2 px-4">CONFLICT</td>
-                          <td className="py-2 px-4">The request conflicts with the current state of the resource</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">422</td>
-                          <td className="py-2 px-4">VALIDATION_ERROR</td>
-                          <td className="py-2 px-4">The request data failed validation</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-4">429</td>
-                          <td className="py-2 px-4">RATE_LIMIT_EXCEEDED</td>
-                          <td className="py-2 px-4">You've made too many requests</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 px-4">500</td>
-                          <td className="py-2 px-4">SERVER_ERROR</td>
-                          <td className="py-2 px-4">An error occurred on the server</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "bot_123",
+    "name": "Updated Bot Name",
+    "description": "Updated description",
+    "status": "inactive",
+    "tradingPair": "ETH/USDT",
+    "strategy": "trend_following",
+    "createdAt": "2023-09-16T15:30:00Z",
+    "updatedAt": "2023-09-16T16:45:00Z",
+    "settings": {
+      "timeframe": "4h",
+      "entryConditions": {
+        "indicator": "RSI",
+        "condition": "crossAbove",
+        "value": 25
+      },
+      "exitConditions": {
+        "indicator": "RSI",
+        "condition": "crossBelow",
+        "value": 75
+      },
+      "riskManagement": {
+        "stopLoss": 3,
+        "takeProfit": 12,
+        "maxPositionSize": 0.15
+      }
+    },
+    "connectedAccounts": [
+      {
+        "id": "acc_789",
+        "name": "Binance Account",
+        "exchange": "binance"
+      }
+    ]
+  },
+  "message": "Bot updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Delete Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">DELETE</span>
+                                      <span className="text-zinc-300 font-mono">/bots/:botId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots/:botId')}
+                                    >
+                                      {copiedEndpoint === '/bots/:botId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the bot to delete</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "message": "Bot deleted successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Start/Stop Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/bots/:botId/toggle</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/bots/:botId/toggle')}
+                                    >
+                                      {copiedEndpoint === '/bots/:botId/toggle' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the bot to toggle</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "action": "start" // or "stop"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "bot_123",
+    "status": "active", // or "inactive"
+    "updatedAt": "2023-09-16T17:30:00Z"
+  },
+  "message": "Bot started successfully" // or "Bot stopped successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+
+                    {/* Premium Bots Section */}
+                    {filterDocs('Premium bots subscribe integrate') && (
+                      <div ref={sectionRefs.premium_bots}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('premium_bots')}>
+                            <div>
+                              <CardTitle>Premium Bots</CardTitle>
+                              <CardDescription>Endpoints for premium bot management</CardDescription>
+                            </div>
+                            {expandedSections.premium_bots ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.premium_bots && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* List Premium Bots */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">page</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Page number for pagination (default: 1)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">limit</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Number of items per page (default: 10)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">category</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by bot category</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "premiumBots": [
+      {
+        "id": "pbot_123",
+        "name": "Alpha BTC Predictor",
+        "description": "Advanced BTC price prediction model",
+        "category": "cryptocurrency",
+        "tradingPairs": ["BTC/USDT"],
+        "monthlyPrice": 29.99,
+        "performance": {
+          "lastMonth": 12.5,
+          "lastQuarter": 38.2,
+          "lastYear": 142.6
+        },
+        "rating": 4.8,
+        "reviewCount": 124,
+        "isPopular": true,
+        "isSubscribed": false
+      },
+      // Additional premium bots...
+    ],
+    "pagination": {
+      "total": 25,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 3
+    }
+  },
+  "message": "Premium bots retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Premium Bot Details */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots/:botId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots/:botId')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots/:botId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the premium bot to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "pbot_123",
+    "name": "Alpha BTC Predictor",
+    "description": "Advanced BTC price prediction model using machine learning and on-chain data analysis",
+    "category": "cryptocurrency",
+    "tradingPairs": ["BTC/USDT"],
+    "monthlyPrice": 29.99,
+    "yearlyPrice": 299.99,
+    "features": [
+      "Advanced technical analysis",
+      "Market sentiment analysis",
+      "Whale tracking",
+      "Customizable alerts"
+    ],
+    "performance": {
+      "lastMonth": 12.5,
+      "lastQuarter": 38.2,
+      "lastYear": 142.6,
+      "monthlyHistory": [
+        {"month": "2023-08", "return": 5.2},
+        {"month": "2023-07", "return": 7.3},
+        // Additional history...
+      ]
+    },
+    "rating": 4.8,
+    "reviewCount": 124,
+    "reviews": [
+      {
+        "userId": "user_456",
+        "userName": "John D.",
+        "rating": 5,
+        "comment": "Fantastic performance over the last 3 months!",
+        "date": "2023-09-10T14:30:00Z"
+      },
+      // Additional reviews...
+    ],
+    "isPopular": true,
+    "isSubscribed": false,
+    "trialAvailable": true,
+    "trialDays": 7
+  },
+  "message": "Premium bot details retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Subscribe to Premium Bot */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots/:botId/subscribe</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots/:botId/subscribe')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots/:botId/subscribe' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the premium bot to subscribe to</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "billingPeriod": "monthly", // or "yearly"
+  "paymentMethodId": "pm_123456789",
+  "isTrial": false // true for trial subscription
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "subscriptionId": "sub_123456",
+    "premiumBotId": "pbot_123",
+    "status": "active",
+    "startDate": "2023-09-16T18:30:00Z",
+    "endDate": "2023-10-16T18:30:00Z",
+    "billingPeriod": "monthly",
+    "price": 29.99,
+    "nextBillingDate": "2023-10-16T18:30:00Z",
+    "isTrial": false
+  },
+  "message": "Successfully subscribed to premium bot"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Cancel Premium Bot Subscription */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">DELETE</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots/:botId/subscription</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots/:botId/subscription')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots/:botId/subscription' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the premium bot subscription to cancel</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "subscriptionId": "sub_123456",
+    "status": "cancelled",
+    "cancelledAt": "2023-09-16T19:45:00Z",
+    "endDate": "2023-10-16T18:30:00Z"
+  },
+  "message": "Subscription cancelled successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* List User's Premium Bot Subscriptions */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots/subscriptions</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots/subscriptions')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots/subscriptions' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_123456",
+        "premiumBot": {
+          "id": "pbot_123",
+          "name": "Alpha BTC Predictor",
+          "description": "Advanced BTC price prediction model",
+          "category": "cryptocurrency"
+        },
+        "status": "active",
+        "startDate": "2023-09-16T18:30:00Z",
+        "endDate": "2023-10-16T18:30:00Z",
+        "billingPeriod": "monthly",
+        "price": 29.99,
+        "nextBillingDate": "2023-10-16T18:30:00Z",
+        "isTrial": false
+      },
+      // Additional subscriptions...
+    ]
+  },
+  "message": "Premium bot subscriptions retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Integrate Premium Bot with Trading Account */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/premium-bots/:botId/integrate</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/premium-bots/:botId/integrate')}
+                                    >
+                                      {copiedEndpoint === '/premium-bots/:botId/integrate' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the premium bot to integrate</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "accountIds": ["acc_789"],
+  "settings": {
+    "tradingPair": "BTC/USDT",
+    "riskLevel": "medium", // low, medium, high
+    "positionSizePercentage": 10,
+    "enableNotifications": true
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "integrationId": "int_123456",
+    "premiumBotId": "pbot_123",
+    "status": "active",
+    "settings": {
+      "tradingPair": "BTC/USDT",
+      "riskLevel": "medium",
+      "positionSizePercentage": 10,
+      "enableNotifications": true
+    },
+    "connectedAccounts": [
+      {
+        "id": "acc_789",
+        "name": "Binance Account",
+        "exchange": "binance"
+      }
+    ],
+    "createdAt": "2023-09-16T20:15:00Z"
+  },
+  "message": "Premium bot integrated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* Prop Trading Bots Section */}
+                    {filterDocs('Prop trading bots challenge') && (
+                      <div ref={sectionRefs.prop_bots}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('prop_bots')}>
+                            <div>
+                              <CardTitle>Prop Trading Bots</CardTitle>
+                              <CardDescription>Endpoints for prop trading bot management</CardDescription>
+                            </div>
+                            {expandedSections.prop_bots ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.prop_bots && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* List Prop Trading Bots */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">page</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Page number for pagination (default: 1)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">limit</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Number of items per page (default: 10)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">category</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by bot category</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "propTradingBots": [
+      {
+        "id": "ptbot_123",
+        "name": "Forex Master Challenge",
+        "description": "Complete our Forex trading challenge to earn a funded account",
+        "category": "forex",
+        "challengeFee": 299,
+        "accountSize": 100000,
+        "challengeRules": {
+          "profitTarget": 10,
+          "maxDrawdown": 5,
+          "minTradingDays": 10,
+          "maxDailyDrawdown": 2
+        },
+        "successRate": 35,
+        "startedCount": 1245,
+        "fundedCount": 436,
+        "rating": 4.7,
+        "reviewCount": 89
+      },
+      // Additional prop trading bots...
+    ],
+    "pagination": {
+      "total": 12,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 2
+    }
+  },
+  "message": "Prop trading bots retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Prop Trading Bot Details */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots/:botId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots/:botId')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots/:botId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the prop trading bot to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "ptbot_123",
+    "name": "Forex Master Challenge",
+    "description": "Complete our Forex trading challenge to earn a funded account with up to $100,000 capital",
+    "category": "forex",
+    "challengeFee": 299,
+    "accountSize": 100000,
+    "challengeTiers": [
+      {
+        "name": "Phase 1",
+        "duration": 30,
+        "profitTarget": 8,
+        "maxDrawdown": 5
+      },
+      {
+        "name": "Phase 2",
+        "duration": 60,
+        "profitTarget": 5,
+        "maxDrawdown": 5
+      }
+    ],
+    "challengeRules": {
+      "profitTarget": 10,
+      "maxDrawdown": 5,
+      "minTradingDays": 10,
+      "maxDailyDrawdown": 2,
+      "minimumTrades": 20,
+      "maximumRiskPerTrade": 1,
+      "tradingHours": "24/5",
+      "allowedInstruments": ["FOREX", "INDICES", "COMMODITIES"]
+    },
+    "profitSplit": 80,
+    "successRate": 35,
+    "startedCount": 1245,
+    "fundedCount": 436,
+    "features": [
+      "Unlimited time to complete challenge",
+      "One-time fee",
+      "Bi-weekly payouts",
+      "Scale up to $400,000"
+    ],
+    "rating": 4.7,
+    "reviewCount": 89,
+    "reviews": [
+      {
+        "userId": "user_456",
+        "userName": "Jane T.",
+        "rating": 5,
+        "comment": "Challenging but fair rules. Got funded in 45 days!",
+        "date": "2023-09-05T14:30:00Z"
+      },
+      // Additional reviews...
+    ]
+  },
+  "message": "Prop trading bot details retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Start Prop Trading Challenge */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots/:botId/start-challenge</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots/:botId/start-challenge')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots/:botId/start-challenge' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the prop trading bot to start challenge</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "accountSize": 100000,
+  "paymentMethodId": "pm_123456789",
+  "tradingPreferences": {
+    "instruments": ["EURUSD", "GBPUSD", "USDJPY"],
+    "tradingStyle": "swing" // day, scalp, swing
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "challengeId": "chal_123456",
+    "propBotId": "ptbot_123",
+    "status": "active",
+    "phase": 1,
+    "startDate": "2023-09-16T21:00:00Z",
+    "endDate": "2023-10-16T21:00:00Z",
+    "accountSize": 100000,
+    "currentBalance": 100000,
+    "highWatermark": 100000,
+    "profitTarget": {
+      "required": 8000,
+      "current": 0,
+      "percentage": 0
+    },
+    "maxDrawdown": {
+      "limit": 5000,
+      "current": 0,
+      "percentage": 0
+    },
+    "credentials": {
+      "loginId": "12345678",
+      "password": "temp_pwd_xyz",
+      "serverName": "ChallengeTrader-Live",
+      "platform": "MetaTrader 5"
+    }
+  },
+  "message": "Challenge started successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Challenge Status */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots/challenges/:challengeId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots/challenges/:challengeId')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots/challenges/:challengeId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">challengeId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the challenge to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "challengeId": "chal_123456",
+    "propBotId": "ptbot_123",
+    "propBot": {
+      "id": "ptbot_123",
+      "name": "Forex Master Challenge"
+    },
+    "status": "active",
+    "phase": 1,
+    "startDate": "2023-09-16T21:00:00Z",
+    "endDate": "2023-10-16T21:00:00Z",
+    "accountSize": 100000,
+    "currentBalance": 103500,
+    "highWatermark": 104200,
+    "profitTarget": {
+      "required": 8000,
+      "current": 3500,
+      "percentage": 43.75
+    },
+    "maxDrawdown": {
+      "limit": 5000,
+      "current": 700,
+      "percentage": 14
+    },
+    "tradingStats": {
+      "totalTrades": 12,
+      "winningTrades": 8,
+      "losingTrades": 4,
+      "winRate": 66.67,
+      "averageWin": 875,
+      "averageLoss": 350,
+      "largestWin": 1450,
+      "largestLoss": 700
+    },
+    "tradingDays": {
+      "required": 10,
+      "completed": 5
+    },
+    "trades": [
+      {
+        "id": "trade_123",
+        "instrument": "EURUSD",
+        "type": "buy",
+        "openTime": "2023-09-17T10:30:00Z",
+        "closeTime": "2023-09-17T16:45:00Z",
+        "openPrice": 1.07245,
+        "closePrice": 1.07825,
+        "size": 1,
+        "profitLoss": 580,
+        "status": "closed"
+      },
+      // Additional trades...
+    ],
+    "dailyPerformance": [
+      {
+        "date": "2023-09-17",
+        "startBalance": 100000,
+        "endBalance": 100580,
+        "profitLoss": 580,
+        "profitLossPercentage": 0.58,
+        "trades": 1
+      },
+      // Additional daily performance...
+    ]
+  },
+  "message": "Challenge status retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* List User's Challenges */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots/challenges</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots/challenges')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots/challenges' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">status</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by status (active, completed, failed)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "challenges": [
+      {
+        "challengeId": "chal_123456",
+        "propBotId": "ptbot_123",
+        "propBotName": "Forex Master Challenge",
+        "status": "active",
+        "phase": 1,
+        "startDate": "2023-09-16T21:00:00Z",
+        "endDate": "2023-10-16T21:00:00Z",
+        "accountSize": 100000,
+        "currentBalance": 103500,
+        "profitTargetPercentage": 43.75,
+        "maxDrawdownPercentage": 14
+      },
+      // Additional challenges...
+    ]
+  },
+  "message": "Challenges retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Integrate Prop Bot Trading Strategy */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/prop-trading-bots/challenges/:challengeId/integrate</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/prop-trading-bots/challenges/:challengeId/integrate')}
+                                    >
+                                      {copiedEndpoint === '/prop-trading-bots/challenges/:challengeId/integrate' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">challengeId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the challenge to integrate trading strategy</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "strategyId": "strat_123",
+  "settings": {
+    "riskPerTrade": 0.5,
+    "maxOpenPositions": 3,
+    "instruments": ["EURUSD", "GBPUSD"],
+    "tradingHours": {
+      "start": "08:00",
+      "end": "16:00",
+      "timezone": "UTC"
+    }
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "integrationId": "int_456789",
+    "challengeId": "chal_123456",
+    "strategyId": "strat_123",
+    "status": "active",
+    "settings": {
+      "riskPerTrade": 0.5,
+      "maxOpenPositions": 3,
+      "instruments": ["EURUSD", "GBPUSD"],
+      "tradingHours": {
+        "start": "08:00",
+        "end": "16:00",
+        "timezone": "UTC"
+      }
+    },
+    "createdAt": "2023-09-16T22:00:00Z"
+  },
+  "message": "Trading strategy integrated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* Trading Accounts Section */}
+                    {filterDocs('Accounts create list delete update') && (
+                      <div ref={sectionRefs.accounts}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('accounts')}>
+                            <div>
+                              <CardTitle>Trading Accounts</CardTitle>
+                              <CardDescription>Endpoints for managing trading accounts</CardDescription>
+                            </div>
+                            {expandedSections.accounts ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.accounts && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* List Accounts */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/accounts</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts')}
+                                    >
+                                      {copiedEndpoint === '/accounts' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">exchange</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by exchange (binance, coinbase, etc.)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">status</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by status (active, inactive, error)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "accounts": [
+      {
+        "id": "acc_123",
+        "name": "Binance Main Account",
+        "exchange": "binance",
+        "status": "active",
+        "balance": {
+          "total": 15420.75,
+          "available": 12500.50,
+          "inTrade": 2920.25,
+          "currency": "USDT"
+        },
+        "credentials": {
+          "isValid": true,
+          "lastValidated": "2023-09-16T10:30:00Z"
+        },
+        "connectedBots": 3,
+        "createdAt": "2023-09-01T10:30:00Z",
+        "updatedAt": "2023-09-16T10:30:00Z"
+      },
+      // Additional accounts...
+    ]
+  },
+  "message": "Accounts retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Account Details */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/accounts/:accountId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts/:accountId')}
+                                    >
+                                      {copiedEndpoint === '/accounts/:accountId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">accountId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the account to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "acc_123",
+    "name": "Binance Main Account",
+    "exchange": "binance",
+    "status": "active",
+    "balance": {
+      "total": 15420.75,
+      "available": 12500.50,
+      "inTrade": 2920.25,
+      "currency": "USDT",
+      "assets": [
+        {
+          "asset": "BTC",
+          "free": 0.12,
+          "locked": 0.05,
+          "total": 0.17,
+          "valueUSD": 4250.80
+        },
+        {
+          "asset": "ETH",
+          "free": 2.5,
+          "locked": 1.0,
+          "total": 3.5,
+          "valueUSD": 6300.75
+        },
+        // Additional assets...
+      ]
+    },
+    "credentials": {
+      "isValid": true,
+      "lastValidated": "2023-09-16T10:30:00Z",
+      "permissions": ["spot", "futures", "margin"]
+    },
+    "connectedBots": [
+      {
+        "id": "bot_456",
+        "name": "ETH Trend Follower",
+        "status": "active"
+      },
+      // Additional bots...
+    ],
+    "tradingHistory": {
+      "totalTrades": 45,
+      "successfulTrades": 32,
+      "winRate": 71.1,
+      "totalVolume": 28750.50,
+      "profitLoss": 1245.80
+    },
+    "createdAt": "2023-09-01T10:30:00Z",
+    "updatedAt": "2023-09-16T10:30:00Z"
+  },
+  "message": "Account details retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Create Account */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/accounts</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts')}
+                                    >
+                                      {copiedEndpoint === '/accounts' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "name": "My Binance Account",
+  "exchange": "binance",
+  "credentials": {
+    "apiKey": "your_api_key",
+    "secretKey": "your_secret_key"
+  },
+  "tradingType": "spot" // spot, futures, margin
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "acc_123",
+    "name": "My Binance Account",
+    "exchange": "binance",
+    "status": "active",
+    "balance": {
+      "total": 15420.75,
+      "available": 15420.75,
+      "inTrade": 0,
+      "currency": "USDT"
+    },
+    "credentials": {
+      "isValid": true,
+      "lastValidated": "2023-09-16T23:15:00Z",
+      "permissions": ["spot"]
+    },
+    "createdAt": "2023-09-16T23:15:00Z",
+    "updatedAt": "2023-09-16T23:15:00Z"
+  },
+  "message": "Account created successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Account */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/accounts/:accountId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts/:accountId')}
+                                    >
+                                      {copiedEndpoint === '/accounts/:accountId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">accountId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the account to update</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "name": "Updated Binance Account",
+  "credentials": {
+    "apiKey": "new_api_key",
+    "secretKey": "new_secret_key"
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "acc_123",
+    "name": "Updated Binance Account",
+    "exchange": "binance",
+    "status": "active",
+    "credentials": {
+      "isValid": true,
+      "lastValidated": "2023-09-17T00:30:00Z"
+    },
+    "updatedAt": "2023-09-17T00:30:00Z"
+  },
+  "message": "Account updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Delete Account */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">DELETE</span>
+                                      <span className="text-zinc-300 font-mono">/accounts/:accountId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts/:accountId')}
+                                    >
+                                      {copiedEndpoint === '/accounts/:accountId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">accountId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the account to delete</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "message": "Account deleted successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Validate Account Credentials */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">POST</span>
+                                      <span className="text-zinc-300 font-mono">/accounts/:accountId/validate</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/accounts/:accountId/validate')}
+                                    >
+                                      {copiedEndpoint === '/accounts/:accountId/validate' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">accountId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the account to validate</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "isValid": true,
+    "permissions": ["spot", "futures", "margin"],
+    "errors": []
+  },
+  "message": "Account credentials validated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* Signals Section */}
+                    {filterDocs('Signals logs history') && (
+                      <div ref={sectionRefs.signals}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('signals')}>
+                            <div>
+                              <CardTitle>Signals & Logs</CardTitle>
+                              <CardDescription>Endpoints for trading signals and logs</CardDescription>
+                            </div>
+                            {expandedSections.signals ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.signals && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* List Signal Logs */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/signals/logs</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/signals/logs')}
+                                    >
+                                      {copiedEndpoint === '/signals/logs' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by bot ID</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">accountId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by account ID</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">startDate</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Start date (ISO format)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">endDate</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">End date (ISO format)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">page</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Page number for pagination (default: 1)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">limit</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Number of items per page (default: 50)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "logs": [
+      {
+        "id": "log_123",
+        "timestamp": "2023-09-16T15:30:00Z",
+        "botId": "bot_456",
+        "botName": "ETH Trend Follower",
+        "accountId": "acc_789",
+        "accountName": "Binance Account",
+        "type": "SIGNAL",
+        "action": "BUY",
+        "symbol": "ETH/USDT",
+        "price": 1650.75,
+        "quantity": 0.5,
+        "status": "EXECUTED",
+        "message": "Buy signal executed successfully",
+        "details": {
+          "orderType": "MARKET",
+          "filledPrice": 1651.20,
+          "fee": 0.825,
+          "feeCurrency": "USDT"
+        }
+      },
+      // Additional logs...
+    ],
+    "pagination": {
+      "total": 245,
+      "page": 1,
+      "limit": 50,
+      "totalPages": 5
+    }
+  },
+  "message": "Signal logs retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Get Signal Log Details */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/signals/logs/:logId</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/signals/logs/:logId')}
+                                    >
+                                      {copiedEndpoint === '/signals/logs/:logId' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">logId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the log to retrieve</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "log_123",
+    "timestamp": "2023-09-16T15:30:00Z",
+    "botId": "bot_456",
+    "botName": "ETH Trend Follower",
+    "accountId": "acc_789",
+    "accountName": "Binance Account",
+    "type": "SIGNAL",
+    "action": "BUY",
+    "symbol": "ETH/USDT",
+    "price": 1650.75,
+    "quantity": 0.5,
+    "status": "EXECUTED",
+    "message": "Buy signal executed successfully",
+    "details": {
+      "orderType": "MARKET",
+      "filledPrice": 1651.20,
+      "fee": 0.825,
+      "feeCurrency": "USDT",
+      "orderId": "1234567890",
+      "exchangeTimestamp": "2023-09-16T15:30:02Z"
+    },
+    "indicators": {
+      "rsi": 32.5,
+      "macd": {
+        "macd": 1.25,
+        "signal": 0.75,
+        "histogram": 0.5
+      },
+      "ema": {
+        "ema9": 1640.25,
+        "ema21": 1625.50
+      }
+    },
+    "relatedTrades": [
+      {
+        "id": "trade_456",
+        "type": "ENTRY",
+        "timestamp": "2023-09-16T15:30:02Z"
+      }
+    ]
+  },
+  "message": "Signal log details retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* List Bot Error Signals */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/signals/errors</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/signals/errors')}
+                                    >
+                                      {copiedEndpoint === '/signals/errors' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Query Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">botId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by bot ID</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">severity</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by severity (low, medium, high, critical)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">status</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">Filter by status (new, acknowledged, resolved)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">page</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Page number for pagination (default: 1)</td>
+                                        </tr>
+                                        <tr>
+                                          <td className="py-2 pr-4">limit</td>
+                                          <td className="py-2 pr-4 text-zinc-400">number</td>
+                                          <td className="py-2 text-zinc-400">Number of items per page (default: 20)</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "errors": [
+      {
+        "id": "err_123",
+        "timestamp": "2023-09-16T18:45:00Z",
+        "botId": "bot_456",
+        "botName": "ETH Trend Follower",
+        "accountId": "acc_789",
+        "accountName": "Binance Account",
+        "type": "API_ERROR",
+        "severity": "high",
+        "status": "new",
+        "message": "API connection timeout",
+        "details": "Connection to Binance API timed out after 30 seconds",
+        "affectedOperations": ["TRADE_EXECUTION", "BALANCE_CHECK"],
+        "recommendedAction": "Check exchange status and API key permissions"
+      },
+      // Additional errors...
+    ],
+    "pagination": {
+      "total": 28,
+      "page": 1,
+      "limit": 20,
+      "totalPages": 2
+    },
+    "summary": {
+      "totalErrors": 28,
+      "byStatus": {
+        "new": 15,
+        "acknowledged": 8,
+        "resolved": 5
+      },
+      "bySeverity": {
+        "low": 10,
+        "medium": 12,
+        "high": 5,
+        "critical": 1
+      }
+    }
+  },
+  "message": "Error signals retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Error Signal Status */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/signals/errors/:errorId/status</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/signals/errors/:errorId/status')}
+                                    >
+                                      {copiedEndpoint === '/signals/errors/:errorId/status' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Path Parameters</h4>
+                                    <table className="w-full text-sm mb-4">
+                                      <thead>
+                                        <tr className="border-b border-zinc-800">
+                                          <th className="text-left pb-2 text-zinc-400">Parameter</th>
+                                          <th className="text-left pb-2 text-zinc-400">Type</th>
+                                          <th className="text-left pb-2 text-zinc-400">Description</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td className="py-2 pr-4">errorId</td>
+                                          <td className="py-2 pr-4 text-zinc-400">string</td>
+                                          <td className="py-2 text-zinc-400">ID of the error to update</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                    
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "status": "acknowledged", // or "resolved"
+  "notes": "Working on fixing API connectivity issue"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "id": "err_123",
+    "status": "acknowledged",
+    "updatedAt": "2023-09-17T09:15:00Z",
+    "notes": "Working on fixing API connectivity issue"
+  },
+  "message": "Error status updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                    
+                    {/* Settings Section */}
+                    {filterDocs('Settings preferences notifications') && (
+                      <div ref={sectionRefs.settings}>
+                        <Card className="bg-[#111111] border-zinc-800">
+                          <CardHeader className="flex flex-row items-center justify-between cursor-pointer" onClick={() => toggleSection('settings')}>
+                            <div>
+                              <CardTitle>User Settings</CardTitle>
+                              <CardDescription>Endpoints for user preferences and settings</CardDescription>
+                            </div>
+                            {expandedSections.settings ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </CardHeader>
+                          
+                          {expandedSections.settings && (
+                            <CardContent>
+                              <div className="space-y-8">
+                                {/* Get User Settings */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold mr-3">GET</span>
+                                      <span className="text-zinc-300 font-mono">/settings</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings')}
+                                    >
+                                      {copiedEndpoint === '/settings' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "notifications": {
+      "email": {
+        "enabled": true,
+        "tradingAlerts": true,
+        "systemAlerts": true,
+        "marketingEmails": false
+      },
+      "push": {
+        "enabled": true,
+        "tradingAlerts": true,
+        "systemAlerts": true,
+        "profitLossAlerts": true
+      },
+      "sms": {
+        "enabled": false,
+        "phoneNumber": null
+      }
+    },
+    "appearance": {
+      "theme": "dark",
+      "compactMode": false,
+      "chartPreferences": {
+        "defaultTimeframe": "1d",
+        "defaultIndicators": ["RSI", "MACD", "EMA"]
+      }
+    },
+    "trading": {
+      "defaultRiskPercentage": 2,
+      "confirmationRequired": true,
+      "defaultLeverage": 1,
+      "timeZone": "UTC",
+      "defaultCurrency": "USD"
+    },
+    "privacy": {
+      "profileVisibility": "public",
+      "showProfitLoss": true,
+      "showTradingHistory": false,
+      "shareDataWithPartners": false
+    },
+    "language": "en-US"
+  },
+  "message": "Settings retrieved successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Notification Settings */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/settings/notifications</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings/notifications')}
+                                    >
+                                      {copiedEndpoint === '/settings/notifications' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "email": {
+    "enabled": true,
+    "tradingAlerts": true,
+    "systemAlerts": false,
+    "marketingEmails": false
+  },
+  "push": {
+    "enabled": true,
+    "tradingAlerts": true,
+    "systemAlerts": true,
+    "profitLossAlerts": true
+  },
+  "sms": {
+    "enabled": true,
+    "phoneNumber": "+1234567890"
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "notifications": {
+      "email": {
+        "enabled": true,
+        "tradingAlerts": true,
+        "systemAlerts": false,
+        "marketingEmails": false
+      },
+      "push": {
+        "enabled": true,
+        "tradingAlerts": true,
+        "systemAlerts": true,
+        "profitLossAlerts": true
+      },
+      "sms": {
+        "enabled": true,
+        "phoneNumber": "+1234567890"
+      }
+    },
+    "updatedAt": "2023-09-17T10:30:00Z"
+  },
+  "message": "Notification settings updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Appearance Settings */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/settings/appearance</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings/appearance')}
+                                    >
+                                      {copiedEndpoint === '/settings/appearance' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "theme": "light",
+  "compactMode": true,
+  "chartPreferences": {
+    "defaultTimeframe": "4h",
+    "defaultIndicators": ["RSI", "Bollinger", "Volume"]
+  }
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "appearance": {
+      "theme": "light",
+      "compactMode": true,
+      "chartPreferences": {
+        "defaultTimeframe": "4h",
+        "defaultIndicators": ["RSI", "Bollinger", "Volume"]
+      }
+    },
+    "updatedAt": "2023-09-17T10:40:00Z"
+  },
+  "message": "Appearance settings updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Trading Settings */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/settings/trading</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings/trading')}
+                                    >
+                                      {copiedEndpoint === '/settings/trading' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "defaultRiskPercentage": 1.5,
+  "confirmationRequired": false,
+  "defaultLeverage": 2,
+  "timeZone": "America/New_York",
+  "defaultCurrency": "EUR"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "trading": {
+      "defaultRiskPercentage": 1.5,
+      "confirmationRequired": false,
+      "defaultLeverage": 2,
+      "timeZone": "America/New_York",
+      "defaultCurrency": "EUR"
+    },
+    "updatedAt": "2023-09-17T10:45:00Z"
+  },
+  "message": "Trading settings updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Privacy Settings */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/settings/privacy</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings/privacy')}
+                                    >
+                                      {copiedEndpoint === '/settings/privacy' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "profileVisibility": "private",
+  "showProfitLoss": false,
+  "showTradingHistory": false,
+  "shareDataWithPartners": false
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "privacy": {
+      "profileVisibility": "private",
+      "showProfitLoss": false,
+      "showTradingHistory": false,
+      "shareDataWithPartners": false
+    },
+    "updatedAt": "2023-09-17T10:50:00Z"
+  },
+  "message": "Privacy settings updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                                
+                                {/* Update Language Setting */}
+                                <div className="border border-zinc-800 rounded-lg overflow-hidden">
+                                  <div className="flex justify-between items-center bg-zinc-900 px-4 py-2">
+                                    <div className="flex items-center">
+                                      <span className="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold mr-3">PUT</span>
+                                      <span className="text-zinc-300 font-mono">/settings/language</span>
+                                    </div>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => copyToClipboard('/settings/language')}
+                                    >
+                                      {copiedEndpoint === '/settings/language' ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <div className="p-4 bg-zinc-950">
+                                    <h4 className="text-sm font-medium mb-2">Request Body</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "language": "vi-VN"
+}`}
+                                    </pre>
+                                    
+                                    <h4 className="text-sm font-medium mt-4 mb-2">Response</h4>
+                                    <pre className="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "language": "vi-VN",
+    "updatedAt": "2023-09-17T10:55:00Z"
+  },
+  "message": "Language setting updated successfully"
+}`}
+                                    </pre>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </div>
+                    )}
                   </div>
-                </ApiDocSection>
-              )}
-              
-              {/* User Profile Section */}
-              {filterContent('user-profile') && activeSection === 'user-profile' && (
-                <ApiDocSection
-                  title="User Profile"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for managing user profile information."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/user/profile"
-                    description="Get current user's profile information"
-                    isOpen={openCollapsibles['get-profile']}
-                    onToggle={() => toggleCollapsible('get-profile')}
-                    response={{
-                      id: "USR-123",
-                      email: "user@example.com",
-                      name: "John Doe",
-                      firstName: "John",
-                      lastName: "Doe",
-                      username: "johndoe",
-                      phone: "+84123456789",
-                      country: "Vietnam",
-                      city: "Ho Chi Minh",
-                      address: "123 Street",
-                      postalCode: "70000",
-                      avatar: "https://example.com/avatar.jpg",
-                      role: "USER",
-                      status: "ACTIVE",
-                      plan: "PREMIUM",
-                      createdAt: "2023-01-01T00:00:00Z",
-                      updatedAt: "2023-02-01T00:00:00Z",
-                      lastLogin: "2023-02-15T00:00:00Z",
-                      emailVerified: true,
-                      twoFactorEnabled: false,
-                      preferences: {
-                        theme: "dark",
-                        language: "en",
-                        notificationsEnabled: true,
-                        emailNotificationsEnabled: true,
-                        smsNotificationsEnabled: false
-                      },
-                      bots: 5,
-                      joinDate: "2023-01-01T00:00:00Z",
-                      botTypes: ["USER_BOT", "PREMIUM_BOT"],
-                      activity: "active"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/profile"
-                    description="Update user profile information"
-                    isOpen={openCollapsibles['update-profile']}
-                    onToggle={() => toggleCollapsible('update-profile')}
-                    request={{
-                      body: {
-                        name: "John Smith",
-                        firstName: "John",
-                        lastName: "Smith",
-                        phone: "+84987654321",
-                        city: "Hanoi",
-                        address: "456 Street",
-                        postalCode: "10000"
-                      }
-                    }}
-                    response={{
-                      id: "USR-123",
-                      name: "John Smith",
-                      firstName: "John",
-                      lastName: "Smith",
-                      phone: "+84987654321",
-                      city: "Hanoi",
-                      address: "456 Street",
-                      postalCode: "10000",
-                      updatedAt: "2023-03-01T00:00:00Z",
-                      message: "Profile updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PATCH"
-                    path="/user/profile/avatar"
-                    description="Update user avatar"
-                    isOpen={openCollapsibles['update-avatar']}
-                    onToggle={() => toggleCollapsible('update-avatar')}
-                    request={{
-                      formData: true,
-                      body: {
-                        avatar: "File upload"
-                      }
-                    }}
-                    response={{
-                      avatarUrl: "https://example.com/new-avatar.jpg",
-                      message: "Avatar updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/profile/password"
-                    description="Change user password"
-                    isOpen={openCollapsibles['change-password']}
-                    onToggle={() => toggleCollapsible('change-password')}
-                    request={{
-                      body: {
-                        currentPassword: "********",
-                        newPassword: "********",
-                        confirmPassword: "********"
-                      }
-                    }}
-                    response={{
-                      message: "Password changed successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/profile/two-factor"
-                    description="Enable/disable two-factor authentication"
-                    isOpen={openCollapsibles['update-2fa']}
-                    onToggle={() => toggleCollapsible('update-2fa')}
-                    request={{
-                      body: {
-                        enable: true,
-                        verificationCode: "123456"
-                      }
-                    }}
-                    response={{
-                      twoFactorEnabled: true,
-                      message: "Two-factor authentication enabled"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Dashboard Section */}
-              {filterContent('dashboard') && activeSection === 'dashboard' && (
-                <ApiDocSection
-                  title="Dashboard"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for dashboard data."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/dashboard/overview"
-                    description="Get dashboard overview data"
-                    isOpen={openCollapsibles['dashboard-overview']}
-                    onToggle={() => toggleCollapsible('dashboard-overview')}
-                    response={{
-                      totalBots: 5,
-                      activeBots: 3,
-                      totalAccounts: 8,
-                      connectedAccounts: 6,
-                      totalSignals: 150,
-                      successfulSignals: 125,
-                      failedSignals: 25,
-                      overallPerformance: "+15.2%",
-                      systemHealth: "healthy",
-                      lastUpdated: "2023-03-15T12:30:45Z"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/dashboard/performance"
-                    description="Get bot performance statistics"
-                    isOpen={openCollapsibles['dashboard-performance']}
-                    onToggle={() => toggleCollapsible('dashboard-performance')}
-                    request={{
-                      query: {
-                        period: "30d",
-                        botType: "all"
-                      }
-                    }}
-                    response={{
-                      period: "30d",
-                      overallPerformance: "+12.5%",
-                      chartData: [
-                        { date: "2023-02-15", performance: 10.2 },
-                        { date: "2023-03-01", performance: 11.5 },
-                        { date: "2023-03-15", performance: 12.5 }
-                      ],
-                      botPerformance: [
-                        {
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          performance: "+18.5%",
-                          trades: 42,
-                          winRate: "68%"
-                        },
-                        {
-                          botId: "pb-456",
-                          botName: "Premium Strategy",
-                          performance: "+12.3%",
-                          trades: 87,
-                          winRate: "72%"
-                        }
-                      ]
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/dashboard/activity"
-                    description="Get recent activity"
-                    isOpen={openCollapsibles['dashboard-activity']}
-                    onToggle={() => toggleCollapsible('dashboard-activity')}
-                    request={{
-                      query: {
-                        limit: 10,
-                        page: 1
-                      }
-                    }}
-                    response={{
-                      activities: [
-                        {
-                          id: "act-123",
-                          type: "bot_signal",
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          action: "BUY",
-                          symbol: "BTCUSDT",
-                          timestamp: "2023-03-15T10:45:30Z",
-                          status: "success"
-                        },
-                        {
-                          id: "act-124",
-                          type: "bot_integration",
-                          botId: "pb-456",
-                          botName: "Premium Strategy",
-                          action: "INTEGRATED",
-                          timestamp: "2023-03-14T14:22:10Z",
-                          status: "success"
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 5,
-                        totalItems: 48,
-                        limit: 10
-                      }
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* User Bots Section */}
-              {filterContent('user-bots') && activeSection === 'user-bots' && (
-                <ApiDocSection
-                  title="User Bots"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for managing user bots."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bots"
-                    description="Get all user bots"
-                    isOpen={openCollapsibles['get-bots']}
-                    onToggle={() => toggleCollapsible('get-bots')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        status: "active",
-                        sortBy: "createdDate"
-                      }
-                    }}
-                    response={{
-                      bots: [
-                        {
-                          id: "BOT-123",
-                          name: "My Trading Bot",
-                          description: "My personal trading strategy",
-                          status: "ACTIVE",
-                          type: "USER_BOT",
-                          createdDate: "2023-01-15T00:00:00Z",
-                          lastUpdated: "2023-03-01T00:00:00Z",
-                          risk: "MEDIUM",
-                          owner: "John Doe",
-                          ownerId: "USR-123",
-                          accounts: 3,
-                          strategy: "Momentum",
-                          isActive: true
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 3,
-                        totalItems: 25,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bots/{botId}"
-                    description="Get user bot details"
-                    isOpen={openCollapsibles['get-bot-detail']}
-                    onToggle={() => toggleCollapsible('get-bot-detail')}
-                    request={{
-                      path: {
-                        botId: "BOT-123"
-                      }
-                    }}
-                    response={{
-                      id: "BOT-123",
-                      name: "My Trading Bot",
-                      description: "My personal trading strategy",
-                      status: "ACTIVE",
-                      type: "USER_BOT",
-                      createdDate: "2023-01-15T00:00:00Z",
-                      lastUpdated: "2023-03-01T00:00:00Z",
-                      risk: "MEDIUM",
-                      owner: "John Doe",
-                      ownerId: "USR-123",
-                      accounts: 3,
-                      accountsList: [
-                        {
-                          id: "ACC-123",
-                          name: "Binance Account",
-                          status: "Connected",
-                          apiName: "Binance",
-                          tradingAccountBalance: "12500.75"
-                        }
-                      ],
-                      strategy: "Momentum",
-                      isActive: true,
-                      settings: {
-                        maxLoss: "5%",
-                        maxRisk: "2%",
-                        maxPositions: 5,
-                        activeTradingHours: ["09:00-17:00", "19:00-22:00"],
-                        excludedSymbols: ["SHIBUSDT"],
-                        includedSymbols: ["BTCUSDT", "ETHUSDT", "ADAUSDT"],
-                        stopLoss: "2%",
-                        takeProfit: "5%",
-                        lotSize: "0.1",
-                        leverage: "10x"
-                      },
-                      performance: {
-                        totalPnL: "+1250.50",
-                        totalTrades: 125,
-                        winRate: "68%",
-                        avgProfit: "2.1%",
-                        avgLoss: "1.2%",
-                        maxDrawdown: "5.8%",
-                        profitFactor: "1.75",
-                        lastMonthPerformance: "+8.5%",
-                        allTimePerformance: "+15.2%",
-                        monthlyPerformance: [
-                          {
-                            month: "2023-01",
-                            performance: "+3.2%",
-                            trades: 42,
-                            winRate: "65%"
-                          },
-                          {
-                            month: "2023-02",
-                            performance: "+5.1%",
-                            trades: 38,
-                            winRate: "68%"
-                          },
-                          {
-                            month: "2023-03",
-                            performance: "+8.5%",
-                            trades: 45,
-                            winRate: "71%"
-                          }
-                        ]
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/bots"
-                    description="Create a new user bot"
-                    isOpen={openCollapsibles['create-bot']}
-                    onToggle={() => toggleCollapsible('create-bot')}
-                    request={{
-                      body: {
-                        name: "New Trading Bot",
-                        description: "My new trading strategy",
-                        risk: "MEDIUM",
-                        strategy: "Swing Trading",
-                        settings: {
-                          maxLoss: "5%",
-                          maxRisk: "2%",
-                          maxPositions: 5,
-                          activeTradingHours: ["09:00-17:00"],
-                          includedSymbols: ["BTCUSDT", "ETHUSDT"],
-                          stopLoss: "2%",
-                          takeProfit: "5%",
-                          lotSize: "0.1",
-                          leverage: "10x"
-                        }
-                      }
-                    }}
-                    response={{
-                      id: "BOT-789",
-                      name: "New Trading Bot",
-                      description: "My new trading strategy",
-                      status: "INACTIVE",
-                      type: "USER_BOT",
-                      createdDate: "2023-03-15T15:30:45Z",
-                      lastUpdated: "2023-03-15T15:30:45Z",
-                      risk: "MEDIUM",
-                      owner: "John Doe",
-                      ownerId: "USR-123",
-                      accounts: 0,
-                      strategy: "Swing Trading",
-                      isActive: false,
-                      settings: {
-                        maxLoss: "5%",
-                        maxRisk: "2%",
-                        maxPositions: 5,
-                        activeTradingHours: ["09:00-17:00"],
-                        includedSymbols: ["BTCUSDT", "ETHUSDT"],
-                        stopLoss: "2%",
-                        takeProfit: "5%",
-                        lotSize: "0.1",
-                        leverage: "10x"
-                      },
-                      message: "Bot created successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/bots/{botId}"
-                    description="Update a user bot"
-                    isOpen={openCollapsibles['update-bot']}
-                    onToggle={() => toggleCollapsible('update-bot')}
-                    request={{
-                      path: {
-                        botId: "BOT-123"
-                      },
-                      body: {
-                        name: "Updated Bot Name",
-                        description: "Updated strategy description",
-                        settings: {
-                          maxLoss: "4%",
-                          maxRisk: "1.5%",
-                          maxPositions: 3
-                        }
-                      }
-                    }}
-                    response={{
-                      id: "BOT-123",
-                      name: "Updated Bot Name",
-                      description: "Updated strategy description",
-                      lastUpdated: "2023-03-15T16:45:30Z",
-                      settings: {
-                        maxLoss: "4%",
-                        maxRisk: "1.5%",
-                        maxPositions: 3,
-                        activeTradingHours: ["09:00-17:00", "19:00-22:00"],
-                        excludedSymbols: ["SHIBUSDT"],
-                        includedSymbols: ["BTCUSDT", "ETHUSDT", "ADAUSDT"],
-                        stopLoss: "2%",
-                        takeProfit: "5%",
-                        lotSize: "0.1",
-                        leverage: "10x"
-                      },
-                      message: "Bot updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="DELETE"
-                    path="/bots/{botId}"
-                    description="Delete a user bot"
-                    isOpen={openCollapsibles['delete-bot']}
-                    onToggle={() => toggleCollapsible('delete-bot')}
-                    request={{
-                      path: {
-                        botId: "BOT-123"
-                      }
-                    }}
-                    response={{
-                      id: "BOT-123",
-                      message: "Bot deleted successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Premium Bots Section */}
-              {filterContent('premium-bots') && activeSection === 'premium-bots' && (
-                <ApiDocSection
-                  title="Premium Bots"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for premium bots."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/premium-bots"
-                    description="Get available premium bots"
-                    isOpen={openCollapsibles['get-premium-bots']}
-                    onToggle={() => toggleCollapsible('get-premium-bots')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        sortBy: "performance",
-                        minCapital: "1000"
-                      }
-                    }}
-                    response={{
-                      bots: [
-                        {
-                          id: "pb-123",
-                          name: "Alpha Strategy",
-                          description: "High-performance algorithmic trading strategy",
-                          status: "ACTIVE",
-                          type: "PREMIUM_BOT",
-                          createdDate: "2023-01-01T00:00:00Z",
-                          lastUpdated: "2023-03-01T00:00:00Z",
-                          risk: "MEDIUM",
-                          exchange: "Binance",
-                          performanceLastMonth: "+12.5%",
-                          performanceAllTime: "+87.3%",
-                          minCapital: "5000",
-                          subscribers: 156,
-                          colorScheme: "blue",
-                          isIntegrated: false,
-                          features: [
-                            "24/7 Trading",
-                            "Multi-pair Strategy",
-                            "Risk Management"
-                          ],
-                          tradingStyle: "Swing Trading",
-                          timeframe: "4h",
-                          markets: ["Crypto"]
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 3,
-                        totalItems: 25,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/premium-bots/{botId}"
-                    description="Get premium bot details"
-                    isOpen={openCollapsibles['get-premium-bot-detail']}
-                    onToggle={() => toggleCollapsible('get-premium-bot-detail')}
-                    request={{
-                      path: {
-                        botId: "pb-123"
-                      }
-                    }}
-                    response={{
-                      id: "pb-123",
-                      name: "Alpha Strategy",
-                      description: "High-performance algorithmic trading strategy",
-                      status: "ACTIVE",
-                      type: "PREMIUM_BOT",
-                      createdDate: "2023-01-01T00:00:00Z",
-                      lastUpdated: "2023-03-01T00:00:00Z",
-                      risk: "MEDIUM",
-                      exchange: "Binance",
-                      performanceLastMonth: "+12.5%",
-                      performanceAllTime: "+87.3%",
-                      minCapital: "5000",
-                      subscribers: 156,
-                      colorScheme: "blue",
-                      isIntegrated: false,
-                      features: [
-                        "24/7 Trading",
-                        "Multi-pair Strategy",
-                        "Risk Management"
-                      ],
-                      tradingStyle: "Swing Trading",
-                      timeframe: "4h",
-                      markets: ["Crypto"],
-                      performance: {
-                        totalPnL: "+8735.50",
-                        totalTrades: 742,
-                        winRate: "73%",
-                        avgProfit: "2.8%",
-                        avgLoss: "1.1%",
-                        maxDrawdown: "12.3%",
-                        profitFactor: "2.54",
-                        lastMonthPerformance: "+12.5%",
-                        allTimePerformance: "+87.3%",
-                        monthlyPerformance: [
-                          {
-                            month: "2023-01",
-                            performance: "+8.7%",
-                            trades: 62,
-                            winRate: "75%"
-                          },
-                          {
-                            month: "2023-02",
-                            performance: "+10.2%",
-                            trades: 58,
-                            winRate: "72%"
-                          },
-                          {
-                            month: "2023-03",
-                            performance: "+12.5%",
-                            trades: 65,
-                            winRate: "71%"
-                          }
-                        ]
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/integrated-premium-bots"
-                    description="Get user's integrated premium bots"
-                    isOpen={openCollapsibles['get-integrated-premium-bots']}
-                    onToggle={() => toggleCollapsible('get-integrated-premium-bots')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10
-                      }
-                    }}
-                    response={{
-                      bots: [
-                        {
-                          id: "pb-456-integrated",
-                          originalId: "pb-456",
-                          name: "Beta Strategy",
-                          description: "Balanced risk-reward trading strategy",
-                          status: "ACTIVE",
-                          type: "PREMIUM_BOT",
-                          createdDate: "2023-02-15T00:00:00Z",
-                          lastUpdated: "2023-03-10T00:00:00Z",
-                          integratedDate: "2023-02-15T10:30:45Z",
-                          risk: "LOW",
-                          accounts: [
-                            {
-                              id: "ACC-123",
-                              name: "Binance Account",
-                              status: "Connected"
-                            }
-                          ],
-                          performance: {
-                            totalPnL: "+325.50",
-                            totalTrades: 28,
-                            winRate: "75%",
-                            lastMonthPerformance: "+5.8%"
-                          }
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 1,
-                        totalItems: 3,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/premium-bots/{botId}/integrate"
-                    description="Integrate a premium bot"
-                    isOpen={openCollapsibles['integrate-premium-bot']}
-                    onToggle={() => toggleCollapsible('integrate-premium-bot')}
-                    request={{
-                      path: {
-                        botId: "pb-123"
-                      },
-                      body: {
-                        accountIds: ["ACC-123", "ACC-456"]
-                      }
-                    }}
-                    response={{
-                      id: "pb-123-integrated",
-                      originalId: "pb-123",
-                      name: "Alpha Strategy",
-                      integratedDate: "2023-03-15T16:45:30Z",
-                      status: "ACTIVE",
-                      accounts: [
-                        {
-                          id: "ACC-123",
-                          name: "Binance Account",
-                          status: "Connected"
-                        },
-                        {
-                          id: "ACC-456",
-                          name: "Bybit Account",
-                          status: "Connected"
-                        }
-                      ],
-                      message: "Bot integrated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="DELETE"
-                    path="/integrated-premium-bots/{botId}"
-                    description="Remove an integrated premium bot"
-                    isOpen={openCollapsibles['remove-integrated-premium-bot']}
-                    onToggle={() => toggleCollapsible('remove-integrated-premium-bot')}
-                    request={{
-                      path: {
-                        botId: "pb-456-integrated"
-                      }
-                    }}
-                    response={{
-                      id: "pb-456-integrated",
-                      message: "Bot integration removed successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Prop Trading Bots Section */}
-              {filterContent('prop-bots') && activeSection === 'prop-bots' && (
-                <ApiDocSection
-                  title="Prop Trading Bots"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for prop trading bots."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/prop-bots"
-                    description="Get available prop trading bots"
-                    isOpen={openCollapsibles['get-prop-bots']}
-                    onToggle={() => toggleCollapsible('get-prop-bots')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        sortBy: "performance",
-                        propFirm: "FTMO"
-                      }
-                    }}
-                    response={{
-                      bots: [
-                        {
-                          id: "ptb-123",
-                          name: "FTMO Challenge Bot",
-                          description: "Designed to pass FTMO challenge",
-                          status: "ACTIVE",
-                          type: "PROP_BOT",
-                          createdDate: "2023-01-10T00:00:00Z",
-                          lastUpdated: "2023-03-05T00:00:00Z",
-                          risk: "LOW",
-                          exchange: "MT4/MT5",
-                          performanceLastMonth: "+8.3%",
-                          performanceAllTime: "+45.7%",
-                          minCapital: "10000",
-                          users: 78,
-                          profit: "+45.7%",
-                          maxDrawdown: "4.8%",
-                          propFirm: "FTMO",
-                          challengeDuration: "30 days",
-                          accountSizes: ["10K", "25K", "50K", "100K"]
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 2,
-                        totalItems: 15,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/prop-bots/{botId}"
-                    description="Get prop trading bot details"
-                    isOpen={openCollapsibles['get-prop-bot-detail']}
-                    onToggle={() => toggleCollapsible('get-prop-bot-detail')}
-                    request={{
-                      path: {
-                        botId: "ptb-123"
-                      }
-                    }}
-                    response={{
-                      id: "ptb-123",
-                      name: "FTMO Challenge Bot",
-                      description: "Designed to pass FTMO challenge",
-                      status: "ACTIVE",
-                      type: "PROP_BOT",
-                      createdDate: "2023-01-10T00:00:00Z",
-                      lastUpdated: "2023-03-05T00:00:00Z",
-                      risk: "LOW",
-                      exchange: "MT4/MT5",
-                      performanceLastMonth: "+8.3%",
-                      performanceAllTime: "+45.7%",
-                      minCapital: "10000",
-                      users: 78,
-                      profit: "+45.7%",
-                      maxDrawdown: "4.8%",
-                      propFirm: "FTMO",
-                      challengeDuration: "30 days",
-                      accountSizes: ["10K", "25K", "50K", "100K"],
-                      performance: {
-                        totalPnL: "+4570.00",
-                        totalTrades: 325,
-                        winRate: "68%",
-                        avgProfit: "1.8%",
-                        avgLoss: "0.7%",
-                        maxDrawdown: "4.8%",
-                        profitFactor: "2.57",
-                        lastMonthPerformance: "+8.3%",
-                        allTimePerformance: "+45.7%",
-                        monthlyPerformance: [
-                          {
-                            month: "2023-01",
-                            performance: "+12.3%",
-                            trades: 108,
-                            winRate: "67%"
-                          },
-                          {
-                            month: "2023-02",
-                            performance: "+9.5%",
-                            trades: 98,
-                            winRate: "70%"
-                          },
-                          {
-                            month: "2023-03",
-                            performance: "+8.3%",
-                            trades: 119,
-                            winRate: "68%"
-                          }
-                        ]
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/integrated-prop-bots"
-                    description="Get user's integrated prop trading bots"
-                    isOpen={openCollapsibles['get-integrated-prop-bots']}
-                    onToggle={() => toggleCollapsible('get-integrated-prop-bots')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10
-                      }
-                    }}
-                    response={{
-                      bots: [
-                        {
-                          id: "ptb-456-integrated",
-                          originalId: "ptb-456",
-                          name: "Forex Prop Trader",
-                          description: "Specialized in forex prop challenges",
-                          status: "ACTIVE",
-                          type: "PROP_BOT",
-                          createdDate: "2023-02-20T00:00:00Z",
-                          lastUpdated: "2023-03-12T00:00:00Z",
-                          integratedDate: "2023-02-20T14:22:15Z",
-                          risk: "MEDIUM",
-                          accounts: [
-                            {
-                              id: "ACC-789",
-                              name: "MT5 Account",
-                              status: "Connected"
-                            }
-                          ],
-                          performance: {
-                            totalPnL: "+583.25",
-                            totalTrades: 35,
-                            winRate: "71%",
-                            lastMonthPerformance: "+7.2%"
-                          }
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 1,
-                        totalItems: 2,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/prop-bots/{botId}/integrate"
-                    description="Integrate a prop trading bot"
-                    isOpen={openCollapsibles['integrate-prop-bot']}
-                    onToggle={() => toggleCollapsible('integrate-prop-bot')}
-                    request={{
-                      path: {
-                        botId: "ptb-123"
-                      },
-                      body: {
-                        accountIds: ["ACC-789"]
-                      }
-                    }}
-                    response={{
-                      id: "ptb-123-integrated",
-                      originalId: "ptb-123",
-                      name: "FTMO Challenge Bot",
-                      integratedDate: "2023-03-15T16:45:30Z",
-                      status: "ACTIVE",
-                      accounts: [
-                        {
-                          id: "ACC-789",
-                          name: "MT5 Account",
-                          status: "Connected"
-                        }
-                      ],
-                      message: "Bot integrated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="DELETE"
-                    path="/integrated-prop-bots/{botId}"
-                    description="Remove an integrated prop trading bot"
-                    isOpen={openCollapsibles['remove-integrated-prop-bot']}
-                    onToggle={() => toggleCollapsible('remove-integrated-prop-bot')}
-                    request={{
-                      path: {
-                        botId: "ptb-456-integrated"
-                      }
-                    }}
-                    response={{
-                      id: "ptb-456-integrated",
-                      message: "Bot integration removed successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Bot Errors Section */}
-              {filterContent('bot-errors') && activeSection === 'bot-errors' && (
-                <ApiDocSection
-                  title="Bot Errors"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for managing bot errors."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-errors"
-                    description="Get bot errors"
-                    isOpen={openCollapsibles['get-bot-errors']}
-                    onToggle={() => toggleCollapsible('get-bot-errors')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        botId: "BOT-123",
-                        severity: "high",
-                        status: "unresolved"
-                      }
-                    }}
-                    response={{
-                      errors: [
-                        {
-                          id: "err-123",
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          botType: "USER_BOT",
-                          errorMessage: "API connection failed",
-                          errorCode: "API_CONNECTION_ERROR",
-                          timestamp: "2023-03-15T10:45:30Z",
-                          severity: "high",
-                          status: "unresolved",
-                          details: {
-                            accountId: "ACC-123",
-                            apiEndpoint: "https://api.exchange.com/v1/account",
-                            responseCode: 401
-                          },
-                          suggestedFix: "Check API key permissions and expiration date."
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 2,
-                        totalItems: 15,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-errors/{errorId}"
-                    description="Get bot error details"
-                    isOpen={openCollapsibles['get-bot-error-detail']}
-                    onToggle={() => toggleCollapsible('get-bot-error-detail')}
-                    request={{
-                      path: {
-                        errorId: "err-123"
-                      }
-                    }}
-                    response={{
-                      id: "err-123",
-                      botId: "BOT-123",
-                      botName: "My Trading Bot",
-                      botType: "USER_BOT",
-                      errorMessage: "API connection failed",
-                      errorCode: "API_CONNECTION_ERROR",
-                      timestamp: "2023-03-15T10:45:30Z",
-                      severity: "high",
-                      status: "unresolved",
-                      details: {
-                        accountId: "ACC-123",
-                        apiEndpoint: "https://api.exchange.com/v1/account",
-                        responseCode: 401,
-                        requestHeaders: {
-                          "Authorization": "Bearer ****",
-                          "Content-Type": "application/json"
-                        },
-                        responseBody: {
-                          error: "Unauthorized",
-                          message: "Invalid API key"
-                        },
-                        stackTrace: "Error: API connection failed\n    at ConnectAPI (/app/src/services/api.js:35:12)\n    at processTicksAndRejections (/app/node_modules/node/internal/process/task_queues.js:95:5)"
-                      },
-                      suggestedFix: "Check API key permissions and expiration date.",
-                      relatedErrors: [
-                        {
-                          id: "err-122",
-                          botId: "BOT-123",
-                          timestamp: "2023-03-15T10:40:15Z",
-                          errorCode: "API_CONNECTION_ERROR",
-                          status: "resolved"
-                        }
-                      ]
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PATCH"
-                    path="/bot-errors/{errorId}"
-                    description="Update bot error status"
-                    isOpen={openCollapsibles['update-bot-error']}
-                    onToggle={() => toggleCollapsible('update-bot-error')}
-                    request={{
-                      path: {
-                        errorId: "err-123"
-                      },
-                      body: {
-                        status: "resolved",
-                        notes: "Fixed by updating API key permissions."
-                      }
-                    }}
-                    response={{
-                      id: "err-123",
-                      status: "resolved",
-                      updatedAt: "2023-03-15T16:45:30Z",
-                      notes: "Fixed by updating API key permissions.",
-                      message: "Error status updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-errors/summary"
-                    description="Get bot errors summary"
-                    isOpen={openCollapsibles['get-bot-errors-summary']}
-                    onToggle={() => toggleCollapsible('get-bot-errors-summary')}
-                    response={{
-                      totalErrors: 25,
-                      unresolvedErrors: 15,
-                      highSeverityErrors: 5,
-                      mediumSeverityErrors: 10,
-                      lowSeverityErrors: 10,
-                      errorsByBot: [
-                        {
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          totalErrors: 8,
-                          unresolvedErrors: 3
-                        },
-                        {
-                          botId: "pb-456-integrated",
-                          botName: "Beta Strategy",
-                          totalErrors: 4,
-                          unresolvedErrors: 2
-                        }
-                      ],
-                      recentTrends: {
-                        last24Hours: 5,
-                        last7Days: 15,
-                        last30Days: 25,
-                        changePercentage: "+20%"
-                      }
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Accounts Section */}
-              {filterContent('accounts') && activeSection === 'accounts' && (
-                <ApiDocSection
-                  title="Trading Accounts"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for managing trading accounts."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/accounts"
-                    description="Get all user trading accounts"
-                    isOpen={openCollapsibles['get-accounts']}
-                    onToggle={() => toggleCollapsible('get-accounts')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        status: "Connected",
-                        sortBy: "createdDate"
-                      }
-                    }}
-                    response={{
-                      accounts: [
-                        {
-                          id: "ACC-123",
-                          name: "Binance Account",
-                          status: "Connected",
-                          createdDate: "2023-01-15T00:00:00Z",
-                          lastUpdated: "2023-03-01T00:00:00Z",
-                          userId: "USR-123",
-                          apiName: "Binance",
-                          apiId: "binance",
-                          tradingAccount: "futures",
-                          tradingAccountType: "Live",
-                          tradingAccountBalance: "12500.75",
-                          volumeMultiplier: "1.0"
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 2,
-                        totalItems: 15,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/accounts/{accountId}"
-                    description="Get trading account details"
-                    isOpen={openCollapsibles['get-account-detail']}
-                    onToggle={() => toggleCollapsible('get-account-detail')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      }
-                    }}
-                    response={{
-                      id: "ACC-123",
-                      name: "Binance Account",
-                      status: "Connected",
-                      createdDate: "2023-01-15T00:00:00Z",
-                      lastUpdated: "2023-03-01T00:00:00Z",
-                      userId: "USR-123",
-                      apiName: "Binance",
-                      apiId: "binance",
-                      tradingAccount: "futures",
-                      tradingAccountType: "Live",
-                      tradingAccountBalance: "12500.75",
-                      volumeMultiplier: "1.0",
-                      connectedBots: [
-                        {
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          botType: "USER_BOT",
-                          status: "ACTIVE"
-                        },
-                        {
-                          botId: "pb-456-integrated",
-                          botName: "Beta Strategy",
-                          botType: "PREMIUM_BOT",
-                          status: "ACTIVE"
-                        }
-                      ],
-                      performance: {
-                        totalPnL: "+1250.50",
-                        totalTrades: 125,
-                        winRate: "68%",
-                        lastMonthPerformance: "+8.5%"
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/accounts"
-                    description="Create a new trading account"
-                    isOpen={openCollapsibles['create-account']}
-                    onToggle={() => toggleCollapsible('create-account')}
-                    request={{
-                      body: {
-                        name: "Bybit Account",
-                        apiName: "Bybit",
-                        apiId: "bybit",
-                        tradingAccount: "futures",
-                        tradingAccountType: "Live",
-                        clientId: "api-key-****",
-                        secretId: "api-secret-****",
-                        volumeMultiplier: "1.0"
-                      }
-                    }}
-                    response={{
-                      id: "ACC-456",
-                      name: "Bybit Account",
-                      status: "Connected",
-                      createdDate: "2023-03-15T15:30:45Z",
-                      lastUpdated: "2023-03-15T15:30:45Z",
-                      userId: "USR-123",
-                      apiName: "Bybit",
-                      apiId: "bybit",
-                      tradingAccount: "futures",
-                      tradingAccountType: "Live",
-                      tradingAccountBalance: "8750.25",
-                      volumeMultiplier: "1.0",
-                      message: "Account created successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/accounts/{accountId}"
-                    description="Update a trading account"
-                    isOpen={openCollapsibles['update-account']}
-                    onToggle={() => toggleCollapsible('update-account')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      },
-                      body: {
-                        name: "Updated Binance Account",
-                        volumeMultiplier: "0.8",
-                        clientId: "new-api-key-****",
-                        secretId: "new-api-secret-****"
-                      }
-                    }}
-                    response={{
-                      id: "ACC-123",
-                      name: "Updated Binance Account",
-                      lastUpdated: "2023-03-15T16:45:30Z",
-                      volumeMultiplier: "0.8",
-                      message: "Account updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="DELETE"
-                    path="/accounts/{accountId}"
-                    description="Delete a trading account"
-                    isOpen={openCollapsibles['delete-account']}
-                    onToggle={() => toggleCollapsible('delete-account')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      }
-                    }}
-                    response={{
-                      id: "ACC-123",
-                      message: "Account deleted successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Signals Section */}
-              {filterContent('signals') && activeSection === 'signals' && (
-                <ApiDocSection
-                  title="Trading Signals"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for trading signals."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/signals"
-                    description="Get trading signals"
-                    isOpen={openCollapsibles['get-signals']}
-                    onToggle={() => toggleCollapsible('get-signals')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        botId: "BOT-123",
-                        status: "executed"
-                      }
-                    }}
-                    response={{
-                      signals: [
-                        {
-                          id: "sig-123",
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          accountId: "ACC-123",
-                          symbol: "BTCUSDT",
-                          action: "BUY",
-                          quantity: "0.01",
-                          price: "45650.75",
-                          timestamp: "2023-03-15T10:45:30Z",
-                          status: "executed",
-                          pnl: "+125.50",
-                          closePrice: "46250.25",
-                          closeTimestamp: "2023-03-15T14:22:15Z"
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 8,
-                        totalItems: 75,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/signals/{signalId}"
-                    description="Get signal details"
-                    isOpen={openCollapsibles['get-signal-detail']}
-                    onToggle={() => toggleCollapsible('get-signal-detail')}
-                    request={{
-                      path: {
-                        signalId: "sig-123"
-                      }
-                    }}
-                    response={{
-                      id: "sig-123",
-                      botId: "BOT-123",
-                      botName: "My Trading Bot",
-                      accountId: "ACC-123",
-                      accountName: "Binance Account",
-                      symbol: "BTCUSDT",
-                      action: "BUY",
-                      quantity: "0.01",
-                      price: "45650.75",
-                      stopLoss: "45000.25",
-                      takeProfit: "46500.50",
-                      orderType: "MARKET",
-                      leverage: "10x",
-                      timestamp: "2023-03-15T10:45:30Z",
-                      status: "executed",
-                      pnl: "+125.50",
-                      pnlPercentage: "+2.75%",
-                      closePrice: "46250.25",
-                      closeTimestamp: "2023-03-15T14:22:15Z",
-                      duration: "3h 36m 45s",
-                      fees: "1.25",
-                      notes: "Momentum strategy signal",
-                      isRisky: false,
-                      executionDetails: {
-                        orderId: "1234567890",
-                        filledQuantity: "0.01",
-                        executionTime: "45ms",
-                        slippage: "0.01%"
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/signals/{signalId}/manual-close"
-                    description="Manually close a signal/position"
-                    isOpen={openCollapsibles['manual-close-signal']}
-                    onToggle={() => toggleCollapsible('manual-close-signal')}
-                    request={{
-                      path: {
-                        signalId: "sig-456"
-                      },
-                      body: {
-                        closePrice: "47250.50",
-                        notes: "Manually closed position due to market conditions"
-                      }
-                    }}
-                    response={{
-                      id: "sig-456",
-                      status: "executed",
-                      closePrice: "47250.50",
-                      closeTimestamp: "2023-03-15T16:45:30Z",
-                      pnl: "+325.75",
-                      pnlPercentage: "+7.12%",
-                      notes: "Manually closed position due to market conditions",
-                      message: "Signal closed successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/signals/statistics"
-                    description="Get signal statistics"
-                    isOpen={openCollapsibles['get-signal-stats']}
-                    onToggle={() => toggleCollapsible('get-signal-stats')}
-                    request={{
-                      query: {
-                        botId: "BOT-123",
-                        period: "30d"
-                      }
-                    }}
-                    response={{
-                      period: "30d",
-                      totalSignals: 125,
-                      executedSignals: 118,
-                      failedSignals: 7,
-                      winningTrades: 80,
-                      losingTrades: 38,
-                      winRate: "67.8%",
-                      totalPnL: "+1250.50",
-                      totalPnLPercentage: "+10.2%",
-                      averageTradeProfit: "+2.1%",
-                      averageTradeLoss: "-1.2%",
-                      largestProfit: "+5.8%",
-                      largestLoss: "-3.2%",
-                      symbolBreakdown: [
-                        {
-                          symbol: "BTCUSDT",
-                          trades: 42,
-                          winRate: "71.4%",
-                          pnL: "+650.25"
-                        },
-                        {
-                          symbol: "ETHUSDT",
-                          trades: 35,
-                          winRate: "65.7%",
-                          pnL: "+420.50"
-                        }
-                      ]
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Logs Section */}
-              {filterContent('logs') && activeSection === 'logs' && (
-                <ApiDocSection
-                  title="Bot Logs"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for bot logs."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-logs"
-                    description="Get bot logs"
-                    isOpen={openCollapsibles['get-bot-logs']}
-                    onToggle={() => toggleCollapsible('get-bot-logs')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        botId: "BOT-123",
-                        level: "info",
-                        startDate: "2023-03-01T00:00:00Z",
-                        endDate: "2023-03-15T23:59:59Z"
-                      }
-                    }}
-                    response={{
-                      logs: [
-                        {
-                          id: "log-123",
-                          botId: "BOT-123",
-                          botName: "My Trading Bot",
-                          level: "info",
-                          message: "Signal generated for BTCUSDT",
-                          timestamp: "2023-03-15T10:45:30Z",
-                          context: {
-                            signalId: "sig-123",
-                            action: "BUY",
-                            price: "45650.75"
-                          }
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 15,
-                        totalItems: 145,
-                        limit: 10
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-logs/{logId}"
-                    description="Get bot log details"
-                    isOpen={openCollapsibles['get-bot-log-detail']}
-                    onToggle={() => toggleCollapsible('get-bot-log-detail')}
-                    request={{
-                      path: {
-                        logId: "log-123"
-                      }
-                    }}
-                    response={{
-                      id: "log-123",
-                      botId: "BOT-123",
-                      botName: "My Trading Bot",
-                      level: "info",
-                      message: "Signal generated for BTCUSDT",
-                      timestamp: "2023-03-15T10:45:30Z",
-                      details: "Technical analysis indicates strong buy signal with RSI at 32 and MACD crossover",
-                      context: {
-                        signalId: "sig-123",
-                        symbol: "BTCUSDT",
-                        action: "BUY",
-                        price: "45650.75",
-                        indicators: {
-                          rsi: 32,
-                          macd: "crossover",
-                          ema": "bullish"
-                        }
-                      },
-                      relatedLogs: [
-                        {
-                          id: "log-122",
-                          message: "Technical analysis completed for BTCUSDT",
-                          timestamp: "2023-03-15T10:45:25Z",
-                          level: "debug"
-                        },
-                        {
-                          id: "log-124",
-                          message: "Signal execution initiated for BTCUSDT",
-                          timestamp: "2023-03-15T10:45:35Z",
-                          level: "info"
-                        }
-                      ]
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/bot-logs/summary"
-                    description="Get bot logs summary"
-                    isOpen={openCollapsibles['get-bot-logs-summary']}
-                    onToggle={() => toggleCollapsible('get-bot-logs-summary')}
-                    request={{
-                      query: {
-                        botId: "BOT-123",
-                        period: "7d"
-                      }
-                    }}
-                    response={{
-                      period: "7d",
-                      totalLogs: 325,
-                      logLevels: {
-                        error: 12,
-                        warning: 25,
-                        info: 158,
-                        debug: 130
-                      },
-                      topErrorMessages: [
-                        {
-                          message: "API connection failed",
-                          count: 5
-                        },
-                        {
-                          message: "Order execution timeout",
-                          count: 3
-                        }
-                      ],
-                      activityTrend: {
-                        daily: [
-                          {
-                            date: "2023-03-09",
-                            count: 42,
-                            errors: 1
-                          },
-                          {
-                            date: "2023-03-10",
-                            count: 45,
-                            errors: 2
-                          }
-                          // Additional dates would be included...
-                        ]
-                      }
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Settings Section */}
-              {filterContent('settings') && activeSection === 'settings' && (
-                <ApiDocSection
-                  title="User Settings"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for user settings."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/user/settings"
-                    description="Get user settings"
-                    isOpen={openCollapsibles['get-settings']}
-                    onToggle={() => toggleCollapsible('get-settings')}
-                    response={{
-                      preferences: {
-                        theme: "dark",
-                        language: "en",
-                        notificationsEnabled: true,
-                        emailNotificationsEnabled: true,
-                        smsNotificationsEnabled: false
-                      },
-                      trading: {
-                        defaultRisk: "MEDIUM",
-                        defaultLeverage: "10x",
-                        defaultStopLoss: "2%",
-                        defaultTakeProfit: "5%",
-                        autoClosePositions: true,
-                        tradingHours: ["00:00-23:59"]
-                      },
-                      security: {
-                        twoFactorEnabled: false,
-                        loginNotifications: true,
-                        tradeNotifications: true,
-                        ipWhitelist: []
-                      },
-                      appearance: {
-                        chartType: "candlestick",
-                        defaultTimeframe: "4h",
-                        showPnL: true,
-                        compactView: false,
-                        colorScheme: "default"
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/settings/preferences"
-                    description="Update user preferences"
-                    isOpen={openCollapsibles['update-preferences']}
-                    onToggle={() => toggleCollapsible('update-preferences')}
-                    request={{
-                      body: {
-                        theme: "light",
-                        language: "vi",
-                        notificationsEnabled: true,
-                        emailNotificationsEnabled: false
-                      }
-                    }}
-                    response={{
-                      preferences: {
-                        theme: "light",
-                        language: "vi",
-                        notificationsEnabled: true,
-                        emailNotificationsEnabled: false,
-                        smsNotificationsEnabled: false
-                      },
-                      message: "Preferences updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/settings/trading"
-                    description="Update trading settings"
-                    isOpen={openCollapsibles['update-trading-settings']}
-                    onToggle={() => toggleCollapsible('update-trading-settings')}
-                    request={{
-                      body: {
-                        defaultRisk: "LOW",
-                        defaultLeverage: "5x",
-                        defaultStopLoss: "3%",
-                        defaultTakeProfit: "6%"
-                      }
-                    }}
-                    response={{
-                      trading: {
-                        defaultRisk: "LOW",
-                        defaultLeverage: "5x",
-                        defaultStopLoss: "3%",
-                        defaultTakeProfit: "6%",
-                        autoClosePositions: true,
-                        tradingHours: ["00:00-23:59"]
-                      },
-                      message: "Trading settings updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/settings/security"
-                    description="Update security settings"
-                    isOpen={openCollapsibles['update-security-settings']}
-                    onToggle={() => toggleCollapsible('update-security-settings')}
-                    request={{
-                      body: {
-                        loginNotifications: false,
-                        tradeNotifications: true,
-                        ipWhitelist: ["192.168.1.1", "10.0.0.1"]
-                      }
-                    }}
-                    response={{
-                      security: {
-                        twoFactorEnabled: false,
-                        loginNotifications: false,
-                        tradeNotifications: true,
-                        ipWhitelist: ["192.168.1.1", "10.0.0.1"]
-                      },
-                      message: "Security settings updated successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PUT"
-                    path="/user/settings/appearance"
-                    description="Update appearance settings"
-                    isOpen={openCollapsibles['update-appearance-settings']}
-                    onToggle={() => toggleCollapsible('update-appearance-settings')}
-                    request={{
-                      body: {
-                        chartType: "line",
-                        defaultTimeframe: "1h",
-                        compactView: true
-                      }
-                    }}
-                    response={{
-                      appearance: {
-                        chartType: "line",
-                        defaultTimeframe: "1h",
-                        showPnL: true,
-                        compactView: true,
-                        colorScheme: "default"
-                      },
-                      message: "Appearance settings updated successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Connections Section */}
-              {filterContent('connections') && activeSection === 'connections' && (
-                <ApiDocSection
-                  title="Connections"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for account connections."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/connections"
-                    description="Get all connection statuses"
-                    isOpen={openCollapsibles['get-connections']}
-                    onToggle={() => toggleCollapsible('get-connections')}
-                    response={{
-                      connections: [
-                        {
-                          accountId: "ACC-123",
-                          accountName: "Binance Account",
-                          connectionStatus: "Connected",
-                          lastConnectionTime: "2023-03-15T10:45:30Z",
-                          healthStatus: "healthy",
-                          successfulConnections: 542,
-                          failedConnections: 3
-                        }
-                      ]
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/connections/{accountId}"
-                    description="Get connection status for a specific account"
-                    isOpen={openCollapsibles['get-connection-detail']}
-                    onToggle={() => toggleCollapsible('get-connection-detail')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      }
-                    }}
-                    response={{
-                      accountId: "ACC-123",
-                      accountName: "Binance Account",
-                      connectionStatus: "Connected",
-                      lastConnectionTime: "2023-03-15T10:45:30Z",
-                      lastDisconnectionTime: "2023-03-14T22:15:45Z",
-                      errorMessage: null,
-                      reconnectAttempts: 0,
-                      healthStatus: "healthy",
-                      successfulConnections: 542,
-                      failedConnections: 3,
-                      connectionHistory: [
-                        {
-                          timestamp: "2023-03-14T22:15:45Z",
-                          status: "Disconnected",
-                          reason: "API server maintenance"
-                        },
-                        {
-                          timestamp: "2023-03-15T08:30:15Z",
-                          status: "Connected",
-                          reason: "User initiated"
-                        }
-                      ]
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/connections/{accountId}/reconnect"
-                    description="Manually reconnect an account"
-                    isOpen={openCollapsibles['reconnect-account']}
-                    onToggle={() => toggleCollapsible('reconnect-account')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      }
-                    }}
-                    response={{
-                      accountId: "ACC-123",
-                      connectionStatus: "Connected",
-                      lastConnectionTime: "2023-03-15T16:45:30Z",
-                      message: "Account reconnected successfully"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="POST"
-                    path="/connections/{accountId}/test"
-                    description="Test account connection"
-                    isOpen={openCollapsibles['test-connection']}
-                    onToggle={() => toggleCollapsible('test-connection')}
-                    request={{
-                      path: {
-                        accountId: "ACC-123"
-                      }
-                    }}
-                    response={{
-                      accountId: "ACC-123",
-                      isConnected: true,
-                      permissions: ["READ", "TRADE", "TRANSFER"],
-                      responseTime: "125ms",
-                      balance: "12500.75",
-                      message: "Connection test successful"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* System Status Section */}
-              {filterContent('system-status') && activeSection === 'system-status' && (
-                <ApiDocSection
-                  title="System Status"
-                  icon={<RefreshCw className="h-5 w-5" />}
-                  description="API endpoints for system status."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/system/status"
-                    description="Get system status"
-                    isOpen={openCollapsibles['get-system-status']}
-                    onToggle={() => toggleCollapsible('get-system-status')}
-                    response={{
-                      status: "operational",
-                      components: [
-                        {
-                          name: "API",
-                          status: "operational",
-                          uptime: "99.99%"
-                        },
-                        {
-                          name: "Trading Engine",
-                          status: "operational",
-                          uptime: "99.95%"
-                        },
-                        {
-                          name: "Database",
-                          status: "operational",
-                          uptime: "100%"
-                        },
-                        {
-                          name: "Authentication",
-                          status: "operational",
-                          uptime: "99.99%"
-                        }
-                      ],
-                      lastIncident: "2023-02-15T08:30:15Z",
-                      uptime: "99.98%",
-                      version: "1.0.5",
-                      lastUpdated: "2023-03-15T16:45:30Z"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/system/stats"
-                    description="Get system statistics"
-                    isOpen={openCollapsibles['get-system-stats']}
-                    onToggle={() => toggleCollapsible('get-system-stats')}
-                    request={{
-                      query: {
-                        includePrivate: false
-                      }
-                    }}
-                    response={{
-                      totalUsers: 1250,
-                      activeUsers: 875,
-                      totalBots: 3250,
-                      activeBots: 2150,
-                      totalAccounts: 1750,
-                      connectedAccounts: 1625,
-                      totalTrades: 156250,
-                      successfulTrades: 135480,
-                      failedTrades: 20770,
-                      systemLoad: 42,
-                      uptime: "45d 12h 30m",
-                      lastUpdated: "2023-03-15T16:45:30Z"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/system/version"
-                    description="Get system version information"
-                    isOpen={openCollapsibles['get-system-version']}
-                    onToggle={() => toggleCollapsible('get-system-version')}
-                    response={{
-                      version: "1.0.5",
-                      buildNumber: "1055",
-                      releaseDate: "2023-03-01T00:00:00Z",
-                      environment: "production",
-                      features: [
-                        "Premium Bot Integration",
-                        "Prop Trading Support",
-                        "Enhanced Error Handling"
-                      ],
-                      changelog: [
-                        "Added support for FTMO prop trading",
-                        "Fixed API connection timeout issues",
-                        "Improved signal performance tracking"
-                      ]
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-              
-              {/* Notifications Section */}
-              {filterContent('notifications') && activeSection === 'notifications' && (
-                <ApiDocSection
-                  title="Notifications"
-                  icon={<Database className="h-5 w-5" />}
-                  description="API endpoints for user notifications."
-                >
-                  <ApiEndpoint
-                    method="GET"
-                    path="/notifications"
-                    description="Get user notifications"
-                    isOpen={openCollapsibles['get-notifications']}
-                    onToggle={() => toggleCollapsible('get-notifications')}
-                    request={{
-                      query: {
-                        page: 1,
-                        limit: 10,
-                        read: false,
-                        type: "all"
-                      }
-                    }}
-                    response={{
-                      notifications: [
-                        {
-                          id: "notif-123",
-                          userId: "USR-123",
-                          title: "Signal Executed",
-                          message: "BUY signal for BTCUSDT was executed successfully",
-                          timestamp: "2023-03-15T10:45:30Z",
-                          read: false,
-                          type: "success",
-                          source: "bot",
-                          sourceId: "BOT-123",
-                          link: "/signals/sig-123",
-                          linkText: "View Signal"
-                        }
-                      ],
-                      pagination: {
-                        currentPage: 1,
-                        totalPages: 5,
-                        totalItems: 42,
-                        limit: 10
-                      },
-                      unreadCount: 12
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="GET"
-                    path="/notifications/{notificationId}"
-                    description="Get notification details"
-                    isOpen={openCollapsibles['get-notification-detail']}
-                    onToggle={() => toggleCollapsible('get-notification-detail')}
-                    request={{
-                      path: {
-                        notificationId: "notif-123"
-                      }
-                    }}
-                    response={{
-                      id: "notif-123",
-                      userId: "USR-123",
-                      title: "Signal Executed",
-                      message: "BUY signal for BTCUSDT was executed successfully at $45,650.75",
-                      timestamp: "2023-03-15T10:45:30Z",
-                      read: false,
-                      type: "success",
-                      source: "bot",
-                      sourceId: "BOT-123",
-                      link: "/signals/sig-123",
-                      linkText: "View Signal",
-                      details: {
-                        signal: {
-                          id: "sig-123",
-                          symbol: "BTCUSDT",
-                          action: "BUY",
-                          price: "45650.75"
-                        },
-                        bot: {
-                          id: "BOT-123",
-                          name: "My Trading Bot"
-                        }
-                      }
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PATCH"
-                    path="/notifications/{notificationId}"
-                    description="Mark notification as read"
-                    isOpen={openCollapsibles['mark-notification-read']}
-                    onToggle={() => toggleCollapsible('mark-notification-read')}
-                    request={{
-                      path: {
-                        notificationId: "notif-123"
-                      },
-                      body: {
-                        read: true
-                      }
-                    }}
-                    response={{
-                      id: "notif-123",
-                      read: true,
-                      message: "Notification marked as read"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="PATCH"
-                    path="/notifications/read-all"
-                    description="Mark all notifications as read"
-                    isOpen={openCollapsibles['mark-all-notifications-read']}
-                    onToggle={() => toggleCollapsible('mark-all-notifications-read')}
-                    response={{
-                      count: 12,
-                      message: "All notifications marked as read"
-                    }}
-                  />
-                  
-                  <ApiEndpoint
-                    method="DELETE"
-                    path="/notifications/{notificationId}"
-                    description="Delete a notification"
-                    isOpen={openCollapsibles['delete-notification']}
-                    onToggle={() => toggleCollapsible('delete-notification')}
-                    request={{
-                      path: {
-                        notificationId: "notif-123"
-                      }
-                    }}
-                    response={{
-                      id: "notif-123",
-                      message: "Notification deleted successfully"
-                    }}
-                  />
-                </ApiDocSection>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+                </TabsContent>
+                
+                <TabsContent value="graphql" className="mt-0">
+                  <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                      <h3 className="text-xl font-medium mb-2">GraphQL Documentation Coming Soon</h3>
+                      <p className="text-zinc-400">
+                        We're working on our GraphQL API implementation and documentation.
+                        <br />Check back later for updates.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </MainLayout>
-  );
-};
-
-const ApiDocSection = ({ 
-  title, 
-  icon, 
-  description, 
-  children 
-}: { 
-  title: string; 
-  icon: React.ReactNode; 
-  description: string; 
-  children: React.ReactNode;
-}) => {
-  return (
-    <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          {icon}
-          <CardTitle>{title}</CardTitle>
-        </div>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {children}
-      </CardContent>
-    </Card>
-  );
-};
-
-interface RequestDetails {
-  path?: Record<string, string>;
-  query?: Record<string, string>;
-  body?: Record<string, any>;
-  formData?: boolean;
-}
-
-interface ApiEndpointProps {
-  method: string;
-  path: string;
-  description: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  request?: RequestDetails;
-  response: Record<string, any>;
-}
-
-const ApiEndpoint = ({ 
-  method, 
-  path, 
-  description,
-  isOpen,
-  onToggle,
-  request,
-  response
-}: ApiEndpointProps) => {
-  const getMethodColor = (method: string) => {
-    switch (method) {
-      case 'GET': return 'bg-blue-500/20 text-blue-500';
-      case 'POST': return 'bg-green-500/20 text-green-500';
-      case 'PUT': return 'bg-amber-500/20 text-amber-500';
-      case 'PATCH': return 'bg-purple-500/20 text-purple-500';
-      case 'DELETE': return 'bg-red-500/20 text-red-500';
-      default: return 'bg-gray-500/20 text-gray-500';
-    }
-  };
-  
-  return (
-    <div className="border rounded-md overflow-hidden mb-4">
-      <Collapsible open={isOpen} onOpenChange={onToggle}>
-        <CollapsibleTrigger className="w-full">
-          <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50">
-            <div className="flex items-center gap-3">
-              <span className={cn("px-2 py-1 rounded text-xs font-medium", getMethodColor(method))}>
-                {method}
-              </span>
-              <code className="text-sm font-mono">
-                {path}
-              </code>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground hidden md:inline-block">
-                {description}
-              </span>
-              <ChevronDown 
-                className={cn("h-5 w-5 text-muted-foreground transition-transform", 
-                  isOpen ? "transform rotate-180" : "")} 
-              />
-            </div>
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="border-t p-4 bg-muted/30">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Request Section */}
-              <div>
-                <h4 className="text-sm font-medium mb-2">Request</h4>
-                
-                {/* Path Parameters */}
-                {request?.path && Object.keys(request.path).length > 0 && (
-                  <div className="mb-3">
-                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Path Parameters</h5>
-                    <code className="text-xs bg-muted p-2 rounded block whitespace-pre">
-                      {JSON.stringify(request.path, null, 2)}
-                    </code>
-                  </div>
-                )}
-                
-                {/* Query Parameters */}
-                {request?.query && Object.keys(request.query).length > 0 && (
-                  <div className="mb-3">
-                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Query Parameters</h5>
-                    <code className="text-xs bg-muted p-2 rounded block whitespace-pre">
-                      {JSON.stringify(request.query, null, 2)}
-                    </code>
-                  </div>
-                )}
-                
-                {/* Request Body */}
-                {request?.body && Object.keys(request.body).length > 0 && (
-                  <div className="mb-3">
-                    <h5 className="text-xs font-medium text-muted-foreground mb-1">
-                      {request.formData ? 'Form Data' : 'Request Body'}
-                    </h5>
-                    <code className="text-xs bg-muted p-2 rounded block whitespace-pre">
-                      {JSON.stringify(request.body, null, 2)}
-                    </code>
-                  </div>
-                )}
-                
-                {/* If no request data */}
-                {(!request || (
-                  (!request.path || Object.keys(request.path).length === 0) && 
-                  (!request.query || Object.keys(request.query).length === 0) && 
-                  (!request.body || Object.keys(request.body).length === 0)
-                )) && (
-                  <div className="text-xs text-muted-foreground italic">No request parameters required</div>
-                )}
-              </div>
-              
-              {/* Response Section */}
-              <div>
-                <h4 className="text-sm font-medium mb-2">Response</h4>
-                <code className="text-xs bg-muted p-2 rounded block whitespace-pre overflow-auto max-h-[300px]">
-                  {JSON.stringify(response, null, 2)}
-                </code>
-              </div>
-            </div>
-            
-            {/* Example cURL Command */}
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Example cURL</h4>
-              <code className="text-xs bg-muted p-2 rounded block whitespace-pre overflow-x-auto">
-                {`curl -X ${method} \\
-  "https://api.tradebot365.com/v1${path}${request?.query ? '?' + Object.entries(request.query).map(([k, v]) => `${k}=${v}`).join('&') : ''}" \\
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\${request?.body ? `
-  -H "Content-Type: application/json" \\
-  -d '${JSON.stringify(request.body)}'` : ''}`}
-              </code>
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
   );
 };
 
