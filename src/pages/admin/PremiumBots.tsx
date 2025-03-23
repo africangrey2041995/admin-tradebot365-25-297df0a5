@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,7 +62,8 @@ const AdminPremiumBots = () => {
       lastUpdated: '15/02/2024',
       colorScheme: 'green',
       exchange: 'Binance',
-      description: 'Premium bot for momentum trading'
+      description: 'Premium bot for momentum trading',
+      botId: 'PRE001'
     },
     { 
       id: 'PRE-002', 
@@ -81,7 +81,8 @@ const AdminPremiumBots = () => {
       lastUpdated: '20/03/2024',
       colorScheme: 'blue',
       exchange: 'Bybit',
-      description: 'Premium bot for momentum trading'
+      description: 'Premium bot for momentum trading',
+      botId: 'PRE002'
     },
     { 
       id: 'PRE-003', 
@@ -99,7 +100,8 @@ const AdminPremiumBots = () => {
       lastUpdated: '10/03/2024',
       colorScheme: 'red',
       exchange: 'KuCoin',
-      description: 'Premium bot for momentum trading'
+      description: 'Premium bot for momentum trading',
+      botId: 'PRE003'
     },
     { 
       id: 'PRE-004', 
@@ -117,7 +119,8 @@ const AdminPremiumBots = () => {
       lastUpdated: '25/01/2024',
       colorScheme: 'green',
       exchange: 'Binance',
-      description: 'Premium bot for momentum trading'
+      description: 'Premium bot for momentum trading',
+      botId: 'PRE004'
     },
     { 
       id: 'PRE-005', 
@@ -133,9 +136,10 @@ const AdminPremiumBots = () => {
       minCapital: '$600',
       subscribers: 22,
       lastUpdated: '22/11/2023',
-      colorScheme: 'purple', // Changed from 'orange' to 'purple'
+      colorScheme: 'purple',
       exchange: 'OKX',
-      description: 'Premium bot for momentum trading'
+      description: 'Premium bot for momentum trading',
+      botId: 'PRE005'
     }
   ];
 

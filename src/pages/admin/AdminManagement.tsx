@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { UserStatus, UserPlan } from '@/constants/userConstants';
+import { UserStatus, UserPlan, UserRole } from '@/constants/userConstants';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdminUser } from '@/types/admin-types';
 
@@ -36,7 +36,7 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: true,
     joinDate: "2023-01-15",
     roleDescription: "Super Admin",
-    role: "superadmin",
+    role: UserRole.SUPERADMIN,
     bots: 3,
     permissions: {
       manageUsers: true,
@@ -61,7 +61,7 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: false,
     joinDate: "2023-02-20",
     roleDescription: "Bot Manager",
-    role: "admin",
+    role: UserRole.ADMIN,
     bots: 0,
     permissions: {
       manageUsers: false,
@@ -86,7 +86,7 @@ const mockAdminUsers: AdminUser[] = [
     twoFactorEnabled: true,
     joinDate: "2023-03-10",
     roleDescription: "User Manager",
-    role: "admin",
+    role: UserRole.ADMIN,
     bots: 0,
     permissions: {
       manageUsers: true,
@@ -229,12 +229,12 @@ const AdminManagement = () => {
                     </TableCell>
                     <TableCell>
                       <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(admin.permissions).map(([permission, value]) => (
+                        {Object.entries(admin.permissions || {}).map(([permission, value]) => (
                           <div key={permission} className="flex items-center space-x-2">
                             <Label htmlFor={permission} className="text-sm capitalize">{permission.replace(/([A-Z])/g, ' $1')}</Label>
                             <Switch
                               id={permission}
-                              checked={value}
+                              checked={value as boolean}
                               onCheckedChange={(checked) => handlePermissionChange(admin.id, permission as keyof AdminUser['permissions'], checked)}
                             />
                           </div>
