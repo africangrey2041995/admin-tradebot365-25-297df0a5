@@ -1,87 +1,78 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { LucideIcon, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface SubItem {
-  icon: LucideIcon;
+  href: string;
   label: string;
-  path: string;
 }
 
 interface CollapsibleMenuItemProps {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   label: string;
-  path: string;
-  isActive: boolean;
-  isOpen: boolean;
-  setOpen: (open: boolean) => void;
-  subItems: SubItem[];
-  isActiveSubItem: (path: string) => boolean;
+  items: SubItem[];
 }
 
-const CollapsibleMenuItem = ({ 
-  icon: Icon, 
+const CollapsibleMenuItem: React.FC<CollapsibleMenuItemProps> = ({ 
+  icon, 
   label, 
-  path, 
-  isActive, 
-  isOpen, 
-  setOpen,
-  subItems,
-  isActiveSubItem
-}: CollapsibleMenuItemProps) => {
+  items
+}) => {
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Check if any sub-item is active
+  const isActive = items.some(item => 
+    location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
+  );
+  
+  // Function to check if a specific sub-item is active
+  const isActiveSubItem = (path: string) => 
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
+  
   return (
     <SidebarMenuItem className="flex flex-col mb-0">
-      {/* Main item link */}
-      <Link 
-        to={path}
+      {/* Main item button */}
+      <div 
         className={`
-          flex items-center py-2 px-3 text-sm rounded-md w-full mb-0
-          ${isActive && !isOpen
+          flex items-center py-2 px-3 text-sm rounded-md w-full mb-0 cursor-pointer
+          ${isActive
             ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
             : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
           }
         `}
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <Icon className="h-4 w-4 mr-2" />
-        <span>{label}</span>
-      </Link>
+        {icon}
+        <span className="ml-2">{label}</span>
+        <ChevronDown 
+          className={`ml-auto h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+        />
+      </div>
       
       {/* Collapsible sub-items */}
       <Collapsible 
         open={isOpen} 
-        onOpenChange={setOpen}
+        onOpenChange={setIsOpen}
         className="w-full"
       >
-        <CollapsibleTrigger asChild>
-          <button
-            className={`
-              flex items-center justify-end py-0.5 px-3 text-sm rounded-md w-full
-              text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground
-            `}
-          >
-            <ChevronDown 
-              className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" 
-            />
-          </button>
-        </CollapsibleTrigger>
         <CollapsibleContent className="pt-0.5">
-          {subItems.map((subItem) => (
+          {items.map((item) => (
             <Link 
-              key={subItem.path} 
-              to={subItem.path}
+              key={item.href} 
+              to={item.href}
               className={`
                 flex items-center py-1.5 px-6 text-sm rounded-md ml-4
-                ${isActiveSubItem(subItem.path) 
+                ${isActiveSubItem(item.href) 
                   ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
                   : 'text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-hover-foreground'
                 }
               `}
             >
-              <subItem.icon className="h-3.5 w-3.5 mr-2" />
-              <span>{subItem.label}</span>
+              <span>{item.label}</span>
             </Link>
           ))}
         </CollapsibleContent>

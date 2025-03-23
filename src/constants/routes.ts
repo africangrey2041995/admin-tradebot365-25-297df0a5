@@ -40,6 +40,8 @@ export const ADMIN_ROUTES = {
   USER_BOT_DETAIL: (botId: string) => `/admin/user-bots/${botId}`,
   ADMIN_MANAGEMENT: '/admin/admin-management',
   SYSTEM_LOGS: '/admin/logs',
+  PACKAGES: '/admin/packages', // Add missing PACKAGES route
+  LOGS: '/admin/logs', // Add missing LOGS route explicitly
   NOTIFICATIONS: '/admin/notifications',
   EMAIL: '/admin/email',
   DATABASE: '/admin/database',

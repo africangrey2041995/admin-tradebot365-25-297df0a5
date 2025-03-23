@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,26 @@ import BotErrors from "./pages/BotErrors";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
+
+// Import Admin pages from their correct locations
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminUserDetail from "./pages/admin/UserDetail";
+import AdminBots from "./pages/admin/Bots";
+import AdminBotErrors from "./pages/admin/BotErrors";
+import AdminPremiumBots from "./pages/admin/PremiumBots";
+import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
+import AdminPropBots from "./pages/admin/PropBots";
+import AdminPropBotDetail from "./pages/admin/PropBotDetail";
+import AdminUserBots from "./pages/admin/UserBots";
+import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+import AdminPackages from "./pages/admin/Packages";
+import AdminDatabase from "./pages/admin/Database";
+import AdminLogs from "./pages/admin/Logs";
+import AdminNotifications from "./pages/admin/Notifications";
+import AdminEmail from "./pages/admin/Email";
+import AdminSettings from "./pages/admin/Settings";
+import AdminManagement from "./pages/admin/AdminManagement";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";

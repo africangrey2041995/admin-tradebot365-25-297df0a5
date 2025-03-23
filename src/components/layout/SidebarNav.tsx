@@ -1,30 +1,29 @@
 
 import React from 'react';
-import { NavGroup } from './sidebar/NavGroup';
-import { NavMenuItem } from './sidebar/NavMenuItem';
-import { CollapsibleMenuItem } from './sidebar/CollapsibleMenuItem';
+import NavGroup from './sidebar/NavGroup';
+import NavMenuItem from './sidebar/NavMenuItem';
+import CollapsibleMenuItem from './sidebar/CollapsibleMenuItem';
 import { 
   LayoutDashboard, Bot, AlertTriangle, Users, 
   Settings, Briefcase, LineChart, ShieldCheck, Database
 } from 'lucide-react';
-import { User } from '@/types';
+import { User, UserRole } from '@/types';
 import { USER_ROUTES, ADMIN_ROUTES } from '@/constants/routes';
 import { cn } from '@/lib/utils';
+import { useAdmin } from '@/hooks/use-admin';
 
 // Mock current user - this would come from auth context in a real app
 const CURRENT_USER: Partial<User> = {
   id: 'USR-001',
-  role: 'user',
-  isAdmin: false
+  role: 'user' as UserRole, // Type assertion to UserRole
+  // isAdmin defined through hook now
 };
 
 const SidebarNav = () => {
-  // Determine if user is admin
-  const isAdmin = CURRENT_USER.isAdmin || CURRENT_USER.role === 'admin';
+  // Use the admin hook to determine if user is admin
+  const { isAdmin } = useAdmin();
   
   console.log("Is admin:", isAdmin);
-  console.log("Is admin in profile:", CURRENT_USER.isAdmin);
-  console.log("Is admin in profile:", CURRENT_USER.role === 'admin');
   
   // Show admin sidebar if user is admin
   if (isAdmin) {

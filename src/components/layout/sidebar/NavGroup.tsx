@@ -3,15 +3,15 @@ import React from 'react';
 import { SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu } from '@/components/ui/sidebar';
 
 interface NavGroupProps {
-  label: string;
+  title: string;
   children: React.ReactNode;
   noSpacing?: boolean;
 }
 
-const NavGroup = ({ label, children, noSpacing = false }: NavGroupProps) => {
+const NavGroup: React.FC<NavGroupProps> = ({ title, children, noSpacing = false }) => {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu className={noSpacing ? "flex flex-col space-y-0" : ""}>
           {children}

@@ -1,26 +1,28 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
 interface NavMenuItemProps {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   label: string;
-  path: string;
-  isActive: boolean;
+  href: string;
 }
 
-const NavMenuItem = ({ icon: Icon, label, path, isActive }: NavMenuItemProps) => {
+const NavMenuItem: React.FC<NavMenuItemProps> = ({ icon, label, href }) => {
+  const location = useLocation();
+  const isActive = location.pathname === href || location.pathname.startsWith(`${href}/`);
+  
   return (
-    <SidebarMenuItem key={path}>
+    <SidebarMenuItem key={href}>
       <SidebarMenuButton 
         asChild 
         isActive={isActive}
         tooltip={label}
       >
-        <Link to={path}>
-          <Icon className="h-4 w-4" />
+        <Link to={href}>
+          {icon}
           <span>{label}</span>
         </Link>
       </SidebarMenuButton>
