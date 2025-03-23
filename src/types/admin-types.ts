@@ -11,23 +11,25 @@ import { Bot, PremiumBot as BasePremiumBot, UserBot as BaseUserBot, PropBot as B
 // Admin User Interface - extends the base User type
 export interface AdminUser extends BaseUser {
   roleDescription?: string;
-  permissions?: string[];
+  permissions?: AdminPermissions;
   lastLogin?: string;
+}
+
+export interface AdminPermissions {
+  manageUsers: boolean;
+  manageBots: boolean;
+  manageDatabase: boolean;
+  viewLogs: boolean;
+  manageNotifications: boolean;
+  manageEmail: boolean;
+  manageSettings: boolean;
+  manageAdmins: boolean;
 }
 
 // Admin User with admin-specific permissions
 export interface AdminSuperUser extends Omit<AdminUser, "role" | "permissions"> {
   role: UserRole.ADMIN | UserRole.SUPERADMIN;
-  permissions: {
-    manageUsers: boolean;
-    manageBots: boolean;
-    manageDatabase: boolean;
-    viewLogs: boolean;
-    manageNotifications: boolean;
-    manageEmail: boolean;
-    manageSettings: boolean;
-    manageAdmins: boolean;
-  };
+  permissions: AdminPermissions;
 }
 
 /**

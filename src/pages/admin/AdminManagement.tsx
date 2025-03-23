@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { UserStatus, UserPlan, UserRole } from '@/constants/userConstants';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AdminUser } from '@/types/admin-types';
+import { AdminUser, AdminPermissions } from '@/types/admin-types';
 
 const mockAdminUsers: AdminUser[] = [
   {
@@ -143,9 +143,9 @@ const AdminManagement = () => {
     setIsEditAdminDialogOpen(false);
   };
 
-  const handlePermissionChange = (adminId: string, permission: keyof AdminUser['permissions'], value: boolean) => {
+  const handlePermissionChange = (adminId: string, permission: keyof AdminPermissions, value: boolean) => {
     setAdminUsers(adminUsers.map(admin => {
-      if (admin.id === adminId) {
+      if (admin.id === adminId && admin.permissions) {
         return {
           ...admin,
           permissions: {
@@ -229,13 +229,13 @@ const AdminManagement = () => {
                     </TableCell>
                     <TableCell>
                       <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(admin.permissions || {}).map(([permission, value]) => (
+                        {admin.permissions && Object.entries(admin.permissions).map(([permission, value]) => (
                           <div key={permission} className="flex items-center space-x-2">
                             <Label htmlFor={permission} className="text-sm capitalize">{permission.replace(/([A-Z])/g, ' $1')}</Label>
                             <Switch
                               id={permission}
-                              checked={value as boolean}
-                              onCheckedChange={(checked) => handlePermissionChange(admin.id, permission as keyof AdminUser['permissions'], checked)}
+                              checked={Boolean(value)}
+                              onCheckedChange={(checked) => handlePermissionChange(admin.id, permission as keyof AdminPermissions, checked)}
                             />
                           </div>
                         ))}
