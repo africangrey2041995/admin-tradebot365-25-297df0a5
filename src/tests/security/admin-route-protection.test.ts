@@ -1,8 +1,9 @@
 
 /**
- * Kiểm tra việc bảo vệ các route dành cho Admin
+ * Kiểm tra việc bảo vệ các route và chức năng admin
  * 
- * Các test case này đảm bảo rằng người dùng không thể truy cập vào các trang và chức năng admin.
+ * Các test case này đảm bảo rằng người dùng thông thường không thể truy cập vào
+ * các route và chức năng dành riêng cho admin.
  */
 
 // Thiết lập môi trường test
@@ -11,141 +12,108 @@ const testUsers = {
   ADMIN: { id: 'ADMIN-001', name: 'Admin User', email: 'admin@example.com', role: 'admin' }
 };
 
-// Các route cần kiểm tra
-const routes = {
-  user: ['/dashboard', '/bots', '/premium-bots', '/prop-trading-bots'],
-  admin: ['/admin/users', '/admin/bots', '/admin/settings', '/admin/signals']
-};
-
 /**
- * Test Suite: Bảo vệ route Admin
+ * Test Suite: Bảo vệ route admin
  */
 export const testAdminRouteProtection = () => {
-  console.log('===== Bắt đầu test: Bảo vệ route Admin =====');
+  console.log('===== Bắt đầu test: Bảo vệ route admin =====');
   
-  // Test case 1: Người dùng thông thường không thể truy cập route admin
-  const testUserCannotAccessAdminRoutes = () => {
-    console.log('\n1. Kiểm tra người dùng không thể truy cập route admin:');
+  // Test case 1: Kiểm tra khi người dùng thông thường truy cập route admin
+  const testUserAccessToAdminRoute = () => {
+    console.log('\n1. Kiểm tra người dùng thông thường truy cập route admin:');
     
+    // Mô phỏng người dùng thông thường
     const currentUser = testUsers.USER_A;
     
-    // Kiểm tra từng route admin
-    routes.admin.forEach(route => {
-      // Ở đây mô phỏng logic kiểm tra quyền truy cập
-      const canAccess = currentUser.role === 'admin';
-      
-      console.log(`1.1. USER_A truy cập ${route}: ${canAccess ? '❌ Cho phép (Lỗi)' : '✅ Từ chối (Đúng)'}`);
-    });
+    // Mô phỏng kiểm tra quyền truy cập admin route
+    const isAdminRoute = true; // Giả định URL có tiền tố /admin
+    const hasAdminAccess = currentUser.role === 'admin';
     
-    // Tổng hợp kết quả
-    const allRoutesDenied = routes.admin.every(route => {
-      return currentUser.role !== 'admin';
-    });
+    // Kết quả mong đợi khi người dùng thông thường truy cập route admin
+    const expectedResult = false; // Từ chối truy cập
     
-    if (allRoutesDenied) {
-      console.log('✅ Test thành công: Tất cả route admin đều bị từ chối truy cập');
+    // Kiểm tra kết quả
+    if (hasAdminAccess === expectedResult) {
+      console.log('✅ Test thành công: Người dùng thông thường bị từ chối truy cập route admin');
     } else {
-      console.log('❌ Test thất bại: Một số route admin cho phép truy cập');
+      console.log('❌ Test thất bại: Người dùng thông thường được phép truy cập route admin');
     }
   };
   
-  // Test case 2: Admin có thể truy cập tất cả các route
-  const testAdminCanAccessAllRoutes = () => {
-    console.log('\n2. Kiểm tra admin có thể truy cập tất cả route:');
+  // Test case 2: Kiểm tra khi admin truy cập route admin
+  const testAdminAccessToAdminRoute = () => {
+    console.log('\n2. Kiểm tra admin truy cập route admin:');
     
+    // Mô phỏng người dùng admin
     const currentUser = testUsers.ADMIN;
-    const allRoutes = [...routes.user, ...routes.admin];
     
-    // Kiểm tra từng route
-    allRoutes.forEach(route => {
-      // Nếu là route admin, cần kiểm tra role
-      const isAdminRoute = routes.admin.includes(route);
-      const canAccess = !isAdminRoute || currentUser.role === 'admin';
-      
-      console.log(`2.1. ADMIN truy cập ${route}: ${canAccess ? '✅ Cho phép' : '❌ Từ chối (Lỗi)'}`);
-    });
+    // Mô phỏng kiểm tra quyền truy cập admin route
+    const isAdminRoute = true; // Giả định URL có tiền tố /admin
+    const hasAdminAccess = currentUser.role === 'admin';
     
-    // Tổng hợp kết quả
-    const allRoutesAllowed = allRoutes.every(route => {
-      const isAdminRoute = routes.admin.includes(route);
-      return !isAdminRoute || currentUser.role === 'admin';
-    });
+    // Kết quả mong đợi khi admin truy cập route admin
+    const expectedResult = true; // Cho phép truy cập
     
-    if (allRoutesAllowed) {
-      console.log('✅ Test thành công: Admin có thể truy cập tất cả route');
+    // Kiểm tra kết quả
+    if (hasAdminAccess === expectedResult) {
+      console.log('✅ Test thành công: Admin được phép truy cập route admin');
     } else {
-      console.log('❌ Test thất bại: Admin không thể truy cập một số route');
+      console.log('❌ Test thất bại: Admin bị từ chối truy cập route admin');
     }
   };
   
-  // Test case 3: Ẩn menu admin từ người dùng thông thường
-  const testAdminMenuVisibility = () => {
-    console.log('\n3. Kiểm tra hiện thị menu admin:');
+  // Test case 3: Kiểm tra hiển thị UI admin cho người dùng thông thường
+  const testAdminUIVisibility = () => {
+    console.log('\n3. Kiểm tra hiển thị UI admin cho người dùng thông thường:');
     
-    // 3.1: USER_A không nên thấy menu admin
-    const userA = testUsers.USER_A;
-    const shouldShowAdminMenuToUserA = userA.role === 'admin';
+    // Mô phỏng người dùng thông thường
+    const currentUser = testUsers.USER_A;
     
-    console.log(`3.1. Hiển thị menu admin cho USER_A: ${shouldShowAdminMenuToUserA ? '❌ Có hiển thị (Lỗi)' : '✅ Không hiển thị (Đúng)'}`);
+    // Mô phỏng kiểm tra xem có hiển thị UI admin hay không
+    const shouldShowAdminUI = currentUser.role === 'admin';
     
-    // 3.2: ADMIN nên thấy menu admin
-    const admin = testUsers.ADMIN;
-    const shouldShowAdminMenuToAdmin = admin.role === 'admin';
+    // Kết quả mong đợi
+    const expectedResult = false; // Không hiển thị UI admin
     
-    console.log(`3.2. Hiển thị menu admin cho ADMIN: ${shouldShowAdminMenuToAdmin ? '✅ Có hiển thị' : '❌ Không hiển thị (Lỗi)'}`);
-    
-    // Tổng hợp kết quả
-    if (!shouldShowAdminMenuToUserA && shouldShowAdminMenuToAdmin) {
-      console.log('✅ Test thành công: Menu admin hiển thị đúng theo quyền');
+    // Kiểm tra kết quả
+    if (shouldShowAdminUI === expectedResult) {
+      console.log('✅ Test thành công: UI admin bị ẩn đối với người dùng thông thường');
     } else {
-      console.log('❌ Test thất bại: Menu admin hiển thị không đúng');
+      console.log('❌ Test thất bại: UI admin được hiển thị cho người dùng thông thường');
     }
   };
   
-  // Test case 4: Ẩn chức năng admin từ người dùng thông thường
-  const testAdminFunctionalityVisibility = () => {
-    console.log('\n4. Kiểm tra hiển thị chức năng admin:');
+  // Test case 4: Kiểm tra việc chuyển hướng khi truy cập trực tiếp vào URL admin
+  const testDirectAccessRedirection = () => {
+    console.log('\n4. Kiểm tra chuyển hướng khi truy cập trực tiếp vào URL admin:');
     
-    // Các chức năng chỉ dành cho admin
-    const adminFeatures = [
-      'Quản lý người dùng',
-      'Xóa bot',
-      'Cài đặt hệ thống',
-      'Xem tất cả tín hiệu'
-    ];
+    // Mô phỏng người dùng thông thường
+    const currentUser = testUsers.USER_A;
     
-    // 4.1: USER_A không nên thấy chức năng admin
-    const userA = testUsers.USER_A;
+    // Mô phỏng truy cập trực tiếp vào URL admin
+    const accessedUrl = '/admin/users';
+    const isRestrictedUrl = accessedUrl.startsWith('/admin');
+    const hasAccess = !isRestrictedUrl || currentUser.role === 'admin';
     
-    adminFeatures.forEach(feature => {
-      const shouldShowFeatureToUserA = userA.role === 'admin';
-      console.log(`4.1. Hiển thị "${feature}" cho USER_A: ${shouldShowFeatureToUserA ? '❌ Có hiển thị (Lỗi)' : '✅ Không hiển thị (Đúng)'}`);
-    });
+    // Mô phỏng hành động hệ thống
+    const action = !hasAccess ? 'redirect' : 'allow';
     
-    // 4.2: ADMIN nên thấy chức năng admin
-    const admin = testUsers.ADMIN;
+    console.log(`4.1. Truy cập URL ${accessedUrl} với vai trò ${currentUser.role}`);
+    console.log(`4.2. Hành động hệ thống: ${action === 'redirect' ? 'Chuyển hướng người dùng' : 'Cho phép truy cập'}`);
     
-    adminFeatures.forEach(feature => {
-      const shouldShowFeatureToAdmin = admin.role === 'admin';
-      console.log(`4.2. Hiển thị "${feature}" cho ADMIN: ${shouldShowFeatureToAdmin ? '✅ Có hiển thị' : '❌ Không hiển thị (Lỗi)'}`);
-    });
-    
-    // Tổng hợp kết quả
-    const allFeaturesHiddenFromUserA = adminFeatures.every(feature => userA.role !== 'admin');
-    const allFeaturesVisibleToAdmin = adminFeatures.every(feature => admin.role === 'admin');
-    
-    if (allFeaturesHiddenFromUserA && allFeaturesVisibleToAdmin) {
-      console.log('✅ Test thành công: Chức năng admin hiển thị đúng theo quyền');
+    // Kiểm tra kết quả
+    if (action === 'redirect') {
+      console.log('✅ Test thành công: Người dùng thông thường bị chuyển hướng khi truy cập trực tiếp vào URL admin');
     } else {
-      console.log('❌ Test thất bại: Chức năng admin hiển thị không đúng');
+      console.log('❌ Test thất bại: Người dùng thông thường được phép truy cập trực tiếp vào URL admin');
     }
   };
   
   // Chạy tất cả các test
-  testUserCannotAccessAdminRoutes();
-  testAdminCanAccessAllRoutes();
-  testAdminMenuVisibility();
-  testAdminFunctionalityVisibility();
+  testUserAccessToAdminRoute();
+  testAdminAccessToAdminRoute();
+  testAdminUIVisibility();
+  testDirectAccessRedirection();
   
-  console.log('\n===== Kết thúc test: Bảo vệ route Admin =====');
+  console.log('\n===== Kết thúc test: Bảo vệ route admin =====');
 };

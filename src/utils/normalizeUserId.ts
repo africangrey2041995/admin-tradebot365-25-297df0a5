@@ -1,17 +1,17 @@
 
 /**
- * Normalizes a user ID by removing dashes and standardizing format
- * This helps avoid comparison issues due to format differences
+ * Chuẩn hóa ID người dùng để so sánh nhất quán
  * 
- * @param userId The userId string to normalize
- * @returns Normalized userId
+ * Chức năng:
+ * - Loại bỏ khoảng trắng
+ * - Chuyển tất cả về chữ hoa
+ * - Xử lý null/undefined
+ * 
+ * @param userId ID người dùng cần chuẩn hóa
+ * @returns ID đã chuẩn hóa hoặc chuỗi rỗng nếu input không hợp lệ
  */
-export const normalizeUserId = (userId: string): string => {
-  if (!userId) {
-    console.warn('Received empty userId for normalization');
-    return '';
-  }
+export function normalizeUserId(userId: string | undefined | null): string {
+  if (!userId) return '';
   
-  // Remove all dashes and convert to uppercase for consistent comparison
-  return userId.replace(/-/g, '').toUpperCase();
-};
+  return userId.toString().trim().toUpperCase();
+}
