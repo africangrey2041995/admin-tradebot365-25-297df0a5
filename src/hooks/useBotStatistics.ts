@@ -29,10 +29,26 @@ export const useBotStatistics = () => {
   ];
 
   const statisticsData: StatData[] = [
-    { name: 'Win Rate', value: '65%', icon: <Activity className="h-4 w-4 text-green-500" /> },
-    { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
-    { name: 'Max Drawdown', value: '8.5%', icon: <LineChart className="h-4 w-4 text-red-500" /> },
-    { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
+    { 
+      name: 'Win Rate', 
+      value: '65%', 
+      icon: <Activity className="h-4 w-4 text-green-500" /> 
+    },
+    { 
+      name: 'Avg Profit', 
+      value: '2.7%', 
+      icon: <TrendingUp className="h-4 w-4 text-green-500" /> 
+    },
+    { 
+      name: 'Max Drawdown', 
+      value: '8.5%', 
+      icon: <LineChart className="h-4 w-4 text-red-500" /> 
+    },
+    { 
+      name: 'Sharp Ratio', 
+      value: '1.8', 
+      icon: <PieChart className="h-4 w-4 text-blue-500" /> 
+    },
   ];
 
   return {
