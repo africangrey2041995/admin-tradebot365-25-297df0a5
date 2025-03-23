@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit3, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Account } from '@/types';
-import { ConnectionStatus } from '@/types/connection';
 import { toast } from 'sonner';
+import AccountsTable from './accounts/AccountsTable';
+import LoadingAccounts from './accounts/LoadingAccounts';
+import EmptyAccountsState from './accounts/EmptyAccountsState';
+import ErrorState from './accounts/ErrorState';
 
 interface BotAccountsTableProps {
   botId: string;
@@ -118,103 +120,21 @@ const BotAccountsTable = ({ botId, userId, initialData = [] }: BotAccountsTableP
     fetchAccounts();
   };
 
-  const getStatusBadge = (status: ConnectionStatus) => {
-    switch (status) {
-      case 'Connected':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Connected</Badge>;
-      case 'Disconnected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">Disconnected</Badge>;
-      case 'Pending':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 hover:bg-orange-50 border-orange-200">Pending</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
   if (loading) {
-    return (
-      <div className="py-8 text-center text-muted-foreground">
-        <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
-        <p>Loading accounts...</p>
-      </div>
-    );
+    return <LoadingAccounts />;
   }
 
   if (error) {
-    return (
-      <div className="py-8 text-center text-destructive bg-destructive/10 rounded-md p-6">
-        <p className="mb-4">{error.message}</p>
-        <Button variant="outline" onClick={handleRefresh}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Try Again
-        </Button>
-      </div>
-    );
+    return <ErrorState error={error} onRetry={handleRefresh} />;
   }
 
   if (accounts.length === 0) {
-    return (
-      <div className="py-10 text-center">
-        <p className="text-muted-foreground mb-4">No accounts connected to this bot yet.</p>
-        <Button>Add an Account</Button>
-      </div>
-    );
+    return <EmptyAccountsState />;
   }
 
   return (
     <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Account Profile</TableHead>
-            <TableHead>Api</TableHead>
-            <TableHead>Account Trading</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {accounts.map((account) => (
-            <TableRow key={account.id}>
-              <TableCell>
-                <div>
-                  <div className="font-medium">{account.userAccount}</div>
-                  <div className="text-xs text-muted-foreground">{account.userEmail}</div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="font-medium">{account.apiName}</div>
-              </TableCell>
-              <TableCell>
-                <div className="font-medium">
-                  {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
-                </div>
-              </TableCell>
-              <TableCell>
-                {getStatusBadge(account.status as ConnectionStatus)}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 w-8 p-0"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <AccountsTable accounts={accounts} />
       <div className="mt-4 flex justify-end">
         <Button variant="outline" size="sm" onClick={handleRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />

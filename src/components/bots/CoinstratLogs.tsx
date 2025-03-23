@@ -1,21 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Eye } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { CoinstratSignal } from '@/types/signal';
-import SignalActionBadge from './signal-logs/SignalActionBadge';
-import SignalStatusBadge from './signal-logs/SignalStatusBadge';
-import AccountStatusSummary from './signal-logs/AccountStatusSummary';
-import FormatDateTime from './signal-logs/FormatDateTime';
 import SignalDetailModal from './signal-logs/SignalDetailModal';
+import SignalLogsTable from './signal-logs/SignalLogsTable';
+import LoadingSignalLogs from './signal-logs/LoadingSignalLogs';
+import EmptySignalLogs from './signal-logs/EmptySignalLogs';
 
 interface CoinstratLogsProps {
   botId: string;
   userId: string;
   initialData?: CoinstratSignal[];
-  signalSourceLabel?: string; // New prop for customizing the column header
+  signalSourceLabel?: string; // Optional prop for customizing the column header
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
@@ -61,14 +59,14 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
           processedAccounts: [
             {
               accountId: 'ACC-001',
-              userId: 'USR-001',
+              userId,
               name: 'Binance Spot Account',
               timestamp: new Date().toISOString(),
               status: 'success'
             },
             {
               accountId: 'ACC-002',
-              userId: 'USR-001',
+              userId,
               name: 'Coinstart Pro Account',
               timestamp: new Date().toISOString(),
               status: 'success'
@@ -90,7 +88,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
           processedAccounts: [
             {
               accountId: 'ACC-001',
-              userId: 'USR-001',
+              userId,
               name: 'Binance Spot Account',
               timestamp: new Date(Date.now() - 3600000).toISOString(),
               status: 'success'
@@ -113,7 +111,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
           failedAccounts: [
             {
               accountId: 'ACC-003',
-              userId: 'USR-001',
+              userId,
               name: 'FTX Account',
               timestamp: new Date(Date.now() - 7200000).toISOString(),
               reason: 'Invalid account configuration',
@@ -122,7 +120,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
             },
             {
               accountId: 'ACC-004',
-              userId: 'USR-001',
+              userId,
               name: 'Bybit Account',
               timestamp: new Date(Date.now() - 7200000).toISOString(),
               reason: 'API key expired',
@@ -161,77 +159,22 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   };
 
   if (loading) {
-    return (
-      <div className="py-8 text-center text-muted-foreground">
-        <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
-        <p>Loading logs...</p>
-      </div>
-    );
+    return <LoadingSignalLogs />;
   }
 
   if (logs.length === 0) {
-    return (
-      <div className="py-10 text-center">
-        <p className="text-muted-foreground mb-4">No logs available for this bot yet.</p>
-        <Button variant="outline" onClick={handleRefresh}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
-      </div>
-    );
+    return <EmptySignalLogs onRefresh={handleRefresh} />;
   }
 
   return (
     <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{signalSourceLabel}</TableHead>
-            <TableHead>Symbol</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Action</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Accounts</TableHead>
-            <TableHead>Note</TableHead>
-            <TableHead>Details</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.map((log) => (
-            <TableRow key={log.id}>
-              <TableCell className="font-medium">{log.originalSignalId}</TableCell>
-              <TableCell>{log.instrument}</TableCell>
-              <TableCell>
-                <FormatDateTime timestamp={log.timestamp} />
-              </TableCell>
-              <TableCell>{log.amount}</TableCell>
-              <TableCell>
-                <SignalActionBadge action={log.action} />
-              </TableCell>
-              <TableCell>
-                <SignalStatusBadge status={log.status as string} />
-              </TableCell>
-              <TableCell>
-                <AccountStatusSummary signal={log} userId={userId} />
-              </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {log.errorMessage || '-'}
-              </TableCell>
-              <TableCell>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => handleViewSignalDetails(log)}
-                  title="View Signal Details"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <SignalLogsTable
+        logs={logs}
+        userId={userId}
+        onViewDetails={handleViewSignalDetails}
+        signalSourceLabel={signalSourceLabel}
+      />
+      
       <div className="mt-4 flex justify-end">
         <Button variant="outline" size="sm" onClick={handleRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />

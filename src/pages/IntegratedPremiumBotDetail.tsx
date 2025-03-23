@@ -499,7 +499,11 @@ const IntegratedPremiumBotDetail = () => {
                 <CardDescription>Xem lịch sử các tín hiệu đã được xử lý bởi Coinstrat Pro</CardDescription>
               </CardHeader>
               <CardContent>
-                <CoinstratLogs botId={botId || ""} userId={CURRENT_USER_ID} />
+                <CoinstratLogs 
+                  botId={botId || ""} 
+                  userId={CURRENT_USER_ID}
+                  signalSourceLabel="TB365 ID" 
+                />
               </CardContent>
             </Card>
           </TabsContent>
