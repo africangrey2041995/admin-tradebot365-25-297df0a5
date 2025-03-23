@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 interface BotAccountsTableProps {
   botId: string;
   userId: string;
+  initialData?: Account[];
 }
 
 const mockAccounts: Account[] = [
@@ -61,7 +62,7 @@ const mockAccounts: Account[] = [
   },
 ];
 
-const BotAccountsTable = ({ botId, userId }: BotAccountsTableProps) => {
+const BotAccountsTable = ({ botId, userId, initialData = [] }: BotAccountsTableProps) => {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,13 @@ const BotAccountsTable = ({ botId, userId }: BotAccountsTableProps) => {
   const fetchAccounts = useCallback(() => {
     setLoading(true);
     setError(null);
+    
+    if (initialData && initialData.length > 0) {
+      const filteredAccounts = initialData.filter(account => account.userId === userId);
+      setAccounts(filteredAccounts);
+      setLoading(false);
+      return;
+    }
     
     try {
       setTimeout(() => {
@@ -90,7 +98,7 @@ const BotAccountsTable = ({ botId, userId }: BotAccountsTableProps) => {
       setLoading(false);
       toast.error('Error fetching account information');
     }
-  }, [botId, userId]);
+  }, [botId, userId, initialData]);
 
   useEffect(() => {
     fetchAccounts();

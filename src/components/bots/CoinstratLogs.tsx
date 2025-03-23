@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -14,9 +13,10 @@ import SignalDetailModal from './signal-logs/SignalDetailModal';
 interface CoinstratLogsProps {
   botId: string;
   userId: string;
+  initialData?: CoinstratSignal[];
 }
 
-const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
+const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId, initialData = [] }) => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
@@ -24,9 +24,21 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
 
   const fetchLogs = () => {
     setLoading(true);
-    // Simulate API call
+    
+    if (initialData && initialData.length > 0) {
+      const filteredLogs = initialData.filter(log => {
+        const processedAccountsForUser = log.processedAccounts.filter(account => account.userId === userId);
+        const failedAccountsForUser = log.failedAccounts.filter(account => account.userId === userId);
+        
+        return processedAccountsForUser.length > 0 || failedAccountsForUser.length > 0;
+      });
+      
+      setLogs(filteredLogs);
+      setLoading(false);
+      return;
+    }
+    
     setTimeout(() => {
-      // Mock data for Coinstrat logs - using CoinstratSignal structure
       const mockLogs: CoinstratSignal[] = [
         {
           id: 'CSP-78952364',
@@ -115,7 +127,6 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
         },
       ];
       
-      // Filter logs by userId
       const filteredLogs = mockLogs.filter(log => {
         const processedAccountsForUser = log.processedAccounts.filter(account => account.userId === userId);
         const failedAccountsForUser = log.failedAccounts.filter(account => account.userId === userId);
@@ -130,7 +141,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ botId, userId }) => {
 
   useEffect(() => {
     fetchLogs();
-  }, [botId, userId]);
+  }, [botId, userId, initialData]);
 
   const handleRefresh = () => {
     toast.info('Refreshing logs...');

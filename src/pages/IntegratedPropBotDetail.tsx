@@ -621,7 +621,12 @@ const IntegratedPropBotDetail = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <CoinstratLogs botId={botId || ""} userId={CURRENT_USER_ID} />
+                {/* Pass the mockLogs directly to the component */}
+                <CoinstratLogs 
+                  botId={botId || ""} 
+                  userId={CURRENT_USER_ID} 
+                  initialData={mockLogs}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -635,7 +640,12 @@ const IntegratedPropBotDetail = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <BotAccountsTable botId={botId || ""} userId={CURRENT_USER_ID} />
+                {/* Pass the mockAccounts directly to the component */}
+                <BotAccountsTable 
+                  botId={botId || ""} 
+                  userId={CURRENT_USER_ID} 
+                  initialData={mockAccounts}
+                />
               </CardContent>
             </Card>
           </TabsContent>
