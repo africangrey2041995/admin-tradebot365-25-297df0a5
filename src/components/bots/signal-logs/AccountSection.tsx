@@ -2,6 +2,7 @@
 import React from 'react';
 import { AccountSignalStatus } from '@/types/signal';
 import AccountListItem from './AccountListItem';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface AccountSectionProps {
   accounts: AccountSignalStatus[];
@@ -18,20 +19,18 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   titleClassName = '',
   userId
 }) => {
-  // Helper function to normalize userId for more reliable comparison
-  const normalizeUserId = (id: string): string => {
-    if (!id) return '';
-    return id.replace(/-/g, '').toLowerCase();
-  };
+  // Use the centralized normalizeUserId utility for consistent userId handling
+  const normalizedInputUserId = normalizeUserId(userId);
   
   // Filter accounts by userId with normalized comparison
-  const normalizedUserId = normalizeUserId(userId);
   const userAccounts = accounts.filter(account => {
-    const accountNormalizedId = normalizeUserId(account.userId);
-    return accountNormalizedId === normalizedUserId;
+    const normalizedAccountUserId = normalizeUserId(account.userId);
+    const match = normalizedAccountUserId === normalizedInputUserId;
+    console.log(`AccountSection - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+    return match;
   });
   
-  console.log(`AccountSection - Filtering accounts for userId: ${userId} (normalized: ${normalizedUserId})`);
+  console.log(`AccountSection - Filtering accounts for userId: ${userId} (normalized: ${normalizedInputUserId})`);
   console.log(`AccountSection - Found ${userAccounts.length} matching accounts out of ${accounts.length} total`);
   
   return (

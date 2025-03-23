@@ -6,6 +6,7 @@ import { TradingViewSignal } from '@/types';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface TradingViewLogsProps {
   botId: string;
@@ -38,7 +39,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refres
             investmentType: 'crypto',
             amount: '1.5',
             status: 'Processed',
-            userId: 'USR-001'
+            userId: 'USR-001' // Standardized to USR-001 format with dash
           },
           {
             id: 'SIG002',
@@ -50,7 +51,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refres
             investmentType: 'crypto',
             amount: '2.3',
             status: 'Processed',
-            userId: 'USR-001'
+            userId: 'USR-001' // Standardized to USR-001 format with dash
           },
           {
             id: 'SIG003',
@@ -63,12 +64,22 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ botId, userId, refres
             amount: '3.7',
             status: 'Failed',
             errorMessage: 'Invalid account configuration',
-            userId: 'USR-002'
+            userId: 'USR-002' // Standardized to USR-002 format with dash
           },
         ];
         
-        const filteredLogs = mockLogs.filter(log => log.userId === userId);
-        console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length}`);
+        // Use normalizeUserId for consistent comparison
+        const normalizedInputUserId = normalizeUserId(userId);
+        console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+        
+        const filteredLogs = mockLogs.filter(log => {
+          const normalizedLogUserId = normalizeUserId(log.userId || '');
+          const match = normalizedLogUserId === normalizedInputUserId;
+          console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+          return match;
+        });
+        
+        console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
         setLogs(filteredLogs);
         setLoading(false);
       } catch (error) {

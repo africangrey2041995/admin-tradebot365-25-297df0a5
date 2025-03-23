@@ -2,6 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types/signal';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface AccountStatusSummaryProps {
   signal: CoinstratSignal;
@@ -9,9 +10,20 @@ interface AccountStatusSummaryProps {
 }
 
 const AccountStatusSummary: React.FC<AccountStatusSummaryProps> = ({ signal, userId }) => {
-  // Filter accounts for current user
-  const userProcessedAccounts = signal.processedAccounts.filter(account => account.userId === userId);
-  const userFailedAccounts = signal.failedAccounts.filter(account => account.userId === userId);
+  // Use the centralized normalizeUserId utility for consistent userId handling
+  const normalizedInputUserId = normalizeUserId(userId);
+  
+  // Filter accounts with normalized comparison
+  const userProcessedAccounts = signal.processedAccounts.filter(account => 
+    normalizeUserId(account.userId) === normalizedInputUserId
+  );
+  
+  const userFailedAccounts = signal.failedAccounts.filter(account => 
+    normalizeUserId(account.userId) === normalizedInputUserId
+  );
+  
+  console.log(`AccountStatusSummary - For signal ${signal.id}, user ${userId} (normalized: ${normalizedInputUserId})`);
+  console.log(`AccountStatusSummary - Found ${userProcessedAccounts.length} processed and ${userFailedAccounts.length} failed accounts`);
   
   const total = userProcessedAccounts.length + userFailedAccounts.length;
   const succeeded = userProcessedAccounts.length;

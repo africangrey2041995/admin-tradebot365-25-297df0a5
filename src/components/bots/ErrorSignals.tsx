@@ -7,6 +7,7 @@ import { ErrorSignalsProps } from './error-signals/types';
 import { mockErrorSignals } from './error-signals/mockData';
 import { toast } from 'sonner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface EnhancedErrorSignalsProps extends ErrorSignalsProps {
   userId: string; // Add userId prop
@@ -24,15 +25,24 @@ const ErrorSignals: React.FC<EnhancedErrorSignalsProps> = ({ botId, userId }) =>
     setError(null);
     
     try {
+      // Normalize the input userId for consistent comparison
+      const normalizedInputUserId = normalizeUserId(userId);
+      console.log(`ErrorSignals - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+      
       // Simulate API call with timeout
       setTimeout(() => {
         try {
-          // Filter mock data to match bot ID AND userId
-          const signals = mockErrorSignals.filter(signal => 
-            (!botId || signal.botId === botId) && 
-            signal.userId === userId // Add user filtering
-          );
+          // Filter mock data to match bot ID AND userId with normalized comparison
+          const signals = mockErrorSignals.filter(signal => {
+            const normalizedSignalUserId = normalizeUserId(signal.userId);
+            const matchesUserId = normalizedSignalUserId === normalizedInputUserId;
+            const matchesBotId = !botId || signal.botId === botId;
+            
+            console.log(`ErrorSignals - Signal ${signal.id}: userId match: ${matchesUserId}, botId match: ${matchesBotId}`);
+            return matchesBotId && matchesUserId;
+          });
           
+          console.log(`ErrorSignals - Filtered ${signals.length} signals for userId: ${userId} and botId: ${botId || 'any'}`);
           setErrorSignals(signals);
           
           // Set first two errors as unread

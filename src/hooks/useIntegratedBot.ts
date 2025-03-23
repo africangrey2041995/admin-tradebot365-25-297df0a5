@@ -4,7 +4,7 @@ import { Account } from '@/types';
 import { CoinstratSignal, SignalAction } from '@/types/signal';
 import { toast } from 'sonner';
 
-// Mock data cho accounts
+// Mock data cho accounts with standardized userId format
 const mockAccounts: Account[] = [
   {
     id: 'ACC001',
@@ -19,7 +19,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001'  // Standardized to USR-001 format
+    userId: 'USR-001'  // Standardized to USR-001 format with dash
   },
   {
     id: 'ACC002',
@@ -34,7 +34,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001'  // Standardized to USR-001 format
+    userId: 'USR-001'  // Standardized to USR-001 format with dash
   },
   {
     id: 'ACC003',
@@ -49,11 +49,11 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    userId: 'USR-002'  // Standardized to USR-002 format
+    userId: 'USR-002'  // Standardized to USR-002 format with dash
   },
 ];
 
-// Mock data cho logs
+// Mock data cho logs with standardized userId format
 const mockLogs: CoinstratSignal[] = [
   {
     id: 'CSP-78952364',
@@ -69,14 +69,14 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR-001',  // Standardized to USR-001 format
+        userId: 'USR-001',  // Standardized to USR-001 format with dash
         name: 'Binance Spot Account',
         timestamp: new Date().toISOString(),
         status: 'success'
       },
       {
         accountId: 'ACC-002',
-        userId: 'USR-001',  // Standardized to USR-001 format
+        userId: 'USR-001',  // Standardized to USR-001 format with dash
         name: 'Coinstart Pro Account',
         timestamp: new Date().toISOString(),
         status: 'success'
@@ -98,7 +98,7 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR-001',  // Standardized to USR-001 format
+        userId: 'USR-001',  // Standardized to USR-001 format with dash
         name: 'Binance Spot Account',
         timestamp: new Date(Date.now() - 3600000).toISOString(),
         status: 'success'
@@ -121,7 +121,7 @@ const mockLogs: CoinstratSignal[] = [
     failedAccounts: [
       {
         accountId: 'ACC-003',
-        userId: 'USR-001',  // Standardized to USR-001 format
+        userId: 'USR-001',  // Standardized to USR-001 format with dash
         name: 'FTX Account',
         timestamp: new Date(Date.now() - 7200000).toISOString(),
         reason: 'Invalid account configuration',
@@ -130,7 +130,7 @@ const mockLogs: CoinstratSignal[] = [
       },
       {
         accountId: 'ACC-004',
-        userId: 'USR-001',  // Standardized to USR-001 format
+        userId: 'USR-001',  // Standardized to USR-001 format with dash
         name: 'Bybit Account',
         timestamp: new Date(Date.now() - 7200000).toISOString(),
         reason: 'API key expired',

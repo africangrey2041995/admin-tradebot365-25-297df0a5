@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -7,6 +8,7 @@ import SignalDetailModal from './signal-logs/SignalDetailModal';
 import SignalLogsTable from './signal-logs/SignalLogsTable';
 import LoadingSignalLogs from './signal-logs/LoadingSignalLogs';
 import EmptySignalLogs from './signal-logs/EmptySignalLogs';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface CoinstratLogsProps {
   botId: string;
@@ -33,16 +35,26 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
     setLoading(true);
     
     try {
+      // Normalize the input userId for consistent comparison
+      const normalizedInputUserId = normalizeUserId(userId);
+      console.log(`CoinstratLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+      
       // If initialData is provided, filter and use it
       if (initialData && initialData.length > 0) {
         const filteredLogs = initialData.filter(log => {
-          const processedAccountsForUser = log.processedAccounts.filter(account => account.userId === userId);
-          const failedAccountsForUser = log.failedAccounts.filter(account => account.userId === userId);
+          // Check both processed and failed accounts with normalized comparison
+          const hasProcessedAccountsForUser = log.processedAccounts.some(account => 
+            normalizeUserId(account.userId) === normalizedInputUserId
+          );
           
-          return processedAccountsForUser.length > 0 || failedAccountsForUser.length > 0;
+          const hasFailedAccountsForUser = log.failedAccounts.some(account => 
+            normalizeUserId(account.userId) === normalizedInputUserId
+          );
+          
+          return hasProcessedAccountsForUser || hasFailedAccountsForUser;
         });
         
-        console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length}`);
+        console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length} of ${initialData.length}`);
         setLogs(filteredLogs);
         setLoading(false);
         return;
@@ -66,14 +78,14 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
               processedAccounts: [
                 {
                   accountId: 'ACC-001',
-                  userId: 'USR-001',
+                  userId: 'USR-001', // Standardized to USR-001 format with dash
                   name: 'Binance Spot Account',
                   timestamp: new Date().toISOString(),
                   status: 'success'
                 },
                 {
                   accountId: 'ACC-002',
-                  userId: 'USR-001',
+                  userId: 'USR-001', // Standardized to USR-001 format with dash
                   name: 'Coinstart Pro Account',
                   timestamp: new Date().toISOString(),
                   status: 'success'
@@ -95,7 +107,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
               processedAccounts: [
                 {
                   accountId: 'ACC-001',
-                  userId: 'USR-001',
+                  userId: 'USR-001', // Standardized to USR-001 format with dash
                   name: 'Binance Spot Account',
                   timestamp: new Date(Date.now() - 3600000).toISOString(),
                   status: 'success'
@@ -118,7 +130,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
               failedAccounts: [
                 {
                   accountId: 'ACC-003',
-                  userId: 'USR-002',
+                  userId: 'USR-002', // Standardized to USR-002 format with dash
                   name: 'FTX Account',
                   timestamp: new Date(Date.now() - 7200000).toISOString(),
                   reason: 'Invalid account configuration',
@@ -127,7 +139,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
                 },
                 {
                   accountId: 'ACC-004',
-                  userId: 'USR-001',
+                  userId: 'USR-001', // Standardized to USR-001 format with dash
                   name: 'Bybit Account',
                   timestamp: new Date(Date.now() - 7200000).toISOString(),
                   reason: 'API key expired',
@@ -140,13 +152,26 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
           ];
           
           const filteredLogs = mockLogs.filter(log => {
-            const processedAccountsForUser = log.processedAccounts.filter(account => account.userId === userId);
-            const failedAccountsForUser = log.failedAccounts.filter(account => account.userId === userId);
+            // Check processed accounts with normalized comparison
+            const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+              const normalizedAccountUserId = normalizeUserId(account.userId);
+              const match = normalizedAccountUserId === normalizedInputUserId;
+              console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+              return match;
+            });
             
-            return processedAccountsForUser.length > 0 || failedAccountsForUser.length > 0;
+            // Check failed accounts with normalized comparison
+            const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+              const normalizedAccountUserId = normalizeUserId(account.userId);
+              const match = normalizedAccountUserId === normalizedInputUserId;
+              console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+              return match;
+            });
+            
+            return hasProcessedAccountsForUser || hasFailedAccountsForUser;
           });
           
-          console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length}`);
+          console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length}`);
           setLogs(filteredLogs);
           setLoading(false);
         } catch (error) {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -9,6 +8,7 @@ import AccountsTable from './accounts/AccountsTable';
 import LoadingAccounts from './accounts/LoadingAccounts';
 import EmptyAccountsState from './accounts/EmptyAccountsState';
 import ErrorState from './accounts/ErrorState';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 interface BotAccountsTableProps {
   botId: string;
@@ -31,7 +31,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001' // Chuẩn hóa thành USR-001
+    userId: 'USR-001' // Standardized to USR-001 format with dash
   },
   {
     id: 'ACC002',
@@ -46,7 +46,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001' // Chuẩn hóa thành USR-001
+    userId: 'USR-001' // Standardized to USR-001 format with dash
   },
   {
     id: 'ACC003',
@@ -61,7 +61,7 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    userId: 'USR-002' // Chuẩn hóa thành USR-002
+    userId: 'USR-002' // Standardized to USR-002 format with dash
   },
 ];
 
@@ -70,16 +70,6 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  // Cải thiện hàm normalizeUserId để đảm bảo xử lý đúng userId
-  const normalizeUserId = (id: string): string => {
-    if (!id) {
-      console.warn('BotAccountsTable - Received empty userId for normalization');
-      return '';
-    }
-    // Loại bỏ tất cả dấu gạch ngang và chuyển về chữ thường để so sánh
-    return id.replace(/-/g, '').toLowerCase();
-  };
 
   const fetchAccounts = useCallback(() => {
     console.log(`BotAccountsTable - Fetching accounts for userId: ${userId}`);
@@ -104,9 +94,9 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
             return;
           }
           
-          // Normalize the userId for comparison
-          const normalizedUserId = normalizeUserId(userId);
-          console.log(`BotAccountsTable - Normalized userId for comparison: ${normalizedUserId}`);
+          // Use our new normalizeUserId utility
+          const normalizedInputUserId = normalizeUserId(userId);
+          console.log(`BotAccountsTable - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
           
           // Log all available userIds for debugging
           const availableUserIds = initialData.length > 0 
@@ -117,11 +107,12 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
           
           if (initialData && initialData.length > 0) {
             console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
-            // Use normalized comparison
+            
+            // Use normalized comparison with our utility
             const filteredAccounts = initialData.filter(account => {
-              const accountNormalizedId = normalizeUserId(account.userId);
-              const match = accountNormalizedId === normalizedUserId;
-              console.log(`Comparing: ${accountNormalizedId} with ${normalizedUserId} - Match: ${match}`);
+              const normalizedAccountUserId = normalizeUserId(account.userId);
+              const match = normalizedAccountUserId === normalizedInputUserId;
+              console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
               return match;
             });
             
@@ -130,11 +121,11 @@ const BotAccountsTable = ({ botId, userId, initialData = [], refreshTrigger = fa
           } else {
             console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
             
-            // Use normalized comparison
+            // Use normalized comparison with our utility
             const filteredAccounts = mockAccounts.filter(account => {
-              const accountNormalizedId = normalizeUserId(account.userId);
-              const match = accountNormalizedId === normalizedUserId;
-              console.log(`Comparing: ${accountNormalizedId} with ${normalizedUserId} - Match: ${match}`);
+              const normalizedAccountUserId = normalizeUserId(account.userId);
+              const match = normalizedAccountUserId === normalizedInputUserId;
+              console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
               return match;
             });
             
