@@ -52,7 +52,15 @@ const IntegratedPremiumBotDetail = () => {
   }
 
   // Create a simplified bot object that matches the expected type
-  const simplifiedBot = {
+  // Using explicit type annotation to fix the error
+  const simplifiedBot: {
+    type: 'premium' | 'prop' | 'user';
+    exchange: string;
+    minCapital: string;
+    createdDate: string;
+    performanceLastMonth: string;
+    performanceAllTime: string;
+  } = {
     type: bot.type === BotType.PREMIUM_BOT ? 'premium' : 'user',
     exchange: bot.exchange || '',
     minCapital: bot.minCapital,
