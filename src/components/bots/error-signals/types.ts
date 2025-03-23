@@ -21,3 +21,6 @@ export interface ErrorSignalRowProps {
   isUnread: boolean;
   onMarkAsRead: (signalId: string) => void;
 }
+
+// Re-export ExtendedSignal to make it available to components importing from this file
+export { ExtendedSignal };

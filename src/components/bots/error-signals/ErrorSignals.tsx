@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './ErrorSignalsTable';
-import { ExtendedSignal, ErrorSignalsProps } from './types';
+import { ExtendedSignal } from '@/types';
+import { ErrorSignalsProps } from './types';
 import { mockErrorSignals } from './mockData';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
