@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Check, ShieldAlert, Info } from "lucide-react";
 
@@ -11,6 +11,7 @@ interface ApiEndpointProps {
   deprecated?: boolean;
   beta?: boolean;
   id: string;
+  children?: ReactNode;
 }
 
 const methodColors = {
@@ -28,7 +29,8 @@ const ApiEndpoint = ({
   authentication = true,
   deprecated = false,
   beta = false,
-  id
+  id,
+  children
 }: ApiEndpointProps) => {
   return (
     <div id={id} className="mb-8 border border-zinc-800 rounded-lg overflow-hidden">
