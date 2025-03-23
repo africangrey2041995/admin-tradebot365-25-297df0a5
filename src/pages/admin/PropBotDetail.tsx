@@ -1047,7 +1047,7 @@ const PropBotDetail: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <TradingViewLogs botId={botId || ''} />
+              <TradingViewLogs botId={botId || ''} userId="ADMIN-001" />
             </CardContent>
           </Card>
           
