@@ -1,71 +1,9 @@
 
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
-import { Account } from './account';
 
 /**
  * Định nghĩa các types liên quan đến Bot
  */
-
-// Thông tin cơ bản của bot
-export interface BaseBot {
-  id: string;
-  name: string;
-  description: string;
-  status: BotStatus;
-  type: BotType;
-  createdDate: string;
-  lastUpdated: string;
-  risk?: BotRiskLevel;
-  imageUrl?: string;
-  exchange?: string;
-  performance?: BotPerformance;
-  botId?: string;
-  ownerId?: string; // Add ownerId to BaseBot so all bot types inherit it
-}
-
-// Bot của người dùng
-export interface UserBot extends BaseBot {
-  type: BotType.USER_BOT;
-  owner: string;
-  ownerId: string;
-  accounts: number;
-  accountsList?: Account[];
-  strategy?: string;
-  isActive: boolean;
-  settings?: UserBotSettings;
-}
-
-// Bot Premium
-export interface PremiumBot extends BaseBot {
-  type: BotType.PREMIUM_BOT;
-  performanceLastMonth: string;
-  performanceAllTime: string;
-  minCapital: string;
-  subscribers: number;
-  users?: number;
-  profit?: string;
-  colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
-  isIntegrated?: boolean;
-  features?: string[];
-  tradingStyle?: string;
-  timeframe?: string;
-  markets?: string[];
-  accounts?: Account[] | number;
-}
-
-// Bot PropTrading
-export interface PropBot extends BaseBot {
-  type: BotType.PROP_BOT;
-  performanceLastMonth: string;
-  performanceAllTime: string;
-  minCapital: string;
-  users: number;
-  profit: string;
-  maxDrawdown?: string;
-  propFirm?: string;
-  challengeDuration?: string;
-  accountSizes?: string[];
-}
 
 // Thống kê hiệu suất bot
 export interface BotPerformance {
@@ -103,6 +41,64 @@ export interface UserBotSettings {
   leverage?: string;
 }
 
+// Thông tin cơ bản của bot - Base bot interface with common properties
+export interface BaseBot {
+  id: string;
+  name: string;
+  description: string;
+  status: BotStatus;
+  type: BotType;
+  createdDate: string;
+  lastUpdated: string;
+  risk?: BotRiskLevel;
+  imageUrl?: string;
+  exchange?: string;
+  performance?: BotPerformance;
+  ownerId?: string; // Standardized ownerId field
+}
+
+// Bot của người dùng
+export interface UserBot extends BaseBot {
+  type: BotType.USER_BOT;
+  owner: string;
+  ownerId: string; // Required for UserBot
+  accounts: number;
+  accountsList?: Account[];
+  strategy?: string;
+  isActive: boolean;
+  settings?: UserBotSettings;
+}
+
+// Bot Premium
+export interface PremiumBot extends BaseBot {
+  type: BotType.PREMIUM_BOT;
+  performanceLastMonth: string;
+  performanceAllTime: string;
+  minCapital: string;
+  subscribers: number;
+  colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
+  isIntegrated?: boolean;
+  features?: string[];
+  tradingStyle?: string;
+  timeframe?: string;
+  markets?: string[];
+  accounts?: Account[] | number;
+}
+
+// Bot PropTrading
+export interface PropBot extends BaseBot {
+  type: BotType.PROP_BOT;
+  performanceLastMonth: string;
+  performanceAllTime: string;
+  minCapital: string;
+  users: number; 
+  profit: string;
+  maxDrawdown?: string;
+  propFirm?: string;
+  challengeDuration?: string;
+  accountSizes?: string[];
+}
+
 // Bot đã tích hợp
 export interface IntegratedBot extends BaseBot {
   originalId: string;
@@ -124,3 +120,23 @@ export interface BotStatusInfo {
 
 // Bot Type Union
 export type Bot = UserBot | PremiumBot | PropBot | IntegratedBot;
+
+// Type guard functions to check bot types
+export function isUserBot(bot: Bot): bot is UserBot {
+  return bot.type === BotType.USER_BOT;
+}
+
+export function isPremiumBot(bot: Bot): bot is PremiumBot {
+  return bot.type === BotType.PREMIUM_BOT;
+}
+
+export function isPropBot(bot: Bot): bot is PropBot {
+  return bot.type === BotType.PROP_BOT;
+}
+
+export function isIntegratedBot(bot: Bot): bot is IntegratedBot {
+  return 'originalId' in bot && 'integratedDate' in bot;
+}
+
+// Import Account type to avoid circular dependencies
+import { Account } from './account';

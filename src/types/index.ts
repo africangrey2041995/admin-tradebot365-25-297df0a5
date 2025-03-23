@@ -1,16 +1,18 @@
 
+// Re-export all type definitions for convenient access
 export * from './user';
 export * from './bot';
 export * from './account';
 export * from './signal';
 export * from './connection';
+export * from './admin-types';
 
 // Re-export bot-related enums from constants for convenience
 export { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
-import { UserPlan } from '@/constants/userConstants';
+export { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
 
 /**
- * Các types khác
+ * System-wide types
  */
 
 // Log hoạt động hệ thống
@@ -91,4 +93,28 @@ export interface Package {
   updatedAt: string;
   isPopular?: boolean;
   isEnterprise?: boolean;
+}
+
+// Type validation utility
+export function validateUserId(userId: string): boolean {
+  // Check if userId follows the standardized format (e.g., 'USR-XXX', 'user-XXX', etc.)
+  return /^(USR-|user-)\w+$/i.test(userId);
+}
+
+// Helper to normalize user IDs to consistent format
+export function normalizeUserId(userId: string | undefined): string {
+  if (!userId) return '';
+  
+  // Convert to uppercase 'USR-XXX' format
+  if (userId.toLowerCase().startsWith('usr-')) {
+    return userId.toUpperCase();
+  }
+  
+  // Convert 'user-XXX' to 'USR-XXX' format
+  if (userId.toLowerCase().startsWith('user-')) {
+    return 'USR-' + userId.substring(5).toUpperCase();
+  }
+  
+  // If it doesn't match any known format, return as is
+  return userId;
 }

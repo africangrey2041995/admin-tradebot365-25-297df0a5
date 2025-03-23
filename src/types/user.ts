@@ -31,10 +31,10 @@ export interface User {
   preferences?: UserPreferences;
   billingInfo?: BillingInfo;
   notifications?: UserNotification[];
-  bots: number; // Changed from optional to required to match admin-types
-  joinDate: string; // Added to match admin-types
-  botTypes?: string[];
-  activity?: string;
+  bots: number; // Number of bots owned by user
+  joinDate: string; // When user joined the platform
+  botTypes?: string[]; // Types of bots user has access to
+  activity?: string; // User activity status
 }
 
 // Thông tin API key của user
@@ -83,4 +83,9 @@ export interface UserNotification {
   timestamp: string;
   read: boolean;
   link?: string;
+}
+
+// Type guard to check premium users
+export function isPremiumUser(user: User): boolean {
+  return user.plan === UserPlan.PREMIUM || user.plan === UserPlan.ENTERPRISE;
 }

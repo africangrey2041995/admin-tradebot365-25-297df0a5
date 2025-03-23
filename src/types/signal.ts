@@ -1,3 +1,4 @@
+
 /**
  * Định nghĩa các types liên quan đến Signal
  */
@@ -8,8 +9,8 @@ export type SignalAction = 'ENTER_LONG' | 'EXIT_LONG' | 'ENTER_SHORT' | 'EXIT_SH
 // Trạng thái tín hiệu
 export type SignalStatus = 'Pending' | 'Processed' | 'Failed' | 'Expired' | 'Sent';
 
-// Tín hiệu TradingView
-export interface TradingViewSignal {
+// Base Signal interface with common properties
+export interface BaseSignal {
   id: string;
   action: SignalAction;
   instrument: string;
@@ -20,6 +21,10 @@ export interface TradingViewSignal {
   amount: string;
   status: string | SignalStatus;
   errorMessage?: string;
+}
+
+// Tín hiệu TradingView
+export interface TradingViewSignal extends BaseSignal {
   source?: string;
   processingTime?: string;
   accountId?: string;
@@ -39,20 +44,10 @@ export interface AccountSignalStatus {
 }
 
 // Tín hiệu Coinstrat
-export interface CoinstratSignal {
-  id: string;
+export interface CoinstratSignal extends BaseSignal {
   originalSignalId: string;
-  action: SignalAction;
-  instrument: string;
-  timestamp: string;
-  signalToken: string;
-  maxLag: string;
-  investmentType: string;
-  amount: string;
-  status: string | SignalStatus;
   processedAccounts: AccountSignalStatus[];
   failedAccounts: AccountSignalStatus[];
-  errorMessage?: string;
   botId?: string;
   botName?: string;
 }

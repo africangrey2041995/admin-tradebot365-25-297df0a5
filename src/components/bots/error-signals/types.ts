@@ -1,5 +1,5 @@
 
-import { ExtendedSignal } from '@/types';
+import { ExtendedSignal } from '@/types/signal';
 
 export interface ErrorSignalsProps {
   botId?: string;

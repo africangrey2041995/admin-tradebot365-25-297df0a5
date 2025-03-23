@@ -1,6 +1,9 @@
 
 import { ConnectionStatus, TradingAccountType } from './connection';
 
+/**
+ * Definition of account-related types
+ */
 export interface Account {
   id: string;
   name: string;
@@ -21,4 +24,20 @@ export interface Account {
   expireDate?: string;
   userAccount?: string;
   userEmail?: string;
+}
+
+// Admin-specific account interface with extended properties
+export interface AdminAccount extends Account {
+  adminNotes?: string;
+  isVerified?: boolean;
+  verificationDate?: string;
+  lastActivityDate?: string;
+  activeSignals?: number;
+  errorSignals?: number;
+  totalTransactions?: number;
+}
+
+// Type guard for admin account
+export function isAdminAccount(account: Account | AdminAccount): account is AdminAccount {
+  return 'adminNotes' in account || 'isVerified' in account;
 }

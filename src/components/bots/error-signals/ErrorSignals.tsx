@@ -2,14 +2,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './ErrorSignalsTable';
-import { ExtendedSignal } from '@/types';
+import { ExtendedSignal } from '@/types/signal';
 import { ErrorSignalsProps } from './types';
 import { mockErrorSignals } from './mockData';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
-const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
+const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId, limit, userId }) => {
   const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
   const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -23,19 +24,33 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
     setError(null);
     
     try {
+      // Normalize the input userId for consistent comparison
+      const normalizedInputUserId = userId ? normalizeUserId(userId) : '';
+      console.log(`ErrorSignals - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+      
       // Simulate API call with timeout
       setTimeout(() => {
         try {
-          // Filter mock data to match bot ID
-          const signals = mockErrorSignals.filter(signal => 
-            !botId || signal.botId === botId
-          );
+          // Filter mock data to match bot ID AND userId with normalized comparison
+          const signals = mockErrorSignals.filter(signal => {
+            // If no userId is provided, don't filter by userId
+            const matchesUserId = !userId || (signal.userId && normalizeUserId(signal.userId) === normalizedInputUserId);
+            // If no botId is provided, don't filter by botId
+            const matchesBotId = !botId || signal.botId === botId;
+            
+            console.log(`ErrorSignals - Signal ${signal.id}: userId match: ${matchesUserId}, botId match: ${matchesBotId}`);
+            return matchesBotId && matchesUserId;
+          });
           
-          setErrorSignals(signals);
+          // Apply limit if provided
+          const limitedSignals = limit ? signals.slice(0, limit) : signals;
+          
+          console.log(`ErrorSignals - Filtered ${limitedSignals.length} signals for userId: ${userId || 'any'} and botId: ${botId || 'any'}`);
+          setErrorSignals(limitedSignals);
           
           // Set first two errors as unread
           const newUnread = new Set<string>();
-          signals.slice(0, 2).forEach(signal => {
+          limitedSignals.slice(0, 2).forEach(signal => {
             if (signal.id) {
               newUnread.add(signal.id);
             }
@@ -56,9 +71,9 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId }) => {
       setLoading(false);
       toast.error('An error occurred while loading error signals');
     }
-  }, [botId]);
+  }, [botId, userId, limit]);
   
-  // Load data when component mounts or botId changes
+  // Load data when component mounts or botId/userId changes
   useEffect(() => {
     fetchErrorSignals();
   }, [fetchErrorSignals]);
