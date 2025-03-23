@@ -1,28 +1,24 @@
-
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogOut, Moon, Settings, Sun, User, Shield } from "lucide-react";
-import { useClerk, useUser as useClerkUser } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdmin } from "@/hooks/use-admin";
-import { useAdminNavigation } from "@/hooks/useAdminNavigation";
-import { toast } from "sonner";
 
 const UserProfileSection = () => {
-  const { user: clerkUser } = useClerkUser();
+  const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { toast: shadowToast } = useToast();
+  const { toast } = useToast();
   const isMobile = useIsMobile();
   const { isAdmin } = useAdmin();
-  const { navigateToAdmin } = useAdminNavigation();
 
   console.log("Is admin in profile:", isAdmin); // Debug log
 
@@ -44,16 +40,21 @@ const UserProfileSection = () => {
     const newTheme = resolvedTheme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     
-    shadowToast({
+    toast({
       title: "Đã thay đổi giao diện",
       description: `Giao diện đã được chuyển sang chế độ ${newTheme === 'light' ? 'sáng' : 'tối'}.`,
       duration: 3000,
     });
   };
 
-  const handleNavigateToAdmin = () => {
-    console.log("Admin button clicked in profile dropdown");
-    navigateToAdmin();
+  const navigateToAdmin = () => {
+    navigate("/admin");
+    
+    toast({
+      title: "Chuyển sang bảng điều khiển Admin",
+      description: "Bạn đang sử dụng hệ thống quản trị viên.",
+      duration: 3000,
+    });
   };
 
   return (
@@ -65,7 +66,7 @@ const UserProfileSection = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleNavigateToAdmin}
+              onClick={navigateToAdmin}
               className="text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 transition-colors h-8 w-8"
               aria-label="Chuyển sang trang Admin"
             >
@@ -101,16 +102,16 @@ const UserProfileSection = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full border border-slate-200 dark:border-zinc-700 p-0">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={clerkUser?.imageUrl} alt={clerkUser?.fullName || "User"} />
-              <AvatarFallback>{clerkUser?.fullName ? getInitials(clerkUser.fullName) : "U"}</AvatarFallback>
+              <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+              <AvatarFallback>{user?.fullName ? getInitials(user.fullName) : "U"}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 mt-1" align={isMobile ? "end" : "start"} forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{clerkUser?.fullName}</p>
-              <p className="text-xs leading-none text-muted-foreground">{clerkUser?.primaryEmailAddress?.emailAddress}</p>
+              <p className="text-sm font-medium leading-none">{user?.fullName}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
               {isAdmin && (
                 <span className="text-xs mt-1 text-amber-500 flex items-center gap-1">
                   <Shield className="h-3 w-3" />
@@ -129,7 +130,7 @@ const UserProfileSection = () => {
             <span>Cài đặt</span>
           </DropdownMenuItem>
           {isAdmin && (
-            <DropdownMenuItem onClick={handleNavigateToAdmin}>
+            <DropdownMenuItem onClick={navigateToAdmin}>
               <Shield className="mr-2 h-4 w-4" />
               <span>Quản trị</span>
             </DropdownMenuItem>

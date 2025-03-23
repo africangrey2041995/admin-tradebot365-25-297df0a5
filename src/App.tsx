@@ -25,7 +25,6 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-import Signals from "./pages/Signals";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -33,7 +32,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminUserDetail from "./pages/admin/UserDetail";
 import AdminBots from "./pages/admin/Bots";
-import AdminBotErrors from "./pages/admin/BotErrors";
 import AdminDatabase from "./pages/admin/Database";
 import AdminLogs from "./pages/admin/Logs";
 import AdminNotifications from "./pages/admin/Notifications";
@@ -46,6 +44,7 @@ import AdminPropBots from "./pages/admin/PropBots";
 import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+import AdminBotErrors from "./pages/admin/BotErrors";
 import AdminPackages from "./pages/admin/Packages";
 
 // Fixed Clerk publishable key - this is your test key
@@ -101,7 +100,6 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/signals" element={<Signals />} />
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />

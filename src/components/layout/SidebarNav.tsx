@@ -14,8 +14,7 @@ import {
   TrendingUp,
   ChevronDown,
   Shield,
-  UserCircle,
-  AlertTriangle
+  UserCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -23,8 +22,6 @@ import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/use-admin';
 import { useToast } from '@/hooks/use-toast';
-import { USER_ROUTES } from '@/constants/routes';
-import { useAdminNavigation } from '@/hooks/useAdminNavigation';
 
 const SidebarNav = () => {
   const location = useLocation();
@@ -32,7 +29,6 @@ const SidebarNav = () => {
   const isMobile = useIsMobile();
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
-  const { navigateToAdmin } = useAdminNavigation();
   
   // State for collapsible sections
   const [premiumOpen, setPremiumOpen] = useState(false);
@@ -46,16 +42,22 @@ const SidebarNav = () => {
     return location.pathname.startsWith(path);
   };
 
-  const handleNavigateToAdmin = () => {
-    console.log("Admin button clicked in sidebar footer");
-    navigateToAdmin();
+  const navigateToAdmin = () => {
+    navigate("/admin");
+    
+    toast({
+      title: "Chuyển sang bảng điều khiển Admin",
+      description: "Bạn đang sử dụng hệ thống quản trị viên.",
+      duration: 3000,
+    });
   };
 
-  console.log("Is admin in sidebar:", isAdmin); // Debug log
+  console.log("Is admin:", isAdmin); // Debug log
 
   return (
     <Sidebar className="border-r-0">
       <SidebarContent className="bg-[#111111] text-white h-full">
+        {/* Logo - Using our new component with better contrast and positioning */}
         <div className={cn(
           "flex justify-center items-center bg-[#111111]",
           isMobile ? "py-4" : "py-6 px-4"
@@ -69,6 +71,7 @@ const SidebarNav = () => {
         
         <SidebarSeparator className="bg-zinc-800" />
         
+        {/* Main Navigation */}
         <div className="mt-4">
           <div className="px-4 mb-2">
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
@@ -89,15 +92,10 @@ const SidebarNav = () => {
               icon={Users} 
               isActive={isActive('/accounts')} 
             />
-            <NavItem 
-              path={USER_ROUTES.SIGNALS} 
-              label="Quản Lý Tín Hiệu" 
-              icon={AlertTriangle} 
-              isActive={isActive(USER_ROUTES.SIGNALS)} 
-            />
           </div>
         </div>
         
+        {/* Premium Section */}
         <div className="mt-6">
           <div className="px-4 mb-2">
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
@@ -148,10 +146,11 @@ const SidebarNav = () => {
         </div>
       </SidebarContent>
       
+      {/* Admin Navigation Footer - Only visible for admin users */}
       {isAdmin && (
         <SidebarFooter className="bg-[#111111] border-t border-zinc-800 p-2">
           <button
-            onClick={handleNavigateToAdmin}
+            onClick={navigateToAdmin}
             className={cn(
               "flex w-full items-center px-3 py-2 text-sm rounded-md transition-colors",
               isActive('/admin') 

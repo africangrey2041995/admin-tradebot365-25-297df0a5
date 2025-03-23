@@ -8,15 +8,9 @@ import PremiumBotsPromo from '@/components/dashboard/PremiumBotsPromo';
 import BetaTag from '@/components/common/BetaTag';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
-import { useAdminNavigation } from '@/hooks/useAdminNavigation';
-import { useAdmin } from '@/hooks/use-admin';
-import { Button } from '@/components/ui/button';
-import { Shield } from 'lucide-react';
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const { isAdmin } = useAdmin();
-  const { navigateToAdmin } = useAdminNavigation();
   
   // Mock statistics for demonstration
   const dashboardStats = {
@@ -31,12 +25,6 @@ const Index = () => {
     processedSignals: 5,
     failedSignals: 0,
     monthlyOrders: 398
-  };
-
-  // Debug button for admin navigation
-  const handleTestAdminNavigation = () => {
-    console.log("Test admin navigation button clicked");
-    navigateToAdmin();
   };
 
   return (
@@ -54,20 +42,6 @@ const Index = () => {
           </span>
         </div>
       </motion.div>
-      
-      {/* Debug Admin Button */}
-      {isAdmin && (
-        <div className="mb-6 flex justify-center">
-          <Button 
-            onClick={handleTestAdminNavigation}
-            variant="outline" 
-            className="bg-amber-950/30 border-amber-900 text-amber-400 hover:bg-amber-900 hover:text-amber-200"
-          >
-            <Shield className="mr-2 h-4 w-4" />
-            Test Admin Navigation
-          </Button>
-        </div>
-      )}
       
       <div className={`space-y-${isMobile ? '3' : '6'}`}>
         <PropTradingPromo />
