@@ -4,11 +4,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Share, Copy, CheckCircle2, Edit, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import { toast } from 'sonner';
-import { CoinstratSignal, SignalAction } from '@/types/signal';
+import { CoinstratSignal, SignalAction, AccountSignalStatus } from '@/types/signal';
 import { PropBot } from '@/types';
 import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY, BotType } from '@/constants/botTypes';
 import { Account } from '@/types';
@@ -40,13 +39,12 @@ const getMockPropBot = (botId: string): PropBot => {
   };
 };
 
-// Mock accounts - using correct Account type properties
+// Mock accounts with correct Account type properties
 const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-001',
     cspAccountName: 'FTMO Challenge Account',
     status: 'active',
-    exchangeType: 'spot',
     createdDate: '2023-09-15T10:30:00Z',
     lastUpdated: '2023-11-10T14:45:00Z',
     apiName: 'FTMO API',
@@ -62,7 +60,6 @@ const mockAccounts: Account[] = [
     cspAccountId: 'acc-002',
     cspAccountName: 'FTMO Verification Account',
     status: 'active',
-    exchangeType: 'futures',
     createdDate: '2023-10-05T09:15:00Z',
     lastUpdated: '2023-11-12T16:20:00Z',
     apiName: 'FTMO API',
@@ -76,7 +73,7 @@ const mockAccounts: Account[] = [
   }
 ];
 
-// Mock logs with corrected types
+// Mock logs with corrected types for AccountSignalStatus
 const mockLogs: CoinstratSignal[] = [
   {
     id: 'signal-001',
@@ -95,7 +92,6 @@ const mockLogs: CoinstratSignal[] = [
         name: 'FTMO Challenge Account',
         status: 'success',
         reason: 'Order placed successfully',
-        exchange: 'FTMO',
         timestamp: new Date().toISOString(),
         userId: 'USR-001'
       }
@@ -121,7 +117,6 @@ const mockLogs: CoinstratSignal[] = [
         name: 'FTMO Challenge Account',
         status: 'success',
         reason: 'Order placed successfully',
-        exchange: 'FTMO',
         timestamp: new Date().toISOString(),
         userId: 'USR-001'
       }
@@ -133,7 +128,6 @@ const mockLogs: CoinstratSignal[] = [
         status: 'failed',
         reason: 'Insufficient margin',
         errorCode: 'ERR-MARGIN',
-        exchange: 'FTMO',
         timestamp: new Date().toISOString(),
         userId: 'USR-001'
       }
