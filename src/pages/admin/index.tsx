@@ -1,14 +1,14 @@
 
 import React from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
-import PropBots from './PropBots';
+import { Navigate } from 'react-router-dom';
 
-const AdminPropBotsPage = () => {
-  return (
-    <AdminLayout>
-      <PropBots />
-    </AdminLayout>
-  );
+/**
+ * Redirects from /admin/index to /admin/prop-bots
+ * This aligns with the routing structure where AdminLayout uses Outlet
+ */
+const AdminIndexPage = () => {
+  // Simply redirect to the prop-bots page when accessing /admin directly
+  return <Navigate to="/admin/prop-bots" replace />;
 };
 
-export default AdminPropBotsPage;
+export default AdminIndexPage;
