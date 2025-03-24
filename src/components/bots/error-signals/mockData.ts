@@ -21,7 +21,7 @@ const hoursAgo = (hours: number) => {
 
 // Mock data for error signals
 export const mockErrorSignals: ExtendedSignal[] = [
-  // User bot errors
+  // User bot errors - Connection errors
   {
     id: 'ERR-001',
     action: 'ENTER_LONG',
@@ -33,7 +33,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '0.05 BTC',
     status: 'Failed',
     errorMessage: 'Insufficient funds in account',
-    botId: 'USER-BOT-001',
+    botId: 'USER-BOTS',
     botName: 'My Bitcoin Strategy',
     userId: 'USR-001',
     tradingAccount: 'Binance-Main',
@@ -52,7 +52,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '2 ETH',
     status: 'Failed',
     errorMessage: 'API key expired or invalid',
-    botId: 'USER-BOT-002',
+    botId: 'USER-BOTS',
     botName: 'Ethereum Scalper',
     userId: 'USR-001',
     tradingAccount: 'Bybit-Demo',
@@ -61,9 +61,51 @@ export const mockErrorSignals: ExtendedSignal[] = [
     botType: BotType.USER_BOT,
   },
   
-  // Premium bot errors
+  // User bot errors - Market errors
   {
     id: 'ERR-003',
+    action: 'ENTER_SHORT',
+    instrument: 'SOL/USDT',
+    timestamp: hoursAgo(6),
+    signalToken: 'sol123',
+    maxLag: '300',
+    investmentType: 'crypto',
+    amount: '10 SOL',
+    status: 'Failed',
+    errorMessage: 'Order rejected: Market volatility too high',
+    botId: 'USER-BOTS',
+    botName: 'Solana Alpha',
+    userId: 'USR-001',
+    tradingAccount: 'Binance-Futures',
+    tradingAccountType: 'Futures',
+    errorSeverity: 'medium',
+    botType: BotType.USER_BOT,
+  },
+  
+  // User bot errors - Software errors
+  {
+    id: 'ERR-004',
+    action: 'ENTER_LONG',
+    instrument: 'ADA/USDT',
+    timestamp: hoursAgo(12),
+    signalToken: 'ada123',
+    maxLag: '200',
+    investmentType: 'crypto',
+    amount: '100 ADA',
+    status: 'Failed',
+    errorMessage: 'TradingView webhook format invalid',
+    botId: 'USER-BOTS',
+    botName: 'ADA Momentum',
+    userId: 'USR-001',
+    tradingAccount: 'Kraken-Main',
+    tradingAccountType: 'Spot',
+    errorSeverity: 'low',
+    botType: BotType.USER_BOT,
+  },
+  
+  // Premium bot errors - Connection errors
+  {
+    id: 'ERR-005',
     action: 'ENTER_SHORT',
     instrument: 'AAPL',
     timestamp: hoursAgo(10),
@@ -73,7 +115,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '10 shares',
     status: 'Failed',
     errorMessage: 'Market closed, order rejected',
-    botId: 'PREMIUM-BOT-001',
+    botId: 'PREMIUM-BOTS',
     botName: 'Alpha Momentum',
     userId: 'USR-001',
     tradingAccount: 'Interactive Brokers',
@@ -82,7 +124,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     botType: BotType.PREMIUM_BOT,
   },
   {
-    id: 'ERR-004',
+    id: 'ERR-006',
     action: 'EXIT_LONG',
     instrument: 'MSFT',
     timestamp: daysAgo(1),
@@ -92,7 +134,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '5 shares',
     status: 'Failed',
     errorMessage: 'Position not found or already closed',
-    botId: 'PREMIUM-BOT-002',
+    botId: 'PREMIUM-BOTS',
     botName: 'Gamma Grid',
     userId: 'USR-001',
     tradingAccount: 'TradingView',
@@ -101,9 +143,51 @@ export const mockErrorSignals: ExtendedSignal[] = [
     botType: BotType.PREMIUM_BOT,
   },
   
-  // Prop trading bot errors
+  // Premium bot errors - Account errors
   {
-    id: 'ERR-005',
+    id: 'ERR-007',
+    action: 'ENTER_LONG',
+    instrument: 'TSLA',
+    timestamp: hoursAgo(14),
+    signalToken: 'tsla123',
+    maxLag: '400',
+    investmentType: 'stock',
+    amount: '2 shares',
+    status: 'Failed',
+    errorMessage: 'Margin requirements not met',
+    botId: 'PREMIUM-BOTS',
+    botName: 'Tech Momentum',
+    userId: 'USR-001',
+    tradingAccount: 'Alpaca',
+    tradingAccountType: 'Margin',
+    errorSeverity: 'high',
+    botType: BotType.PREMIUM_BOT,
+  },
+  
+  // Premium bot errors - Software errors
+  {
+    id: 'ERR-008',
+    action: 'EXIT_SHORT',
+    instrument: 'QQQ',
+    timestamp: daysAgo(2),
+    signalToken: 'qqq123',
+    maxLag: '350',
+    investmentType: 'stock',
+    amount: '3 shares',
+    status: 'Failed',
+    errorMessage: 'Strategy execution timeout',
+    botId: 'PREMIUM-BOTS',
+    botName: 'ETF Strategy',
+    userId: 'USR-001',
+    tradingAccount: 'TD Ameritrade',
+    tradingAccountType: 'Margin',
+    errorSeverity: 'medium',
+    botType: BotType.PREMIUM_BOT,
+  },
+  
+  // Prop trading bot errors - Connection errors
+  {
+    id: 'ERR-009',
     action: 'ENTER_LONG',
     instrument: 'EUR/USD',
     timestamp: hoursAgo(18),
@@ -113,7 +197,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '1 lot',
     status: 'Failed',
     errorMessage: 'Maximum daily drawdown reached',
-    botId: 'PROP-BOT-001',
+    botId: 'PROP-BOTS',
     botName: 'Prop Master',
     userId: 'USR-001',
     tradingAccount: 'FTMO Challenge',
@@ -122,7 +206,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     botType: BotType.PROP_BOT,
   },
   {
-    id: 'ERR-006',
+    id: 'ERR-010',
     action: 'EXIT_SHORT',
     instrument: 'GBP/JPY',
     timestamp: daysAgo(2),
@@ -132,7 +216,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '0.5 lot',
     status: 'Failed',
     errorMessage: 'Connection timeout, order not confirmed',
-    botId: 'PROP-BOT-002',
+    botId: 'PROP-BOTS',
     botName: 'FX Scalper Pro',
     userId: 'USR-001',
     tradingAccount: 'MFF Evaluation',
@@ -141,9 +225,51 @@ export const mockErrorSignals: ExtendedSignal[] = [
     botType: BotType.PROP_BOT,
   },
   
-  // Additional signals for Admin user
+  // Prop trading bot errors - Account errors
   {
-    id: 'ERR-007',
+    id: 'ERR-011',
+    action: 'ENTER_SHORT',
+    instrument: 'USD/CAD',
+    timestamp: hoursAgo(8),
+    signalToken: 'usdcad123',
+    maxLag: '250',
+    investmentType: 'forex',
+    amount: '0.75 lot',
+    status: 'Failed',
+    errorMessage: 'Account locked: Risk management violation',
+    botId: 'PROP-BOTS',
+    botName: 'Forex Navigator',
+    userId: 'USR-001',
+    tradingAccount: 'Topstep',
+    tradingAccountType: 'Prop',
+    errorSeverity: 'critical',
+    botType: BotType.PROP_BOT,
+  },
+  
+  // Prop trading bot errors - Market errors
+  {
+    id: 'ERR-012',
+    action: 'EXIT_LONG',
+    instrument: 'AUD/USD',
+    timestamp: daysAgo(1),
+    signalToken: 'audusd123',
+    maxLag: '300',
+    investmentType: 'forex',
+    amount: '0.25 lot',
+    status: 'Failed',
+    errorMessage: 'Slippage exceeded allowed limit',
+    botId: 'PROP-BOTS',
+    botName: 'Aussie Trend',
+    userId: 'USR-001',
+    tradingAccount: 'FTMO Live',
+    tradingAccountType: 'Prop',
+    errorSeverity: 'high',
+    botType: BotType.PROP_BOT,
+  },
+  
+  // Additional signals for Admin user - User Bots
+  {
+    id: 'ERR-013',
     action: 'ENTER_LONG',
     instrument: 'SOL/USDT',
     timestamp: hoursAgo(4),
@@ -153,7 +279,7 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '50 SOL',
     status: 'Failed',
     errorMessage: 'Order rejected due to market volatility',
-    botId: 'USER-BOT-003',
+    botId: 'USER-BOTS',
     botName: 'Solana DCA Bot',
     userId: 'ADMIN-001',
     tradingAccount: 'Binance-Pro',
@@ -161,8 +287,10 @@ export const mockErrorSignals: ExtendedSignal[] = [
     errorSeverity: 'medium',
     botType: BotType.USER_BOT,
   },
+  
+  // Additional signals for Admin user - Premium Bots
   {
-    id: 'ERR-008',
+    id: 'ERR-014',
     action: 'EXIT_LONG',
     instrument: 'BNB/USDT',
     timestamp: daysAgo(3),
@@ -172,13 +300,55 @@ export const mockErrorSignals: ExtendedSignal[] = [
     amount: '2 BNB',
     status: 'Failed',
     errorMessage: 'Exchange API rate limit exceeded',
-    botId: 'PREMIUM-BOT-004',
+    botId: 'PREMIUM-BOTS',
     botName: 'Delta Hedge',
     userId: 'ADMIN-001',
     tradingAccount: 'Kraken-Main',
     tradingAccountType: 'Margin',
     errorSeverity: 'high',
     botType: BotType.PREMIUM_BOT,
+  },
+  
+  // Additional signals for Admin user - Prop Bots
+  {
+    id: 'ERR-015',
+    action: 'ENTER_SHORT',
+    instrument: 'USD/JPY',
+    timestamp: hoursAgo(7),
+    signalToken: 'usdjpy123',
+    maxLag: '300',
+    investmentType: 'forex',
+    amount: '0.5 lot',
+    status: 'Failed',
+    errorMessage: 'Breaking news stop: High impact economic event',
+    botId: 'PROP-BOTS',
+    botName: 'Yen Master',
+    userId: 'ADMIN-001',
+    tradingAccount: 'MFF Phase 2',
+    tradingAccountType: 'Prop',
+    errorSeverity: 'medium',
+    botType: BotType.PROP_BOT,
+  },
+  
+  // Critical system-wide errors - Admin visibility
+  {
+    id: 'ERR-016',
+    action: 'ENTER_LONG',
+    instrument: 'System',
+    timestamp: hoursAgo(1),
+    signalToken: 'system123',
+    maxLag: '100',
+    investmentType: 'system',
+    amount: 'N/A',
+    status: 'Failed',
+    errorMessage: 'Database connection failure: Signal storage unavailable',
+    botId: 'SYSTEM',
+    botName: 'Signal Processor',
+    userId: 'ADMIN-001',
+    tradingAccount: 'System',
+    tradingAccountType: 'System',
+    errorSeverity: 'critical',
+    botType: 'SYSTEM',
   },
 ];
 
