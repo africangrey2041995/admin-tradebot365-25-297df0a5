@@ -54,13 +54,13 @@ import { BotType, BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY, BOT_RISK_DISPLAY 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
-// Mock data for admin prop bots
+// Mock data for admin prop bots - fixed to use BotType.PROP_BOT explicitly
 const mockPropBots = [
   {
     botId: 'PROP-001',
     name: 'FTMO Challenger',
     description: 'Bot đặc biệt thiết kế để vượt qua FTMO Challenge với tỷ lệ thành công cao.',
-    type: BotType.PROP_BOT,
+    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
     status: BotStatus.ACTIVE,
     exchange: 'FTMO',
     risk: BotRiskLevel.MEDIUM,
@@ -80,7 +80,7 @@ const mockPropBots = [
     botId: 'PROP-002',
     name: 'FundedNext Master',
     description: 'Bot chuyên biệt cho FundedNext, tối ưu hóa chiến lược để vượt qua các bài kiểm tra với hiệu suất cao nhất.',
-    type: BotType.PROP_BOT,
+    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
     status: BotStatus.ACTIVE,
     exchange: 'FundedNext',
     risk: BotRiskLevel.LOW,
@@ -100,7 +100,7 @@ const mockPropBots = [
     botId: 'PROP-003',
     name: 'Coinstrat Challenge Bot',
     description: 'Bot tối ưu cho Coinstrat Pro, sử dụng các chiến lược đặc biệt phù hợp với quy tắc giao dịch của nền tảng.',
-    type: BotType.PROP_BOT,
+    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
     status: BotStatus.ACTIVE,
     exchange: 'Coinstrat Pro',
     risk: BotRiskLevel.HIGH,
@@ -120,7 +120,7 @@ const mockPropBots = [
     botId: 'PROP-004',
     name: 'Universal Prop Trader',
     description: 'Bot đa năng thích ứng với nhiều nền tảng prop trading khác nhau, phù hợp cho người mới bắt đầu.',
-    type: BotType.PROP_BOT,
+    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
     status: BotStatus.ACTIVE,
     exchange: 'Multiple',
     risk: BotRiskLevel.MEDIUM,
@@ -216,7 +216,7 @@ const AdminPropBots = () => {
     }, 1000);
   };
 
-  // Create new bot handler
+  // Create new bot handler - fixed to use BotType.PROP_BOT explicitly
   const createNewBot = (botData: Partial<PropBot>) => {
     setIsCreating(true);
     
@@ -226,7 +226,7 @@ const AdminPropBots = () => {
         botId: `PROP-${Math.floor(Math.random() * 1000)}`,
         name: botData.name || 'New Prop Bot',
         description: botData.description || 'Mô tả mặc định cho prop bot mới.',
-        type: BotType.PROP_BOT,
+        type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
         status: botData.status || BotStatus.ACTIVE,
         exchange: botData.exchange || 'Unknown',
         risk: botData.risk || BotRiskLevel.MEDIUM,

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -15,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
+import { BotType, BotRiskLevel } from '@/constants/botTypes';
 
 // Mocking prop trading bot data
 const propTradingBots = [
@@ -23,10 +23,10 @@ const propTradingBots = [
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
-    type: 'prop',
+    type: BotType.PROP_BOT,
     performanceLastMonth: '+11.2%',
     performanceAllTime: '+45.8%',
-    risk: 'low' as 'medium' | 'low' | 'high',
+    risk: BotRiskLevel.LOW,
     minCapital: '$500',
     status: 'active',
     subscribers: 120,
@@ -38,10 +38,10 @@ const propTradingBots = [
     name: 'Risk Manager Pro',
     description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
     exchange: 'Coinstrat Pro',
-    type: 'prop',
+    type: BotType.PROP_BOT,
     performanceLastMonth: '+8.5%',
     performanceAllTime: '+38.9%',
-    risk: 'low' as 'medium' | 'low' | 'high',
+    risk: BotRiskLevel.LOW,
     minCapital: '$700',
     status: 'active',
     subscribers: 95,
@@ -53,10 +53,10 @@ const propTradingBots = [
     name: 'Consistent Trader',
     description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
     exchange: 'Coinstrat Pro',
-    type: 'prop',
+    type: BotType.PROP_BOT,
     performanceLastMonth: '+9.7%',
     performanceAllTime: '+42.3%',
-    risk: 'medium' as 'medium' | 'low' | 'high',
+    risk: BotRiskLevel.MEDIUM,
     status: 'active',
     minCapital: '$600',
     subscribers: 83,
@@ -72,10 +72,10 @@ const integratedPropBots = [
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
-    type: 'prop',
+    type: BotType.PROP_BOT,
     performanceLastMonth: '+11.2%',
     performanceAllTime: '+45.8%',
-    risk: 'low' as 'medium' | 'low' | 'high',
+    risk: BotRiskLevel.LOW,
     minCapital: '$500',
     status: 'active',
     subscribers: 120,
