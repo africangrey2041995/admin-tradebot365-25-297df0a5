@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
  * This layout is used for all admin pages
  */
 const AdminLayout: React.FC = () => {
-  // Use dark mode colors based on the image provided
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <div className="flex flex-col p-6">

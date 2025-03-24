@@ -46,6 +46,7 @@ import { Badge } from "@/components/ui/badge";
 import { PropBot } from '@/types';
 import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import { mockPropBots } from '@/mocks/propBotsMock';
+import { PremiumBotStatsCards } from "@/components/admin/premium-bots/PremiumBotStatsCards";
 
 const PropBotStatsCards = () => {
   // Calculate stats from mock data
