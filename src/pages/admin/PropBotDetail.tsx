@@ -45,7 +45,6 @@ const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-001',
     cspAccountName: 'FTMO Challenge Account',
-    exchange: 'FTMO',
     status: 'active',
     exchangeType: 'spot',
     createdDate: '2023-09-15T10:30:00Z',
@@ -62,7 +61,6 @@ const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-002',
     cspAccountName: 'FTMO Verification Account',
-    exchange: 'FTMO',
     status: 'active',
     exchangeType: 'futures',
     createdDate: '2023-10-05T09:15:00Z',
@@ -86,7 +84,7 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'completed',
     instrument: 'EURUSD',
-    action: 'ENTER_LONG' as SignalAction,
+    action: 'ENTER_LONG',
     amount: '0.1',
     signalToken: 'token123',
     timestamp: new Date().toISOString(),
@@ -97,7 +95,6 @@ const mockLogs: CoinstratSignal[] = [
         name: 'FTMO Challenge Account',
         status: 'success',
         reason: 'Order placed successfully',
-        orderId: '12345',
         exchange: 'FTMO',
         timestamp: new Date().toISOString(),
         userId: 'USR-001'
@@ -113,7 +110,7 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'partial',
     instrument: 'USDJPY',
-    action: 'ENTER_SHORT' as SignalAction,
+    action: 'ENTER_SHORT',
     amount: '0.2',
     signalToken: 'token456',
     timestamp: new Date(Date.now() - 86400000).toISOString(),
@@ -124,7 +121,6 @@ const mockLogs: CoinstratSignal[] = [
         name: 'FTMO Challenge Account',
         status: 'success',
         reason: 'Order placed successfully',
-        orderId: '12346',
         exchange: 'FTMO',
         timestamp: new Date().toISOString(),
         userId: 'USR-001'
