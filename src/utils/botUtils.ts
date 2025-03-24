@@ -16,6 +16,15 @@ export function determineBotType(botId: string): BotType | undefined {
     }
   }
   
+  // Check for specific patterns in the bot ID
+  if (botId.startsWith('MY-')) {
+    return BotType.USER_BOT;
+  } else if (botId.startsWith('PRE-')) {
+    return BotType.PREMIUM_BOT;
+  } else if (botId.startsWith('PROP-')) {
+    return BotType.PROP_BOT;
+  }
+  
   // Nếu không tìm thấy prefix phù hợp, thử đoán dựa trên định dạng khác
   if (botId.includes('premium') || botId.includes('Premium')) {
     return BotType.PREMIUM_BOT;
@@ -37,10 +46,13 @@ export function normalizeBotId(botId: string, type?: BotType): string {
   if (!botId) return '';
   
   // Nếu ID đã có tiền tố hợp lệ, giữ nguyên
-  for (const prefix of Object.values(BOT_ID_PREFIXES)) {
-    if (botId.startsWith(prefix)) {
-      return botId;
-    }
+  if (botId.startsWith('MY-') || botId.startsWith('PRE-') || botId.startsWith('PROP-')) {
+    return botId;
+  }
+  
+  // If botId is a generic category ID, return as is
+  if (botId === 'USER-BOTS' || botId === 'PREMIUM-BOTS' || botId === 'PROP-BOTS') {
+    return botId;
   }
   
   // Nếu không có tiền tố, thêm tiền tố dựa vào loại

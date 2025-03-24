@@ -1,4 +1,3 @@
-
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, USER_ROUTES, SHARED_ROUTES } from '@/constants/routes';
 import { BotType } from '@/constants/botTypes';
@@ -27,15 +26,17 @@ export function useNavigation() {
       return;
     }
     
-    // Ghi log để debug
-    logBotIdInfo(botId, 'navigateToBotDetail');
+    // Log bot ID for debugging
+    console.log(`[Navigation] Navigating to bot with ID: ${botId}`);
     
     try {
       const botType = determineBotType(botId);
       const normalizedId = normalizeBotId(botId, botType);
       
+      console.log(`[Navigation] Determined bot type: ${botType}, normalized ID: ${normalizedId}`);
+      
       if (isAdminContext) {
-        // Định tuyến trong context admin
+        // Admin context routing
         switch (botType) {
           case BotType.PREMIUM_BOT:
             navigate(ADMIN_ROUTES.PREMIUM_BOT_DETAIL(normalizedId));
@@ -47,13 +48,13 @@ export function useNavigation() {
             navigate(ADMIN_ROUTES.USER_BOT_DETAIL(normalizedId));
             break;
           default:
-            // Fallback cho trường hợp không xác định được loại bot
+            // Fallback
             console.warn(`Unknown bot type for ID: ${botId}. Navigating to admin bots.`);
             toast.warning('Không thể xác định loại bot. Chuyển hướng đến trang Bots');
             navigate(ADMIN_ROUTES.BOTS);
         }
       } else {
-        // Định tuyến trong context user
+        // User context routing - for premium bots, use the integrated route
         switch (botType) {
           case BotType.PREMIUM_BOT:
             navigate(USER_ROUTES.INTEGRATED_PREMIUM_BOT_DETAIL(normalizedId));
@@ -65,7 +66,7 @@ export function useNavigation() {
             navigate(USER_ROUTES.BOT_DETAIL(normalizedId));
             break;
           default:
-            // Fallback cho trường hợp không xác định được loại bot
+            // Fallback
             console.warn(`Unknown bot type for ID: ${botId}. Navigating to user bots.`);
             toast.warning('Không thể xác định loại bot. Chuyển hướng đến trang Bots');
             navigate(USER_ROUTES.BOTS);
@@ -74,7 +75,7 @@ export function useNavigation() {
     } catch (error) {
       console.error(`Navigation error for bot ID ${botId}:`, error);
       toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
-      // Fallback an toàn - chuyển đến trang bots chung
+      // Safe fallback
       navigate(isAdminContext ? ADMIN_ROUTES.BOTS : USER_ROUTES.BOTS);
     }
   };

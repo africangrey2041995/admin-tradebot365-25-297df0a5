@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import ErrorSignals from '@/components/bots/ErrorSignals';
+import { BotType } from '@/constants/botTypes';
 
 // Mock admin user ID for admin pages
 const ADMIN_USER_ID = 'ADMIN-001';
@@ -65,15 +66,15 @@ const BotErrors = () => {
               </TabsList>
 
               <TabsContent value="user-bots" className="mt-0">
-                <ErrorSignals botId="USER-BOTS" userId={ADMIN_USER_ID} />
+                <ErrorSignals botType={BotType.USER_BOT} userId={ADMIN_USER_ID} />
               </TabsContent>
 
               <TabsContent value="premium-bots" className="mt-0">
-                <ErrorSignals botId="PREMIUM-BOTS" userId={ADMIN_USER_ID} />
+                <ErrorSignals botType={BotType.PREMIUM_BOT} userId={ADMIN_USER_ID} />
               </TabsContent>
 
               <TabsContent value="prop-bots" className="mt-0">
-                <ErrorSignals botId="PROP-BOTS" userId={ADMIN_USER_ID} />
+                <ErrorSignals botType={BotType.PROP_BOT} userId={ADMIN_USER_ID} />
               </TabsContent>
             </Tabs>
           </CardContent>

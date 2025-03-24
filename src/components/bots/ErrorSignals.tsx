@@ -1,116 +1,81 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
-import { ExtendedSignal } from '@/types/signal';
-import { ErrorSignalsProps } from './error-signals/types';
+import React, { useState, useEffect } from 'react';
 import { mockErrorSignals } from './error-signals/mockData';
-import { toast } from 'sonner';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
+import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
+import NoErrorsState from './error-signals/NoErrorsState';
+import { ExtendedSignal } from '@/types';
 import { normalizeUserId } from '@/utils/normalizeUserId';
+import { BotType } from '@/constants/botTypes';
 
-const ErrorSignals: React.FC<ErrorSignalsProps> = ({ botId, userId, limit }) => {
-  const [errorSignals, setErrorSignals] = useState<ExtendedSignal[]>([]);
-  const [unreadErrors, setUnreadErrors] = useState<Set<string>>(new Set());
+interface ErrorSignalsProps {
+  limit?: number;
+  userId?: string;
+  botType?: BotType;
+}
+
+const ErrorSignals: React.FC<ErrorSignalsProps> = ({ 
+  limit = 10,
+  userId,
+  botType
+}) => {
+  const [signals, setSignals] = useState<ExtendedSignal[]>([]);
+  const [unreadSignals, setUnreadSignals] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   
-  // Fetch error signals with improved error handling
-  const fetchErrorSignals = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Normalize the input userId for consistent comparison
-      const normalizedInputUserId = userId ? normalizeUserId(userId) : '';
-      console.log(`ErrorSignals - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
-      
-      // Simulate API call with timeout
-      setTimeout(() => {
-        try {
-          // Filter mock data to match bot ID AND userId with normalized comparison
-          const signals = mockErrorSignals.filter(signal => {
-            // If no userId is provided, don't filter by userId
-            const matchesUserId = !userId || (signal.userId && normalizeUserId(signal.userId) === normalizedInputUserId);
-            // If no botId is provided, don't filter by botId
-            const matchesBotId = !botId || signal.botId === botId;
-            
-            console.log(`ErrorSignals - Signal ${signal.id}: userId match: ${matchesUserId}, botId match: ${matchesBotId}`);
-            return matchesBotId && matchesUserId;
-          });
-          
-          // Apply limit if provided
-          const limitedSignals = limit ? signals.slice(0, limit) : signals;
-          
-          console.log(`ErrorSignals - Filtered ${limitedSignals.length} signals for userId: ${userId || 'any'} and botId: ${botId || 'any'}`);
-          setErrorSignals(limitedSignals);
-          
-          // Set first two errors as unread
-          const newUnread = new Set<string>();
-          limitedSignals.slice(0, 2).forEach(signal => {
-            if (signal.id) {
-              newUnread.add(signal.id);
-            }
-          });
-          setUnreadErrors(newUnread);
-          
-          setLoading(false);
-        } catch (innerError) {
-          console.error('Error processing error signals:', innerError);
-          setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing signals'));
-          setLoading(false);
-          toast.error('An error occurred while processing error signals');
-        }
-      }, 800);
-    } catch (err) {
-      console.error('Error fetching error signals:', err);
-      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
-      setLoading(false);
-      toast.error('An error occurred while loading error signals');
-    }
-  }, [botId, userId, limit]);
-  
-  // Load data when component mounts or botId/userId changes
+  // Initialize unread signals on component mount
   useEffect(() => {
-    fetchErrorSignals();
-  }, [fetchErrorSignals]);
-  
-  // Handle marking errors as read
-  const handleMarkAsRead = (signalId: string) => {
-    try {
-      setUnreadErrors(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(signalId);
-        return newSet;
+    // Simulate loading
+    setLoading(true);
+    
+    setTimeout(() => {
+      // Filter signals based on userId and botType
+      const filteredSignals = mockErrorSignals.filter(signal => {
+        // If userId is provided, only show signals for that user
+        const userIdMatch = !userId || signal.userId === userId || normalizeUserId(signal.userId) === normalizeUserId(userId);
+        
+        // If botType is provided, only show signals for that bot type
+        const botTypeMatch = !botType || signal.botType === botType;
+        
+        // Log for debugging
+        console.info(`ErrorSignals - Signal ${signal.id}: userId match: ${userIdMatch}, botType match: ${botTypeMatch}`);
+        
+        return userIdMatch && botTypeMatch;
       });
-      toast.success('Error signal marked as read');
-    } catch (err) {
-      console.error('Error marking signal as read:', err);
-      toast.error('An error occurred while marking the signal as read');
-    }
+      
+      // Log the filtered count
+      console.info(`ErrorSignals - Filtered ${filteredSignals.length} signals for userId: ${userId || 'any'} and botType: ${botType || 'any'}`);
+      
+      // Set all signals as unread initially
+      const initialUnreadSet = new Set(filteredSignals.map(signal => signal.id));
+      
+      setSignals(filteredSignals.slice(0, limit));
+      setUnreadSignals(initialUnreadSet);
+      setLoading(false);
+    }, 800);
+  }, [limit, userId, botType]);
+  
+  const handleMarkAsRead = (signalId: string) => {
+    const newUnreadSet = new Set(unreadSignals);
+    newUnreadSet.delete(signalId);
+    setUnreadSignals(newUnreadSet);
   };
   
+  const handleMarkAllAsRead = () => {
+    setUnreadSignals(new Set());
+  };
+  
+  if (!loading && signals.length === 0) {
+    return <NoErrorsState />;
+  }
+  
   return (
-    <ErrorBoundary>
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Signals</CardTitle>
-          <CardDescription>
-            Signals that failed to process due to errors. Requires attention.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ErrorSignalsTable 
-            errorSignals={errorSignals}
-            unreadErrors={unreadErrors}
-            onMarkAsRead={handleMarkAsRead}
-            loading={loading}
-            error={error}
-            onRefresh={fetchErrorSignals}
-          />
-        </CardContent>
-      </Card>
-    </ErrorBoundary>
+    <ErrorSignalsTable 
+      signals={signals} 
+      unreadSignals={unreadSignals} 
+      onMarkAsRead={handleMarkAsRead}
+      onMarkAllAsRead={handleMarkAllAsRead}
+      loading={loading}
+    />
   );
 };
 

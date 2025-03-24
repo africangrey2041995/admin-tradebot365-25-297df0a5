@@ -27,6 +27,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const handleBotClick = () => {
     if (signal.botId) {
       try {
+        // Use botId for navigation to proper detail page
         navigateToBotDetail(signal.botId);
       } catch (error) {
         console.error('Error navigating to bot details:', error);

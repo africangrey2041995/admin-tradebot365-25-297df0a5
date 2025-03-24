@@ -8,6 +8,7 @@ import { AlertTriangle } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import ErrorSignals from '@/components/bots/ErrorSignals';
 import { useUser } from '@clerk/clerk-react';
+import { BotType } from '@/constants/botTypes';
 
 const BotErrors = () => {
   const [activeTab, setActiveTab] = useState('user-bots');
@@ -54,15 +55,15 @@ const BotErrors = () => {
                 </TabsList>
 
                 <TabsContent value="user-bots" className="mt-0">
-                  <ErrorSignals botId="USER-BOTS" userId={userId} />
+                  <ErrorSignals botType={BotType.USER_BOT} userId={userId} />
                 </TabsContent>
 
                 <TabsContent value="premium-bots" className="mt-0">
-                  <ErrorSignals botId="PREMIUM-BOTS" userId={userId} />
+                  <ErrorSignals botType={BotType.PREMIUM_BOT} userId={userId} />
                 </TabsContent>
 
                 <TabsContent value="prop-bots" className="mt-0">
-                  <ErrorSignals botId="PROP-BOTS" userId={userId} />
+                  <ErrorSignals botType={BotType.PROP_BOT} userId={userId} />
                 </TabsContent>
               </Tabs>
             </CardContent>
