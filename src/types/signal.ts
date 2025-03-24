@@ -21,6 +21,7 @@ export interface BaseSignal {
   amount: string;
   status: string | SignalStatus;
   errorMessage?: string;
+  userId?: string; // Added userId as an optional property to the base interface
 }
 
 // Tín hiệu TradingView
