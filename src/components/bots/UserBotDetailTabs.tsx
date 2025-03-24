@@ -16,6 +16,7 @@ interface UserBotDetailTabsProps {
   onRefresh?: () => void;
   isLoading?: boolean;
   signalSourceLabel?: string;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
@@ -26,6 +27,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   onRefresh,
   isLoading = false,
   signalSourceLabel = "TradingView ID",
+  botType = 'user'
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [refreshLoading, setRefreshLoading] = useState(false);
@@ -96,6 +98,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             botId={botId} 
             userId={userId}
             refreshTrigger={refreshLoading}
+            botType={botType}
           />
         </TabsContent>
         
@@ -106,6 +109,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             initialData={logsData}
             signalSourceLabel={signalSourceLabel}
             refreshTrigger={refreshLoading}
+            botType={botType}
           />
         </TabsContent>
       </Tabs>

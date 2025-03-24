@@ -20,13 +20,15 @@ interface SignalDetailModalProps {
   onOpenChange: (open: boolean) => void;
   signal: CoinstratSignal | null;
   userId: string;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 const SignalDetailModal: React.FC<SignalDetailModalProps> = ({ 
   open, 
   onOpenChange, 
   signal, 
-  userId 
+  userId, 
+  botType = 'user'
 }) => {
   const { toast } = useToast();
   
@@ -40,6 +42,9 @@ const SignalDetailModal: React.FC<SignalDetailModalProps> = ({
       duration: 2000,
     });
   };
+
+  // Only show token for user-created bots, not for premium or prop bots
+  const showToken = botType === 'user';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,7 +67,8 @@ const SignalDetailModal: React.FC<SignalDetailModalProps> = ({
           {/* Signal Information Section */}
           <SignalInformation 
             signal={signal} 
-            onCopy={copyToClipboard} 
+            onCopy={copyToClipboard}
+            showToken={showToken}
           />
           
           {/* Processed Accounts Section */}

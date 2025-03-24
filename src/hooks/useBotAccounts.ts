@@ -7,10 +7,7 @@ import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Mock data cho tài khoản bot với chuẩn hóa định dạng userId (USR-XXX)
- * 
- * Mỗi tài khoản chứa thông tin chi tiết về kết nối với sàn giao dịch và người dùng.
- * Định dạng chuẩn cho userId là USR-XXX, ví dụ: USR-001
+ * Mock data for bot accounts with standardized userId format (USR-XXX)
  */
 const mockAccounts: Account[] = [
   {
@@ -22,13 +19,13 @@ const mockAccounts: Account[] = [
     apiId: 'API001',
     tradingAccountNumber: '4056629',
     tradingAccountId: '40819726',
-    tradingAccountType: 'HEDGED', // Loại tài khoản: HEDGED hoặc NETTED
-    tradingAccountBalance: '$500', // Số dư tài khoản
-    status: 'Connected', // Trạng thái kết nối
+    tradingAccountType: 'HEDGED',
+    tradingAccountBalance: '$500',
+    status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001', // Định dạng chuẩn USR-XXX với dấu gạch ngang
-    isLive: false // Tài khoản demo/thực
+    cspUserId: 'USR-001',
+    isLive: false
   },
   {
     cspAccountId: 'ACC002',
@@ -44,7 +41,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001', // Định dạng chuẩn USR-XXX với dấu gạch ngang
+    cspUserId: 'USR-001',
     isLive: true
   },
   {
@@ -61,33 +58,67 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    cspUserId: 'USR-002', // Định dạng chuẩn USR-XXX với dấu gạch ngang
+    cspUserId: 'USR-002',
     isLive: false
   },
 ];
 
+interface UseBotAccountsProps {
+  botId: string;
+  userId: string;
+  initialData?: Account[];
+}
+
+interface UseBotAccountsReturn {
+  accounts: Account[];
+  loading: boolean;
+  error: Error | null;
+  fetchAccounts: () => void;
+  handleRefresh: () => void;
+  handleViewUserDetails: () => void;
+}
+
 /**
- * Hook để quản lý và lấy dữ liệu tài khoản bot
+ * Hook to manage and fetch bot account data
  * 
- * @param botId ID của bot (BOT-XXX, PREMIUM-XXX, PROP-XXX)
- * @param userId ID của người dùng (chuẩn hóa thành USR-XXX)
- * @param initialData Dữ liệu tài khoản ban đầu (tùy chọn)
- * @returns Dữ liệu tài khoản và các hàm quản lý
+ * @param botId Bot ID (BOT-XXX, PREMIUM-XXX, PROP-XXX)
+ * @param userId User ID (normalized to USR-XXX)
+ * @param initialData Initial account data (optional)
+ * @returns Account data and management functions
  */
-export function useBotAccounts(botId: string, userId: string, initialData: Account[] = []) {
+export function useBotAccounts(
+  botId: string, 
+  userId: string, 
+  initialData: Account[] = []
+): UseBotAccountsReturn {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [error, setError] = useState<Error | null>(null);
   
-  // Use our safe loading hook instead of raw useState
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 3000,
     initialState: true,
     debugComponent: 'BotAccountsTable'
   });
 
+  // Filter accounts based on normalized userId
+  const filterAccountsByUserId = useCallback((accountsData: Account[], normalizedUserId: string) => {
+    return accountsData.filter(account => {
+      if (!account.cspUserId) {
+        console.warn(`BotAccountsTable - Account ${account.cspAccountId} is missing cspUserId`);
+        return false;
+      }
+      
+      const normalizedAccountUserId = normalizeUserId(account.cspUserId);
+      const match = normalizedAccountUserId === normalizedUserId;
+      console.log(`Comparing: ${account.cspUserId} (${normalizedAccountUserId}) with ${userId} (${normalizedUserId}) - Match: ${match}`);
+      return match;
+    });
+  }, [userId]);
+
+  // Fetch accounts data
   const fetchAccounts = useCallback(() => {
-    // Validate userId trước khi xử lý
+    // Validate userId before processing
     if (!validateUserId(userId)) {
       console.warn(`BotAccountsTable - Invalid userId format: ${userId}, should be in format USR-XXX`);
       // We still proceed but with a warning
@@ -97,91 +128,58 @@ export function useBotAccounts(botId: string, userId: string, initialData: Accou
     startLoading();
     setError(null);
     
-    try {
-      setTimeout(() => {
-        try {
-          if (!userId) {
-            console.error('BotAccountsTable - No userId provided for filtering accounts');
-            stopLoading();
-            setAccounts([]);
-            return;
-          }
-          
-          // Sử dụng normalizeUserId để chuẩn hóa
-          const normalizedInputUserId = normalizeUserId(userId);
-          console.log(`BotAccountsTable - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
-          
-          // Log tất cả userIds có sẵn để debug
-          const availableUserIds = initialData.length > 0 
-            ? initialData.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`)
-            : mockAccounts.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`);
-          
-          console.log(`BotAccountsTable - Available userIds: ${availableUserIds.join(', ')}`);
-          
-          try {
-            if (initialData && initialData.length > 0) {
-              console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
-              
-              // Sử dụng so sánh chuẩn hóa với công cụ của chúng ta
-              const filteredAccounts = initialData.filter(account => {
-                if (!account.cspUserId) {
-                  console.warn(`BotAccountsTable - Account ${account.cspAccountId} is missing cspUserId`);
-                  return false;
-                }
-                
-                const normalizedAccountUserId = normalizeUserId(account.cspUserId);
-                const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`Comparing: ${account.cspUserId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-                return match;
-              });
-              
-              console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
-              setAccounts(filteredAccounts);
-            } else {
-              console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
-              
-              // Sử dụng so sánh chuẩn hóa với công cụ của chúng ta
-              const filteredAccounts = mockAccounts.filter(account => {
-                if (!account.cspUserId) {
-                  console.warn(`BotAccountsTable - Account ${account.cspAccountId} is missing cspUserId`);
-                  return false;
-                }
-                
-                const normalizedAccountUserId = normalizeUserId(account.cspUserId);
-                const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`Comparing: ${account.cspUserId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-                return match;
-              });
-              
-              console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
-              setAccounts(filteredAccounts);
-            }
-          } catch (filterErr) {
-            console.error('Error filtering accounts:', filterErr);
-            setError(filterErr instanceof Error ? filterErr : new Error('Error filtering accounts data'));
-            setAccounts([]);
-          }
-        } catch (innerError) {
-          console.error('Error processing accounts data:', innerError);
-          setError(innerError instanceof Error ? innerError : new Error('An error occurred while processing accounts'));
+    // Simulate API call
+    setTimeout(() => {
+      try {
+        if (!userId) {
+          console.error('BotAccountsTable - No userId provided for filtering accounts');
           setAccounts([]);
-        } finally {
-          // Always set loading to false regardless of success or error
-          stopLoading();
+          return;
         }
-      }, 800);
-    } catch (err) {
-      console.error('Error fetching accounts:', err);
-      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
-      stopLoading();
-    }
-  }, [botId, userId, initialData, startLoading, stopLoading]);
+        
+        // Use normalizeUserId for standardization
+        const normalizedInputUserId = normalizeUserId(userId);
+        console.log(`BotAccountsTable - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
+        
+        // Log available userIds for debugging
+        const dataSource = initialData.length > 0 ? initialData : mockAccounts;
+        const availableUserIds = dataSource.map(acc => 
+          `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`
+        );
+        
+        console.log(`BotAccountsTable - Available userIds: ${availableUserIds.join(', ')}`);
+        
+        // Filter accounts based on normalized userId
+        let filteredAccounts: Account[] = [];
+        
+        if (initialData && initialData.length > 0) {
+          console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
+          filteredAccounts = filterAccountsByUserId(initialData, normalizedInputUserId);
+          console.log(`BotAccountsTable - Filtered accounts from initialData: ${filteredAccounts.length}`);
+        } else {
+          console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
+          filteredAccounts = filterAccountsByUserId(mockAccounts, normalizedInputUserId);
+          console.log(`BotAccountsTable - Filtered accounts from mockData: ${filteredAccounts.length}`);
+        }
+        
+        setAccounts(filteredAccounts);
+      } catch (err) {
+        console.error('Error processing accounts data:', err);
+        setError(err instanceof Error ? err : new Error('An error occurred while processing accounts'));
+        setAccounts([]);
+      } finally {
+        stopLoading();
+      }
+    }, 800);
+  }, [botId, userId, initialData, startLoading, stopLoading, filterAccountsByUserId]);
 
+  // Handle refresh action
   const handleRefresh = () => {
     toast.info('Refreshing accounts data...');
     fetchAccounts();
   };
 
+  // Handle view user details action
   const handleViewUserDetails = () => {
     try {
       navigate('/profile');
