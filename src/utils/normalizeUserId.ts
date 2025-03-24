@@ -1,82 +1,103 @@
 /**
- * Normalizes user ID format across the application
- * @param userId Raw user identifier 
- * @returns Normalized user ID
+ * Utility functions for handling user IDs in the application
+ * 
+ * These functions ensure consistent formatting and validation of user IDs
+ * across the entire application, preventing issues with data filtering and comparison.
+ */
+
+/**
+ * Normalizes a user ID for consistent comparison
+ * 
+ * This function standardizes user IDs to a consistent format (USR-XXX with dash)
+ * to ensure proper data filtering and comparisons throughout the application.
+ * 
+ * @param userId The user ID to normalize
+ * @returns Normalized user ID string in the format USR-XXX
  */
 export const normalizeUserId = (userId: string): string => {
-  // If the ID includes a colon (e.g., "user:123"), extract the part after the colon
-  if (userId.includes(':')) {
-    return userId.split(':')[1];
+  if (!userId) return '';
+  
+  // Strip any whitespace
+  const trimmed = userId.trim();
+  
+  // Already in standard format
+  if (/^USR-\d{3,}$/i.test(trimmed)) {
+    // Just ensure consistent case (USR- prefix)
+    return trimmed.replace(/^usr-/i, 'USR-');
   }
   
-  // If starts with "user_", remove that prefix
-  if (userId.startsWith('user_')) {
-    return userId.substring(5);
+  // Handle format without dash (USR123 -> USR-123)
+  if (/^USR\d{3,}$/i.test(trimmed)) {
+    const numeric = trimmed.replace(/^USR/i, '');
+    return `USR-${numeric}`;
   }
   
-  return userId;
+  // If it's just a numeric ID, add prefix
+  if (/^\d{3,}$/.test(trimmed)) {
+    return `USR-${trimmed}`;
+  }
+  
+  // For other formats, return the trimmed value with standardized prefix
+  // This ensures we preserve the original ID but with consistent formatting
+  if (/^USR/i.test(trimmed)) {
+    // Format is already like USR but with possibly different structure
+    return trimmed.replace(/^usr/i, 'USR-').replace(/-+/, '-');
+  }
+  
+  // If nothing matches, assume it's a raw ID that needs USR- prefix
+  return `USR-${trimmed}`;
 };
 
 /**
- * Validates a user ID
- * @param userId User identifier to validate
- * @returns True if the user ID is valid
+ * Validates if a user ID follows the expected format
+ * 
+ * The expected format is USR-XXX where XXX is a numeric sequence.
+ * This function helps ensure data consistency and proper filtering.
+ * 
+ * @param userId The user ID to validate
+ * @returns Boolean indicating if the user ID is valid
  */
 export const validateUserId = (userId: string): boolean => {
-  // Simple validation: user ID must be at least 3 characters
-  // and follow certain format patterns
-  if (!userId || userId.length < 3) {
-    return false;
-  }
+  if (!userId) return false;
   
-  // USR-XXX format validation
-  const usrPattern = /^USR-\d{3}$/;
-  if (usrPattern.test(userId)) {
-    return true;
-  }
+  // Normalize the user ID first
+  const normalizedId = normalizeUserId(userId);
   
-  // user-XXX format validation
-  const userDashPattern = /^user-\d{3}$/;
-  if (userDashPattern.test(userId)) {
-    return true;
-  }
-  
-  // user_XXX format validation
-  const userUnderscorePattern = /^user_\d{3}$/;
-  if (userUnderscorePattern.test(userId)) {
-    return true;
-  }
-  
-  // user:XXX format validation
-  const userColonPattern = /^user:\d{3}$/;
-  if (userColonPattern.test(userId)) {
-    return true;
-  }
-  
-  // Other user ID formats can be added here
-  const alphanumericPattern = /^[a-zA-Z0-9-_:]{3,}$/;
-  return alphanumericPattern.test(userId);
+  // Check if the ID follows the expected pattern (USR-XXX format)
+  return /^USR-\d{3,}$/i.test(normalizedId);
 };
 
 /**
- * Validates a bot ID
- * @param botId Bot identifier to validate
- * @returns True if the bot ID is valid
+ * Validates if a bot ID follows the expected format
+ * 
+ * Bot IDs can follow different patterns based on bot type: BOT-XXX, PREMIUM-XXX, PROP-XXX, etc.
+ * 
+ * @param botId The bot ID to validate
+ * @returns Boolean indicating if the bot ID is valid
  */
 export const validateBotId = (botId: string): boolean => {
-  // Simple validation: bot ID must be at least 5 characters
-  // and follow certain format patterns
-  if (!botId || botId.length < 5) {
-    return false;
-  }
+  if (!botId) return false;
   
-  // PROP-XXX format validation
-  const propBotPattern = /^PROP-\d{3}$/;
-  if (propBotPattern.test(botId)) {
-    return true;
-  }
+  // Strip any whitespace
+  const trimmed = botId.trim();
   
-  // Other bot ID formats can be added here
-  const alphanumericPattern = /^[a-zA-Z0-9-_]{5,}$/;
-  return alphanumericPattern.test(botId);
+  // Check if the ID follows one of the expected patterns
+  // Bot IDs can be in different formats: BOT-XXX, USER-BOTS, PREMIUM-BOTS, etc.
+  return /^(BOT-|USER-|PREMIUM-|PROP-)[\w-]+$/i.test(trimmed);
+};
+
+/**
+ * Normalizes a bot ID for consistent comparison
+ * 
+ * @param botId The bot ID to normalize
+ * @returns Normalized bot ID string
+ */
+export const normalizeBotId = (botId: string): string => {
+  if (!botId) return '';
+  
+  // Strip any whitespace
+  const trimmed = botId.trim();
+  
+  // We keep the original case for bot IDs
+  return trimmed;
 };
