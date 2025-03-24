@@ -13,6 +13,7 @@ interface ErrorSignalsTableProps {
   errorSignals: ExtendedSignal[];
   unreadErrors: Set<string>;
   onMarkAsRead: (signalId: string) => void;
+  onMarkAllAsRead?: () => void;
   loading: boolean;
   onRefresh?: () => void;
   error?: Error | null;
@@ -22,6 +23,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   errorSignals, 
   unreadErrors, 
   onMarkAsRead, 
+  onMarkAllAsRead,
   loading,
   onRefresh,
   error
@@ -108,14 +110,19 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
             <AlertTriangle className="h-4 w-4 mr-2" />
             <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
           </p>
-          {onRefresh && (
-            <div className="mt-2 flex justify-end">
+          <div className="mt-2 flex justify-end gap-2">
+            {onMarkAllAsRead && unreadErrors.size > 0 && (
+              <Button variant="outline" size="sm" onClick={onMarkAllAsRead} className="text-xs">
+                Mark all as read
+              </Button>
+            )}
+            {onRefresh && (
               <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs">
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Làm mới dữ liệu
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </ErrorBoundary>

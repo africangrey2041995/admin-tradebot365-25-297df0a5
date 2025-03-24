@@ -11,6 +11,7 @@ export interface ErrorSignalsTableProps {
   errorSignals: ExtendedSignal[];
   unreadErrors: Set<string>;
   onMarkAsRead: (signalId: string) => void;
+  onMarkAllAsRead?: () => void; // Added this property as optional
   loading: boolean;
   onRefresh?: () => void;
   error?: Error | null;
