@@ -45,7 +45,7 @@ const SignalInformation: React.FC<SignalInformationProps> = ({
         {showToken && (
           <CopyableField
             label="Signal Token"
-            value={signal.signalToken || 'N/A'}
+            value={signal.signalToken}
             tooltip="Security token to validate signal authenticity"
             className="col-span-2"
             onCopy={onCopy}
@@ -53,7 +53,7 @@ const SignalInformation: React.FC<SignalInformationProps> = ({
         )}
         <CopyableField
           label="Max Lag"
-          value={signal.maxLag || 'N/A'}
+          value={signal.maxLag}
           tooltip="Maximum allowed delay for signal processing in milliseconds"
           onCopy={onCopy}
         />

@@ -1,412 +1,1069 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Box, Copy, RefreshCw, Server } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Bot, 
+  Save, 
+  CheckCircle2,
+  CircleAlert, 
+  BarChart2, 
+  TrendingUp,
+  AlertTriangle,
+  Users,
+  DollarSign,
+  Edit3,
+  X,
+  Plus,
+  Trash2
+} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ADMIN_ROUTES } from '@/constants/routes';
-import { BotRiskLevel, BotStatus, BOT_RISK_DISPLAY, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
-import { toast } from 'sonner';
-import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from '@/components/ui/switch';
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
+import TradingViewLogs from '@/components/bots/TradingViewLogs';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
-// Dummy user ID for demo
-const ADMIN_USER_ID = 'ADM-001';
+const propTradingBots = [
+  {
+    id: 'ptb-001',
+    name: 'Prop Master',
+    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+11.2%',
+    performanceAllTime: '+45.8%',
+    risk: 'low',
+    minCapital: '$500',
+    status: 'active',
+    subscribers: 120,
+    imageUrl: null,
+    colorScheme: 'blue',
+    features: [
+      'Tối ưu hóa để vượt qua các bài kiểm tra Prop Trading',
+      'Quản lý rủi ro tự động theo yêu cầu của Coinstrat Pro',
+      'Báo cáo hiệu suất chi tiết theo các tiêu chí đánh giá Prop Trading',
+      'Chiến lược giao dịch nhất quán với tỷ lệ win cao'
+    ],
+    requirements: [
+      'Vốn tối thiểu $500',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp với giai đoạn Challenger hoặc Verification'
+    ]
+  },
+  {
+    id: 'ptb-002',
+    name: 'Risk Manager Pro',
+    description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+8.5%',
+    performanceAllTime: '+38.9%',
+    risk: 'low',
+    minCapital: '$700',
+    status: 'active',
+    subscribers: 95,
+    imageUrl: null,
+    colorScheme: 'green',
+    features: [
+      'Kiểm soát chặt chẽ tỷ lệ rủi ro trên từng giao dịch',
+      'Giữ mức drawdown tối đa dưới 5%',
+      'Tự động điều chỉnh kích thước vị thế dựa trên biến động thị trường',
+      'Báo cáo phân tích rủi ro chi tiết'
+    ],
+    requirements: [
+      'Vốn tối thiểu $700',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp cho giai đoạn Verification hoặc Funded'
+    ]
+  },
+  {
+    id: 'ptb-003',
+    name: 'Consistent Trader',
+    description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
+    exchange: 'Coinstrat Pro',
+    type: 'prop',
+    performanceLastMonth: '+9.7%',
+    performanceAllTime: '+42.3%',
+    risk: 'medium',
+    status: 'active',
+    minCapital: '$600',
+    subscribers: 83,
+    imageUrl: null,
+    colorScheme: 'purple',
+    features: [
+      'Tính nhất quán cao trong mọi điều kiện thị trường',
+      'Tỷ lệ win/loss ổn định trên 65%',
+      'Thời gian nắm giữ giao dịch tối ưu',
+      'Cơ chế tự động tránh các sự kiện thị trường biến động mạnh'
+    ],
+    requirements: [
+      'Vốn tối thiểu $600',
+      'Tài khoản Coinstrat Pro đã xác minh',
+      'Phù hợp với tất cả các giai đoạn Prop Trading'
+    ]
+  }
+];
 
-const PropBotDetail = () => {
+const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [loading, setLoading] = useState(true);
-  const [botData, setBotData] = useState<any>(null);
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const [logs, setLogs] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Simulate API fetch
-    setTimeout(() => {
-      // Mock data for a single prop bot
-      setBotData({
-        botId: botId || 'PROP-001',
-        name: 'FTMO Challenger Pro',
-        description: 'Bot đặc biệt thiết kế để vượt qua FTMO Challenge với tỷ lệ thành công cao.',
-        type: 'prop',
-        status: BotStatus.ACTIVE,
-        exchange: 'FTMO',
-        risk: BotRiskLevel.MEDIUM,
-        performanceLastMonth: '+8.5%',
-        performanceAllTime: '+32.7%',
-        users: 42,
-        minCapital: '$5,000',
-        profit: '+8.5%',
-        propFirm: 'FTMO',
-        createdDate: '2023-08-15',
-        lastUpdated: '2023-11-22',
-        maxDrawdown: '4.2%',
-        challengeDuration: '30 ngày',
-        accountSizes: ['$10K', '$25K', '$50K', '$100K'],
-        apiKey: 'prop_api_' + Math.random().toString(36).substring(2, 15),
-        webhookUrl: 'https://api.example.com/webhook/prop-trading/' + botId,
-      });
-
-      // Mock accounts data
-      setAccounts([
-        {
-          id: 'ACC-001',
-          name: 'FTMO Challenge Account',
-          exchange: 'FTMO',
-          userId: 'USR-042',
-          userName: 'John Trader',
-          status: 'active',
-          balance: '$10,240',
-          profit: '+5.2%',
-          lastSync: '2023-11-20T14:32:00Z'
-        },
-        {
-          id: 'ACC-002',
-          name: 'FundedNext Account',
-          exchange: 'FundedNext',
-          userId: 'USR-018',
-          userName: 'Sarah Investor',
-          status: 'active',
-          balance: '$25,840',
-          profit: '+3.7%',
-          lastSync: '2023-11-21T09:15:00Z'
-        }
-      ]);
-
-      // Mock logs data
-      setLogs([
-        {
-          id: 'SIG-001',
-          timestamp: new Date().toISOString(),
-          action: 'BUY',
-          instrument: 'EURUSD',
-          amount: '0.5 lot',
-          status: 'completed',
-          processedAccounts: [{ id: 'ACC-001', name: 'FTMO Challenge Account' }],
-          failedAccounts: [],
-          originalSignalId: 'TB365-12345'
-        },
-        {
-          id: 'SIG-002',
-          timestamp: new Date(Date.now() - 86400000).toISOString(),
-          action: 'SELL',
-          instrument: 'GBPUSD',
-          amount: '0.3 lot',
-          status: 'completed',
-          processedAccounts: [
-            { id: 'ACC-001', name: 'FTMO Challenge Account' },
-            { id: 'ACC-002', name: 'FundedNext Account' }
-          ],
-          failedAccounts: [],
-          originalSignalId: 'TB365-12346'
-        }
-      ]);
-      
-      setLoading(false);
-    }, 1000);
-  }, [botId]);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  
+  const initialBot = propTradingBots.find(b => b.id === botId) || propTradingBots[0];
+  const [bot, setBot] = useState(initialBot);
+  
+  const [editingGeneral, setEditingGeneral] = useState(false);
+  const [editingFeatures, setEditingFeatures] = useState(false);
+  const [editingRequirements, setEditingRequirements] = useState(false);
+  const [editingPerformance, setEditingPerformance] = useState(false);
+  const [editingBotInfo, setEditingBotInfo] = useState(false);
+  
+  const [generalForm, setGeneralForm] = useState({
+    name: bot.name,
+    description: bot.description,
+    exchange: bot.exchange,
+    risk: bot.risk,
+    minCapital: bot.minCapital,
+    status: bot.status,
+    colorScheme: bot.colorScheme
+  });
+  
+  const [featuresForm, setFeaturesForm] = useState([...bot.features]);
+  const [requirementsForm, setRequirementsForm] = useState([...bot.requirements]);
+  
+  const [performanceForm, setPerformanceForm] = useState({
+    performanceLastMonth: bot.performanceLastMonth,
+    performanceAllTime: bot.performanceAllTime
+  });
+  
+  const [newFeature, setNewFeature] = useState('');
+  const [newRequirement, setNewRequirement] = useState('');
+  
+  const [botInfoForm, setBotInfoForm] = useState({
+    exchange: bot.exchange,
+    type: 'Prop Trading',
+    status: bot.status,
+    id: bot.id,
+    subscribers: bot.subscribers.toString()
+  });
+  
+  const colorSchemeClasses = {
+    blue: {
+      badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-900/10',
+      icon: 'text-blue-500 dark:text-blue-400',
+      border: 'border-blue-200 dark:border-blue-800/30'
+    },
+    green: {
+      badge: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400',
+      bg: 'bg-green-50 dark:bg-green-900/10',
+      icon: 'text-green-500 dark:text-green-400',
+      border: 'border-green-200 dark:border-green-800/30'
+    },
+    purple: {
+      badge: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400',
+      bg: 'bg-purple-50 dark:bg-purple-900/10',
+      icon: 'text-purple-500 dark:text-purple-400',
+      border: 'border-purple-200 dark:border-purple-800/30'
+    },
+    red: {
+      badge: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-900/10',
+      icon: 'text-red-500 dark:text-red-400',
+      border: 'border-red-200 dark:border-red-800/30'
+    },
+    default: {
+      badge: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400',
+      bg: 'bg-slate-50 dark:bg-slate-900/10',
+      icon: 'text-slate-500 dark:text-slate-400',
+      border: 'border-slate-200 dark:border-slate-800/30'
+    }
   };
-
-  const handleRefresh = () => {
-    setLoading(true);
-    // Simulate refetch
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Dữ liệu đã được cập nhật thành công!');
-    }, 1000);
+  
+  const getColorByRisk = (risk: string) => {
+    switch (risk) {
+      case 'low': return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400';
+      case 'medium': return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400';
+      case 'high': return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
+      default: return 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400';
+    }
   };
-
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${label} đã được sao chép!`);
+  
+  const riskLabel = {
+    'low': 'Thấp',
+    'medium': 'Trung bình',
+    'high': 'Cao'
+  }[bot.risk as 'low' | 'medium' | 'high'] || '';
+  
+  const riskColor = getColorByRisk(bot.risk);
+  const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
+  
+  const saveGeneralInfo = () => {
+    setBot({
+      ...bot,
+      name: generalForm.name,
+      description: generalForm.description,
+      exchange: generalForm.exchange,
+      risk: generalForm.risk,
+      minCapital: generalForm.minCapital,
+      status: generalForm.status,
+      colorScheme: generalForm.colorScheme
+    });
+    setEditingGeneral(false);
+    toast.success('Thông tin chung đã được cập nhật');
   };
-
-  if (loading && !botData) {
-    return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg">Đang tải...</span>
-      </div>
-    );
-  }
-
-  if (!botData) {
-    return (
-      <div className="space-y-4">
+  
+  const saveFeatures = () => {
+    const updatedFeatures = [...featuresForm];
+    if (newFeature.trim()) {
+      updatedFeatures.push(newFeature.trim());
+      setNewFeature('');
+    }
+    
+    setBot({
+      ...bot,
+      features: updatedFeatures
+    });
+    setFeaturesForm(updatedFeatures);
+    setEditingFeatures(false);
+    toast.success('Tính năng đã được cập nhật');
+  };
+  
+  const saveRequirements = () => {
+    const updatedRequirements = [...requirementsForm];
+    if (newRequirement.trim()) {
+      updatedRequirements.push(newRequirement.trim());
+      setNewRequirement('');
+    }
+    
+    setBot({
+      ...bot,
+      requirements: updatedRequirements
+    });
+    setRequirementsForm(updatedRequirements);
+    setEditingRequirements(false);
+    toast.success('Yêu cầu đã được cập nhật');
+  };
+  
+  const savePerformance = () => {
+    setBot({
+      ...bot,
+      performanceLastMonth: performanceForm.performanceLastMonth,
+      performanceAllTime: performanceForm.performanceAllTime
+    });
+    setEditingPerformance(false);
+    toast.success('Hiệu suất đã được cập nhật');
+  };
+  
+  const saveBotInfo = () => {
+    setBot({
+      ...bot,
+      exchange: botInfoForm.exchange,
+      status: botInfoForm.status,
+      subscribers: parseInt(botInfoForm.subscribers, 10)
+    });
+    setEditingBotInfo(false);
+    toast.success('Thông tin bot đã được cập nhật');
+  };
+  
+  const removeFeature = (index: number) => {
+    const updated = [...featuresForm];
+    updated.splice(index, 1);
+    setFeaturesForm(updated);
+  };
+  
+  const removeRequirement = (index: number) => {
+    const updated = [...requirementsForm];
+    updated.splice(index, 1);
+    setRequirementsForm(updated);
+  };
+  
+  const cancelGeneral = () => {
+    setGeneralForm({
+      name: bot.name,
+      description: bot.description,
+      exchange: bot.exchange,
+      risk: bot.risk,
+      minCapital: bot.minCapital,
+      status: bot.status,
+      colorScheme: bot.colorScheme
+    });
+    setEditingGeneral(false);
+  };
+  
+  const cancelFeatures = () => {
+    setFeaturesForm([...bot.features]);
+    setNewFeature('');
+    setEditingFeatures(false);
+  };
+  
+  const cancelRequirements = () => {
+    setRequirementsForm([...bot.requirements]);
+    setNewRequirement('');
+    setEditingRequirements(false);
+  };
+  
+  const cancelPerformance = () => {
+    setPerformanceForm({
+      performanceLastMonth: bot.performanceLastMonth,
+      performanceAllTime: bot.performanceAllTime
+    });
+    setEditingPerformance(false);
+  };
+  
+  const cancelBotInfo = () => {
+    setBotInfoForm({
+      exchange: bot.exchange,
+      type: 'Prop Trading',
+      status: bot.status,
+      id: bot.id,
+      subscribers: bot.subscribers.toString()
+    });
+    setEditingBotInfo(false);
+  };
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
             size="icon"
-            onClick={() => navigate(ADMIN_ROUTES.PROP_BOTS)}
+            onClick={() => navigate('/admin/prop-bots')}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">Bot không tồn tại</h1>
+          <h1 className="text-2xl font-bold text-white">
+            {bot.name}
+          </h1>
         </div>
-        <p>Bot với ID {botId} không tồn tại hoặc bạn không có quyền truy cập.</p>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Xóa Bot
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xác nhận xóa Bot</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn xóa bot "{bot.name}"? Hành động này không thể hoàn tác.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {}}>Hủy</Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  toast.success(`Bot ${bot.name} đã được xóa`);
+                  navigate('/admin/prop-bots');
+                }}
+              >
+                Xóa Bot
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => navigate(ADMIN_ROUTES.PROP_BOTS)}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <div className="flex items-center">
-                <h1 className="text-2xl font-bold mr-2">{botData.name}</h1>
-                <Badge 
-                  variant={botData.status === BotStatus.ACTIVE ? "default" : "secondary"}
-                >
-                  {BOT_STATUS_DISPLAY[botData.status as BotStatus]}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">{botData.propFirm} - Bot ID: {botData.botId}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handleRefresh}
-              disabled={loading}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Làm mới
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(`${ADMIN_ROUTES.PROP_BOTS}/edit/${botId}`)}
-            >
-              Chỉnh sửa
-            </Button>
-          </div>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-            <TabsTrigger value="api-integration">API tích hợp</TabsTrigger>
-            <TabsTrigger value="bot-details">Chi tiết Bot</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Thông tin Bot</CardTitle>
+      
+      <Tabs defaultValue="details" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="details">Chi tiết</TabsTrigger>
+          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="details" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle>Thông tin chung</CardTitle>
+                    <CardDescription>
+                      Thông tin cơ bản về Prop Trading Bot
+                    </CardDescription>
+                  </div>
+                  {!editingGeneral ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingGeneral(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelGeneral}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveGeneralInfo}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
-                      <p>{botData.description}</p>
+                  {!editingGeneral ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Avatar className={`h-14 w-14 ${colors.bg} ${colors.border} border-2`}>
+                          <AvatarFallback className={colors.icon}>
+                            <Bot className="h-6 w-6" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold">{bot.name}</h3>
+                          <p className="text-muted-foreground">{bot.description}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        <Badge variant="outline" className={riskColor}>
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          Rủi ro: {riskLabel}
+                        </Badge>
+                        <Badge variant="outline" className={colors.badge}>
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          Vốn tối thiểu: {bot.minCapital}
+                        </Badge>
+                        <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400">
+                          <Users className="h-3 w-3 mr-1" />
+                          {bot.subscribers} người đăng ký
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Prop Firm</p>
-                      <p>{botData.propFirm}</p>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Tên Bot</Label>
+                          <Input 
+                            id="name" 
+                            value={generalForm.name} 
+                            onChange={(e) => setGeneralForm({...generalForm, name: e.target.value})}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="exchange">Sàn giao dịch</Label>
+                          <Input 
+                            id="exchange" 
+                            value={generalForm.exchange} 
+                            onChange={(e) => setGeneralForm({...generalForm, exchange: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Mô tả</Label>
+                        <Textarea 
+                          id="description" 
+                          value={generalForm.description} 
+                          onChange={(e) => setGeneralForm({...generalForm, description: e.target.value})}
+                          rows={3}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="risk">Mức độ rủi ro</Label>
+                          <Select 
+                            value={generalForm.risk} 
+                            onValueChange={(value) => setGeneralForm({...generalForm, risk: value})}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn mức độ rủi ro" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">Thấp</SelectItem>
+                              <SelectItem value="medium">Trung bình</SelectItem>
+                              <SelectItem value="high">Cao</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="minCapital">Vốn tối thiểu</Label>
+                          <Input 
+                            id="minCapital" 
+                            value={generalForm.minCapital} 
+                            onChange={(e) => setGeneralForm({...generalForm, minCapital: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="colorScheme">Màu sắc</Label>
+                          <Select 
+                            value={generalForm.colorScheme} 
+                            onValueChange={(value) => setGeneralForm({...generalForm, colorScheme: value})}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn màu sắc" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="blue">Xanh dương</SelectItem>
+                              <SelectItem value="green">Xanh lá</SelectItem>
+                              <SelectItem value="purple">Tím</SelectItem>
+                              <SelectItem value="red">Đỏ</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="status">Trạng thái</Label>
+                          <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <Label htmlFor="status">Bot đang hoạt động</Label>
+                            </div>
+                            <Switch 
+                              id="status" 
+                              checked={generalForm.status === 'active'}
+                              onCheckedChange={(checked) => 
+                                setGeneralForm({
+                                  ...generalForm, 
+                                  status: checked ? 'active' : 'inactive'
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Mức độ rủi ro</p>
-                      <Badge className="mt-1" variant="outline">{BOT_RISK_DISPLAY[botData.risk as BotRiskLevel]}</Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Vốn tối thiểu</p>
-                      <p>{botData.minCapital}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Số người dùng</p>
-                      <p>{botData.users}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Hiệu suất tháng trước</p>
-                      <p className="text-green-600">{botData.performanceLastMonth}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Max Drawdown</p>
-                      <p>{botData.maxDrawdown}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Thời gian challenge</p>
-                      <p>{botData.challengeDuration}</p>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
               
               <Card>
-                <CardHeader>
-                  <CardTitle>Thông tin quản lý</CardTitle>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                      Tính năng
+                    </CardTitle>
+                    <CardDescription>
+                      Các tính năng chính của bot
+                    </CardDescription>
+                  </div>
+                  {!editingFeatures ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingFeatures(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelFeatures}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveFeatures}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
-                      <p>{new Date(botData.createdDate).toLocaleDateString('vi-VN')}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Cập nhật cuối</p>
-                      <p>{new Date(botData.lastUpdated).toLocaleDateString('vi-VN')}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Account Sizes</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {botData.accountSizes.map((size: string) => (
-                          <Badge key={size} variant="outline">{size}</Badge>
-                        ))}
+                  {!editingFeatures ? (
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                      {bot.features.map((feature, index) => (
+                        <li key={index}>{feature}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="space-y-4">
+                      {featuresForm.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Input 
+                            value={feature} 
+                            onChange={(e) => {
+                              const updated = [...featuresForm];
+                              updated[index] = e.target.value;
+                              setFeaturesForm(updated);
+                            }} 
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeFeature(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Thêm tính năng mới" 
+                          value={newFeature}
+                          onChange={(e) => setNewFeature(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newFeature.trim()) {
+                              e.preventDefault();
+                              setFeaturesForm([...featuresForm, newFeature.trim()]);
+                              setNewFeature('');
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => {
+                            if (newFeature.trim()) {
+                              setFeaturesForm([...featuresForm, newFeature.trim()]);
+                              setNewFeature('');
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
+                      Yêu cầu
+                    </CardTitle>
+                    <CardDescription>
+                      Các yêu cầu để sử dụng bot
+                    </CardDescription>
                   </div>
+                  {!editingRequirements ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingRequirements(true)}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelRequirements}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveRequirements}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  {!editingRequirements ? (
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                      {bot.requirements.map((req, index) => (
+                        <li key={index}>{req}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="space-y-4">
+                      {requirementsForm.map((req, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Input 
+                            value={req} 
+                            onChange={(e) => {
+                              const updated = [...requirementsForm];
+                              updated[index] = e.target.value;
+                              setRequirementsForm(updated);
+                            }} 
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeRequirement(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Thêm yêu cầu mới" 
+                          value={newRequirement}
+                          onChange={(e) => setNewRequirement(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newRequirement.trim()) {
+                              e.preventDefault();
+                              setRequirementsForm([...requirementsForm, newRequirement.trim()]);
+                              setNewRequirement('');
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => {
+                            if (newRequirement.trim()) {
+                              setRequirementsForm([...requirementsForm, newRequirement.trim()]);
+                              setNewRequirement('');
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="api-integration" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Thông tin API tích hợp</CardTitle>
-                <CardDescription>
-                  Sử dụng thông tin dưới đây để tích hợp bot Prop Trading với hệ thống của bạn
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="webhook-url">Webhook URL</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="webhook-url"
-                      value={botData.webhookUrl}
-                      readOnly
-                      className="font-mono text-sm bg-muted"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => copyToClipboard(botData.webhookUrl, 'Webhook URL')}
+            
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center">
+                      <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
+                      Hiệu suất
+                    </CardTitle>
+                    <CardDescription>
+                      Dữ liệu hiệu suất giao dịch
+                    </CardDescription>
+                  </div>
+                  {!editingPerformance ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingPerformance(true)}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
                     </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelPerformance}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={savePerformance}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  {!editingPerformance ? (
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất tháng trước</div>
+                        <div className="text-2xl font-bold mt-1 flex items-center">
+                          {bot.performanceLastMonth}
+                          <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                        </div>
+                      </div>
+                      
+                      <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất từ đầu</div>
+                        <div className="text-2xl font-bold mt-1 flex items-center">
+                          {bot.performanceAllTime}
+                          <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="performanceLastMonth">Hiệu suất tháng trước</Label>
+                        <Input 
+                          id="performanceLastMonth" 
+                          value={performanceForm.performanceLastMonth} 
+                          onChange={(e) => setPerformanceForm({...performanceForm, performanceLastMonth: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="performanceAllTime">Hiệu suất từ đầu</Label>
+                        <Input 
+                          id="performanceAllTime" 
+                          value={performanceForm.performanceAllTime} 
+                          onChange={(e) => setPerformanceForm({...performanceForm, performanceAllTime: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-start justify-between pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="text-base">Thông tin Bot</CardTitle>
+                    <CardDescription>
+                      Thông tin chi tiết về bot
+                    </CardDescription>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Sử dụng URL này để nhận tín hiệu từ hệ thống Prop Trading của bạn
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="api-key">API Key</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="api-key"
-                      value={botData.apiKey}
-                      readOnly
-                      className="font-mono text-sm bg-muted"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => copyToClipboard(botData.apiKey, 'API Key')}
+                  {!editingBotInfo ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setEditingBotInfo(true)}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
                     </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Sử dụng API Key này để xác thực các yêu cầu webhook
-                  </p>
-                </div>
-
-                <Separator />
-
-                <div className="bg-muted p-4 rounded-md border">
-                  <div className="flex items-center mb-2">
-                    <Server className="h-5 w-5 mr-2 text-primary" />
-                    <h3 className="font-medium">Ví dụ cấu trúc webhook</h3>
-                  </div>
-                  <div className="bg-card p-3 rounded-md overflow-x-auto">
-                    <pre className="text-xs">
-{`POST ${botData.webhookUrl}
-Content-Type: application/json
-X-API-Key: ${botData.apiKey}
-
-{
-  "signal": {
-    "instrument": "EURUSD",
-    "action": "BUY",
-    "amount": "0.5",
-    "price": 1.0921,
-    "signalId": "TB365-12345",
-    "timestamp": "${new Date().toISOString()}"
-  }
-}`}
-                    </pre>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="font-medium">Trạng thái API</h3>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span>Đang hoạt động</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <Button variant="outline" onClick={() => toast.success('API Key đã được tạo mới!')}>
-                      Tạo mới API Key
-                    </Button>
-                    <Button variant="destructive" onClick={() => toast.success('API Key đã bị vô hiệu hóa!')}>
-                      Vô hiệu hóa API
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={cancelBotInfo}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Hủy
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={saveBotInfo}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Lưu
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {!editingBotInfo ? (
+                    <>
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Sàn giao dịch
+                        </div>
+                        <div className="mt-1">{bot.exchange}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Loại bot
+                        </div>
+                        <div className="mt-1">Prop Trading</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Trạng thái
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <span className={`inline-block w-2 h-2 rounded-full ${bot.status === 'active' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></span>
+                          {bot.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          ID Bot
+                        </div>
+                        <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
+                          {bot.id}
+                        </code>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                          Người đăng ký
+                        </div>
+                        <div className="mt-1 flex items-center">
+                          <Users className="h-4 w-4 mr-1 text-slate-400" />
+                          {bot.subscribers} người dùng
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="exchange">Sàn giao dịch</Label>
+                        <Input 
+                          id="exchange" 
+                          value={botInfoForm.exchange} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, exchange: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="type">Loại bot</Label>
+                        <Input 
+                          id="type" 
+                          value={botInfoForm.type} 
+                          disabled
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Trạng thái</Label>
+                        <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="botStatus">Bot đang hoạt động</Label>
+                          </div>
+                          <Switch 
+                            id="botStatus" 
+                            checked={botInfoForm.status === 'active'}
+                            onCheckedChange={(checked) => 
+                              setBotInfoForm({
+                                ...botInfoForm, 
+                                status: checked ? 'active' : 'inactive'
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="id">ID Bot</Label>
+                        <Input 
+                          id="id" 
+                          value={botInfoForm.id} 
+                          disabled
+                          className="bg-slate-50 dark:bg-slate-800 text-slate-500"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="subscribers">Số người đăng ký</Label>
+                        <Input 
+                          id="subscribers" 
+                          type="number"
+                          min="0"
+                          value={botInfoForm.subscribers} 
+                          onChange={(e) => setBotInfoForm({...botInfoForm, subscribers: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Button 
+                className="w-full"
+                onClick={() => window.open(`/prop-trading-bots/${bot.id}`, '_blank')}
+              >
+                Xem trang người dùng
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="accounts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tài khoản đã tích hợp</CardTitle>
+              <CardDescription>
+                Quản lý tài khoản người dùng đã kết nối với bot này
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BotAccountsTable botId={botId || ''} userId="ADMIN-001" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="logs" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>TB365 Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ TradingView
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TradingViewLogs botId={botId || ''} userId="ADMIN-001" />
+            </CardContent>
+          </Card>
           
-          <TabsContent value="bot-details" className="mt-6">
-            <UserBotDetailTabs
-              userId={ADMIN_USER_ID}
-              botId={botId || ''}
-              accountsData={accounts}
-              logsData={logs}
-              isLoading={loading}
-              onRefresh={handleRefresh}
-              signalSourceLabel="TB365 ID"
-              botType="prop"
-            />
-          </TabsContent>
-        </Tabs>
-      </motion.div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Coinstrat Logs</CardTitle>
+              <CardDescription>
+                Logs tín hiệu từ Coinstrat
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CoinstratLogs botId={botId || ''} userId="ADMIN-001" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
