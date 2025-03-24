@@ -18,6 +18,47 @@ export const normalizeUserId = (userId: string): string => {
 };
 
 /**
+ * Validates a user ID
+ * @param userId User identifier to validate
+ * @returns True if the user ID is valid
+ */
+export const validateUserId = (userId: string): boolean => {
+  // Simple validation: user ID must be at least 3 characters
+  // and follow certain format patterns
+  if (!userId || userId.length < 3) {
+    return false;
+  }
+  
+  // USR-XXX format validation
+  const usrPattern = /^USR-\d{3}$/;
+  if (usrPattern.test(userId)) {
+    return true;
+  }
+  
+  // user-XXX format validation
+  const userDashPattern = /^user-\d{3}$/;
+  if (userDashPattern.test(userId)) {
+    return true;
+  }
+  
+  // user_XXX format validation
+  const userUnderscorePattern = /^user_\d{3}$/;
+  if (userUnderscorePattern.test(userId)) {
+    return true;
+  }
+  
+  // user:XXX format validation
+  const userColonPattern = /^user:\d{3}$/;
+  if (userColonPattern.test(userId)) {
+    return true;
+  }
+  
+  // Other user ID formats can be added here
+  const alphanumericPattern = /^[a-zA-Z0-9-_:]{3,}$/;
+  return alphanumericPattern.test(userId);
+};
+
+/**
  * Validates a bot ID
  * @param botId Bot identifier to validate
  * @returns True if the bot ID is valid

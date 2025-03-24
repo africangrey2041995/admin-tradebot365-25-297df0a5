@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Card,
@@ -23,8 +22,10 @@ import { BotType, BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import AdminLayout from '@/components/admin/AdminLayout';
 import PropBotsTable from '@/components/admin/tables/PropBotsTable';
 import DeleteConfirmationDialog from '@/components/admin/dialogs/DeleteConfirmationDialog';
+import PropBotIdBadge from '@/components/admin/badges/PropBotIdBadge';
+import PropBotStatusBadge from '@/components/admin/badges/PropBotStatusBadge';
+import PropBotRiskBadge from '@/components/admin/badges/PropBotRiskBadge';
 
-// Mocking admin prop bots data
 const mockPropBots: PropBot[] = [
   {
     botId: 'PROP-001',
@@ -132,7 +133,6 @@ const AdminPropBots = () => {
   const handleDeleteConfirm = () => {
     if (!botToDelete) return;
     
-    // In a real application, you would make an API call here to delete the bot
     const updatedBots = propBots.filter(bot => bot.botId !== botToDelete);
     setPropBots(updatedBots);
     setDeleteModalOpen(false);
@@ -234,7 +234,11 @@ const AdminPropBots = () => {
                 onClick={refreshData}
                 disabled={isLoading}
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardHeader>

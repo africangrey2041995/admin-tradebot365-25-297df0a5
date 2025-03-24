@@ -13,6 +13,9 @@ import PropBotDetailHeader from '@/components/admin/headers/PropBotDetailHeader'
 import PropBotApiIntegrationCard from '@/components/admin/cards/PropBotApiIntegrationCard';
 import PropBotDetailTabs from '@/components/admin/tabs/PropBotDetailTabs';
 import PropBotOverviewTab from '@/components/admin/tabs/PropBotOverviewTab';
+import PropBotIdBadge from '@/components/admin/badges/PropBotIdBadge';
+import PropBotStatusBadge from '@/components/admin/badges/PropBotStatusBadge';
+import PropBotRiskBadge from '@/components/admin/badges/PropBotRiskBadge';
 
 // Mock data for the bot details
 const getMockPropBot = (botId: string): PropBot => {
