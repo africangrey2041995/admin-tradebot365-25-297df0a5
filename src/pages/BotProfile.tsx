@@ -11,20 +11,109 @@ import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';
 import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
 import { toast } from 'sonner';
+import { Account } from '@/types';
+import { CoinstratSignal } from '@/types/signal';
+import { normalizeUserId } from '@/utils/normalizeUserId';
 
 const BotProfile = () => {
-  const { botId } = useParams<{ botId: string }>(); // Already using botId
+  const { botId } = useParams<{ botId: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   
+  // Dữ liệu mẫu cho tài khoản
+  const mockAccounts: Account[] = [
+    {
+      cspAccountId: 'ACC001',
+      cspAccountName: 'Trading Account 1',
+      userAccount: 'Primary Account',
+      cspUserEmail: 'user@example.com',
+      apiName: 'Binance API',
+      apiId: 'API001',
+      tradingAccountNumber: '4056629',
+      tradingAccountId: '40819726',
+      tradingAccountType: 'HEDGED',
+      tradingAccountBalance: '$500',
+      status: 'Connected',
+      createdDate: new Date(2023, 5, 15).toISOString(),
+      lastUpdated: new Date(2023, 11, 20).toISOString(),
+      cspUserId: 'USR-001',
+      isLive: false
+    },
+    {
+      cspAccountId: 'ACC002',
+      cspAccountName: 'Trading Account 2',
+      userAccount: 'Secondary Account',
+      cspUserEmail: 'user@example.com',
+      apiName: 'Binance API',
+      apiId: 'API001',
+      tradingAccountNumber: '4056789',
+      tradingAccountId: '40819727',
+      tradingAccountType: 'HEDGED',
+      tradingAccountBalance: '$1000',
+      status: 'Connected',
+      createdDate: new Date(2023, 6, 22).toISOString(),
+      lastUpdated: new Date(2023, 10, 5).toISOString(),
+      cspUserId: 'USR-001',
+      isLive: true
+    }
+  ];
+
+  // Dữ liệu mẫu cho logs
+  const mockLogs: CoinstratSignal[] = [
+    {
+      id: 'CSP-78952364',
+      originalSignalId: 'SIG001',
+      action: 'ENTER_LONG',
+      instrument: 'BTCUSDT',
+      timestamp: new Date().toISOString(),
+      signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
+      maxLag: '5s',
+      investmentType: 'crypto',
+      amount: '1.5',
+      status: 'Processed',
+      processedAccounts: [
+        {
+          accountId: 'ACC-001',
+          userId: 'USR-001',
+          name: 'Binance Spot Account',
+          timestamp: new Date().toISOString(),
+          status: 'success'
+        }
+      ],
+      failedAccounts: []
+    },
+    {
+      id: 'CSP-78956789',
+      originalSignalId: 'SIG002',
+      action: 'EXIT_LONG',
+      instrument: 'ETHUSDT',
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
+      maxLag: '5s',
+      investmentType: 'crypto',
+      amount: '2.3',
+      status: 'Processed',
+      processedAccounts: [
+        {
+          accountId: 'ACC-001',
+          userId: 'USR-001',
+          name: 'Binance Spot Account',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          status: 'success'
+        }
+      ],
+      failedAccounts: []
+    }
+  ];
+  
   // Using the new webhook URL format
   const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
   const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
   
-  // Current user ID - in a real app this would come from auth context
-  const userId = 'USR-001';
+  // Current user ID - chuẩn hóa đúng định dạng USR-XXX
+  const userId = normalizeUserId('USR-001');
   
   useEffect(() => {
     const fetchBotDetails = () => {
@@ -40,7 +129,7 @@ const BotProfile = () => {
                     botId === 'BOT8932' ? 'Chuyên về chiến lược giao dịch vị thế dài hạn' :
                     botId === 'BOT2734' ? 'Hệ thống giao dịch thuật toán tập trung vào kim loại quý' :
                     'Bot giao dịch cho chiến lược tự động',
-          botId: botId || 'Unknown', // Already using botId
+          botId: botId || 'Unknown',
           accountCount: '12/30',
           lastUpdated: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'numeric', year: 'numeric' }),
           colorScheme: botId === 'BOT7459' ? 'red' :
@@ -113,7 +202,7 @@ const BotProfile = () => {
     <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
-          botId={bot.botId} // Already using botId
+          botId={bot.botId}
           status={bot.status} 
           botDetails={bot}
           onUpdateBot={handleUpdateBot}
@@ -133,18 +222,20 @@ const BotProfile = () => {
         </div>
         
         <UserBotDetailTabs 
-          botId={bot.botId} // Already using botId
+          botId={bot.botId}
           userId={userId}
           onRefresh={refreshData}
           isLoading={refreshLoading}
           signalSourceLabel="TradingView ID"
+          accountsData={mockAccounts}
+          logsData={mockLogs}
         />
       </div>
       
       <AddAccountDialog 
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot.botId} // Already using botId
+        botId={bot.botId}
         onAddAccount={handleAddAccount}
       />
     </MainLayout>

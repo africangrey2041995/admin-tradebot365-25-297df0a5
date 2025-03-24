@@ -44,6 +44,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   }, [isLoading]);
 
   console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}`);
+  console.log(`UserBotDetailTabs - accountsData length: ${accountsData?.length || 0}, logsData length: ${logsData?.length || 0}`);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
