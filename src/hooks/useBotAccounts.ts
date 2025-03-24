@@ -15,13 +15,15 @@ const mockAccounts: Account[] = [
     cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
-    tradingAccount: '4056629',
-    tradingAccountType: 'Live',
+    tradingAccountNumber: '4056629',
+    tradingAccountId: '40819726',
+    tradingAccountType: 'HEDGED',
     tradingAccountBalance: '$500',
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001' // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001', // Standardized to USR-001 format with dash
+    isLive: false
   },
   {
     cspAccountId: 'ACC002',
@@ -30,13 +32,15 @@ const mockAccounts: Account[] = [
     cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
-    tradingAccount: '4056789',
-    tradingAccountType: 'Live',
+    tradingAccountNumber: '4056789',
+    tradingAccountId: '40819727',
+    tradingAccountType: 'HEDGED',
     tradingAccountBalance: '$1000',
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001' // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001', // Standardized to USR-001 format with dash
+    isLive: true
   },
   {
     cspAccountId: 'ACC003',
@@ -45,13 +49,15 @@ const mockAccounts: Account[] = [
     cspUserEmail: 'test@example.com',
     apiName: 'Coinbase API',
     apiId: 'API002',
-    tradingAccount: '4044856',
-    tradingAccountType: 'Demo',
+    tradingAccountNumber: '4044856',
+    tradingAccountId: '40819728',
+    tradingAccountType: 'NETTED',
     tradingAccountBalance: '$10000',
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    cspUserId: 'USR-002' // Standardized to USR-002 format with dash
+    cspUserId: 'USR-002', // Standardized to USR-002 format with dash
+    isLive: false
   },
 ];
 

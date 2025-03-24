@@ -23,13 +23,15 @@ const mockAccounts: Account[] = [
     cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
-    tradingAccount: '4056629',
-    tradingAccountType: 'Live',
+    tradingAccountNumber: '4056629',
+    tradingAccountId: '40819726',
+    tradingAccountType: 'HEDGED',
     tradingAccountBalance: '$500',
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001'
+    cspUserId: 'USR-001',
+    isLive: false
   },
   {
     cspAccountId: 'ACC002',
@@ -38,13 +40,15 @@ const mockAccounts: Account[] = [
     cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
-    tradingAccount: '4056789',
-    tradingAccountType: 'Live',
+    tradingAccountNumber: '4056789',
+    tradingAccountId: '40819727',
+    tradingAccountType: 'HEDGED',
     tradingAccountBalance: '$1000',
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001'
+    cspUserId: 'USR-001',
+    isLive: true
   }
 ];
 
@@ -96,7 +100,7 @@ const mockLogs: CoinstratSignal[] = [
 ];
 
 const AdminUserBotDetail = () => {
-  const { botId } = useParams<{ botId: string }>(); // Already using botId
+  const { botId } = useParams<{ botId: string }>();
   const { goBack, navigateTo } = useNavigation();
   
   const { 
@@ -186,7 +190,7 @@ const AdminUserBotDetail = () => {
         <BotIntegrationInfo botId={botId || ''} />
 
         <UserBotDetailTabs 
-          botId={botId || ''} // Already using botId
+          botId={botId || ''}
           userId={userInfo?.id || ''}
           accountsData={mockAccounts}
           logsData={mockLogs}

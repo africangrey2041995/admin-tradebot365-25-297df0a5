@@ -33,9 +33,11 @@ const integratedPremiumBots: PremiumBot[] = [
         cspUserId: 'user-123',
         apiName: 'Binance',
         apiId: 'binance-123',
-        tradingAccount: 'Spot',
+        tradingAccountNumber: 'Spot',
+        tradingAccountId: '40819726',
         tradingAccountType: 'Spot',
-        tradingAccountBalance: '$1,200'
+        tradingAccountBalance: '$1,200',
+        isLive: true
       },
       {
         cspAccountId: 'acc-002',
@@ -47,9 +49,11 @@ const integratedPremiumBots: PremiumBot[] = [
         cspUserId: 'user-123',
         apiName: 'Bybit',
         apiId: 'bybit-123',
-        tradingAccount: 'Spot',
+        tradingAccountNumber: 'Spot',
+        tradingAccountId: '40819727',
         tradingAccountType: 'Spot',
-        tradingAccountBalance: '$800'
+        tradingAccountBalance: '$800',
+        isLive: false
       }
     ]
   },
@@ -83,9 +87,11 @@ const integratedPremiumBots: PremiumBot[] = [
         cspUserId: 'user-123',
         apiName: 'Binance',
         apiId: 'binance-123',
-        tradingAccount: 'Spot',
+        tradingAccountNumber: 'Spot',
+        tradingAccountId: '40819728',
         tradingAccountType: 'Spot',
-        tradingAccountBalance: '$1,500'
+        tradingAccountBalance: '$1,500',
+        isLive: true
       }
     ]
   }
