@@ -10,7 +10,7 @@ import { ADMIN_ROUTES } from '@/constants/routes';
 import { toast } from 'sonner';
 import { CoinstratSignal } from '@/types/signal';
 import { PropBot } from '@/types';
-import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
+import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY, BotType } from '@/constants/botTypes';
 import { Account } from '@/types';
 import AdminLayout from '@/components/admin/AdminLayout';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
@@ -22,7 +22,7 @@ const getMockPropBot = (botId: string): PropBot => {
     botId,
     name: 'FTMO Challenger Pro',
     description: 'Bot đặc biệt thiết kế để vượt qua FTMO Challenge với tỷ lệ thành công cao.',
-    type: 'prop',
+    type: BotType.PROP_BOT,
     status: BotStatus.ACTIVE,
     exchange: 'FTMO',
     risk: BotRiskLevel.MEDIUM,
@@ -43,7 +43,7 @@ const getMockPropBot = (botId: string): PropBot => {
 // Mock accounts
 const mockAccounts: Account[] = [
   {
-    id: 'acc-001',
+    accountId: 'acc-001',
     name: 'FTMO Challenge Account',
     exchange: 'FTMO',
     status: 'active',
@@ -56,7 +56,7 @@ const mockAccounts: Account[] = [
     pnl: '+$240'
   },
   {
-    id: 'acc-002',
+    accountId: 'acc-002',
     name: 'FTMO Verification Account',
     exchange: 'FTMO',
     status: 'active',
@@ -78,18 +78,19 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'completed',
     instrument: 'EURUSD',
-    action: 'buy',
+    action: 'ENTER_LONG',
     amount: '0.1',
     signalToken: 'token123',
     timestamp: new Date().toISOString(),
     processedAccounts: [
       {
-        id: 'acc-001',
+        accountId: 'acc-001',
         name: 'FTMO Challenge Account',
         status: 'success',
         exchangeResponse: 'Order placed successfully',
         orderId: '12345',
-        exchange: 'FTMO'
+        exchange: 'FTMO',
+        timestamp: new Date().toISOString()
       }
     ],
     failedAccounts: [],
@@ -102,28 +103,29 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'partial',
     instrument: 'USDJPY',
-    action: 'sell',
+    action: 'ENTER_SHORT',
     amount: '0.2',
     signalToken: 'token456',
     timestamp: new Date(Date.now() - 86400000).toISOString(),
     processedAccounts: [
       {
-        id: 'acc-001',
+        accountId: 'acc-001',
         name: 'FTMO Challenge Account',
         status: 'success',
         exchangeResponse: 'Order placed successfully',
         orderId: '12346',
-        exchange: 'FTMO'
+        exchange: 'FTMO',
+        timestamp: new Date().toISOString()
       }
     ],
     failedAccounts: [
       {
-        id: 'acc-002',
+        accountId: 'acc-002',
         name: 'FTMO Verification Account',
         status: 'failed',
         exchangeResponse: 'Insufficient margin',
-        orderId: '',
-        exchange: 'FTMO'
+        exchange: 'FTMO',
+        timestamp: new Date().toISOString()
       }
     ],
     maxLag: '5000',
