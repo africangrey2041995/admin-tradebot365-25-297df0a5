@@ -6,8 +6,9 @@ import NoErrorsState from './error-signals/NoErrorsState';
 import { ExtendedSignal } from '@/types/signal';
 import { normalizeUserId } from '@/utils/normalizeUserId';
 import { BotType } from '@/constants/botTypes';
-import { useUserContext } from '@/contexts/UserContext';
+import { useAdmin } from '@/hooks/use-admin';
 import { mockErrorSignals } from './error-signals/mockData';
+import { useUser } from '@clerk/clerk-react';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
@@ -26,12 +27,10 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
   const [signals, setSignals] = useState<ExtendedSignal[]>([]);
   const [unreadSignals, setUnreadSignals] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const { isAdmin, userId: contextUserId } = useUserContext();
+  const { isAdmin } = useAdmin();
+  const { user } = useUser();
   const { navigateToBotDetail } = useNavigation();
   const [error, setError] = useState<Error | null>(null);
-  
-  // Get userId from context if not provided as prop
-  const effectiveUserId = userId || contextUserId;
   
   // Initialize unread signals on component mount
   useEffect(() => {
@@ -42,7 +41,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
       // Filter signals based on userId, botType, and admin status
       const filteredSignals = mockErrorSignals.filter(signal => {
         // If userId is provided, only show signals for that user
-        const userIdMatch = !effectiveUserId || signal.userId === effectiveUserId || normalizeUserId(signal.userId) === normalizeUserId(effectiveUserId);
+        const userIdMatch = !userId || signal.userId === userId || normalizeUserId(signal.userId) === normalizeUserId(userId);
         
         // If botType is provided, only show signals for that bot type
         const botTypeMatch = !botType || signal.botType === botType;
@@ -62,7 +61,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
       });
       
       // Log the filtered count
-      console.info(`ErrorSignals - Filtered ${filteredSignals.length} signals for userId: ${effectiveUserId || 'any'} and botType: ${botType || 'any'}, isAdmin: ${isAdmin}`);
+      console.info(`ErrorSignals - Filtered ${filteredSignals.length} signals for userId: ${userId || 'any'} and botType: ${botType || 'any'}, isAdmin: ${isAdmin}`);
       
       // Set all signals as unread initially
       const initialUnreadSet = new Set(filteredSignals.map(signal => signal.id));
@@ -71,7 +70,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
       setUnreadSignals(initialUnreadSet);
       setLoading(false);
     }, 800);
-  }, [limit, effectiveUserId, botType, isAdmin]);
+  }, [limit, userId, botType, isAdmin]);
   
   const handleMarkAsRead = (signalId: string) => {
     const newUnreadSet = new Set(unreadSignals);

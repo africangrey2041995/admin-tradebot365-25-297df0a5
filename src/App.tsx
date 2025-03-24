@@ -7,8 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { ThemeProvider } from "next-themes";
-import { UserProvider } from "@/contexts/UserContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Bots from "./pages/Bots";
 import BotProfile from "./pages/BotProfile";
@@ -27,7 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-import BotErrors from "./pages/BotErrors";
+import BotErrors from "./pages/BotErrors"; // Add import for the new page
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -81,132 +79,62 @@ const App = () => (
   >
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AnimatePresence mode="wait">
-                <Routes>
-                  {/* Main routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/bots" element={
-                    <ProtectedRoute>
-                      <Bots />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/bots/:botId" element={
-                    <ProtectedRoute>
-                      <BotProfile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/premium-bots" element={
-                    <ProtectedRoute>
-                      <PremiumBots />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/premium-bots/:botId" element={
-                    <ProtectedRoute>
-                      <PremiumBotDetail />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrated-premium-bots" element={
-                    <ProtectedRoute>
-                      <IntegratedPremiumBots />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrated-premium-bots/:botId" element={
-                    <ProtectedRoute>
-                      <IntegratedPremiumBotDetail />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/prop-trading-bots" element={
-                    <ProtectedRoute>
-                      <PropTradingBots />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrated-prop-bots" element={
-                    <ProtectedRoute>
-                      <IntegratedPropBots />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/integrated-prop-bots/:botId" element={
-                    <ProtectedRoute>
-                      <IntegratedPropBotDetail />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/prop-trading-bots/:botId" element={
-                    <ProtectedRoute>
-                      <PropTradingBotDetail />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/accounts" element={
-                    <ProtectedRoute>
-                      <Accounts />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/accounts/:accountId" element={
-                    <ProtectedRoute>
-                      <AccountProfile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <UserProfile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings" element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/bot-errors" element={
-                    <ProtectedRoute>
-                      <BotErrors />
-                    </ProtectedRoute>
-                  } />
-                  
-                  {/* Auth routes */}
-                  <Route path="/sign-in" element={<SignIn />} />
-                  <Route path="/sign-up" element={<SignUp />} />
-                  
-                  {/* Admin routes */}
-                  <Route path="/admin" element={
-                    <ProtectedRoute requiresAdmin>
-                      <AdminLayout />
-                    </ProtectedRoute>
-                  }>
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="users" element={<AdminUsers />} />
-                    <Route path="users/:userId" element={<AdminUserDetail />} />
-                    <Route path="bots" element={<AdminBots />} />
-                    <Route path="bot-errors" element={<AdminBotErrors />} />
-                    <Route path="premium-bots" element={<AdminPremiumBots />} />
-                    <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
-                    <Route path="prop-bots" element={<AdminPropBots />} />
-                    <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
-                    <Route path="user-bots" element={<AdminUserBots />} />
-                    <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
-                    <Route path="packages" element={<AdminPackages />} />
-                    <Route path="database" element={<AdminDatabase />} />
-                    <Route path="logs" element={<AdminLogs />} />
-                    <Route path="notifications" element={<AdminNotifications />} />
-                    <Route path="email" element={<AdminEmail />} />
-                    <Route path="settings" element={<AdminSettings />} />
-                    <Route path="admin-management" element={
-                      <ProtectedRoute requiresSuperAdmin>
-                        <AdminManagement />
-                      </ProtectedRoute>
-                    } />
-                  </Route>
-                  
-                  {/* Not found route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AnimatePresence>
-            </BrowserRouter>
-          </TooltipProvider>
-        </UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* Main routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/bots" element={<Bots />} />
+                <Route path="/bots/:botId" element={<BotProfile />} />
+                <Route path="/premium-bots" element={<PremiumBots />} />
+                <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+                <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+                <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+                <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+                <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
+                <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/accounts/:accountId" element={<AccountProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/bot-errors" element={<BotErrors />} /> {/* Add new route */}
+                
+                {/* Auth routes */}
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="users/:userId" element={<AdminUserDetail />} />
+                  <Route path="bots" element={<AdminBots />} />
+                  <Route path="bot-errors" element={<AdminBotErrors />} />
+                  <Route path="premium-bots" element={<AdminPremiumBots />} />
+                  <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
+                  <Route path="prop-bots" element={<AdminPropBots />} />
+                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
+                  <Route path="user-bots" element={<AdminUserBots />} />
+                  <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
+                  <Route path="packages" element={<AdminPackages />} />
+                  <Route path="database" element={<AdminDatabase />} />
+                  <Route path="logs" element={<AdminLogs />} />
+                  <Route path="notifications" element={<AdminNotifications />} />
+                  <Route path="email" element={<AdminEmail />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route path="admin-management" element={<AdminManagement />} />
+                </Route>
+                
+                {/* Not found route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </BrowserRouter>
+        </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </ClerkProvider>
