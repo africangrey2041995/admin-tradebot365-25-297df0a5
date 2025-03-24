@@ -22,7 +22,9 @@ export const USER_ROUTES = {
   PROFILE: '/profile',
   SIGNALS: '/signals',
   CONNECTIONS: '/connections',
-  BOT_ERRORS: '/bot-errors', // Add new route
+  BOT_ERRORS: '/bot-errors',
+  SIGN_IN: '/sign-in',
+  SIGN_UP: '/sign-up',
 };
 
 // Admin Routes

@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { PremiumBot } from '@/types';
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import { toast } from 'sonner';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface UseBotAuthorizationProps {
   botId: string | undefined;
-  userId: string;
+  userId?: string;
 }
 
 interface UseBotAuthorizationReturn {
@@ -17,11 +18,15 @@ interface UseBotAuthorizationReturn {
 
 export const useBotAuthorization = ({ 
   botId, 
-  userId 
+  userId: propUserId 
 }: UseBotAuthorizationProps): UseBotAuthorizationReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [bot, setBot] = useState<PremiumBot | null>(null);
+  const { userId: contextUserId } = useUserContext();
+  
+  // Use userId from props if provided, otherwise use from context
+  const userId = propUserId || contextUserId;
 
   useEffect(() => {
     const fetchBotDetails = () => {
