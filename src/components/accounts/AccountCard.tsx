@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MoreHorizontal, Star, Mail, Link, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -89,14 +90,14 @@ const AccountCard: React.FC<AccountCardProps> = ({
   return (
     <Card className="p-5 rounded-lg border shadow-sm hover:shadow transition-all duration-300">
       <div className="flex items-center gap-4">
-        <Avatar className={cn("h-12 w-12", getAvatarColor(account.name || ''))}>
-          <AvatarFallback>{getInitials(account.name || '')}</AvatarFallback>
+        <Avatar className={cn("h-12 w-12", getAvatarColor(account.cspAccountName || ''))}>
+          <AvatarFallback>{getInitials(account.cspAccountName || '')}</AvatarFallback>
         </Avatar>
         
         <div className="flex-grow">
           <div className="flex flex-col">
             <div className="flex justify-between">
-              <h3 className="font-medium text-base">{account.name}</h3>
+              <h3 className="font-medium text-base">{account.cspAccountName}</h3>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full">
                   <Star className="h-4 w-4 text-muted-foreground" />
@@ -130,7 +131,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
             </div>
             <div className="text-sm text-muted-foreground mt-1 flex items-center">
               <Mail className="h-3.5 w-3.5 mr-1" />
-              <span>{truncateMiddle(account.userEmail || 'user@coinstratpro.com', 24)}</span>
+              <span>{truncateMiddle(account.cspUserEmail || 'user@coinstratpro.com', 24)}</span>
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -24,22 +25,22 @@ const Accounts = () => {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [newAccount, setNewAccount] = useState({
     name: '',
-    designation: '',
+    email: '',
   });
 
   const [accounts, setAccounts] = useState<Account[]>([
     {
-      id: 'acc001',
+      cspAccountId: 'acc001',
       clientId: 'client123',
       secretId: 'secret123',
       accessToken: 'token123',
       ctidTraderAccountId: 'ct123456',
-      name: 'Account 1',
+      cspAccountName: 'Account 1',
       status: 'Connected',
       createdDate: '2023-05-15T10:30:00Z',
       lastUpdated: '2023-06-20T14:45:00Z',
       expireDate: '2024-06-20T14:45:00Z',
-      userId: 'user123',
+      cspUserId: 'user123',
       apiName: 'api123',
       apiId: 'API001',
       tradingAccount: 'trading123',
@@ -47,17 +48,17 @@ const Accounts = () => {
       tradingAccountBalance: 'balance123',
     },
     {
-      id: 'acc002',
+      cspAccountId: 'acc002',
       clientId: 'client456',
       secretId: 'secret456',
       accessToken: 'token456',
       ctidTraderAccountId: 'ct789012',
-      name: 'Account 2',
+      cspAccountName: 'Account 2',
       status: 'Disconnected',
       createdDate: '2023-06-10T08:15:00Z',
       lastUpdated: '2023-06-22T11:20:00Z',
       expireDate: '2024-06-22T11:20:00Z',
-      userId: 'user456',
+      cspUserId: 'user456',
       apiName: 'api456',
       apiId: 'API002',
       tradingAccount: 'trading456',
@@ -65,17 +66,17 @@ const Accounts = () => {
       tradingAccountBalance: 'balance456',
     },
     {
-      id: 'acc003',
+      cspAccountId: 'acc003',
       clientId: 'client789',
       secretId: 'secret789',
       accessToken: 'token789',
       ctidTraderAccountId: 'ct345678',
-      name: 'Account 3',
+      cspAccountName: 'Account 3',
       status: 'Pending',
       createdDate: '2023-04-22T16:40:00Z',
       lastUpdated: '2023-06-18T09:10:00Z',
       expireDate: '2024-06-18T09:10:00Z',
-      userId: 'user789',
+      cspUserId: 'user789',
       apiName: 'api789',
       apiId: 'API003',
       tradingAccount: 'trading789',
@@ -85,7 +86,7 @@ const Accounts = () => {
   ]);
 
   const filteredAccounts = accounts.filter(account => 
-    account.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    account.cspAccountName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     account.ctidTraderAccountId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -95,14 +96,14 @@ const Accounts = () => {
 
   const handleSaveAccount = () => {
     const newAccountData: Account = {
-      id: `acc${Date.now()}`,
+      cspAccountId: `acc${Date.now()}`,
       clientId: `client${Date.now()}`,
-      name: newAccount.name,
-      userEmail: newAccount.designation,
+      cspAccountName: newAccount.name,
+      cspUserEmail: newAccount.email,
       status: 'Pending',
       createdDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
-      userId: `user${Date.now()}`,
+      cspUserId: `user${Date.now()}`,
       apiName: `api${Date.now()}`,
       apiId: `api-${Date.now()}`,
       tradingAccount: `trading${Date.now()}`,
@@ -113,11 +114,11 @@ const Accounts = () => {
     setAccounts([...accounts, newAccountData]);
     
     toast('Tài khoản đã được thêm thành công', {
-      description: `Tên: ${newAccount.name}, Email: ${newAccount.designation}`,
+      description: `Tên: ${newAccount.name}, Email: ${newAccount.email}`,
     });
     
     setIsAddDialogOpen(false);
-    setNewAccount({ name: '', designation: '' });
+    setNewAccount({ name: '', email: '' });
   };
 
   const handleEditAccount = (clientId: string) => {
@@ -144,7 +145,7 @@ const Accounts = () => {
     setAccounts(updatedAccounts);
     
     toast.success('Tài khoản đã được cập nhật thành công', {
-      description: `Đã cập nhật thông tin cho ${updatedAccount.name || selectedAccount.name}`,
+      description: `Đã cập nhật thông tin cho ${updatedAccount.cspAccountName || selectedAccount.cspAccountName}`,
     });
   };
 
@@ -250,12 +251,12 @@ const Accounts = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="designation" className="text-sm font-medium">Email Account</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email Account</Label>
               <Input 
-                id="designation" 
+                id="email" 
                 placeholder="Enter email account" 
-                value={newAccount.designation}
-                onChange={(e) => setNewAccount({...newAccount, designation: e.target.value})}
+                value={newAccount.email}
+                onChange={(e) => setNewAccount({...newAccount, email: e.target.value})}
               />
             </div>
           </div>
@@ -266,7 +267,7 @@ const Accounts = () => {
             </Button>
             <Button 
               onClick={handleSaveAccount} 
-              disabled={!newAccount.name || !newAccount.designation}
+              disabled={!newAccount.name || !newAccount.email}
               className="bg-green-500 hover:bg-green-600"
             >
               Add Member

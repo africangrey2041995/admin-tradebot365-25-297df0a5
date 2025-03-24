@@ -2,28 +2,28 @@
 import { ConnectionStatus, TradingAccountType } from './connection';
 
 /**
- * Definition of account-related types
+ * Definition of account-related types with standardized CSP (Coinstrat Pro) naming
  */
 export interface Account {
-  id: string;
-  name: string;
+  cspAccountId: string;         // renamed from id
+  cspAccountName: string;       // renamed from name
   status: ConnectionStatus | string;
   createdDate: string;
   lastUpdated: string;
-  userId: string;
+  cspUserId: string;            // renamed from userId
   apiName: string;
   apiId: string;
-  tradingAccount: string;
+  tradingAccount: string;       // keeping as requested
   tradingAccountType: string;
   tradingAccountBalance: string;
   volumeMultiplier?: string;
   clientId?: string;
   secretId?: string;
   accessToken?: string;
-  ctidTraderAccountId?: string;
+  ctidTraderAccountId?: string; // keeping as requested
   expireDate?: string;
-  userAccount?: string;
-  userEmail?: string;
+  userAccount?: string;         // legacy field, will phase out
+  cspUserEmail?: string;        // renamed from userEmail
 }
 
 // Admin-specific account interface with extended properties

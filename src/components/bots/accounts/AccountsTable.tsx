@@ -38,11 +38,11 @@ const AccountsTable: React.FC<AccountsTableProps> = ({ accounts }) => {
       </TableHeader>
       <TableBody>
         {accounts.map((account) => (
-          <TableRow key={account.id}>
+          <TableRow key={account.cspAccountId}>
             <TableCell>
               <div>
-                <div className="font-medium">{account.userAccount}</div>
-                <div className="text-xs text-muted-foreground">{account.userEmail}</div>
+                <div className="font-medium">{account.userAccount || account.cspAccountName}</div>
+                <div className="text-xs text-muted-foreground">{account.cspUserEmail}</div>
               </div>
             </TableCell>
             <TableCell>

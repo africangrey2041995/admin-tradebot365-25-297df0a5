@@ -22,15 +22,15 @@ const EditAccountDialog: React.FC<EditAccountDialogProps> = ({
   onSave 
 }) => {
   const [formData, setFormData] = useState<Partial<Account>>({
-    name: '',
-    userEmail: '',
+    cspAccountName: '',
+    cspUserEmail: '',
   });
 
   React.useEffect(() => {
     if (account) {
       setFormData({
-        name: account.name || account.userAccount || '',
-        userEmail: account.userEmail || '',
+        cspAccountName: account.cspAccountName || account.userAccount || '',
+        cspUserEmail: account.cspUserEmail || '',
       });
     }
   }, [account]);
@@ -44,7 +44,7 @@ const EditAccountDialog: React.FC<EditAccountDialogProps> = ({
   };
 
   const handleSave = () => {
-    if (!formData.name) {
+    if (!formData.cspAccountName) {
       toast.error('Tên tài khoản không được để trống');
       return;
     }
@@ -74,21 +74,21 @@ const EditAccountDialog: React.FC<EditAccountDialogProps> = ({
         
         <div className="space-y-4 px-1">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">Tên Tài Khoản</Label>
+            <Label htmlFor="cspAccountName" className="text-sm font-medium">Tên Tài Khoản</Label>
             <Input 
-              id="name" 
+              id="cspAccountName" 
               placeholder="Nhập tên tài khoản" 
-              value={formData.name}
+              value={formData.cspAccountName}
               onChange={handleChange}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="userEmail" className="text-sm font-medium">Email</Label>
+            <Label htmlFor="cspUserEmail" className="text-sm font-medium">Email</Label>
             <Input 
-              id="userEmail" 
+              id="cspUserEmail" 
               placeholder="Nhập email" 
-              value={formData.userEmail}
+              value={formData.cspUserEmail}
               onChange={handleChange}
             />
           </div>
@@ -100,7 +100,7 @@ const EditAccountDialog: React.FC<EditAccountDialogProps> = ({
           </Button>
           <Button 
             onClick={handleSave} 
-            disabled={!formData.name}
+            disabled={!formData.cspAccountName}
             className="bg-green-500 hover:bg-green-600"
           >
             Lưu Thay Đổi

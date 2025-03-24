@@ -22,10 +22,10 @@ interface BotAccountsTableProps {
 
 const mockAccounts: Account[] = [
   {
-    id: 'ACC001',
-    name: 'Trading Account 1',
+    cspAccountId: 'ACC001',
+    cspAccountName: 'Trading Account 1',
     userAccount: 'Primary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056629',
@@ -34,13 +34,13 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001' // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001' // Standardized to USR-001 format with dash
   },
   {
-    id: 'ACC002',
-    name: 'Trading Account 2',
+    cspAccountId: 'ACC002',
+    cspAccountName: 'Trading Account 2',
     userAccount: 'Secondary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056789',
@@ -49,13 +49,13 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001' // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001' // Standardized to USR-001 format with dash
   },
   {
-    id: 'ACC003',
-    name: 'Demo Account',
+    cspAccountId: 'ACC003',
+    cspAccountName: 'Demo Account',
     userAccount: 'Test Account',
-    userEmail: 'test@example.com',
+    cspUserEmail: 'test@example.com',
     apiName: 'Coinbase API',
     apiId: 'API002',
     tradingAccount: '4044856',
@@ -64,7 +64,7 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    userId: 'USR-002' // Standardized to USR-002 format with dash
+    cspUserId: 'USR-002' // Standardized to USR-002 format with dash
   },
 ];
 
@@ -107,8 +107,8 @@ const BotAccountsTable = ({
           
           // Log all available userIds for debugging
           const availableUserIds = initialData.length > 0 
-            ? initialData.map(acc => `${acc.userId} (normalized: ${normalizeUserId(acc.userId)})`)
-            : mockAccounts.map(acc => `${acc.userId} (normalized: ${normalizeUserId(acc.userId)})`);
+            ? initialData.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`)
+            : mockAccounts.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`);
           
           console.log(`BotAccountsTable - Available userIds: ${availableUserIds.join(', ')}`);
           
@@ -118,9 +118,9 @@ const BotAccountsTable = ({
               
               // Use normalized comparison with our utility
               const filteredAccounts = initialData.filter(account => {
-                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const normalizedAccountUserId = normalizeUserId(account.cspUserId);
                 const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                console.log(`Comparing: ${account.cspUserId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
                 return match;
               });
               
@@ -131,9 +131,9 @@ const BotAccountsTable = ({
               
               // Use normalized comparison with our utility
               const filteredAccounts = mockAccounts.filter(account => {
-                const normalizedAccountUserId = normalizeUserId(account.userId);
+                const normalizedAccountUserId = normalizeUserId(account.cspUserId);
                 const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                console.log(`Comparing: ${account.cspUserId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
                 return match;
               });
               
