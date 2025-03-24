@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Share, Copy, CheckCircle2, Edit, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { RefreshCw, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import { toast } from 'sonner';
-import { CoinstratSignal, AccountSignalStatus } from '@/types/signal';
+import { CoinstratSignal } from '@/types/signal';
 import { PropBot } from '@/types';
-import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY, BotType } from '@/constants/botTypes';
+import { BotRiskLevel, BotStatus, BotType } from '@/constants/botTypes';
 import { Account } from '@/types';
 import AdminLayout from '@/components/admin/AdminLayout';
-import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
-import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
+import PropBotDetailHeader from '@/components/admin/headers/PropBotDetailHeader';
+import PropBotApiIntegrationCard from '@/components/admin/cards/PropBotApiIntegrationCard';
+import PropBotDetailTabs from '@/components/admin/tabs/PropBotDetailTabs';
+import PropBotOverviewTab from '@/components/admin/tabs/PropBotOverviewTab';
+import { validateBotId } from '@/utils/normalizeUserId';
 
 // Mock data for the bot details
 const getMockPropBot = (botId: string): PropBot => {
@@ -39,7 +39,7 @@ const getMockPropBot = (botId: string): PropBot => {
   };
 };
 
-// Mock accounts with correct Account type properties
+// Mock accounts
 const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-001',
@@ -73,7 +73,7 @@ const mockAccounts: Account[] = [
   }
 ];
 
-// Mock logs with corrected types for AccountSignalStatus
+// Mock logs with corrected types
 const mockLogs: CoinstratSignal[] = [
   {
     id: 'signal-001',
@@ -174,7 +174,6 @@ const PropBotDetail = () => {
   const [loading, setLoading] = useState(true);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const [copied, setCopied] = useState<string | null>(null);
   
   // Mock API integration details
   const webhookUrl = `https://api.coinstratbot.com/webhook/prop/${botId}`;
@@ -205,21 +204,13 @@ const PropBotDetail = () => {
       toast.success('Dữ liệu đã được cập nhật!');
     }, 1000);
   };
-
-  const handleCopy = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(label);
-    toast.success(`Đã sao chép ${label}`, {
-      duration: 2000,
-    });
-    
-    setTimeout(() => {
-      setCopied(null);
-    }, 2000);
-  };
   
   const handleBackClick = () => {
     navigate(ADMIN_ROUTES.PROP_BOTS);
+  };
+
+  const handleEditClick = () => {
+    toast.info("Tính năng đang phát triển");
   };
 
   if (loading) {
@@ -242,47 +233,17 @@ const PropBotDetail = () => {
           <p className="text-muted-foreground mb-4">
             Không tìm thấy thông tin cho bot với ID: {botId}
           </p>
-          <Button onClick={handleBackClick}>
+          <button 
+            className="flex items-center px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={handleBackClick}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay lại danh sách
-          </Button>
+          </button>
         </div>
       </AdminLayout>
     );
   }
-
-  const getBotRiskBadge = (risk: BotRiskLevel) => {
-    let className = '';
-    switch (risk) {
-      case BotRiskLevel.LOW:
-        className = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-        break;
-      case BotRiskLevel.MEDIUM:
-        className = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-        break;
-      case BotRiskLevel.HIGH:
-        className = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-        break;
-    }
-    
-    return (
-      <Badge variant="outline" className={className}>
-        {BOT_RISK_DISPLAY[risk]}
-      </Badge>
-    );
-  };
-
-  const getBotStatusBadge = (status: BotStatus) => {
-    const className = status === BotStatus.ACTIVE 
-      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-      : 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400';
-    
-    return (
-      <Badge variant="outline" className={className}>
-        {BOT_STATUS_DISPLAY[status]}
-      </Badge>
-    );
-  };
 
   const botInfo = {
     createdDate: bot.createdDate,
@@ -294,100 +255,25 @@ const PropBotDetail = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={handleBackClick}
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">{bot.name}</h1>
-                <div className="flex items-center gap-2">
-                  {getBotStatusBadge(bot.status)}
-                  {getBotRiskBadge(bot.risk)}
-                </div>
-              </div>
-              <p className="text-muted-foreground mt-1">{bot.description}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => toast.info("Tính năng đang phát triển")}>
-              <Edit className="mr-2 h-4 w-4" />
-              Chỉnh sửa
-            </Button>
-            <Button onClick={handleRefresh} disabled={refreshLoading}>
-              <RefreshCw className={`mr-2 h-4 w-4 ${refreshLoading ? 'animate-spin' : ''}`} />
-              Làm mới
-            </Button>
-          </div>
-        </div>
+        <PropBotDetailHeader
+          botName={bot.name}
+          botDescription={bot.description}
+          botStatus={bot.status}
+          botRisk={bot.risk}
+          isRefreshing={refreshLoading}
+          onBackClick={handleBackClick}
+          onRefreshClick={handleRefresh}
+          onEditClick={handleEditClick}
+        />
 
         {/* API Integration Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Share className="h-5 w-5 mr-2 text-primary" />
-              API Integration
-            </CardTitle>
-            <CardDescription>
-              Thông tin tích hợp API cho Prop Bot này
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="text-sm font-medium">Webhook URL</div>
-              <div className="flex items-center">
-                <div className="bg-muted p-2 rounded-md flex-1 text-sm font-mono truncate">
-                  {webhookUrl}
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="ml-2"
-                  onClick={() => handleCopy(webhookUrl, 'Webhook URL')}
-                >
-                  {copied === 'Webhook URL' ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="text-sm font-medium">API Token</div>
-              <div className="flex items-center">
-                <div className="bg-muted p-2 rounded-md flex-1 text-sm font-mono truncate">
-                  {apiToken}
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="ml-2"
-                  onClick={() => handleCopy(apiToken, 'API Token')}
-                >
-                  {copied === 'API Token' ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Sử dụng token này để xác thực khi gửi request tới webhook URL.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <PropBotApiIntegrationCard
+          webhookUrl={webhookUrl}
+          apiToken={apiToken}
+        />
 
         {/* Bot Content Tabs */}
-        <PropTradingBotTabs
+        <PropBotDetailTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           userId="admin"
