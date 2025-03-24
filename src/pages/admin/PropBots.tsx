@@ -54,13 +54,13 @@ import { BotType, BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY, BOT_RISK_DISPLAY 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
-// Mock data for admin prop bots - fixed to use BotType.PROP_BOT explicitly
+// Mock data for admin prop bots - fixed to explicitly use BotType.PROP_BOT
 const mockPropBots = [
   {
     botId: 'PROP-001',
     name: 'FTMO Challenger',
     description: 'Bot đặc biệt thiết kế để vượt qua FTMO Challenge với tỷ lệ thành công cao.',
-    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
+    type: BotType.PROP_BOT,
     status: BotStatus.ACTIVE,
     exchange: 'FTMO',
     risk: BotRiskLevel.MEDIUM,
@@ -80,7 +80,7 @@ const mockPropBots = [
     botId: 'PROP-002',
     name: 'FundedNext Master',
     description: 'Bot chuyên biệt cho FundedNext, tối ưu hóa chiến lược để vượt qua các bài kiểm tra với hiệu suất cao nhất.',
-    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
+    type: BotType.PROP_BOT,
     status: BotStatus.ACTIVE,
     exchange: 'FundedNext',
     risk: BotRiskLevel.LOW,
@@ -100,7 +100,7 @@ const mockPropBots = [
     botId: 'PROP-003',
     name: 'Coinstrat Challenge Bot',
     description: 'Bot tối ưu cho Coinstrat Pro, sử dụng các chiến lược đặc biệt phù hợp với quy tắc giao dịch của nền tảng.',
-    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
+    type: BotType.PROP_BOT,
     status: BotStatus.ACTIVE,
     exchange: 'Coinstrat Pro',
     risk: BotRiskLevel.HIGH,
@@ -120,7 +120,7 @@ const mockPropBots = [
     botId: 'PROP-004',
     name: 'Universal Prop Trader',
     description: 'Bot đa năng thích ứng với nhiều nền tảng prop trading khác nhau, phù hợp cho người mới bắt đầu.',
-    type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
+    type: BotType.PROP_BOT,
     status: BotStatus.ACTIVE,
     exchange: 'Multiple',
     risk: BotRiskLevel.MEDIUM,
@@ -153,9 +153,7 @@ const AdminPropBots = () => {
   const [editingBot, setEditingBot] = useState<PropBot | null>(null);
   const [botToDelete, setBotToDelete] = useState<string | null>(null);
 
-  // Modal handlers for edit action
   const handleEdit = (botId: string) => {
-    // Find the bot to edit
     const propBotToEdit = propBots.find(bot => bot.botId === botId);
     if (propBotToEdit) {
       setEditingBot(propBotToEdit);
@@ -163,7 +161,6 @@ const AdminPropBots = () => {
     }
   };
 
-  // Filter bots based on search query, risk, and status
   const filteredPropBots = propBots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           bot.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -173,14 +170,11 @@ const AdminPropBots = () => {
     return matchesSearch && matchesRisk && matchesStatus;
   });
 
-  // Sort bots alphabetically by name
   filteredPropBots.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Deletion confirmation
   const handleDeleteConfirm = (botId: string) => {
     setIsDeleting(true);
     
-    // Simulate API call
     setTimeout(() => {
       const updatedBots = propBots.filter(bot => bot.botId !== botId);
       setPropBots(updatedBots);
@@ -193,40 +187,33 @@ const AdminPropBots = () => {
     }, 1000);
   };
 
-  // Handlers for opening delete confirmation
   const handleDelete = (botId: string) => {
     setBotToDelete(botId);
     setDeleteModalOpen(true);
   };
 
-  // Handler for viewing bot details
   const handleView = (botId: string) => {
-    // Navigate to the bot detail page
     window.open(`/prop-trading-bots/${botId}`, '_blank');
   };
 
-  // Refresh data
   const refreshData = () => {
     setIsLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Dữ liệu đã được làm mới!");
     }, 1000);
   };
 
-  // Create new bot handler - fixed to use BotType.PROP_BOT explicitly
   const createNewBot = (botData: Partial<PropBot>) => {
     setIsCreating(true);
     
-    // Simulate API call
     setTimeout(() => {
       const newBot: PropBot = {
         botId: `PROP-${Math.floor(Math.random() * 1000)}`,
         name: botData.name || 'New Prop Bot',
         description: botData.description || 'Mô tả mặc định cho prop bot mới.',
-        type: BotType.PROP_BOT,  // Explicitly use BotType.PROP_BOT
+        type: BotType.PROP_BOT,
         status: botData.status || BotStatus.ACTIVE,
         exchange: botData.exchange || 'Unknown',
         risk: botData.risk || BotRiskLevel.MEDIUM,
@@ -252,12 +239,10 @@ const AdminPropBots = () => {
       });
     }, 1000);
   };
-  
-  // Update existing bot handler
+
   const updateExistingBot = (botData: PropBot) => {
     setIsUpdating(true);
     
-    // Simulate API call
     setTimeout(() => {
       const updatedBots = propBots.map(bot => 
         bot.botId === botData.botId ? { ...botData, lastUpdated: new Date().toISOString() } : bot
@@ -273,7 +258,6 @@ const AdminPropBots = () => {
     }, 1000);
   };
 
-  // Handle create form submission
   const handleCreateSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -297,8 +281,7 @@ const AdminPropBots = () => {
     
     createNewBot(botData);
   };
-  
-  // Handle edit form submission
+
   const handleEditSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -329,7 +312,7 @@ const AdminPropBots = () => {
   const getRiskLabel = (risk: string) => {
     return BOT_RISK_DISPLAY[risk as BotRiskLevel] || risk;
   };
-  
+
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
@@ -343,7 +326,6 @@ const AdminPropBots = () => {
     return BOT_STATUS_DISPLAY[status as BotStatus] || status;
   };
 
-  // Generate rows for the admin data table
   const generatePropBotRows = () => {
     return filteredPropBots.map((bot) => (
       <tr key={bot.botId} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
@@ -512,7 +494,6 @@ const AdminPropBots = () => {
         </CardContent>
       </Card>
 
-      {/* Create bot modal */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -613,7 +594,6 @@ const AdminPropBots = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit bot modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -716,7 +696,6 @@ const AdminPropBots = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

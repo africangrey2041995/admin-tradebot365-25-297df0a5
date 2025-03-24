@@ -1,4 +1,3 @@
-
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 
 /**
