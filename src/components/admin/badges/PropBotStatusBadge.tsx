@@ -14,7 +14,7 @@ const PropBotStatusBadge: React.FC<PropBotStatusBadgeProps> = ({ status }) => {
   
   return (
     <Badge variant="outline" className={className}>
-      <span>{BOT_STATUS_DISPLAY[status]}</span>
+      {BOT_STATUS_DISPLAY[status]}
     </Badge>
   );
 };

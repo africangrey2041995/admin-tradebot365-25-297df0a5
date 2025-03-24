@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { BotRiskLevel, BOT_RISK_DISPLAY } from '@/constants/botTypes';
-import { AlertTriangle } from 'lucide-react';
+import { BotRiskLevel } from '@/constants/botTypes';
 
 interface PropBotRiskBadgeProps {
   risk: BotRiskLevel;
@@ -16,19 +15,24 @@ const PropBotRiskBadge: React.FC<PropBotRiskBadgeProps> = ({ risk }) => {
       className = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       break;
     case BotRiskLevel.MEDIUM:
-      className = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+      className = 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
       break;
     case BotRiskLevel.HIGH:
       className = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       break;
+    default:
+      className = 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400';
   }
+  
+  const riskDisplay = {
+    [BotRiskLevel.LOW]: 'Thấp',
+    [BotRiskLevel.MEDIUM]: 'Trung bình',
+    [BotRiskLevel.HIGH]: 'Cao'
+  };
   
   return (
     <Badge variant="outline" className={className}>
-      <span className="flex items-center gap-1">
-        <AlertTriangle className="h-3 w-3" />
-        <span>{BOT_RISK_DISPLAY[risk]}</span>
-      </span>
+      {riskDisplay[risk]}
     </Badge>
   );
 };

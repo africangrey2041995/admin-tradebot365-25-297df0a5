@@ -13,7 +13,6 @@ import PropBotDetailHeader from '@/components/admin/headers/PropBotDetailHeader'
 import PropBotApiIntegrationCard from '@/components/admin/cards/PropBotApiIntegrationCard';
 import PropBotDetailTabs from '@/components/admin/tabs/PropBotDetailTabs';
 import PropBotOverviewTab from '@/components/admin/tabs/PropBotOverviewTab';
-import { validateBotId } from '@/utils/normalizeUserId';
 
 // Mock data for the bot details
 const getMockPropBot = (botId: string): PropBot => {

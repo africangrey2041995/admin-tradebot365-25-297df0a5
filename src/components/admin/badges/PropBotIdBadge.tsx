@@ -9,7 +9,7 @@ interface PropBotIdBadgeProps {
 const PropBotIdBadge: React.FC<PropBotIdBadgeProps> = ({ botId }) => {
   return (
     <Badge variant="outline">
-      <span>{botId}</span>
+      {botId}
     </Badge>
   );
 };
