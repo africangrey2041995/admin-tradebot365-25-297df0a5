@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import ActionBadge from './ActionBadge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ExternalLink } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -59,6 +59,29 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
+  // Format trading account to show ID, type and balance if available
+  const formatTradingAccount = () => {
+    const parts = [];
+    
+    if (signal.tradingAccountId) {
+      parts.push(signal.tradingAccountId);
+    }
+    
+    if (signal.tradingAccount) {
+      parts.push(signal.tradingAccount);
+    }
+    
+    if (signal.tradingAccountType) {
+      parts.push(signal.tradingAccountType);
+    }
+    
+    if (signal.tradingAccountBalance) {
+      parts.push(`$${signal.tradingAccountBalance}`);
+    }
+    
+    return parts.length > 0 ? parts.join(' | ') : 'N/A';
+  };
+  
   return (
     <TableRow className={isUnread ? "bg-red-50/10" : ""}>
       <TableCell className="font-mono text-xs">
@@ -93,7 +116,17 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
         {signal.userId || 'N/A'}
       </TableCell>
       <TableCell>
-        {signal.tradingAccount || 'N/A'}
+        {formatTradingAccount()}
+      </TableCell>
+      <TableCell>
+        {signal.coinstratLogId ? (
+          <div className="flex items-center gap-1">
+            <span className="font-mono text-xs">{signal.coinstratLogId}</span>
+            <ExternalLink className="h-3 w-3 text-blue-500" />
+          </div>
+        ) : (
+          <span className="text-gray-400 italic text-xs">No log ID</span>
+        )}
       </TableCell>
       <TableCell>
         <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>

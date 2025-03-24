@@ -6,6 +6,7 @@ import NoErrorsState from './error-signals/NoErrorsState';
 import { ExtendedSignal } from '@/types';
 import { normalizeUserId } from '@/utils/normalizeUserId';
 import { BotType } from '@/constants/botTypes';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface ErrorSignalsProps {
   limit?: number;
@@ -21,6 +22,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
   const [signals, setSignals] = useState<ExtendedSignal[]>([]);
   const [unreadSignals, setUnreadSignals] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAdmin();
   
   // Initialize unread signals on component mount
   useEffect(() => {
@@ -28,7 +30,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
     setLoading(true);
     
     setTimeout(() => {
-      // Filter signals based on userId and botType
+      // Filter signals based on userId, botType, and admin status
       const filteredSignals = mockErrorSignals.filter(signal => {
         // If userId is provided, only show signals for that user
         const userIdMatch = !userId || signal.userId === userId || normalizeUserId(signal.userId) === normalizeUserId(userId);
@@ -36,10 +38,16 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
         // If botType is provided, only show signals for that bot type
         const botTypeMatch = !botType || signal.botType === botType;
         
-        // Log for debugging
-        console.info(`ErrorSignals - Signal ${signal.id}: userId match: ${userIdMatch}, botType match: ${botTypeMatch}`);
+        // Check if this is an admin-only signal (ADMIN-001)
+        const isAdminOnlySignal = signal.userId === 'ADMIN-001';
         
-        return userIdMatch && botTypeMatch;
+        // Include admin signals only for admin users
+        const includeBasedOnAdminStatus = !isAdminOnlySignal || isAdmin;
+        
+        // Log for debugging
+        console.info(`ErrorSignals - Signal ${signal.id}: userId match: ${userIdMatch}, botType match: ${botTypeMatch}, adminOnly: ${isAdminOnlySignal}, include: ${includeBasedOnAdminStatus}`);
+        
+        return userIdMatch && botTypeMatch && includeBasedOnAdminStatus;
       });
       
       // Log the filtered count
@@ -52,7 +60,7 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
       setUnreadSignals(initialUnreadSet);
       setLoading(false);
     }, 800);
-  }, [limit, userId, botType]);
+  }, [limit, userId, botType, isAdmin]);
   
   const handleMarkAsRead = (signalId: string) => {
     const newUnreadSet = new Set(unreadSignals);

@@ -30,6 +30,7 @@ export interface TradingViewSignal extends BaseSignal {
   accountId?: string;
   accountName?: string;
   coinstratSignalId?: string;
+  coinstratLogId?: string; // Added Coinstrat Pro Log ID
 }
 
 // Trạng thái xử lý tín hiệu cho từng tài khoản
@@ -50,6 +51,7 @@ export interface CoinstratSignal extends BaseSignal {
   failedAccounts: AccountSignalStatus[];
   botId?: string;
   botName?: string;
+  coinstratLogId?: string; // Added Coinstrat Pro Log ID
 }
 
 // Tín hiệu mở rộng với thông tin người dùng và tài khoản
@@ -58,12 +60,14 @@ export interface ExtendedSignal extends TradingViewSignal {
   tradingAccount?: string;
   tradingAccountType?: string;
   tradingAccountBalance?: string;
+  tradingAccountId?: string; // Added Trading Account ID
   botId?: string;
   botType?: string;
   botName?: string;
   exchange?: string;
   errorCode?: string;
   errorSeverity?: 'low' | 'medium' | 'high' | 'critical';
+  coinstratLogId?: string; // Added Coinstrat Pro Log ID
 }
 
 // Lịch sử giao dịch

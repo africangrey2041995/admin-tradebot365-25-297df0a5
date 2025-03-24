@@ -1,4 +1,3 @@
-
 import { ExtendedSignal } from '@/types';
 import { BotType } from '@/constants/botTypes';
 
@@ -17,6 +16,17 @@ const hoursAgo = (hours: number) => {
   const date = new Date(now);
   date.setHours(date.getHours() - hours);
   return date.toISOString();
+};
+
+// Generate a random Coinstrat Log ID
+const generateCoinstratLogId = (prefix = 'CL') => {
+  const randomPart = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+  return `${prefix}-${randomPart}`;
+};
+
+// Generate random account ID
+const generateAccountId = () => {
+  return Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 };
 
 // Mock data for error signals
@@ -38,8 +48,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Binance-Main',
     tradingAccountType: 'Spot',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '2500',
     errorSeverity: 'high',
     botType: BotType.USER_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   {
     id: 'ERR-002',
@@ -57,8 +70,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Bybit-Demo',
     tradingAccountType: 'Futures',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '5000',
     errorSeverity: 'critical',
     botType: BotType.USER_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // User bot errors - Market errors
@@ -78,8 +94,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Binance-Futures',
     tradingAccountType: 'Futures',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '3200',
     errorSeverity: 'medium',
     botType: BotType.USER_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // User bot errors - Software errors
@@ -99,8 +118,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Kraken-Main',
     tradingAccountType: 'Spot',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '1800',
     errorSeverity: 'low',
     botType: BotType.USER_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Premium bot errors - Connection errors
@@ -120,8 +142,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Interactive Brokers',
     tradingAccountType: 'Margin',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '10000',
     errorSeverity: 'medium',
     botType: BotType.PREMIUM_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   {
     id: 'ERR-006',
@@ -139,8 +164,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'TradingView',
     tradingAccountType: 'Paper',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '25000',
     errorSeverity: 'low',
     botType: BotType.PREMIUM_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Premium bot errors - Account errors
@@ -160,8 +188,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Alpaca',
     tradingAccountType: 'Margin',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '8000',
     errorSeverity: 'high',
     botType: BotType.PREMIUM_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Premium bot errors - Software errors
@@ -181,8 +212,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'TD Ameritrade',
     tradingAccountType: 'Margin',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '12000',
     errorSeverity: 'medium',
     botType: BotType.PREMIUM_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Prop trading bot errors - Connection errors
@@ -202,8 +236,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'FTMO Challenge',
     tradingAccountType: 'Prop',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '100000',
     errorSeverity: 'high',
     botType: BotType.PROP_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   {
     id: 'ERR-010',
@@ -221,8 +258,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'MFF Evaluation',
     tradingAccountType: 'Prop',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '50000',
     errorSeverity: 'critical',
     botType: BotType.PROP_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Prop trading bot errors - Account errors
@@ -242,8 +282,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'Topstep',
     tradingAccountType: 'Prop',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '150000',
     errorSeverity: 'critical',
     botType: BotType.PROP_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Prop trading bot errors - Market errors
@@ -263,8 +306,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'USR-001',
     tradingAccount: 'FTMO Live',
     tradingAccountType: 'Prop',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '200000',
     errorSeverity: 'high',
     botType: BotType.PROP_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Additional signals for Admin user - User Bots
@@ -284,8 +330,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'ADMIN-001',
     tradingAccount: 'Binance-Pro',
     tradingAccountType: 'Spot',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '15000',
     errorSeverity: 'medium',
     botType: BotType.USER_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Additional signals for Admin user - Premium Bots
@@ -305,8 +354,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'ADMIN-001',
     tradingAccount: 'Kraken-Main',
     tradingAccountType: 'Margin',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '25000',
     errorSeverity: 'high',
     botType: BotType.PREMIUM_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Additional signals for Admin user - Prop Bots
@@ -326,8 +378,11 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'ADMIN-001',
     tradingAccount: 'MFF Phase 2',
     tradingAccountType: 'Prop',
+    tradingAccountId: generateAccountId(),
+    tradingAccountBalance: '75000',
     errorSeverity: 'medium',
     botType: BotType.PROP_BOT,
+    coinstratLogId: generateCoinstratLogId(),
   },
   
   // Critical system-wide errors - Admin visibility
@@ -347,8 +402,10 @@ export const mockErrorSignals: ExtendedSignal[] = [
     userId: 'ADMIN-001',
     tradingAccount: 'System',
     tradingAccountType: 'System',
+    tradingAccountId: 'SYSTEM',
     errorSeverity: 'critical',
     botType: 'SYSTEM',
+    coinstratLogId: generateCoinstratLogId('SYS'),
   },
 ];
 
