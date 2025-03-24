@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import { toast } from 'sonner';
-import { CoinstratSignal, SignalAction, AccountSignalStatus } from '@/types/signal';
+import { CoinstratSignal, AccountSignalStatus } from '@/types/signal';
 import { PropBot } from '@/types';
 import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY, BotType } from '@/constants/botTypes';
 import { Account } from '@/types';
