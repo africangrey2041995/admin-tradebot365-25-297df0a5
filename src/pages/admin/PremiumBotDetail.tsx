@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -740,7 +739,7 @@ const AdminPremiumBotDetail = () => {
                     </h3>
                     <div className="flex items-center gap-2">
                       <div className="bg-slate-50 p-3 rounded-md text-sm w-full font-mono text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        https://api.tradebot365.com/webhook/premium/{bot.id.toLowerCase()}
+                        https://api.tradebot365.com/webhook/premium/{bot.botId.toLowerCase()}
                       </div>
                     </div>
                   </div>

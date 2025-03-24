@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -67,7 +68,7 @@ const propTradingBots = [
 // Mocking integrated prop trading bots data
 const integratedPropBots = [
   {
-    botId: 'ptb-001',
+    botId: 'PROP001',
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
@@ -81,7 +82,6 @@ const integratedPropBots = [
     imageUrl: null,
     colorScheme: 'blue',
     isIntegrated: true,
-    botId: 'PROP001',
     accounts: [
       {
         id: 'acc-001',
@@ -298,7 +298,6 @@ const PropTradingBots = () => {
                       colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
                       isIntegrated={true}
                       accountCount={bot.accounts?.length.toString() || "0"}
-                      botId={bot.botId}
                     />
                   </motion.div>
                 ))}

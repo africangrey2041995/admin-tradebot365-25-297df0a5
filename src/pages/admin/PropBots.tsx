@@ -1,1008 +1,754 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, MoreHorizontal, Play, Pause, Settings, Trash2, Plus, Eye, Download, FileDown, FileSpreadsheet, FileX, Check } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
-import { PropBot } from '@/types/admin-types';
-import { BotType, BotStatus } from '@/constants/botTypes';
-import * as XLSX from 'xlsx';
+import { Badge } from "@/components/ui/badge";
+import { 
+  RefreshCw, 
+  Plus, 
+  Edit, 
+  Trash, 
+  Eye,
+  MoreHorizontal,
+  FileQuestion,
+  Loader2,
+  Check,
+  X,
+} from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { 
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
+import { PropBot } from '@/types';
+import { BotType, BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY, BOT_RISK_DISPLAY } from '@/constants/botTypes';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+
+// Mock data for admin prop bots
+const mockPropBots = [
+  {
+    botId: 'PROP-001',
+    name: 'FTMO Challenger',
+    description: 'Bot đặc biệt thiết kế để vượt qua FTMO Challenge với tỷ lệ thành công cao.',
+    type: BotType.PROP_BOT,
+    status: BotStatus.ACTIVE,
+    exchange: 'FTMO',
+    risk: BotRiskLevel.MEDIUM,
+    performanceLastMonth: '+8.5%',
+    performanceAllTime: '+32.7%',
+    users: 42,
+    minCapital: '$5,000',
+    profit: '+8.5%',
+    propFirm: 'FTMO',
+    createdDate: '2023-08-15',
+    lastUpdated: '2023-10-05',
+    maxDrawdown: '4.2%',
+    challengeDuration: '30 ngày',
+    accountSizes: ['$10K', '$25K', '$50K', '$100K']
+  },
+  {
+    botId: 'PROP-002',
+    name: 'FundedNext Master',
+    description: 'Bot chuyên biệt cho FundedNext, tối ưu hóa chiến lược để vượt qua các bài kiểm tra với hiệu suất cao nhất.',
+    type: BotType.PROP_BOT,
+    status: BotStatus.ACTIVE,
+    exchange: 'FundedNext',
+    risk: BotRiskLevel.LOW,
+    performanceLastMonth: '+6.2%',
+    performanceAllTime: '+28.5%',
+    users: 37,
+    minCapital: '$3,000',
+    profit: '+6.2%',
+    propFirm: 'FundedNext',
+    createdDate: '2023-07-20',
+    lastUpdated: '2023-10-10',
+    maxDrawdown: '3.8%',
+    challengeDuration: '45 ngày',
+    accountSizes: ['$15K', '$30K', '$50K', '$100K', '$200K']
+  },
+  {
+    botId: 'PROP-003',
+    name: 'Coinstrat Challenge Bot',
+    description: 'Bot tối ưu cho Coinstrat Pro, sử dụng các chiến lược đặc biệt phù hợp với quy tắc giao dịch của nền tảng.',
+    type: BotType.PROP_BOT,
+    status: BotStatus.ACTIVE,
+    exchange: 'Coinstrat Pro',
+    risk: BotRiskLevel.HIGH,
+    performanceLastMonth: '+12.8%',
+    performanceAllTime: '+45.2%',
+    users: 28,
+    minCapital: '$2,000',
+    profit: '+12.8%',
+    propFirm: 'Coinstrat Pro',
+    createdDate: '2023-09-05',
+    lastUpdated: '2023-10-15',
+    maxDrawdown: '6.5%',
+    challengeDuration: '21 ngày',
+    accountSizes: ['$5K', '$10K', '$25K', '$50K']
+  },
+  {
+    botId: 'PROP-004',
+    name: 'Universal Prop Trader',
+    description: 'Bot đa năng thích ứng với nhiều nền tảng prop trading khác nhau, phù hợp cho người mới bắt đầu.',
+    type: BotType.PROP_BOT,
+    status: BotStatus.ACTIVE,
+    exchange: 'Multiple',
+    risk: BotRiskLevel.MEDIUM,
+    performanceLastMonth: '+7.5%',
+    performanceAllTime: '+23.8%',
+    users: 54,
+    minCapital: '$1,000',
+    profit: '+7.5%',
+    propFirm: 'Multiple',
+    createdDate: '2023-06-10',
+    lastUpdated: '2023-10-12',
+    maxDrawdown: '5.0%',
+    challengeDuration: 'Varies',
+    accountSizes: ['Varies by firm']
+  },
+];
 
 const AdminPropBots = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
-  const [selectedBots, setSelectedBots] = useState<string[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  const totalBots = 5;
-  const activeBots = 3;
-  const inactiveBots = 2;
-  const totalAccounts = 170;
-  const averageAccountsPerBot = 34;
-  const performanceRate = "9.6%";
-  const topPerformingRatio = "4 / 5";
-  
-  const [newBot, setNewBot] = useState({
-    name: '',
-    description: '',
-    riskLevel: 'low',
-    propFirm: 'coinstrat_pro',
-    maxDrawdown: '5',
-    targetProfit: '10',
-    accountSizes: ['10k', '25k', '50k', '100k'],
-    challengeType: 'one_phase',
-    tradingWindow: '30',
-    timeframe: '1h',
-    tradingHours: 'all_day',
-    maxDailyDrawdown: '2',
-    tradingStrategy: 'risk_managed',
-    enableWeekendTrading: false,
-    enableNewsPause: true,
-    enableVolatilityFilter: true,
-    tradingAssets: 'forex_crypto',
-    supportShort: true,
-    supportLong: true
+  const [propBots, setPropBots] = useState<PropBot[]>(mockPropBots);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [riskFilter, setRiskFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editingBot, setEditingBot] = useState<PropBot | null>(null);
+  const [botToDelete, setBotToDelete] = useState<string | null>(null);
+
+  // Modal handlers for edit action
+  const handleEdit = (botId: string) => {
+    // Find the bot to edit
+    const propBotToEdit = propBots.find(bot => bot.botId === botId);
+    if (propBotToEdit) {
+      setEditingBot(propBotToEdit);
+      setEditModalOpen(true);
+    }
+  };
+
+  // Filter bots based on search query, risk, and status
+  const filteredPropBots = propBots.filter(bot => {
+    const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          bot.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRisk = riskFilter === 'all' || bot.risk === riskFilter;
+    const matchesStatus = statusFilter === 'all' || bot.status === statusFilter;
+    
+    return matchesSearch && matchesRisk && matchesStatus;
   });
-  
-  const propBots: PropBot[] = [
-    {
-      id: 'ptb-001',
-      name: 'FTMO Challenge Bot',
-      status: BotStatus.ACTIVE,
-      createdDate: '2023-08-15',
-      users: 25,
-      profit: '+8.2%',
-      type: BotType.PROP_BOT,
-      propFirm: 'FTMO',
-      performanceLastMonth: '+5.1%', 
-      performanceAllTime: '+22.4%',
-      minCapital: '$10,000',
-      description: 'Specialized bot for FTMO challenges',
-      lastUpdated: '2023-08-25'
-    },
-    {
-      id: 'ptb-002',
-      name: 'FTMO Challenge Bot - Aggressive',
-      status: BotStatus.ACTIVE,
-      createdDate: '2023-09-10',
-      users: 15,
-      profit: '+12.5%',
-      type: BotType.PROP_BOT,
-      propFirm: 'FTMO',
-      performanceLastMonth: '+8.2%',
-      performanceAllTime: '+35.7%',
-      minCapital: '$25,000',
-      description: 'Aggressive strategy for FTMO challenges',
-      lastUpdated: '2023-09-20'
-    },
-    {
-      id: 'ptb-003',
-      name: 'FundedNext Challenge Bot',
-      status: BotStatus.MAINTENANCE,
-      createdDate: '2023-07-22',
-      users: 18,
-      profit: '+6.8%',
-      type: BotType.PROP_BOT,
-      propFirm: 'FundedNext',
-      performanceLastMonth: '+3.5%',
-      performanceAllTime: '+18.2%',
-      minCapital: '$15,000',
-      description: 'Optimized for FundedNext evaluation phases',
-      lastUpdated: '2023-07-30'
-    },
-    {
-      id: 'ptb-004',
-      name: 'Coinstrat Pro Challenge Bot',
-      status: BotStatus.INACTIVE,
-      createdDate: '2023-06-30',
-      users: 8,
-      profit: '+3.2%',
-      type: BotType.PROP_BOT,
-      propFirm: 'Coinstrat Pro',
-      performanceLastMonth: '+1.2%',
-      performanceAllTime: '+7.5%',
-      minCapital: '$5,000',
-      description: 'Entry-level bot for Coinstrat Pro challenges',
-      lastUpdated: '2023-07-05'
-    }
-  ];
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  // Sort bots alphabetically by name
+  filteredPropBots.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Deletion confirmation
+  const handleDeleteConfirm = (botId: string) => {
+    setIsDeleting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const updatedBots = propBots.filter(bot => bot.botId !== botId);
+      setPropBots(updatedBots);
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+      
+      toast.success("Bot xóa thành công", {
+        description: `Prop Trading Bot với botId ${botId} đã được xóa thành công.`,
+      });
+    }, 1000);
   };
 
-  const handleFilterClick = () => {
-    if (!filterStatus) {
-      setFilterStatus('active');
-    } else if (filterStatus === 'active') {
-      setFilterStatus('inactive');
-    } else if (filterStatus === 'inactive') {
-      setFilterStatus('maintenance');
-    } else {
-      setFilterStatus(null);
-    }
+  // Handlers for opening delete confirmation
+  const handleDelete = (botId: string) => {
+    setBotToDelete(botId);
+    setDeleteModalOpen(true);
   };
 
-  const viewBotDetail = (botId: string) => {
-    navigate(`/admin/prop-bots/${botId}`, { 
-      state: { from: location.pathname } 
-    });
+  // Handler for viewing bot details
+  const handleView = (botId: string) => {
+    // Navigate to the bot detail page
+    window.open(`/prop-trading-bots/${botId}`, '_blank');
+  };
+
+  // Refresh data
+  const refreshData = () => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success("Dữ liệu đã được làm mới!");
+    }, 1000);
+  };
+
+  // Create new bot handler
+  const createNewBot = (botData: Partial<PropBot>) => {
+    setIsCreating(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const newBot: PropBot = {
+        botId: `PROP-${Math.floor(Math.random() * 1000)}`,
+        name: botData.name || 'New Prop Bot',
+        description: botData.description || 'Mô tả mặc định cho prop bot mới.',
+        type: BotType.PROP_BOT,
+        status: botData.status || BotStatus.ACTIVE,
+        exchange: botData.exchange || 'Unknown',
+        risk: botData.risk || BotRiskLevel.MEDIUM,
+        performanceLastMonth: botData.performanceLastMonth || '+0.0%',
+        performanceAllTime: botData.performanceAllTime || '+0.0%',
+        users: 0,
+        minCapital: botData.minCapital || '$1,000',
+        profit: botData.performanceLastMonth || '+0.0%',
+        propFirm: botData.propFirm || 'Unknown',
+        createdDate: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+        maxDrawdown: botData.maxDrawdown || '5.0%',
+        challengeDuration: botData.challengeDuration || '30 ngày',
+        accountSizes: botData.accountSizes || ['$10K', '$25K', '$50K']
+      };
+      
+      setPropBots([newBot, ...propBots]);
+      setIsCreating(false);
+      setCreateModalOpen(false);
+      
+      toast.success("Bot tạo thành công", {
+        description: `Prop Trading Bot mới với botId ${newBot.botId} đã được tạo thành công.`,
+      });
+    }, 1000);
   };
   
-  const handleAddBot = () => {
-    if (!newBot.name || !newBot.description) {
-      toast.error("Vui lòng điền đầy đủ thông tin bot");
-      return;
-    }
+  // Update existing bot handler
+  const updateExistingBot = (botData: PropBot) => {
+    setIsUpdating(true);
     
-    toast.success("Đã thêm Prop Trading Bot mới thành công");
-    setIsAddBotDialogOpen(false);
-    
-    setNewBot({
-      name: '',
-      description: '',
-      riskLevel: 'low',
-      propFirm: 'coinstrat_pro',
-      maxDrawdown: '5',
-      targetProfit: '10',
-      accountSizes: ['10k', '25k', '50k', '100k'],
-      challengeType: 'one_phase',
-      tradingWindow: '30',
-      timeframe: '1h',
-      tradingHours: 'all_day',
-      maxDailyDrawdown: '2',
-      tradingStrategy: 'risk_managed',
-      enableWeekendTrading: false,
-      enableNewsPause: true,
-      enableVolatilityFilter: true,
-      tradingAssets: 'forex_crypto',
-      supportShort: true,
-      supportLong: true
-    });
-    
-    setActiveTab('general');
-  };
-
-  const toggleAccountSize = (size: string) => {
-    if (newBot.accountSizes.includes(size)) {
-      setNewBot({
-        ...newBot, 
-        accountSizes: newBot.accountSizes.filter(s => s !== size)
+    // Simulate API call
+    setTimeout(() => {
+      const updatedBots = propBots.map(bot => 
+        bot.botId === botData.botId ? { ...botData, lastUpdated: new Date().toISOString() } : bot
+      );
+      
+      setPropBots(updatedBots);
+      setIsUpdating(false);
+      setEditModalOpen(false);
+      
+      toast.success("Bot cập nhật thành công", {
+        description: `Thông tin Bot với botId ${botData.botId} đã được cập nhật thành công.`,
       });
-    } else {
-      setNewBot({
-        ...newBot, 
-        accountSizes: [...newBot.accountSizes, size]
-      });
-    }
+    }, 1000);
   };
 
-  const handleSelectAll = () => {
-    const newSelectAll = !selectAll;
-    setSelectAll(newSelectAll);
+  // Handle create form submission
+  const handleCreateSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     
-    if (newSelectAll) {
-      setSelectedBots(filteredBots.map(bot => bot.id));
-    } else {
-      setSelectedBots([]);
-    }
-  };
-
-  const handleSelectBot = (botId: string) => {
-    setSelectedBots(prev => {
-      if (prev.includes(botId)) {
-        return prev.filter(id => id !== botId);
-      } else {
-        return [...prev, botId];
-      }
-    });
-  };
-
-  const handleBulkAction = (action: 'activate' | 'deactivate') => {
-    if (selectedBots.length === 0) {
-      toast.error("Vui lòng chọn ít nhất một bot");
-      return;
-    }
-
-    const statusMessage = action === 'activate' ? 'kích hoạt' : 'tạm dừng';
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
     
-    toast.success(
-      `Đã ${statusMessage} ${selectedBots.length} bot`,
-      { description: `Các bot đã được ${statusMessage} thành công` }
-    );
-
-    // In a real app, we would update the status of the selected bots here
-  };
-
-  const handleExportData = (format: 'excel' | 'csv') => {
-    const botsToExport = selectedBots.length > 0 
-      ? filteredBots.filter(bot => selectedBots.includes(bot.id))
-      : filteredBots;
-    
-    if (botsToExport.length === 0) {
-      toast.error("Không có dữ liệu để xuất");
-      return;
-    }
-
-    // Define headers for export
-    const headers = ["ID", "Tên Bot", "Trạng thái", "Loại", "Tài khoản", "Lợi nhuận", "Ngày tạo"];
-    
-    // Map status to Vietnamese
-    const translateStatus = (status: string): string => {
-      switch(status) {
-        case 'active': return 'Hoạt động';
-        case 'inactive': return 'Tạm dừng';
-        case 'maintenance': return 'Bảo trì';
-        default: return status;
-      }
+    const botData: Partial<PropBot> = {
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      exchange: formData.get('exchange') as string,
+      risk: formData.get('risk') as BotRiskLevel,
+      status: formData.get('status') as BotStatus,
+      performanceLastMonth: formData.get('performanceLastMonth') as string,
+      performanceAllTime: formData.get('performanceAllTime') as string,
+      minCapital: formData.get('minCapital') as string,
+      propFirm: formData.get('propFirm') as string,
+      maxDrawdown: formData.get('maxDrawdown') as string,
+      challengeDuration: formData.get('challengeDuration') as string,
+      accountSizes: formData.getAll('accountSizes') as string[],
     };
     
-    // Format data for export
-    const exportData = botsToExport.map(bot => [
-      bot.id,
-      bot.name,
-      translateStatus(bot.status),
-      bot.type || 'N/A',
-      bot.users.toString(),
-      bot.profit,
-      bot.createdDate
-    ]);
+    createNewBot(botData);
+  };
+  
+  // Handle edit form submission
+  const handleEditSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     
-    if (format === 'csv') {
-      // Create CSV content
-      const csvContent = [
-        headers.join(','),
-        ...exportData.map(row => row.join(','))
-      ].join('\n');
-      
-      // Create blob and download
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `prop-bots-${new Date().toISOString().slice(0, 10)}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // Create worksheet for Excel
-      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData]);
-      
-      // Create workbook and add the worksheet
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Prop Bots');
-      
-      // Generate Excel file and download
-      XLSX.writeFile(workbook, `prop-bots-${new Date().toISOString().slice(0, 10)}.xlsx`);
-    }
+    if (!editingBot) return;
     
-    toast.success(
-      `Đã xuất ${botsToExport.length} bot ra file ${format.toUpperCase()}`,
-      { description: `Dữ liệu đã được xuất thành công` }
-    );
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    
+    const botData: PropBot = {
+      ...editingBot,
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      exchange: formData.get('exchange') as string,
+      risk: formData.get('risk') as BotRiskLevel,
+      status: formData.get('status') as BotStatus,
+      performanceLastMonth: formData.get('performanceLastMonth') as string,
+      performanceAllTime: formData.get('performanceAllTime') as string,
+      minCapital: formData.get('minCapital') as string,
+      propFirm: formData.get('propFirm') as string,
+      maxDrawdown: formData.get('maxDrawdown') as string,
+      challengeDuration: formData.get('challengeDuration') as string,
+      accountSizes: formData.getAll('accountSizes') as string[],
+    };
+    
+    updateExistingBot(botData);
   };
 
-  const filteredBots = propBots
-    .filter(bot => 
-      (searchTerm === '' || 
-        bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bot.id.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-    .filter(bot => 
-      (filterStatus === null || bot.status === filterStatus)
-    );
-    
-  React.useEffect(() => {
-    if (filteredBots.length > 0 && selectedBots.length === filteredBots.length &&
-      filteredBots.every(bot => selectedBots.includes(bot.id))) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
+  const getRiskLabel = (risk: string) => {
+    return BOT_RISK_DISPLAY[risk as BotRiskLevel] || risk;
+  };
+  
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
     }
-  }, [selectedBots, filteredBots]);
+  };
+
+  const getStatusLabel = (status: string) => {
+    return BOT_STATUS_DISPLAY[status as BotStatus] || status;
+  };
+
+  // Generate rows for the admin data table
+  const generatePropBotRows = () => {
+    return filteredPropBots.map((bot) => (
+      <tr key={bot.botId} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+        <td className="px-4 py-3">
+          <div className="flex items-center">
+            <div className={`w-2 h-2 rounded-full mr-2 ${
+              bot.status === BotStatus.ACTIVE ? 'bg-green-500' : 'bg-gray-300'
+            }`} />
+            <span className="font-medium">{bot.name}</span>
+          </div>
+        </td>
+        <td className="px-4 py-3 text-sm">
+          <Badge variant="outline">{bot.botId}</Badge>
+        </td>
+        <td className="px-4 py-3 hidden md:table-cell">
+          <div className="line-clamp-2 text-sm">{bot.description}</div>
+        </td>
+        <td className="px-4 py-3 text-sm hidden lg:table-cell">
+          <Badge className={getRiskColor(bot.risk)}>{getRiskLabel(bot.risk)}</Badge>
+        </td>
+        <td className="px-4 py-3 text-sm text-right">
+          {bot.users}
+        </td>
+        <td className="px-4 py-3 text-sm text-right">
+          <div className={`font-medium ${parseFloat(bot.profit) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {bot.profit}
+          </div>
+        </td>
+        <td className="px-4 py-3 text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleView(bot.botId)}>
+                <Eye className="mr-2 h-4 w-4" />
+                <span>Xem chi tiết</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(bot.botId)}>
+                <Edit className="mr-2 h-4 w-4" />
+                <span>Chỉnh sửa</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleDelete(bot.botId)} className="text-red-600">
+                <Trash className="mr-2 h-4 w-4" />
+                <span>Xóa</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </td>
+      </tr>
+    ));
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-white">Quản lý Prop Trading Bots</h1>
-        <Button 
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-          onClick={() => setIsAddBotDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm Prop Bot mới
+        <Button onClick={() => setCreateModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Tạo Prop Bot Mới
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardContent className="p-6">
-            <p className="text-zinc-400 text-sm">Tổng Bot</p>
-            <h2 className="text-4xl font-bold mt-2 mb-4">{totalBots}</h2>
-            
-            <div className="flex justify-between text-sm">
-              <div>
-                <p className="text-green-500">Hoạt động</p>
-                <p className="text-2xl font-semibold mt-1">{activeBots}</p>
-              </div>
-              <div>
-                <p className="text-yellow-500">Không hoạt động</p>
-                <p className="text-2xl font-semibold mt-1">{inactiveBots}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardContent className="p-6">
-            <p className="text-zinc-400 text-sm">Tài khoản</p>
-            <h2 className="text-4xl font-bold mt-2 mb-4">{totalAccounts}</h2>
-            
-            <div>
-              <p className="text-zinc-400 text-sm">Bình quân mỗi bot</p>
-              <p className="text-2xl font-semibold mt-1">{averageAccountsPerBot}</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-zinc-900 border-zinc-800 text-white">
-          <CardContent className="p-6">
-            <p className="text-zinc-400 text-sm">Hiệu suất</p>
-            <h2 className="text-4xl font-bold mt-2 mb-4 text-green-500">{performanceRate}</h2>
-            
-            <div>
-              <p className="text-zinc-400 text-sm">Bot hiệu quả</p>
-              <p className="text-2xl font-semibold mt-1">{topPerformingRatio}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <Input
+          type="search"
+          placeholder="Tìm kiếm bot..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="flex gap-2">
+          <Select value={riskFilter} onValueChange={setRiskFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Lọc theo rủi ro" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả rủi ro</SelectItem>
+              <SelectItem value={BotRiskLevel.LOW}>{getRiskLabel(BotRiskLevel.LOW)}</SelectItem>
+              <SelectItem value={BotRiskLevel.MEDIUM}>{getRiskLabel(BotRiskLevel.MEDIUM)}</SelectItem>
+              <SelectItem value={BotRiskLevel.HIGH}>{getRiskLabel(BotRiskLevel.HIGH)}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Lọc theo trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value={BotStatus.ACTIVE}>{getStatusLabel(BotStatus.ACTIVE)}</SelectItem>
+              <SelectItem value={BotStatus.INACTIVE}>{getStatusLabel(BotStatus.INACTIVE)}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <Card className="border-zinc-800 bg-zinc-900 text-white">
-        <CardHeader>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Danh sách Prop Trading Bots</CardTitle>
-          <CardDescription className="text-zinc-400">
-            Quản lý tất cả Prop Trading Bots trong hệ thống Trade Bot 365.
-          </CardDescription>
+          <div className="flex items-center gap-2">
+            <Badge>{filteredPropBots.length} Bot</Badge>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={refreshData}
+              disabled={isLoading}
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:items-center gap-4">
-              <div className="relative w-full sm:max-w-[400px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
-                <Input 
-                  placeholder="Tìm kiếm Bot..." 
-                  className="pl-10 bg-zinc-800 border-zinc-700 text-white"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-              </div>
-              <Button 
-                variant="outline" 
-                className={`border-zinc-700 ${filterStatus ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`}
-                onClick={handleFilterClick}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                {filterStatus ? `Lọc: ${filterStatus}` : 'Lọc'}
-              </Button>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              {selectedBots.length > 0 ? (
-                <>
-                  <Button 
-                    variant="outline" 
-                    className="border-zinc-700 text-green-400 hover:text-green-300"
-                    onClick={() => handleBulkAction('activate')}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    Kích hoạt
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="border-zinc-700 text-amber-400 hover:text-amber-300"
-                    onClick={() => handleBulkAction('deactivate')}
-                  >
-                    <Pause className="h-4 w-4 mr-2" />
-                    Tạm dừng
-                  </Button>
-                </>
-              ) : null}
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="border-zinc-700 text-zinc-400"
-                  >
-                    <FileDown className="h-4 w-4 mr-2" />
-                    Xuất dữ liệu
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
-                  <DropdownMenuLabel>Xuất d�� liệu</DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-zinc-800" />
-                  <DropdownMenuItem 
-                    className="focus:bg-zinc-800 cursor-pointer"
-                    onClick={() => handleExportData('excel')}
-                  >
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
-                    <span>Xuất Excel</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="focus:bg-zinc-800 cursor-pointer"
-                    onClick={() => handleExportData('csv')}
-                  >
-                    <FileX className="mr-2 h-4 w-4" />
-                    <span>Xuất CSV</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-zinc-800">
-                  <TableHead className="text-zinc-400 w-10">
-                    <Checkbox 
-                      className="border-zinc-600"
-                      checked={selectAll && filteredBots.length > 0}
-                      onCheckedChange={handleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead className="text-zinc-400 w-28">ID</TableHead>
-                  <TableHead className="text-zinc-400">Tên Bot</TableHead>
-                  <TableHead className="text-zinc-400">Trạng thái</TableHead>
-                  <TableHead className="text-zinc-400">Loại</TableHead>
-                  <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
-                  <TableHead className="text-zinc-400 text-right">Lợi nhuận</TableHead>
-                  <TableHead className="text-zinc-400">Ngày tạo</TableHead>
-                  <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredBots.length > 0 ? (
-                  filteredBots.map((bot) => (
-                    <TableRow key={bot.id} className="border-zinc-800">
-                      <TableCell>
-                        <Checkbox
-                          className="border-zinc-600"
-                          checked={selectedBots.includes(bot.id)}
-                          onCheckedChange={() => handleSelectBot(bot.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
-                      <TableCell className="font-medium">{bot.name}</TableCell>
-                      <TableCell>
-                        <BotStatusBadge status={bot.status} />
-                      </TableCell>
-                      <TableCell>{bot.type}</TableCell>
-                      <TableCell className="text-right">{bot.users}</TableCell>
-                      <TableCell className={`text-right ${bot.profit.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
-                        {bot.profit}
-                      </TableCell>
-                      <TableCell>{bot.createdDate}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
-                            <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-zinc-800" />
-                            <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => viewBotDetail(bot.id)}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              <span>Xem chi tiết</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="focus:bg-zinc-800">
-                              <Settings className="mr-2 h-4 w-4" />
-                              <span>Chỉnh sửa</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="focus:bg-zinc-800">
-                              {bot.status === 'active' ? (
-                                <>
-                                  <Pause className="mr-2 h-4 w-4" />
-                                  <span>Tạm dừng</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Play className="mr-2 h-4 w-4" />
-                                  <span>Kích hoạt</span>
-                                </>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="bg-zinc-800" />
-                            <DropdownMenuItem className="focus:bg-zinc-800 text-red-500 focus:text-red-500">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Xóa Bot</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
+        <CardContent className="p-0">
+          <div className="overflow-x-auto rounded-md">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Tên Bot</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Bot ID</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground hidden md:table-cell">Mô tả</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground hidden lg:table-cell">Rủi ro</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">Người dùng</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">Hiệu suất</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <RefreshCw className="h-6 w-6 animate-spin text-primary mb-2" />
+                        <span className="text-sm text-muted-foreground">Đang tải dữ liệu...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredPropBots.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <FileQuestion className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                        <span className="text-muted-foreground">Không tìm thấy Bot nào phù hợp</span>
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          onClick={() => {
+                            setSearchQuery('');
+                            setRiskFilter('all');
+                            setStatusFilter('all');
+                          }}
+                          className="mt-2"
+                        >
+                          Xóa tất cả bộ lọc
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
-                      Không tìm thấy kết quả phù hợp.
-                    </TableCell>
-                  </TableRow>
+                  generatePropBotRows()
                 )}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-zinc-400">
-              {selectedBots.length > 0 ? (
-                <div className="flex items-center">
-                  <Check className="h-4 w-4 mr-2 text-green-400" />
-                  <span>Đã chọn <span className="font-medium text-white">{selectedBots.length}</span> bot</span>
-                </div>
-              ) : (
-                <div>
-                  Hiển thị <span className="font-medium text-white">1-{filteredBots.length}</span> trong <span className="font-medium text-white">{filteredBots.length}</span> bots
-                </div>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-400">
-                Trước
-              </Button>
-              <Button variant="outline" size="sm" className="border-zinc-700 bg-zinc-800 text-white">
-                1
-              </Button>
-              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-400">
-                Sau
-              </Button>
-            </div>
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
-      
-      <Dialog open={isAddBotDialogOpen} onOpenChange={setIsAddBotDialogOpen}>
-        <DialogContent className="lg:max-w-[800px] border-zinc-800 bg-zinc-900 text-white">
+
+      {/* Create bot modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Thêm Prop Trading Bot Mới</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Tạo mới một Prop Trading Bot được tối ưu cho các bài kiểm tra Prop Trading.
+            <DialogTitle>Tạo Prop Trading Bot mới</DialogTitle>
+            <DialogDescription>
+              Nhập thông tin cho Bot Prop Trading mới. Bot sẽ được thêm vào danh sách và có thể được chỉnh sửa sau.
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="general">Thông tin chung</TabsTrigger>
-              <TabsTrigger value="challenge">Cài đặt thử thách</TabsTrigger>
-              <TabsTrigger value="strategy">Chiến lược & Tính năng</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="general" className="space-y-4">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Tên Bot</Label>
-                  <Input
-                    id="name"
-                    placeholder="Nhập tên của Bot"
-                    className="bg-zinc-800 border-zinc-700 text-white"
-                    value={newBot.name}
-                    onChange={(e) => setNewBot({...newBot, name: e.target.value})}
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Mô tả</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Mô tả chiến lược và tính năng của Bot"
-                    className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
-                    value={newBot.description}
-                    onChange={(e) => setNewBot({...newBot, description: e.target.value})}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="propFirm">Công ty Prop Trading</Label>
-                    <Select 
-                      value={newBot.propFirm} 
-                      onValueChange={(value) => setNewBot({...newBot, propFirm: value})}
-                    >
-                      <SelectTrigger id="propFirm" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn công ty" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="coinstrat_pro">Coinstrat Pro</SelectItem>
-                        <SelectItem value="ftmo">FTMO</SelectItem>
-                        <SelectItem value="funded_next">FundedNext</SelectItem>
-                        <SelectItem value="multiple">Nhiều công ty</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="riskLevel">Mức độ rủi ro</Label>
-                    <Select 
-                      value={newBot.riskLevel} 
-                      onValueChange={(value) => setNewBot({...newBot, riskLevel: value})}
-                    >
-                      <SelectTrigger id="riskLevel" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn mức độ rủi ro" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="very_low">Rất thấp</SelectItem>
-                        <SelectItem value="low">Thấp</SelectItem>
-                        <SelectItem value="medium">Trung bình</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label className="mb-1">Kích thước tài khoản hỗ trợ</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="account10k" 
-                        checked={newBot.accountSizes.includes('10k')}
-                        onCheckedChange={() => toggleAccountSize('10k')}
-                      />
-                      <Label htmlFor="account10k" className="text-sm">10,000 USD</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="account25k" 
-                        checked={newBot.accountSizes.includes('25k')}
-                        onCheckedChange={() => toggleAccountSize('25k')}
-                      />
-                      <Label htmlFor="account25k" className="text-sm">25,000 USD</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="account50k" 
-                        checked={newBot.accountSizes.includes('50k')}
-                        onCheckedChange={() => toggleAccountSize('50k')}
-                      />
-                      <Label htmlFor="account50k" className="text-sm">50,000 USD</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="account100k" 
-                        checked={newBot.accountSizes.includes('100k')}
-                        onCheckedChange={() => toggleAccountSize('100k')}
-                      />
-                      <Label htmlFor="account100k" className="text-sm">100,000 USD</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="account200k" 
-                        checked={newBot.accountSizes.includes('200k')}
-                        onCheckedChange={() => toggleAccountSize('200k')}
-                      />
-                      <Label htmlFor="account200k" className="text-sm">200,000 USD</Label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="challengeType">Loại thử thách</Label>
-                    <Select 
-                      value={newBot.challengeType} 
-                      onValueChange={(value) => setNewBot({...newBot, challengeType: value})}
-                    >
-                      <SelectTrigger id="challengeType" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn loại thử thách" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="one_phase">Một giai đoạn</SelectItem>
-                        <SelectItem value="two_phase">Hai giai đoạn</SelectItem>
-                        <SelectItem value="evaluation">Evaluation Model</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="tradingAssets">Loại tài sản giao dịch</Label>
-                    <Select 
-                      value={newBot.tradingAssets} 
-                      onValueChange={(value) => setNewBot({...newBot, tradingAssets: value})}
-                    >
-                      <SelectTrigger id="tradingAssets" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn loại tài sản" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="forex">Forex</SelectItem>
-                        <SelectItem value="crypto">Crypto</SelectItem>
-                        <SelectItem value="forex_crypto">Forex & Crypto</SelectItem>
-                        <SelectItem value="all">Tất cả loại tài sản</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          <form onSubmit={handleCreateSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Tên Bot</Label>
+                <Input type="text" id="name" name="name" required />
               </div>
-            </TabsContent>
-            
-            <TabsContent value="challenge" className="space-y-4">
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="targetProfit">Mục tiêu lợi nhuận (%)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        id="targetProfit"
-                        defaultValue={[10]}
-                        max={30}
-                        step={1}
-                        value={[parseInt(newBot.targetProfit)]}
-                        onValueChange={(value) => setNewBot({...newBot, targetProfit: value[0].toString()})}
-                        className="flex-1"
-                      />
-                      <span className="min-w-[3rem] text-center font-medium">{newBot.targetProfit}%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        id="maxDrawdown"
-                        defaultValue={[5]}
-                        max={10}
-                        step={0.5}
-                        value={[parseFloat(newBot.maxDrawdown)]}
-                        onValueChange={(value) => setNewBot({...newBot, maxDrawdown: value[0].toString()})}
-                        className="flex-1"
-                      />
-                      <span className="min-w-[3rem] text-center font-medium">{newBot.maxDrawdown}%</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="maxDailyDrawdown">Drawdown hàng ngày tối đa (%)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        id="maxDailyDrawdown"
-                        defaultValue={[2]}
-                        max={5}
-                        step={0.1}
-                        value={[parseFloat(newBot.maxDailyDrawdown)]}
-                        onValueChange={(value) => setNewBot({...newBot, maxDailyDrawdown: value[0].toString()})}
-                        className="flex-1"
-                      />
-                      <span className="min-w-[3rem] text-center font-medium">{newBot.maxDailyDrawdown}%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="tradingWindow">Cửa sổ giao dịch (ngày)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        id="tradingWindow"
-                        defaultValue={[30]}
-                        min={15}
-                        max={60}
-                        step={1}
-                        value={[parseInt(newBot.tradingWindow)]}
-                        onValueChange={(value) => setNewBot({...newBot, tradingWindow: value[0].toString()})}
-                        className="flex-1"
-                      />
-                      <span className="min-w-[3rem] text-center font-medium">{newBot.tradingWindow}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="timeframe">Khung thời gian</Label>
-                    <Select 
-                      value={newBot.timeframe} 
-                      onValueChange={(value) => setNewBot({...newBot, timeframe: value})}
-                    >
-                      <SelectTrigger id="timeframe" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn khung thời gian" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="5m">5 phút</SelectItem>
-                        <SelectItem value="15m">15 phút</SelectItem>
-                        <SelectItem value="30m">30 phút</SelectItem>
-                        <SelectItem value="1h">1 giờ</SelectItem>
-                        <SelectItem value="4h">4 giờ</SelectItem>
-                        <SelectItem value="1d">Ngày</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="tradingHours">Giờ giao dịch</Label>
-                    <Select 
-                      value={newBot.tradingHours} 
-                      onValueChange={(value) => setNewBot({...newBot, tradingHours: value})}
-                    >
-                      <SelectTrigger id="tradingHours" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn giờ giao dịch" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="all_day">Cả ngày</SelectItem>
-                        <SelectItem value="london_ny">London & New York</SelectItem>
-                        <SelectItem value="asia">Phiên Á</SelectItem>
-                        <SelectItem value="custom">Tùy chỉnh</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+              <div>
+                <Label htmlFor="exchange">Sàn giao dịch</Label>
+                <Input type="text" id="exchange" name="exchange" required />
               </div>
-            </TabsContent>
-            
-            <TabsContent value="strategy" className="space-y-4">
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="tradingStrategy">Chiến lược giao dịch</Label>
-                    <Select 
-                      value={newBot.tradingStrategy} 
-                      onValueChange={(value) => setNewBot({...newBot, tradingStrategy: value})}
-                    >
-                      <SelectTrigger id="tradingStrategy" className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue placeholder="Chọn chiến lược" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectItem value="risk_managed">Quản lý rủi ro chặt chẽ</SelectItem>
-                        <SelectItem value="trend_following">Theo xu hướng</SelectItem>
-                        <SelectItem value="breakout">Breakout</SelectItem>
-                        <SelectItem value="mean_reversion">Mean Reversion</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label>Hướng giao dịch</Label>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="supportLong" 
-                          checked={newBot.supportLong}
-                          onCheckedChange={(checked) => setNewBot({...newBot, supportLong: checked as boolean})}
-                        />
-                        <Label htmlFor="supportLong" className="text-sm">Long</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="supportShort" 
-                          checked={newBot.supportShort}
-                          onCheckedChange={(checked) => setNewBot({...newBot, supportShort: checked as boolean})}
-                        />
-                        <Label htmlFor="supportShort" className="text-sm">Short</Label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="enableWeekendTrading">Giao dịch cuối tuần</Label>
-                    <p className="text-sm text-zinc-400">Cho phép giao dịch cryptocurrency vào cuối tuần</p>
-                  </div>
-                  <Switch
-                    id="enableWeekendTrading"
-                    checked={newBot.enableWeekendTrading}
-                    onCheckedChange={(checked) => setNewBot({...newBot, enableWeekendTrading: checked})}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="enableNewsPause">Tạm dừng trong tin tức</Label>
-                    <p className="text-sm text-zinc-400">Tự động tạm dừng giao dịch trong các sự kiện tin tức quan trọng</p>
-                  </div>
-                  <Switch
-                    id="enableNewsPause"
-                    checked={newBot.enableNewsPause}
-                    onCheckedChange={(checked) => setNewBot({...newBot, enableNewsPause: checked})}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="enableVolatilityFilter">Bộ lọc biến động</Label>
-                    <p className="text-sm text-zinc-400">Tránh giao dịch trong các điều kiện thị trường biến động cao</p>
-                  </div>
-                  <Switch
-                    id="enableVolatilityFilter"
-                    checked={newBot.enableVolatilityFilter}
-                    onCheckedChange={(checked) => setNewBot({...newBot, enableVolatilityFilter: checked})}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="risk">Mức độ rủi ro</Label>
+                <Select name="risk" defaultValue={BotRiskLevel.MEDIUM}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn mức độ rủi ro" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={BotRiskLevel.LOW}>{getRiskLabel(BotRiskLevel.LOW)}</SelectItem>
+                    <SelectItem value={BotRiskLevel.MEDIUM}>{getRiskLabel(BotRiskLevel.MEDIUM)}</SelectItem>
+                    <SelectItem value={BotRiskLevel.HIGH}>{getRiskLabel(BotRiskLevel.HIGH)}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </TabsContent>
-          </Tabs>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsAddBotDialogOpen(false)}
-              className="border-zinc-700 text-zinc-400"
-            >
-              Hủy
-            </Button>
-            <Button 
-              onClick={handleAddBot}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Tạo Bot
-            </Button>
-          </DialogFooter>
+              <div>
+                <Label htmlFor="status">Trạng thái</Label>
+                <Select name="status" defaultValue={BotStatus.ACTIVE}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={BotStatus.ACTIVE}>{getStatusLabel(BotStatus.ACTIVE)}</SelectItem>
+                    <SelectItem value={BotStatus.INACTIVE}>{getStatusLabel(BotStatus.INACTIVE)}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="performanceLastMonth">Hiệu suất tháng này</Label>
+                <Input type="text" id="performanceLastMonth" name="performanceLastMonth" defaultValue="+0.0%" required />
+              </div>
+              <div>
+                <Label htmlFor="performanceAllTime">Hiệu suất tổng thời gian</Label>
+                <Input type="text" id="performanceAllTime" name="performanceAllTime" defaultValue="+0.0%" required />
+              </div>
+              <div>
+                <Label htmlFor="minCapital">Vốn tối thiểu</Label>
+                <Input type="text" id="minCapital" name="minCapital" defaultValue="$1,000" required />
+              </div>
+              <div>
+                <Label htmlFor="propFirm">Prop Firm</Label>
+                <Input type="text" id="propFirm" name="propFirm" required />
+              </div>
+              <div>
+                <Label htmlFor="maxDrawdown">Max Drawdown</Label>
+                <Input type="text" id="maxDrawdown" name="maxDrawdown" defaultValue="5.0%" required />
+              </div>
+              <div>
+                <Label htmlFor="challengeDuration">Challenge Duration</Label>
+                <Input type="text" id="challengeDuration" name="challengeDuration" defaultValue="30 ngày" required />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="accountSizes">Account Sizes</Label>
+                <Input type="text" id="accountSizes" name="accountSizes" defaultValue="$10K, $25K, $50K" required />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="description">Mô tả</Label>
+                <Textarea id="description" name="description" className="min-h-[80px]" required />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateModalOpen(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" disabled={isCreating}>
+                {isCreating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Đang tạo...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Tạo Bot
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
+
+      {/* Edit bot modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa Prop Trading Bot</DialogTitle>
+            <DialogDescription>
+              Cập nhật thông tin cho Bot Prop Trading với botId {editingBot?.botId}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingBot && (
+            <form onSubmit={handleEditSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Tên Bot</Label>
+                  <Input type="text" id="name" name="name" defaultValue={editingBot.name} required />
+                </div>
+                <div>
+                  <Label htmlFor="exchange">Sàn giao dịch</Label>
+                  <Input type="text" id="exchange" name="exchange" defaultValue={editingBot.exchange} required />
+                </div>
+                <div>
+                  <Label htmlFor="risk">Mức độ rủi ro</Label>
+                  <Select name="risk" defaultValue={editingBot.risk}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn mức độ rủi ro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={BotRiskLevel.LOW}>{getRiskLabel(BotRiskLevel.LOW)}</SelectItem>
+                      <SelectItem value={BotRiskLevel.MEDIUM}>{getRiskLabel(BotRiskLevel.MEDIUM)}</SelectItem>
+                      <SelectItem value={BotRiskLevel.HIGH}>{getRiskLabel(BotRiskLevel.HIGH)}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="status">Trạng thái</Label>
+                  <Select name="status" defaultValue={editingBot.status}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn trạng thái" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={BotStatus.ACTIVE}>{getStatusLabel(BotStatus.ACTIVE)}</SelectItem>
+                      <SelectItem value={BotStatus.INACTIVE}>{getStatusLabel(BotStatus.INACTIVE)}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="performanceLastMonth">Hiệu suất tháng này</Label>
+                  <Input type="text" id="performanceLastMonth" name="performanceLastMonth" defaultValue={editingBot.performanceLastMonth} required />
+                </div>
+                <div>
+                  <Label htmlFor="performanceAllTime">Hiệu suất tổng thời gian</Label>
+                  <Input type="text" id="performanceAllTime" name="performanceAllTime" defaultValue={editingBot.performanceAllTime} required />
+                </div>
+                <div>
+                  <Label htmlFor="minCapital">Vốn tối thiểu</Label>
+                  <Input type="text" id="minCapital" name="minCapital" defaultValue={editingBot.minCapital} required />
+                </div>
+                <div>
+                  <Label htmlFor="propFirm">Prop Firm</Label>
+                  <Input type="text" id="propFirm" name="propFirm" defaultValue={editingBot.propFirm} required />
+                </div>
+                <div>
+                  <Label htmlFor="maxDrawdown">Max Drawdown</Label>
+                  <Input type="text" id="maxDrawdown" name="maxDrawdown" defaultValue={editingBot.maxDrawdown} required />
+                </div>
+                <div>
+                  <Label htmlFor="challengeDuration">Challenge Duration</Label>
+                  <Input type="text" id="challengeDuration" name="challengeDuration" defaultValue={editingBot.challengeDuration} required />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="accountSizes">Account Sizes</Label>
+                  <Input type="text" id="accountSizes" name="accountSizes" defaultValue={editingBot.accountSizes?.join(', ')} required />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="description">Mô tả</Label>
+                  <Textarea id="description" name="description" className="min-h-[80px]" defaultValue={editingBot.description} required />
+                </div>
+              </div>
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setEditModalOpen(false)}>
+                  Hủy
+                </Button>
+                <Button type="submit" disabled={isUpdating}>
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Đang cập nhật...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Cập nhật Bot
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn muốn xóa Bot này?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Bot sẽ bị xóa vĩnh viễn khỏi hệ thống và tất cả người dùng sẽ mất quyền truy cập vào nó.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDeleteConfirm(botToDelete)}
+              className="bg-red-600 text-white hover:bg-red-700"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                <>
+                  <Trash className="mr-2 h-4 w-4" />
+                  Xóa Bot
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-};
-
-const BotStatusBadge = ({ status }: { status: string }) => {
-  switch(status) {
-    case 'active':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-          <span className="text-green-500">Hoạt động</span>
-        </div>
-      );
-    case 'inactive':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></div>
-          <span className="text-yellow-500">Không hoạt động</span>
-        </div>
-      );
-    case 'maintenance':
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-blue-500 mr-2"></div>
-          <span className="text-blue-500">Bảo trì</span>
-        </div>
-      );
-    default:
-      return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-zinc-500 mr-2"></div>
-          <span className="text-zinc-500">Không xác định</span>
-        </div>
-      );
-  }
 };
 
 export default AdminPropBots;
