@@ -6,11 +6,13 @@ import { CoinstratSignal } from '@/types/signal';
 interface SignalInformationProps {
   signal: CoinstratSignal;
   onCopy: (text: string, label: string) => void;
+  showToken?: boolean;
 }
 
 const SignalInformation: React.FC<SignalInformationProps> = ({
   signal,
-  onCopy
+  onCopy,
+  showToken = false
 }) => {
   return (
     <div className="border-t pt-4">
@@ -40,13 +42,15 @@ const SignalInformation: React.FC<SignalInformationProps> = ({
           tooltip="Current status of this signal"
           onCopy={onCopy}
         />
-        <CopyableField
-          label="Signal Token"
-          value={signal.signalToken}
-          tooltip="Security token to validate signal authenticity"
-          className="col-span-2"
-          onCopy={onCopy}
-        />
+        {showToken && (
+          <CopyableField
+            label="Signal Token"
+            value={signal.signalToken}
+            tooltip="Security token to validate signal authenticity"
+            className="col-span-2"
+            onCopy={onCopy}
+          />
+        )}
         <CopyableField
           label="Max Lag"
           value={signal.maxLag}

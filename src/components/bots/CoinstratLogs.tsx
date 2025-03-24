@@ -81,6 +81,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
         onOpenChange={setSignalDetailsOpen}
         signal={selectedSignal}
         userId={userId}
+        botType={botType}
       />
     </div>
   );
