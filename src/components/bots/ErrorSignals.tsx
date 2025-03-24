@@ -70,8 +70,8 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
   
   return (
     <ErrorSignalsTable 
-      signals={signals} 
-      unreadSignals={unreadSignals} 
+      errorSignals={signals} 
+      unreadErrors={unreadSignals} 
       onMarkAsRead={handleMarkAsRead}
       onMarkAllAsRead={handleMarkAllAsRead}
       loading={loading}
