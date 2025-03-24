@@ -2,40 +2,29 @@
 /**
  * ID standardization utility functions for the Trade Bot 365 system.
  * This file contains helpers for standardizing entity IDs throughout the application.
+ * 
+ * IMPORTANT: The standard format for user IDs is USR-XXX (e.g., USR-001)
+ * IMPORTANT: The standard format for account IDs is ACC-XXX (e.g., ACC-001)
+ * IMPORTANT: Bot IDs follow type-specific formats (BOT-XXX, PREMIUM-XXX, PROP-XXX)
  */
+
+import { normalizeUserId } from './normalizeUserId';
 
 /**
  * Standardize and normalize a user ID to the proper format (USR-XXXX)
+ * 
  * @param userId The user ID to normalize
- * @returns Normalized user ID
+ * @returns Normalized user ID in standard format
  */
 export function standardizeUserId(userId: string): string {
-  if (!userId) return '';
-  
-  // If already in standard format, return as is
-  if (userId.startsWith('USR-')) {
-    return userId;
-  }
-  
-  // Remove any existing prefixes if present
-  let cleanId = userId;
-  const knownPrefixes = ['user-', 'user_', 'u-', 'u_'];
-  
-  for (const prefix of knownPrefixes) {
-    if (cleanId.toLowerCase().startsWith(prefix)) {
-      cleanId = cleanId.substring(prefix.length);
-      break;
-    }
-  }
-  
-  // Add standard prefix
-  return `USR-${cleanId}`;
+  return normalizeUserId(userId); // Use our central normalization function
 }
 
 /**
  * Standardize and normalize an account ID to the proper format (ACC-XXXX)
+ * 
  * @param accountId The account ID to normalize
- * @returns Normalized account ID
+ * @returns Normalized account ID in standard format
  */
 export function standardizeAccountId(accountId: string): string {
   if (!accountId) return '';
@@ -62,6 +51,7 @@ export function standardizeAccountId(accountId: string): string {
 
 /**
  * Convert legacy ID formats to standardized IDs throughout the application
+ * 
  * @param data The data object or array to standardize
  * @returns The same data with standardized IDs
  */
@@ -118,6 +108,7 @@ export function standardizeAllIds<T extends Record<string, any>>(data: T | T[]):
 
 /**
  * Migration function to help transition from using generic 'id' to specific entity IDs
+ * 
  * @param dataArray Array of entities to migrate
  * @param entityType Type of entity to perform the migration for
  * @returns Migrated data with standardized IDs

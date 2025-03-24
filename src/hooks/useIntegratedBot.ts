@@ -1,9 +1,15 @@
+
 import { useState } from 'react';
 import { Account } from '@/types';
 import { CoinstratSignal, SignalAction } from '@/types/signal';
 import { toast } from 'sonner';
 
-// Mock data cho accounts with standardized userId format
+/**
+ * Mock data cho các tài khoản với định dạng userId chuẩn hóa (USR-XXX)
+ * 
+ * Mỗi tài khoản bao gồm thông tin chi tiết về kết nối với sàn giao dịch,
+ * loại tài khoản, số dư và trạng thái kết nối.
+ */
 const mockAccounts: Account[] = [
   {
     cspAccountId: 'ACC001',
@@ -14,13 +20,13 @@ const mockAccounts: Account[] = [
     apiId: 'API001',
     tradingAccountNumber: '4056629',
     tradingAccountId: '40819726',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$500',
-    status: 'Connected',
+    tradingAccountType: 'HEDGED', // Loại tài khoản: HEDGED (đối lập) hoặc NETTED (ròng)
+    tradingAccountBalance: '$500', // Số dư tài khoản
+    status: 'Connected', // Trạng thái kết nối
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001',  // Standardized to USR-001 format with dash
-    isLive: false
+    cspUserId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
+    isLive: false // Tài khoản demo (false) hoặc thực (true)
   },
   {
     cspAccountId: 'ACC002',
@@ -36,7 +42,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001',  // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
     isLive: true
   },
   {
@@ -53,12 +59,17 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    cspUserId: 'USR-002',  // Standardized to USR-002 format with dash
+    cspUserId: 'USR-002',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
     isLive: false
   },
 ];
 
-// Mock data cho logs with standardized userId format
+/**
+ * Mock data cho các tín hiệu với định dạng userId chuẩn hóa (USR-XXX)
+ * 
+ * Mỗi tín hiệu bao gồm thông tin về loại hành động, cặp giao dịch,
+ * thời gian tạo, và danh sách các tài khoản đã xử lý hoặc bị lỗi.
+ */
 const mockLogs: CoinstratSignal[] = [
   {
     id: 'CSP-78952364',
@@ -74,14 +85,14 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR-001',  // Standardized to USR-001 format with dash
+        userId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
         name: 'Binance Spot Account',
         timestamp: new Date().toISOString(),
         status: 'success'
       },
       {
         accountId: 'ACC-002',
-        userId: 'USR-001',  // Standardized to USR-001 format with dash
+        userId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
         name: 'Coinstart Pro Account',
         timestamp: new Date().toISOString(),
         status: 'success'
@@ -103,7 +114,7 @@ const mockLogs: CoinstratSignal[] = [
     processedAccounts: [
       {
         accountId: 'ACC-001',
-        userId: 'USR-001',  // Standardized to USR-001 format with dash
+        userId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
         name: 'Binance Spot Account',
         timestamp: new Date(Date.now() - 3600000).toISOString(),
         status: 'success'
@@ -126,7 +137,7 @@ const mockLogs: CoinstratSignal[] = [
     failedAccounts: [
       {
         accountId: 'ACC-003',
-        userId: 'USR-001',  // Standardized to USR-001 format with dash
+        userId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
         name: 'FTX Account',
         timestamp: new Date(Date.now() - 7200000).toISOString(),
         reason: 'Invalid account configuration',
@@ -135,7 +146,7 @@ const mockLogs: CoinstratSignal[] = [
       },
       {
         accountId: 'ACC-004',
-        userId: 'USR-001',  // Standardized to USR-001 format with dash
+        userId: 'USR-001',  // Định dạng chuẩn USR-XXX với dấu gạch ngang
         name: 'Bybit Account',
         timestamp: new Date(Date.now() - 7200000).toISOString(),
         reason: 'API key expired',
@@ -156,15 +167,25 @@ export interface UseIntegratedBotResult {
   refreshTabData: () => void;
 }
 
+/**
+ * Hook để quản lý dữ liệu cho các bot tích hợp
+ * 
+ * @param initialTab Tab ban đầu được chọn
+ * @returns Trạng thái tab, dữ liệu tài khoản, dữ liệu logs và các hàm cập nhật
+ */
 export const useIntegratedBot = (
   initialTab: string = "overview"
 ): UseIntegratedBotResult => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [refreshLoading, setRefreshLoading] = useState(false);
 
+  /**
+   * Làm mới dữ liệu của tab hiện tại
+   * Mô phỏng API call với bộ hẹn giờ
+   */
   const refreshTabData = () => {
     setRefreshLoading(true);
-    // Mô phỏng API call bằng bộ hẹn giờ
+    
     setTimeout(() => {
       setRefreshLoading(false);
       toast.success(`Đã làm mới dữ liệu tab ${

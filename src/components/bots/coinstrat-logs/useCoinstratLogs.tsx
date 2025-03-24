@@ -1,6 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { CoinstratSignal } from '@/types/signal';
-import { normalizeUserId } from '@/utils/normalizeUserId';
+import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
 
 interface UseCoinstratLogsProps {
@@ -17,6 +18,15 @@ interface UseCoinstratLogsResult {
   fetchLogs: () => void;
 }
 
+/**
+ * Custom hook to fetch and process Coinstrat signal logs
+ * 
+ * @param botId ID of the bot (BOT-XXX, PREMIUM-XXX, PROP-XXX)
+ * @param userId ID of the user, should follow the USR-XXX format
+ * @param initialData Optional initial data to use instead of fetching
+ * @param refreshTrigger Trigger to refresh logs when changed
+ * @returns Logs data, loading state, error and refresh function
+ */
 export const useCoinstratLogs = ({
   botId,
   userId,
@@ -33,7 +43,13 @@ export const useCoinstratLogs = ({
   const [error, setError] = useState<Error | null>(null);
 
   const fetchLogs = useCallback(() => {
-    console.log(`CoinstratLogs - Fetching logs for userId: ${userId}, botId: ${botId}`);
+    // Validate userId before processing
+    if (!validateUserId(userId)) {
+      console.warn(`CoinstratLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
+      // We still proceed but with a warning
+    }
+    
+    console.log(`CoinstratLogs - Fetching logs for userId: ${userId} (normalized: ${normalizeUserId(userId)}), botId: ${botId}`);
     startLoading();
     setError(null);
     
@@ -47,13 +63,21 @@ export const useCoinstratLogs = ({
         try {
           const filteredLogs = initialData.filter(log => {
             // Check both processed and failed accounts with normalized comparison
-            const hasProcessedAccountsForUser = log.processedAccounts.some(account => 
-              normalizeUserId(account.userId) === normalizedInputUserId
-            );
+            const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+              if (!account.userId) {
+                console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
+                return false;
+              }
+              return normalizeUserId(account.userId) === normalizedInputUserId;
+            });
             
-            const hasFailedAccountsForUser = log.failedAccounts.some(account => 
-              normalizeUserId(account.userId) === normalizedInputUserId
-            );
+            const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+              if (!account.userId) {
+                console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
+                return false;
+              }
+              return normalizeUserId(account.userId) === normalizedInputUserId;
+            });
             
             return hasProcessedAccountsForUser || hasFailedAccountsForUser;
           });
@@ -88,14 +112,14 @@ export const useCoinstratLogs = ({
               processedAccounts: [
                 {
                   accountId: 'ACC-001',
-                  userId: 'USR-001', // Standardized to USR-001 format with dash
+                  userId: 'USR-001', // Standardized format with dash
                   name: 'Binance Spot Account',
                   timestamp: new Date().toISOString(),
                   status: 'success'
                 },
                 {
                   accountId: 'ACC-002',
-                  userId: 'USR-001', // Standardized to USR-001 format with dash
+                  userId: 'USR-001', // Standardized format with dash
                   name: 'Coinstart Pro Account',
                   timestamp: new Date().toISOString(),
                   status: 'success'
@@ -117,7 +141,7 @@ export const useCoinstratLogs = ({
               processedAccounts: [
                 {
                   accountId: 'ACC-001',
-                  userId: 'USR-001', // Standardized to USR-001 format with dash
+                  userId: 'USR-001', // Standardized format with dash
                   name: 'Binance Spot Account',
                   timestamp: new Date(Date.now() - 3600000).toISOString(),
                   status: 'success'
@@ -140,7 +164,7 @@ export const useCoinstratLogs = ({
               failedAccounts: [
                 {
                   accountId: 'ACC-003',
-                  userId: 'USR-002', // Standardized to USR-002 format with dash
+                  userId: 'USR-002', // Standardized format with dash
                   name: 'FTX Account',
                   timestamp: new Date(Date.now() - 7200000).toISOString(),
                   reason: 'Invalid account configuration',
@@ -149,7 +173,7 @@ export const useCoinstratLogs = ({
                 },
                 {
                   accountId: 'ACC-004',
-                  userId: 'USR-001', // Standardized to USR-001 format with dash
+                  userId: 'USR-001', // Standardized format with dash
                   name: 'Bybit Account',
                   timestamp: new Date(Date.now() - 7200000).toISOString(),
                   reason: 'API key expired',
@@ -165,6 +189,11 @@ export const useCoinstratLogs = ({
             const filteredLogs = mockLogs.filter(log => {
               // Check processed accounts with normalized comparison
               const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+                if (!account.userId) {
+                  console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
+                  return false;
+                }
+                
                 const normalizedAccountUserId = normalizeUserId(account.userId);
                 const match = normalizedAccountUserId === normalizedInputUserId;
                 console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
@@ -173,6 +202,11 @@ export const useCoinstratLogs = ({
               
               // Check failed accounts with normalized comparison
               const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+                if (!account.userId) {
+                  console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
+                  return false;
+                }
+                
                 const normalizedAccountUserId = normalizeUserId(account.userId);
                 const match = normalizedAccountUserId === normalizedInputUserId;
                 console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);

@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { TradingViewSignal } from '@/types';
-import { normalizeUserId } from '@/utils/normalizeUserId';
+import { TradingViewSignal } from '@/types/signal';
+import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
 
 interface UseTradingViewLogsProps {
@@ -18,6 +18,14 @@ interface UseTradingViewLogsResult {
   fetchLogs: () => void;
 }
 
+/**
+ * Custom hook để lấy và xử lý nhật ký tín hiệu từ TradingView
+ * 
+ * @param botId ID của bot, cần tuân theo định dạng BOT-XXX, PREMIUM-XXX hoặc PROP-XXX
+ * @param userId ID của người dùng, cần tuân theo định dạng USR-XXX
+ * @param refreshTrigger Kích hoạt refresh nhật ký khi giá trị thay đổi
+ * @returns Nhật ký tín hiệu, trạng thái loading, lỗi và hàm fetchLogs để tải lại dữ liệu
+ */
 export const useTradingViewLogs = ({
   botId,
   userId,
@@ -33,12 +41,19 @@ export const useTradingViewLogs = ({
   });
 
   const fetchLogs = useCallback(() => {
-    console.log(`TradingViewLogs - Fetching logs for userId: ${userId}`);
+    // Validate userId before processing
+    if (!validateUserId(userId)) {
+      console.warn(`TradingViewLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
+      // We still proceed but with a warning
+    }
+    
+    console.log(`TradingViewLogs - Fetching logs for userId: ${userId} (normalized: ${normalizeUserId(userId)})`);
     startLoading();
     setError(null);
     
     setTimeout(() => {
       try {
+        // Mock data with standardized userId format (USR-XXX)
         const mockLogs: TradingViewSignal[] = [
           {
             id: 'SIG001',
@@ -50,7 +65,7 @@ export const useTradingViewLogs = ({
             investmentType: 'crypto',
             amount: '1.5',
             status: 'Processed',
-            userId: 'USR-001' // Standardized to USR-001 format with dash
+            userId: 'USR-001' // Standardized format with dash
           },
           {
             id: 'SIG002',
@@ -62,7 +77,7 @@ export const useTradingViewLogs = ({
             investmentType: 'crypto',
             amount: '2.3',
             status: 'Processed',
-            userId: 'USR-001' // Standardized to USR-001 format with dash
+            userId: 'USR-001' // Standardized format with dash
           },
           {
             id: 'SIG003',
@@ -75,7 +90,7 @@ export const useTradingViewLogs = ({
             amount: '3.7',
             status: 'Failed',
             errorMessage: 'Invalid account configuration',
-            userId: 'USR-002' // Standardized to USR-002 format with dash
+            userId: 'USR-002' // Standardized format with dash
           },
         ];
         
@@ -85,7 +100,12 @@ export const useTradingViewLogs = ({
           console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
           
           const filteredLogs = mockLogs.filter(log => {
-            const normalizedLogUserId = normalizeUserId(log.userId || '');
+            if (!log.userId) {
+              console.warn(`TradingViewLogs - Log ${log.id} is missing userId`);
+              return false;
+            }
+            
+            const normalizedLogUserId = normalizeUserId(log.userId);
             const match = normalizedLogUserId === normalizedInputUserId;
             console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
             return match;

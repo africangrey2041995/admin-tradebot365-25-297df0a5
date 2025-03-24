@@ -2,13 +2,20 @@
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types/signal';
-import { normalizeUserId } from '@/utils/normalizeUserId';
+import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 
 interface AccountStatusSummaryProps {
   signal: CoinstratSignal;
   userId: string;
 }
 
+/**
+ * Hiển thị tóm tắt trạng thái tài khoản cho một tín hiệu
+ * Gồm số lượng tài khoản thành công/thất bại được lọc theo userId
+ * 
+ * @param signal Tín hiệu cần hiển thị trạng thái
+ * @param userId ID của người dùng, cần tuân theo định dạng USR-XXX
+ */
 const AccountStatusSummary: React.FC<AccountStatusSummaryProps> = ({ signal, userId }) => {
   const [succeeded, setSucceeded] = useState(0);
   const [failed, setFailed] = useState(0);
@@ -17,17 +24,33 @@ const AccountStatusSummary: React.FC<AccountStatusSummaryProps> = ({ signal, use
   
   useEffect(() => {
     try {
-      // Use the centralized normalizeUserId utility for consistent userId handling
+      // Validate userId trước khi xử lý
+      if (!validateUserId(userId)) {
+        console.warn(`AccountStatusSummary - Invalid userId format: ${userId}, should be in format USR-XXX`);
+        // We still proceed but with a warning
+      }
+      
+      // Sử dụng hàm normalizeUserId để chuẩn hóa userId
       const normalizedInputUserId = normalizeUserId(userId);
       
-      // Filter accounts with normalized comparison
-      const userProcessedAccounts = signal.processedAccounts.filter(account => 
-        normalizeUserId(account.userId) === normalizedInputUserId
-      );
+      // Lọc tài khoản với so sánh chuẩn hóa
+      const userProcessedAccounts = signal.processedAccounts.filter(account => {
+        if (!account.userId) {
+          console.warn(`AccountStatusSummary - Processed account ${account.accountId} is missing userId`);
+          return false;
+        }
+        
+        return normalizeUserId(account.userId) === normalizedInputUserId;
+      });
       
-      const userFailedAccounts = signal.failedAccounts.filter(account => 
-        normalizeUserId(account.userId) === normalizedInputUserId
-      );
+      const userFailedAccounts = signal.failedAccounts.filter(account => {
+        if (!account.userId) {
+          console.warn(`AccountStatusSummary - Failed account ${account.accountId} is missing userId`);
+          return false;
+        }
+        
+        return normalizeUserId(account.userId) === normalizedInputUserId;
+      });
       
       console.log(`AccountStatusSummary - For signal ${signal.id}, user ${userId} (normalized: ${normalizedInputUserId})`);
       console.log(`AccountStatusSummary - Found ${userProcessedAccounts.length} processed and ${userFailedAccounts.length} failed accounts`);
