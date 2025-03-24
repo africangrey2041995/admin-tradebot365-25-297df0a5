@@ -1,12 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
-import { mockErrorSignals } from './error-signals/mockData';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
 import NoErrorsState from './error-signals/NoErrorsState';
-import { ExtendedSignal } from '@/types';
+import { ExtendedSignal } from '@/types/signal';
 import { normalizeUserId } from '@/utils/normalizeUserId';
 import { BotType } from '@/constants/botTypes';
 import { useAdmin } from '@/hooks/use-admin';
+import { mockErrorSignals } from './error-signals/mockData';
+import { useUser } from '@clerk/clerk-react';
+import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 interface ErrorSignalsProps {
   limit?: number;
@@ -23,6 +27,9 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
   const [unreadSignals, setUnreadSignals] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAdmin();
+  const { user } = useUser();
+  const { navigateToBotDetail } = useNavigation();
+  const [error, setError] = useState<Error | null>(null);
   
   // Initialize unread signals on component mount
   useEffect(() => {
