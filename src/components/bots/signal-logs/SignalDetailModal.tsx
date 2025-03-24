@@ -43,7 +43,7 @@ const SignalDetailModal: React.FC<SignalDetailModalProps> = ({
     });
   };
 
-  // Only show token for user-created bots, not for premium or prop bots
+  // Chỉ hiển thị token cho user-created bots, không hiển thị cho premium/prop bots
   const showToken = botType === 'user';
 
   return (

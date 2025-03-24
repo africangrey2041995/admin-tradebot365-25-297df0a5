@@ -60,6 +60,18 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
     return <EmptySignalLogs onRefresh={handleRefresh} botType={botType} />;
   }
 
+  // Tạo một title cho button refresh dựa vào botType
+  const getRefreshButtonTitle = () => {
+    switch (botType) {
+      case 'premium':
+        return 'Refresh Premium Signal Logs';
+      case 'prop':
+        return 'Refresh Prop Trading Logs';
+      default:
+        return 'Refresh Signal Logs';
+    }
+  };
+
   return (
     <div>
       <SignalLogsTable
@@ -70,7 +82,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
       />
       
       <div className="mt-4 flex justify-end">
-        <Button variant="outline" size="sm" onClick={handleRefresh}>
+        <Button variant="outline" size="sm" onClick={handleRefresh} title={getRefreshButtonTitle()}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh Logs
         </Button>

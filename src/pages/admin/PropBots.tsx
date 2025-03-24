@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -53,6 +54,8 @@ import { PropBot } from '@/types';
 import { BotType, BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY, BOT_RISK_DISPLAY } from '@/constants/botTypes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { ADMIN_ROUTES } from '@/constants/routes';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for admin prop bots - fixed to explicitly use BotType.PROP_BOT
 const mockPropBots: PropBot[] = [
@@ -152,6 +155,7 @@ const AdminPropBots = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingBot, setEditingBot] = useState<PropBot | null>(null);
   const [botToDelete, setBotToDelete] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleEdit = (botId: string) => {
     const propBotToEdit = propBots.find(bot => bot.botId === botId);
@@ -193,7 +197,8 @@ const AdminPropBots = () => {
   };
 
   const handleView = (botId: string) => {
-    window.open(`/prop-trading-bots/${botId}`, '_blank');
+    // Redirect to admin detail route instead of user route
+    navigate(ADMIN_ROUTES.PROP_BOT_DETAIL(botId));
   };
 
   const refreshData = () => {
