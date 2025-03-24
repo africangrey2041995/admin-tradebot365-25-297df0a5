@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import { toast } from 'sonner';
-import { CoinstratSignal } from '@/types/signal';
+import { CoinstratSignal, SignalAction } from '@/types/signal';
 import { PropBot } from '@/types';
 import { BotRiskLevel, BOT_RISK_DISPLAY, BotStatus, BOT_STATUS_DISPLAY, BotType } from '@/constants/botTypes';
 import { Account } from '@/types';
@@ -40,37 +40,45 @@ const getMockPropBot = (botId: string): PropBot => {
   };
 };
 
-// Mock accounts
+// Mock accounts - using correct Account type properties
 const mockAccounts: Account[] = [
   {
-    accountId: 'acc-001',
-    name: 'FTMO Challenge Account',
+    cspAccountId: 'acc-001',
+    cspAccountName: 'FTMO Challenge Account',
     exchange: 'FTMO',
     status: 'active',
     exchangeType: 'spot',
-    createdAt: '2023-09-15T10:30:00Z',
-    updatedAt: '2023-11-10T14:45:00Z',
-    apiKey: '***************',
-    balance: '$25,000',
-    equity: '$25,240',
-    pnl: '+$240'
+    createdDate: '2023-09-15T10:30:00Z',
+    lastUpdated: '2023-11-10T14:45:00Z',
+    apiName: 'FTMO API',
+    apiId: '***************',
+    tradingAccountNumber: '25000',
+    tradingAccountId: 'ftmo-123',
+    tradingAccountType: 'HEDGED',
+    tradingAccountBalance: '$25,000',
+    isLive: true,
+    cspUserId: 'USR-001'
   },
   {
-    accountId: 'acc-002',
-    name: 'FTMO Verification Account',
+    cspAccountId: 'acc-002',
+    cspAccountName: 'FTMO Verification Account',
     exchange: 'FTMO',
     status: 'active',
     exchangeType: 'futures',
-    createdAt: '2023-10-05T09:15:00Z',
-    updatedAt: '2023-11-12T16:20:00Z',
-    apiKey: '***************',
-    balance: '$25,000',
-    equity: '$26,180',
-    pnl: '+$1,180'
+    createdDate: '2023-10-05T09:15:00Z',
+    lastUpdated: '2023-11-12T16:20:00Z',
+    apiName: 'FTMO API',
+    apiId: '***************',
+    tradingAccountNumber: '25000',
+    tradingAccountId: 'ftmo-124',
+    tradingAccountType: 'HEDGED',
+    tradingAccountBalance: '$25,000',
+    isLive: true,
+    cspUserId: 'USR-001'
   }
 ];
 
-// Mock logs
+// Mock logs with corrected types
 const mockLogs: CoinstratSignal[] = [
   {
     id: 'signal-001',
@@ -78,19 +86,21 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'completed',
     instrument: 'EURUSD',
-    action: 'ENTER_LONG',
+    action: 'ENTER_LONG' as SignalAction,
     amount: '0.1',
     signalToken: 'token123',
     timestamp: new Date().toISOString(),
+    investmentType: 'forex',
     processedAccounts: [
       {
         accountId: 'acc-001',
         name: 'FTMO Challenge Account',
         status: 'success',
-        exchangeResponse: 'Order placed successfully',
+        reason: 'Order placed successfully',
         orderId: '12345',
         exchange: 'FTMO',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: 'USR-001'
       }
     ],
     failedAccounts: [],
@@ -103,19 +113,21 @@ const mockLogs: CoinstratSignal[] = [
     botId: 'bot-001',
     status: 'partial',
     instrument: 'USDJPY',
-    action: 'ENTER_SHORT',
+    action: 'ENTER_SHORT' as SignalAction,
     amount: '0.2',
     signalToken: 'token456',
     timestamp: new Date(Date.now() - 86400000).toISOString(),
+    investmentType: 'forex',
     processedAccounts: [
       {
         accountId: 'acc-001',
         name: 'FTMO Challenge Account',
         status: 'success',
-        exchangeResponse: 'Order placed successfully',
+        reason: 'Order placed successfully',
         orderId: '12346',
         exchange: 'FTMO',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: 'USR-001'
       }
     ],
     failedAccounts: [
@@ -123,9 +135,11 @@ const mockLogs: CoinstratSignal[] = [
         accountId: 'acc-002',
         name: 'FTMO Verification Account',
         status: 'failed',
-        exchangeResponse: 'Insufficient margin',
+        reason: 'Insufficient margin',
+        errorCode: 'ERR-MARGIN',
         exchange: 'FTMO',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: 'USR-001'
       }
     ],
     maxLag: '5000',

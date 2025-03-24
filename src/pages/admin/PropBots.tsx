@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -358,7 +357,6 @@ const AdminPropBots = () => {
           </CardContent>
         </Card>
 
-        {/* Delete Confirmation - In a real app, we would use AlertDialog component here */}
         {deleteModalOpen && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg max-w-md w-full">

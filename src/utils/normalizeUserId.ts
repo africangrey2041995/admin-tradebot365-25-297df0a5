@@ -10,6 +10,16 @@ export function validateUserId(userId: string): boolean {
 }
 
 /**
+ * Validates if a botId follows the standardized format
+ * @param botId - Bot ID to validate
+ * @returns boolean indicating whether the botId is valid
+ */
+export function validateBotId(botId: string): boolean {
+  // Check if botId follows the standardized format (e.g., 'BOT-XXX', 'pb-XXX', etc.)
+  return /^(BOT-|pb-|PROP-)\w+$/i.test(botId);
+}
+
+/**
  * Normalizes user IDs to a consistent format
  * @param userId - User ID to normalize
  * @returns Normalized user ID string
