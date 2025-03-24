@@ -7,10 +7,10 @@ import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Mock data cho tài khoản bot với chuẩn hóa định dạng userId (USR-XXX)
+ * Mock data for bot accounts with standardized userId format (USR-XXX)
  * 
- * Mỗi tài khoản chứa thông tin chi tiết về kết nối với sàn giao dịch và người dùng.
- * Định dạng chuẩn cho userId là USR-XXX, ví dụ: USR-001
+ * Each account contains detailed information about exchange connections and user.
+ * Standard format for userId is USR-XXX, e.g.: USR-001
  */
 const mockAccounts: Account[] = [
   {
@@ -22,13 +22,13 @@ const mockAccounts: Account[] = [
     apiId: 'API001',
     tradingAccountNumber: '4056629',
     tradingAccountId: '40819726',
-    tradingAccountType: 'HEDGED', // Loại tài khoản: HEDGED hoặc NETTED
-    tradingAccountBalance: '$500', // Số dư tài khoản
-    status: 'Connected', // Trạng thái kết nối
+    tradingAccountType: 'HEDGED', // Account type: HEDGED or NETTED
+    tradingAccountBalance: '$500', // Account balance
+    status: 'Connected', // Connection status
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001', // Định dạng chuẩn USR-XXX với dấu gạch ngang
-    isLive: false // Tài khoản demo/thực
+    cspUserId: 'USR-001', // Standard USR-XXX format with hyphen
+    isLive: false // Demo/live account
   },
   {
     cspAccountId: 'ACC002',
@@ -44,7 +44,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001', // Định dạng chuẩn USR-XXX với dấu gạch ngang
+    cspUserId: 'USR-001', // Standard USR-XXX format with hyphen
     isLive: true
   },
   {
@@ -61,25 +61,25 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    cspUserId: 'USR-002', // Định dạng chuẩn USR-XXX với dấu gạch ngang
+    cspUserId: 'USR-002', // Standard USR-XXX format with hyphen
     isLive: false
   },
 ];
 
 /**
- * Hook để quản lý và lấy dữ liệu tài khoản bot
+ * Hook to manage and fetch bot account data
  * 
- * @param botId ID của bot (BOT-XXX, PREMIUM-XXX, PROP-XXX)
- * @param userId ID của người dùng (chuẩn hóa thành USR-XXX)
- * @param initialData Dữ liệu tài khoản ban đầu (tùy chọn)
- * @returns Dữ liệu tài khoản và các hàm quản lý
+ * @param botId Bot ID (BOT-XXX, PREMIUM-XXX, PROP-XXX)
+ * @param userId User ID (normalized to USR-XXX)
+ * @param initialData Initial account data (optional)
+ * @returns Account data and management functions
  */
 export function useBotAccounts(botId: string, userId: string, initialData: Account[] = []) {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [error, setError] = useState<Error | null>(null);
   
-  // Use our safe loading hook instead of raw useState
+  // Use safe loading hook instead of raw useState
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 3000,
     initialState: true,
@@ -87,7 +87,7 @@ export function useBotAccounts(botId: string, userId: string, initialData: Accou
   });
 
   const fetchAccounts = useCallback(() => {
-    // Validate userId trước khi xử lý
+    // Validate userId before processing
     if (!validateUserId(userId)) {
       console.warn(`BotAccountsTable - Invalid userId format: ${userId}, should be in format USR-XXX`);
       // We still proceed but with a warning
@@ -107,11 +107,11 @@ export function useBotAccounts(botId: string, userId: string, initialData: Accou
             return;
           }
           
-          // Sử dụng normalizeUserId để chuẩn hóa
+          // Use normalizeUserId for standardization
           const normalizedInputUserId = normalizeUserId(userId);
           console.log(`BotAccountsTable - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
           
-          // Log tất cả userIds có sẵn để debug
+          // Log all available userIds for debugging
           const availableUserIds = initialData.length > 0 
             ? initialData.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`)
             : mockAccounts.map(acc => `${acc.cspUserId} (normalized: ${normalizeUserId(acc.cspUserId)})`);
@@ -122,7 +122,7 @@ export function useBotAccounts(botId: string, userId: string, initialData: Accou
             if (initialData && initialData.length > 0) {
               console.log(`BotAccountsTable - Using initialData, before filtering: ${initialData.length} accounts`);
               
-              // Sử dụng so sánh chuẩn hóa với công cụ của chúng ta
+              // Use normalized comparison with our tool
               const filteredAccounts = initialData.filter(account => {
                 if (!account.cspUserId) {
                   console.warn(`BotAccountsTable - Account ${account.cspAccountId} is missing cspUserId`);
@@ -140,7 +140,7 @@ export function useBotAccounts(botId: string, userId: string, initialData: Accou
             } else {
               console.log(`BotAccountsTable - Using mockData, before filtering: ${mockAccounts.length} accounts`);
               
-              // Sử dụng so sánh chuẩn hóa với công cụ của chúng ta
+              // Use normalized comparison with our tool
               const filteredAccounts = mockAccounts.filter(account => {
                 if (!account.cspUserId) {
                   console.warn(`BotAccountsTable - Account ${account.cspAccountId} is missing cspUserId`);
