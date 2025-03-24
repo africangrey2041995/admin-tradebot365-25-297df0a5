@@ -1,103 +1,12 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, CardContent } from "@/components/ui/card";
-import { RefreshCw, Info } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import BotInfoCard from '@/components/bots/BotInfoCard';
-import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { useNavigation } from '@/hooks/useNavigation';
-import { CoinstratSignal } from '@/types/signal';
-import { Account } from '@/types';
-import UserBotDetailHeader from './components/UserBotDetailHeader';
-import UserInfoCard from './components/UserInfoCard';
-import BotIntegrationInfo from './components/BotIntegrationInfo';
+import UserBotDetailContent from './components/user-bot-detail/UserBotDetailContent';
 import { useAdminBotDetail } from './hooks/useAdminBotDetail';
+import { mockAccounts, mockLogs } from './components/user-bot-detail/mock-data';
 import { toast } from 'sonner';
-
-const mockAccounts: Account[] = [
-  {
-    cspAccountId: 'ACC001',
-    cspAccountName: 'Trading Account 1',
-    userAccount: 'Primary Account',
-    cspUserEmail: 'user@example.com',
-    apiName: 'Binance API',
-    apiId: 'API001',
-    tradingAccountNumber: '4056629',
-    tradingAccountId: '40819726',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$500',
-    status: 'Connected',
-    createdDate: new Date(2023, 5, 15).toISOString(),
-    lastUpdated: new Date(2023, 11, 20).toISOString(),
-    cspUserId: 'USR-001',
-    isLive: false
-  },
-  {
-    cspAccountId: 'ACC002',
-    cspAccountName: 'Trading Account 2',
-    userAccount: 'Secondary Account',
-    cspUserEmail: 'user@example.com',
-    apiName: 'Binance API',
-    apiId: 'API001',
-    tradingAccountNumber: '4056789',
-    tradingAccountId: '40819727',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$1000',
-    status: 'Connected',
-    createdDate: new Date(2023, 6, 22).toISOString(),
-    lastUpdated: new Date(2023, 10, 5).toISOString(),
-    cspUserId: 'USR-001',
-    isLive: true
-  }
-];
-
-const mockLogs: CoinstratSignal[] = [
-  {
-    id: 'CSP-78952364',
-    originalSignalId: 'SIG001',
-    action: 'ENTER_LONG',
-    instrument: 'BTCUSDT',
-    timestamp: new Date().toISOString(),
-    signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
-    maxLag: '5s',
-    investmentType: 'crypto',
-    amount: '1.5',
-    status: 'Processed',
-    processedAccounts: [
-      {
-        accountId: 'ACC-001',
-        userId: 'USR-001',
-        name: 'Binance Spot Account',
-        timestamp: new Date().toISOString(),
-        status: 'success'
-      }
-    ],
-    failedAccounts: []
-  },
-  {
-    id: 'CSP-78956789',
-    originalSignalId: 'SIG002',
-    action: 'EXIT_LONG',
-    instrument: 'ETHUSDT',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}BOT`,
-    maxLag: '5s',
-    investmentType: 'crypto',
-    amount: '2.3',
-    status: 'Processed',
-    processedAccounts: [
-      {
-        accountId: 'ACC-001',
-        userId: 'USR-001',
-        name: 'Binance Spot Account',
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        status: 'success'
-      }
-    ],
-    failedAccounts: []
-  }
-];
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -135,69 +44,21 @@ const AdminUserBotDetail = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-lg font-medium">Đang tải thông tin bot...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!bot) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <Info className="h-12 w-12 text-orange-500 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Không Tìm Thấy Bot</h2>
-          <p className="text-muted-foreground mb-6">Chúng tôi không thể tìm thấy bot bạn đang tìm kiếm.</p>
-          <Button onClick={handleBackClick}>Quay Lại Danh Sách Bot</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <ErrorBoundary>
-      <div className="space-y-6">
-        <UserBotDetailHeader 
-          title="Chi tiết Bot Người Dùng"
-          onBack={handleBackClick}
-          onViewPublicProfile={viewPublicBotProfile}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-5">
-            <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-              <CardContent className="pt-6">
-                <BotInfoCard bot={bot} />
-              </CardContent>
-            </Card>
-          </div>
-                
-          <div className="lg:col-span-7">
-            {userInfo && (
-              <UserInfoCard 
-                userInfo={userInfo}
-                onViewUserDetails={viewUserDetails}
-              />
-            )}
-          </div>
-        </div>
-
-        <BotIntegrationInfo botId={botId || ''} />
-
-        <UserBotDetailTabs 
-          botId={botId || ''}
-          userId={userInfo?.id || ''}
-          accountsData={mockAccounts}
-          logsData={mockLogs}
-          onRefresh={handleRefresh}
-          isLoading={refreshLoading}
-        />
-      </div>
+      <UserBotDetailContent
+        botId={botId || ''}
+        isLoading={isLoading}
+        refreshLoading={refreshLoading}
+        bot={bot}
+        userInfo={userInfo}
+        accounts={mockAccounts}
+        logs={mockLogs}
+        handleRefresh={handleRefresh}
+        handleBackClick={handleBackClick}
+        viewPublicBotProfile={viewPublicBotProfile}
+        viewUserDetails={viewUserDetails}
+      />
     </ErrorBoundary>
   );
 };
