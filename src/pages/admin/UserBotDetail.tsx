@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,10 +17,10 @@ import { toast } from 'sonner';
 
 const mockAccounts: Account[] = [
   {
-    id: 'ACC001',
-    name: 'Trading Account 1',
+    cspAccountId: 'ACC001',
+    cspAccountName: 'Trading Account 1',
     userAccount: 'Primary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056629',
@@ -30,13 +29,13 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001'
+    cspUserId: 'USR-001'
   },
   {
-    id: 'ACC002',
-    name: 'Trading Account 2',
+    cspAccountId: 'ACC002',
+    cspAccountName: 'Trading Account 2',
     userAccount: 'Secondary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056789',
@@ -45,7 +44,7 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001'
+    cspUserId: 'USR-001'
   }
 ];
 

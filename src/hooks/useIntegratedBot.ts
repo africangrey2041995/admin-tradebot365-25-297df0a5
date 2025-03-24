@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Account } from '@/types';
 import { CoinstratSignal, SignalAction } from '@/types/signal';
@@ -7,10 +6,10 @@ import { toast } from 'sonner';
 // Mock data cho accounts with standardized userId format
 const mockAccounts: Account[] = [
   {
-    id: 'ACC001',
-    name: 'Trading Account 1',
+    cspAccountId: 'ACC001',
+    cspAccountName: 'Trading Account 1',
     userAccount: 'Primary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056629',
@@ -19,13 +18,13 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 5, 15).toISOString(),
     lastUpdated: new Date(2023, 11, 20).toISOString(),
-    userId: 'USR-001'  // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001'  // Standardized to USR-001 format with dash
   },
   {
-    id: 'ACC002',
-    name: 'Trading Account 2',
+    cspAccountId: 'ACC002',
+    cspAccountName: 'Trading Account 2',
     userAccount: 'Secondary Account',
-    userEmail: 'user@example.com',
+    cspUserEmail: 'user@example.com',
     apiName: 'Binance API',
     apiId: 'API001',
     tradingAccount: '4056789',
@@ -34,13 +33,13 @@ const mockAccounts: Account[] = [
     status: 'Connected',
     createdDate: new Date(2023, 6, 22).toISOString(),
     lastUpdated: new Date(2023, 10, 5).toISOString(),
-    userId: 'USR-001'  // Standardized to USR-001 format with dash
+    cspUserId: 'USR-001'  // Standardized to USR-001 format with dash
   },
   {
-    id: 'ACC003',
-    name: 'Demo Account',
+    cspAccountId: 'ACC003',
+    cspAccountName: 'Demo Account',
     userAccount: 'Test Account',
-    userEmail: 'test@example.com',
+    cspUserEmail: 'test@example.com',
     apiName: 'Coinbase API',
     apiId: 'API002',
     tradingAccount: '4044856',
@@ -49,7 +48,7 @@ const mockAccounts: Account[] = [
     status: 'Disconnected',
     createdDate: new Date(2023, 7, 10).toISOString(),
     lastUpdated: new Date(2023, 9, 18).toISOString(),
-    userId: 'USR-002'  // Standardized to USR-002 format with dash
+    cspUserId: 'USR-002'  // Standardized to USR-002 format with dash
   },
 ];
 
