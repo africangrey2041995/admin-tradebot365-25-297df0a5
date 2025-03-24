@@ -55,7 +55,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 
 // Mock data for admin prop bots - fixed to explicitly use BotType.PROP_BOT
-const mockPropBots = [
+const mockPropBots: PropBot[] = [
   {
     botId: 'PROP-001',
     name: 'FTMO Challenger',
