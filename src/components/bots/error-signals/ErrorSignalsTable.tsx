@@ -91,7 +91,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
               <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Log ID</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">ID CPL</TableHead>
               <TableHead className="text-red-700 dark:text-red-400">Error</TableHead>
             </TableRow>
           </TableHeader>

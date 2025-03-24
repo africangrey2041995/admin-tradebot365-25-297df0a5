@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorSignalsTable from './error-signals/ErrorSignalsTable';
@@ -45,20 +46,22 @@ const ErrorSignals: React.FC<ErrorSignalsProps> = ({
         // If botType is provided, only show signals for that bot type
         const botTypeMatch = !botType || signal.botType === botType;
         
-        // Check if this is an admin-only signal (ADMIN-001)
+        // Always exclude admin-only signals (ADMIN-001) for non-admin users
         const isAdminOnlySignal = signal.userId === 'ADMIN-001';
         
         // Include admin signals only for admin users
-        const includeBasedOnAdminStatus = !isAdminOnlySignal || isAdmin;
+        if (isAdminOnlySignal && !isAdmin) {
+          return false;
+        }
         
         // Log for debugging
-        console.info(`ErrorSignals - Signal ${signal.id}: userId match: ${userIdMatch}, botType match: ${botTypeMatch}, adminOnly: ${isAdminOnlySignal}, include: ${includeBasedOnAdminStatus}`);
+        console.info(`ErrorSignals - Signal ${signal.id}: userId match: ${userIdMatch}, botType match: ${botTypeMatch}, adminOnly: ${isAdminOnlySignal}, isAdmin: ${isAdmin}`);
         
-        return userIdMatch && botTypeMatch && includeBasedOnAdminStatus;
+        return userIdMatch && botTypeMatch;
       });
       
       // Log the filtered count
-      console.info(`ErrorSignals - Filtered ${filteredSignals.length} signals for userId: ${userId || 'any'} and botType: ${botType || 'any'}`);
+      console.info(`ErrorSignals - Filtered ${filteredSignals.length} signals for userId: ${userId || 'any'} and botType: ${botType || 'any'}, isAdmin: ${isAdmin}`);
       
       // Set all signals as unread initially
       const initialUnreadSet = new Set(filteredSignals.map(signal => signal.id));

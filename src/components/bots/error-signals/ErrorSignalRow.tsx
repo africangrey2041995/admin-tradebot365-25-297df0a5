@@ -59,16 +59,12 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
-  // Format trading account to show ID, type and balance if available
+  // Format trading account to show ID, type and balance without exchange name
   const formatTradingAccount = () => {
     const parts = [];
     
     if (signal.tradingAccountId) {
       parts.push(signal.tradingAccountId);
-    }
-    
-    if (signal.tradingAccount) {
-      parts.push(signal.tradingAccount);
     }
     
     if (signal.tradingAccountType) {
@@ -125,7 +121,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
             <ExternalLink className="h-3 w-3 text-blue-500" />
           </div>
         ) : (
-          <span className="text-gray-400 italic text-xs">No log ID</span>
+          <span className="text-gray-400 italic text-xs">No ID CPL</span>
         )}
       </TableCell>
       <TableCell>

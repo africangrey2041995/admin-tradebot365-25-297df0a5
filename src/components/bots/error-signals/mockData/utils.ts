@@ -18,8 +18,8 @@ export const hoursAgo = (hours: number) => {
   return date.toISOString();
 };
 
-// Generate a random Coinstrat Log ID
-export const generateCoinstratLogId = (prefix = 'CL') => {
+// Generate a random Coinstrat Log ID (CPL ID)
+export const generateCoinstratLogId = (prefix = 'CPL') => {
   const randomPart = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
   return `${prefix}-${randomPart}`;
 };
@@ -28,3 +28,4 @@ export const generateCoinstratLogId = (prefix = 'CL') => {
 export const generateAccountId = () => {
   return Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 };
+
