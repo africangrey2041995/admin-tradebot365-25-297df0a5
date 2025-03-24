@@ -18,7 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 export interface BotCardProps {
   title: string;
   subtitle?: string;
-  botId: string;
+  botId: string; // Already using botId, no change needed
   accountCount?: string;
   lastUpdated?: string;
   isFavorite?: boolean;
@@ -33,7 +33,7 @@ export interface BotCardProps {
 const BotCard = ({
   title,
   subtitle,
-  botId,
+  botId, // Already using botId, no change needed
   accountCount,
   lastUpdated,
   isFavorite = false,

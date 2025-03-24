@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf } from 'lucide-react';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { toast } from 'sonner';
 
 interface PremiumBotCardProps {
-  id: string;
+  botId: string;
   name: string;
   description: string;
   exchange: string;
@@ -22,11 +21,11 @@ interface PremiumBotCardProps {
   colorScheme: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;
   accountCount?: string;
-  botId?: string;
+  externalId?: string;
 }
 
 export const PremiumBotCard = ({
-  id,
+  botId,
   name,
   description,
   exchange,
@@ -40,7 +39,7 @@ export const PremiumBotCard = ({
   colorScheme = 'default',
   isIntegrated = false,
   accountCount,
-  botId,
+  externalId,
 }: PremiumBotCardProps) => {
   const navigate = useNavigate();
 
@@ -111,14 +110,14 @@ export const PremiumBotCard = ({
   };
 
   const handleSubscribe = () => {
-    navigate(`/premium-bots/${id}`);
+    navigate(`/premium-bots/${botId}`);
   };
 
   const handleViewDetails = () => {
     toast('Xem chi tiết', {
       description: `Đang chuyển đến trang chi tiết của bot ${name}`,
     });
-    navigate(`/premium-bots/${id}`);
+    navigate(`/premium-bots/${botId}`);
   };
 
   const getExchangeLogo = (exchange: string) => {
@@ -166,10 +165,10 @@ export const PremiumBotCard = ({
               <div className="flex gap-1 mt-1 items-center text-xs">
                 {getExchangeLogo(exchange)}
                 <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
-                {botId && (
+                {externalId && (
                   <>
                     <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                    <span className="text-xs text-slate-500">{botId}</span>
+                    <span className="text-xs text-slate-500">{externalId}</span>
                   </>
                 )}
               </div>
@@ -234,7 +233,7 @@ export const PremiumBotCard = ({
             variant="default" 
             size="sm"
             className="w-full text-xs h-8" 
-            onClick={() => navigate(`/premium-bots/${id}`)}
+            onClick={() => navigate(`/premium-bots/${botId}`)}
           >
             Quản Lý Bot
           </Button>

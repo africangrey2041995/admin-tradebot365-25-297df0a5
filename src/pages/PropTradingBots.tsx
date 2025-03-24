@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -19,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 // Mocking prop trading bot data
 const propTradingBots = [
   {
-    id: 'ptb-001',
+    botId: 'ptb-001',
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
@@ -34,7 +33,7 @@ const propTradingBots = [
     colorScheme: 'blue'
   },
   {
-    id: 'ptb-002',
+    botId: 'ptb-002',
     name: 'Risk Manager Pro',
     description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
     exchange: 'Coinstrat Pro',
@@ -49,7 +48,7 @@ const propTradingBots = [
     colorScheme: 'green'
   },
   {
-    id: 'ptb-003',
+    botId: 'ptb-003',
     name: 'Consistent Trader',
     description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
     exchange: 'Coinstrat Pro',
@@ -68,7 +67,7 @@ const propTradingBots = [
 // Mocking integrated prop trading bots data
 const integratedPropBots = [
   {
-    id: 'ptb-001',
+    botId: 'ptb-001',
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
@@ -99,11 +98,10 @@ const integratedPropBots = [
 const PropTradingBots = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [riskFilter, setRiskFilter] = useState('all');  // Changed from '' to 'all'
+  const [riskFilter, setRiskFilter] = useState('all');
   const [sortOption, setSortOption] = useState('performance');
   const [viewMode, setViewMode] = useState('available');
 
-  // Filter bots based on search term and risk level
   const getFilteredBots = (botsArray: any[]) => {
     return botsArray.filter(bot => {
       const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,8 +114,7 @@ const PropTradingBots = () => {
 
   const filteredAvailableBots = getFilteredBots(propTradingBots);
   const filteredIntegratedBots = getFilteredBots(integratedPropBots);
-  
-  // Sort bots based on selected sort option
+
   const sortBots = (botsArray: any[]) => {
     return [...botsArray].sort((a, b) => {
       if (sortOption === 'performance') {
@@ -235,16 +232,16 @@ const PropTradingBots = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {sortedAvailableBots.map((bot, index) => (
                   <motion.div
-                    key={bot.id}
+                    key={bot.botId}
                     custom={index}
                     variants={cardVariants}
                     initial="hidden"
                     animate="visible"
-                    onClick={() => handleBotClick(bot.id)}
+                    onClick={() => handleBotClick(bot.botId)}
                     className="cursor-pointer"
                   >
                     <PremiumBotCard 
-                      id={bot.id}
+                      botId={bot.botId}
                       name={bot.name}
                       description={bot.description}
                       exchange={bot.exchange}
@@ -278,16 +275,16 @@ const PropTradingBots = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {sortedIntegratedBots.map((bot, index) => (
                   <motion.div
-                    key={bot.id}
+                    key={bot.botId}
                     custom={index}
                     variants={cardVariants}
                     initial="hidden"
                     animate="visible"
-                    onClick={() => handleBotClick(bot.id)}
+                    onClick={() => handleBotClick(bot.botId)}
                     className="cursor-pointer"
                   >
                     <PremiumBotCard 
-                      id={bot.id}
+                      botId={bot.botId}
                       name={bot.name}
                       description={bot.description}
                       exchange={bot.exchange}

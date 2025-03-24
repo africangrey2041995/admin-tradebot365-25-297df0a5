@@ -19,7 +19,7 @@ interface UserBotColumn {
 
 const columns: UserBotColumn[] = [
   {
-    accessorKey: 'id',
+    accessorKey: 'botId',
     header: 'ID',
   },
   {
@@ -53,7 +53,7 @@ const columns: UserBotColumn[] = [
 
 const mockUserBots: UserBot[] = [
   {
-    id: 'ub-001',
+    botId: 'MY-001',
     name: 'My First Bot',
     description: 'A simple bot for testing purposes',
     status: BotStatus.ACTIVE,
@@ -67,7 +67,7 @@ const mockUserBots: UserBot[] = [
     isActive: true
   },
   {
-    id: 'ub-002',
+    botId: 'MY-002',
     name: 'BTC Trader',
     description: 'Trades BTC based on RSI',
     status: BotStatus.ACTIVE,
@@ -81,7 +81,7 @@ const mockUserBots: UserBot[] = [
     isActive: true
   },
   {
-    id: 'ub-003',
+    botId: 'MY-003',
     name: 'ETH Grid Bot',
     description: 'Grid trading bot for ETH',
     status: BotStatus.INACTIVE,
@@ -95,7 +95,7 @@ const mockUserBots: UserBot[] = [
     isActive: false
   },
   {
-    id: 'ub-004',
+    botId: 'MY-004',
     name: 'Auto Trader Pro',
     description: 'Advanced auto trading bot',
     status: BotStatus.ACTIVE,
@@ -109,7 +109,7 @@ const mockUserBots: UserBot[] = [
     isActive: true
   },
   {
-    id: 'ub-005',
+    botId: 'MY-005',
     name: 'Altcoin Hunter',
     description: 'Hunts for promising altcoins',
     status: BotStatus.ACTIVE,
@@ -171,7 +171,7 @@ const AdminUserBots = () => {
 
   const filteredBots = userBots.filter(bot =>
     bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bot.id.toLowerCase().includes(searchTerm.toLowerCase())
+    bot.botId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addUserBot = () => {
@@ -185,7 +185,7 @@ const AdminUserBots = () => {
   
   const handleRowClick = useCallback((row: UserBot) => {
     try {
-      navigateToBotDetail(row.id);
+      navigateToBotDetail(row.botId);
     } catch (error) {
       console.error('Error navigating to bot detail:', error);
       toast.error('Không thể chuyển đến trang chi tiết bot');

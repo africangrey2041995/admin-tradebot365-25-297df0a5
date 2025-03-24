@@ -30,7 +30,7 @@ export const useBotAuthorization = ({
       // Simulate API call with timeout
       setTimeout(() => {
         const mockBot: PremiumBot = {
-          id: botId || 'pb-001',
+          botId: botId || 'pb-001', // Using botId consistently
           name: 'Alpha Momentum',
           description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
           exchange: 'Coinstart Pro',
@@ -44,7 +44,6 @@ export const useBotAuthorization = ({
           imageUrl: null,
           colorScheme: 'green',
           isIntegrated: true,
-          botId: 'PRE7459', // External ID used for display
           createdDate: '2023-10-15',
           lastUpdated: '2023-11-10',
           ownerId: userId,

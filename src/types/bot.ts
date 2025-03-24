@@ -43,7 +43,7 @@ export interface UserBotSettings {
 
 // Thông tin cơ bản của bot - Base bot interface with common properties
 export interface BaseBot {
-  id: string;
+  botId: string; // Changed from id to botId for standardization
   name: string;
   description: string;
   status: BotStatus;
@@ -55,7 +55,7 @@ export interface BaseBot {
   exchange?: string;
   performance?: BotPerformance;
   ownerId?: string; // Standardized ownerId field
-  botId?: string; // External identifier for the bot
+  externalId?: string; // Optional external identifier for the bot if needed
 }
 
 // Bot của người dùng
@@ -84,7 +84,6 @@ export interface PremiumBot extends BaseBot {
   timeframe?: string;
   markets?: string[];
   accounts?: Account[] | number;
-  botId: string; // External identifier, now required
   users?: number; // Number of users for admin context
   profit?: string; // Profit in percentage for admin context
 }
@@ -105,7 +104,7 @@ export interface PropBot extends BaseBot {
 
 // Bot đã tích hợp
 export interface IntegratedBot extends BaseBot {
-  originalId: string;
+  originalBotId: string; // Changed from originalId to originalBotId
   integratedDate: string;
   accounts?: Account[];
   performance?: BotPerformance;
@@ -113,7 +112,7 @@ export interface IntegratedBot extends BaseBot {
 
 // Thông tin trạng thái bot
 export interface BotStatusInfo {
-  id: string;
+  botId: string; // Changed from id to botId
   status: BotStatus;
   lastActiveTime?: string;
   errorCount?: number;
@@ -139,7 +138,7 @@ export function isPropBot(bot: Bot): bot is PropBot {
 }
 
 export function isIntegratedBot(bot: Bot): bot is IntegratedBot {
-  return 'originalId' in bot && 'integratedDate' in bot;
+  return 'originalBotId' in bot && 'integratedDate' in bot;
 }
 
 // Import Account type to avoid circular dependencies

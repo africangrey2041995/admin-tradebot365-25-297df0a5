@@ -97,7 +97,7 @@ const mockLogs: CoinstratSignal[] = [
 ];
 
 const AdminUserBotDetail = () => {
-  const { botId } = useParams<{ botId: string }>();
+  const { botId } = useParams<{ botId: string }>(); // Already using botId
   const { goBack, navigateTo } = useNavigation();
   
   const { 
@@ -187,7 +187,7 @@ const AdminUserBotDetail = () => {
         <BotIntegrationInfo botId={botId || ''} />
 
         <UserBotDetailTabs 
-          botId={botId || ''} 
+          botId={botId || ''} // Already using botId
           userId={userInfo?.id || ''}
           accountsData={mockAccounts}
           logsData={mockLogs}

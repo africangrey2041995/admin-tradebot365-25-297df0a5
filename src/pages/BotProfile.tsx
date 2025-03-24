@@ -13,7 +13,7 @@ import UserBotDetailTabs from '@/components/bots/UserBotDetailTabs';
 import { toast } from 'sonner';
 
 const BotProfile = () => {
-  const { botId } = useParams<{ botId: string }>();
+  const { botId } = useParams<{ botId: string }>(); // Already using botId
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
@@ -40,7 +40,7 @@ const BotProfile = () => {
                     botId === 'BOT8932' ? 'Chuyên về chiến lược giao dịch vị thế dài hạn' :
                     botId === 'BOT2734' ? 'Hệ thống giao dịch thuật toán tập trung vào kim loại quý' :
                     'Bot giao dịch cho chiến lược tự động',
-          botId: botId || 'Unknown',
+          botId: botId || 'Unknown', // Already using botId
           accountCount: '12/30',
           lastUpdated: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'numeric', year: 'numeric' }),
           colorScheme: botId === 'BOT7459' ? 'red' :
@@ -113,7 +113,7 @@ const BotProfile = () => {
     <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
-          botId={bot.botId} 
+          botId={bot.botId} // Already using botId
           status={bot.status} 
           botDetails={bot}
           onUpdateBot={handleUpdateBot}
@@ -133,7 +133,7 @@ const BotProfile = () => {
         </div>
         
         <UserBotDetailTabs 
-          botId={bot.botId} 
+          botId={bot.botId} // Already using botId
           userId={userId}
           onRefresh={refreshData}
           isLoading={refreshLoading}
@@ -144,7 +144,7 @@ const BotProfile = () => {
       <AddAccountDialog 
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot.botId}
+        botId={bot.botId} // Already using botId
         onAddAccount={handleAddAccount}
       />
     </MainLayout>

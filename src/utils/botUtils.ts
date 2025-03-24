@@ -107,3 +107,29 @@ export function logBotIdInfo(botId: string, context: string = ''): void {
   console.log(`  - Type: ${determineBotType(botId) || 'Unknown'}`);
   console.log(`  - Normalized: ${normalizeBotId(botId)}`);
 }
+
+/**
+ * Hàm migration để chuyển đổi dữ liệu từ sử dụng 'id' sang 'botId'
+ * Sử dụng cho dữ liệu thật nếu cần thiết
+ * @param data Dữ liệu bot cần chuyển đổi (có thể là bot đơn lẻ hoặc mảng bot)
+ * @returns Dữ liệu đã được chuẩn hóa với botId
+ */
+export function migrateIdToBotId<T extends { id?: string, botId?: string }>(data: T): T;
+export function migrateIdToBotId<T extends { id?: string, botId?: string }>(data: T[]): T[];
+export function migrateIdToBotId<T extends { id?: string, botId?: string }>(data: T | T[]): T | T[] {
+  if (Array.isArray(data)) {
+    return data.map(item => migrateIdToBotId(item));
+  }
+  
+  const result = { ...data };
+  
+  // Nếu có trường id nhưng không có botId, chuyển id sang botId
+  if (result.id && !result.botId) {
+    // @ts-ignore - Không quan tâm đến lỗi typecript ở đây vì chúng ta đang migrate
+    result.botId = result.id;
+    // @ts-ignore
+    delete result.id;
+  }
+  
+  return result;
+}

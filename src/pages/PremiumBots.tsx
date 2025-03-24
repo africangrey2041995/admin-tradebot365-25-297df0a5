@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 // Mocking premium bot data
 const premiumBots = [
   {
-    id: 'pb-001',
+    botId: 'pb-001',
     name: 'Alpha Momentum',
     description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
     exchange: 'Coinstart Pro',
@@ -32,7 +32,7 @@ const premiumBots = [
     colorScheme: 'green'
   },
   {
-    id: 'pb-002',
+    botId: 'pb-002',
     name: 'Beta Scalper',
     description: 'Bot scalping tự động với thời gian giao dịch ngắn, tối ưu cho thị trường sideway.',
     exchange: 'Coinstart Pro',
@@ -47,7 +47,7 @@ const premiumBots = [
     colorScheme: 'red'
   },
   {
-    id: 'pb-003',
+    botId: 'pb-003',
     name: 'Delta Swing',
     description: 'Bot giao dịch swing dựa trên các chu kỳ thị trường và phân tích kỹ thuật nâng cao.',
     exchange: 'Coinstart Pro',
@@ -62,7 +62,7 @@ const premiumBots = [
     colorScheme: 'blue'
   },
   {
-    id: 'pb-004',
+    botId: 'pb-004',
     name: 'Gamma Grid',
     description: 'Bot grid trading với chiến lược phân bổ thanh khoản thông minh dựa trên biến động thị trường.',
     exchange: 'Coinstart Pro',
@@ -77,7 +77,7 @@ const premiumBots = [
     colorScheme: 'purple'
   },
   {
-    id: 'pb-005',
+    botId: 'pb-005',
     name: 'Omega Trend',
     description: 'Bot đi theo xu hướng với bộ lọc tín hiệu thông minh và quản lý vốn tự động.',
     exchange: 'Coinstart Pro',
@@ -92,7 +92,7 @@ const premiumBots = [
     colorScheme: 'default'
   },
   {
-    id: 'ptb-001',
+    botId: 'ptb-001',
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
@@ -107,7 +107,7 @@ const premiumBots = [
     colorScheme: 'blue'
   },
   {
-    id: 'ptb-002',
+    botId: 'ptb-002',
     name: 'Risk Manager Pro',
     description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
     exchange: 'Coinstrat Pro',
@@ -122,7 +122,7 @@ const premiumBots = [
     colorScheme: 'green'
   },
   {
-    id: 'ptb-003',
+    botId: 'ptb-003',
     name: 'Consistent Trader',
     description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
     exchange: 'Coinstrat Pro',
@@ -253,16 +253,16 @@ const PremiumBots = () => {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {sortedBots.map((bot, index) => (
               <motion.div
-                key={bot.id}
+                key={bot.botId}
                 custom={index}
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
-                onClick={() => navigate(`/premium-bots/${bot.id}`)}
+                onClick={() => navigate(`/premium-bots/${bot.botId}`)}
                 className="cursor-pointer"
               >
                 <PremiumBotCard 
-                  id={bot.id}
+                  botId={bot.botId}
                   name={bot.name}
                   description={bot.description}
                   exchange={bot.exchange}

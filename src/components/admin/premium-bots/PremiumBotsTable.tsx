@@ -56,15 +56,15 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
         <TableBody>
           {bots.length > 0 ? (
             bots.map((bot) => (
-              <TableRow key={bot.id} className="border-zinc-800">
+              <TableRow key={bot.botId} className="border-zinc-800">
                 <TableCell>
                   <Checkbox 
-                    checked={selectedBots.includes(bot.id)}
-                    onCheckedChange={() => onSelectBot(bot.id)}
+                    checked={selectedBots.includes(bot.botId)}
+                    onCheckedChange={() => onSelectBot(bot.botId)}
                     aria-label={`Select ${bot.name}`}
                   />
                 </TableCell>
-                <TableCell className="font-mono text-xs text-zinc-400">{bot.id}</TableCell>
+                <TableCell className="font-mono text-xs text-zinc-400">{bot.botId}</TableCell>
                 <TableCell className="font-medium">{bot.name}</TableCell>
                 <TableCell>
                   <BotStatusBadge status={bot.status} />
@@ -84,7 +84,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                     <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                       <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-zinc-800" />
-                      <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => onViewBotDetail(bot.id)}>
+                      <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => onViewBotDetail(bot.botId)}>
                         <Eye className="mr-2 h-4 w-4" />
                         <span>Xem chi tiết</span>
                       </DropdownMenuItem>
