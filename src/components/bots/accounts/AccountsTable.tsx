@@ -25,6 +25,12 @@ const AccountsTable: React.FC<AccountsTableProps> = ({ accounts }) => {
     }
   };
 
+  const formatAccountType = (account: Account) => {
+    const accountTypeLabel = account.tradingAccountType || 'Unknown';
+    const liveStatus = account.isLive ? 'Live' : 'Demo';
+    return `${accountTypeLabel} - ${liveStatus}`;
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -50,7 +56,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({ accounts }) => {
             </TableCell>
             <TableCell>
               <div className="font-medium">
-                {account.tradingAccount} | {account.tradingAccountType} | {account.tradingAccountBalance}
+                {account.tradingAccountNumber} | {formatAccountType(account)} | {account.tradingAccountBalance}
               </div>
             </TableCell>
             <TableCell>

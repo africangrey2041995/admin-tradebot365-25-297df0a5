@@ -18,7 +18,11 @@ import {
 const formSchema = z.object({
   userAccount: z.string({ required_error: "Please select a user account" }),
   apiKey: z.string({ required_error: "Please select an API key" }),
-  tradingAccount: z.string({ required_error: "Please select a trading account" }),
+  tradingAccountId: z.string({ required_error: "Please select a trading account" }),
+  tradingAccountNumber: z.string().optional(),
+  tradingAccountType: z.string().optional(),
+  tradingAccountBalance: z.string().optional(),
+  isLive: z.boolean().optional(),
   volumeMultiplier: z.string().default("1"),
 });
 
@@ -42,7 +46,11 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     defaultValues: {
       userAccount: "",
       apiKey: "",
-      tradingAccount: "",
+      tradingAccountId: "",
+      tradingAccountNumber: "",
+      tradingAccountType: "",
+      tradingAccountBalance: "",
+      isLive: false,
       volumeMultiplier: "1",
     },
   });
@@ -51,7 +59,11 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     form.reset({
       userAccount: "",
       apiKey: "",
-      tradingAccount: "",
+      tradingAccountId: "",
+      tradingAccountNumber: "",
+      tradingAccountType: "",
+      tradingAccountBalance: "",
+      isLive: false,
       volumeMultiplier: "1",
     });
   };
@@ -95,7 +107,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                     onValueChange={(value) => {
                       field.onChange(value);
                       form.setValue("apiKey", "");
-                      form.setValue("tradingAccount", "");
+                      form.setValue("tradingAccountId", "");
                     }}
                     value={field.value}
                   >

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,6 +14,7 @@ interface TradingAccountOption {
   number: string;
   type: string;
   balance: string;
+  isLive: boolean;
   apiId: string;
 }
 
@@ -41,7 +41,7 @@ export const AccountFormApiField = ({
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
-              form.setValue("tradingAccount", "");
+              form.setValue("tradingAccountId", "");
             }}
             value={field.value}
             disabled={!form.watch("userAccount")}
@@ -77,12 +77,22 @@ export const AccountFormTradingField = ({
   return (
     <FormField
       control={form.control}
-      name="tradingAccount"
+      name="tradingAccountId"
       render={({ field }) => (
         <FormItem>
           <FormLabel>Account Trading</FormLabel>
           <Select 
-            onValueChange={field.onChange}
+            onValueChange={(value) => {
+              field.onChange(value);
+              
+              const selectedAccount = filteredTradingAccounts.find(acc => acc.id === value);
+              if (selectedAccount) {
+                form.setValue("tradingAccountNumber", selectedAccount.number);
+                form.setValue("tradingAccountType", selectedAccount.type);
+                form.setValue("tradingAccountBalance", selectedAccount.balance);
+                form.setValue("isLive", selectedAccount.isLive);
+              }
+            }}
             value={field.value}
             disabled={!form.watch("apiKey")}
           >
@@ -94,7 +104,7 @@ export const AccountFormTradingField = ({
             <SelectContent>
               {filteredTradingAccounts.map(account => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.number} | {account.type} | {account.balance}
+                  {account.number} | {account.isLive ? 'Live' : 'Demo'} | {account.balance}
                 </SelectItem>
               ))}
             </SelectContent>

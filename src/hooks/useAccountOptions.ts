@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 export const useAccountOptions = () => {
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [apis, setApis] = useState<{ id: string; name: string; userId: string }[]>([]);
-  const [tradingAccounts, setTradingAccounts] = useState<{ id: string; number: string; type: string; balance: string; apiId: string }[]>([]);
+  const [tradingAccounts, setTradingAccounts] = useState<{ 
+    id: string;           // tradingAccountId (accountId from Ctrader)
+    number: string;       // accountNumber from Ctrader
+    type: string;         // traderAccountType from Ctrader
+    balance: string;      // balance from Ctrader
+    isLive: boolean;      // live status from Ctrader
+    apiId: string;        // related API ID
+  }[]>([]);
   
   const volumeOptions = [
     { value: "0.5", label: "x0.5" },
@@ -28,12 +35,48 @@ export const useAccountOptions = () => {
       { id: "api3", name: "API 1", userId: "user2" },
     ]);
 
+    // Updated mock data with Ctrader structure
     setTradingAccounts([
-      { id: "acc1", number: "4056629", type: "Live", balance: "$500", apiId: "api1" },
-      { id: "acc2", number: "4056789", type: "Live", balance: "$1000", apiId: "api1" },
-      { id: "acc3", number: "4044856", type: "Demo", balance: "$10000", apiId: "api1" },
-      { id: "acc4", number: "4044857", type: "Demo", balance: "$5000", apiId: "api2" },
-      { id: "acc5", number: "4056630", type: "Live", balance: "$2000", apiId: "api3" },
+      { 
+        id: "40819726", 
+        number: "5065708", 
+        type: "HEDGED", 
+        balance: "$500", 
+        isLive: false, 
+        apiId: "api1" 
+      },
+      { 
+        id: "40819727", 
+        number: "5065709", 
+        type: "HEDGED", 
+        balance: "$1000", 
+        isLive: true, 
+        apiId: "api1" 
+      },
+      { 
+        id: "40819728", 
+        number: "5065710", 
+        type: "NETTED", 
+        balance: "$10000", 
+        isLive: false, 
+        apiId: "api1" 
+      },
+      { 
+        id: "40819729", 
+        number: "5065711", 
+        type: "HEDGED", 
+        balance: "$5000", 
+        isLive: false, 
+        apiId: "api2" 
+      },
+      { 
+        id: "40819730", 
+        number: "5065712", 
+        type: "NETTED", 
+        balance: "$2000", 
+        isLive: true, 
+        apiId: "api3" 
+      },
     ]);
   }, []);
 
