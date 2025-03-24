@@ -39,7 +39,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
 
   const handleRefresh = () => {
-    toast.info('Refreshing logs...');
+    toast.info('Đang làm mới dữ liệu...');
     fetchLogs();
   };
 
@@ -72,7 +72,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
       <div className="mt-4 flex justify-end">
         <Button variant="outline" size="sm" onClick={handleRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh Logs
+          Làm mới
         </Button>
       </div>
 
