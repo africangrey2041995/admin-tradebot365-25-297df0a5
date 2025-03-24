@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ const AdminPremiumBots = () => {
   
   const bots: PremiumBot[] = [
     { 
-      id: 'PRE-001', 
+      botId: 'PRE-001', 
       name: 'Premium DCA Bot',
       type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
@@ -62,11 +63,10 @@ const AdminPremiumBots = () => {
       lastUpdated: '15/02/2024',
       colorScheme: 'green',
       exchange: 'Binance',
-      description: 'Premium bot for momentum trading',
-      botId: 'PRE001'
+      description: 'Premium bot for momentum trading'
     },
     { 
-      id: 'PRE-002', 
+      botId: 'PRE-002', 
       name: 'Premium Swing Trader',
       type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
@@ -81,11 +81,10 @@ const AdminPremiumBots = () => {
       lastUpdated: '20/03/2024',
       colorScheme: 'blue',
       exchange: 'Bybit',
-      description: 'Premium bot for momentum trading',
-      botId: 'PRE002'
+      description: 'Premium bot for momentum trading'
     },
     { 
-      id: 'PRE-003', 
+      botId: 'PRE-003', 
       name: 'Premium Scalper Pro',
       type: BotType.PREMIUM_BOT,
       status: BotStatus.INACTIVE,
@@ -100,11 +99,10 @@ const AdminPremiumBots = () => {
       lastUpdated: '10/03/2024',
       colorScheme: 'red',
       exchange: 'KuCoin',
-      description: 'Premium bot for momentum trading',
-      botId: 'PRE003'
+      description: 'Premium bot for momentum trading'
     },
     { 
-      id: 'PRE-004', 
+      botId: 'PRE-004', 
       name: 'Premium Grid Bot',
       type: BotType.PREMIUM_BOT,
       status: BotStatus.ACTIVE,
@@ -119,11 +117,10 @@ const AdminPremiumBots = () => {
       lastUpdated: '25/01/2024',
       colorScheme: 'green',
       exchange: 'Binance',
-      description: 'Premium bot for momentum trading',
-      botId: 'PRE004'
+      description: 'Premium bot for momentum trading'
     },
     { 
-      id: 'PRE-005', 
+      botId: 'PRE-005', 
       name: 'Premium Crypto Master',
       type: BotType.PREMIUM_BOT,
       status: BotStatus.MAINTENANCE,
@@ -138,8 +135,7 @@ const AdminPremiumBots = () => {
       lastUpdated: '22/11/2023',
       colorScheme: 'purple',
       exchange: 'OKX',
-      description: 'Premium bot for momentum trading',
-      botId: 'PRE005'
+      description: 'Premium bot for momentum trading'
     }
   ];
 
@@ -201,7 +197,7 @@ const AdminPremiumBots = () => {
     .filter(bot => 
       (searchTerm === '' || 
         bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bot.id.toLowerCase().includes(searchTerm.toLowerCase()))
+        bot.botId.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(bot => 
       (filterStatus === null || bot.status === filterStatus)
@@ -221,7 +217,7 @@ const AdminPremiumBots = () => {
     if (selectAll) {
       setSelectedBots([]);
     } else {
-      setSelectedBots(filteredBots.map(bot => bot.id));
+      setSelectedBots(filteredBots.map(bot => bot.botId));
     }
     setSelectAll(!selectAll);
   };
@@ -235,7 +231,7 @@ const AdminPremiumBots = () => {
     let botsToExport = filteredBots;
     
     if (selectedBots.length > 0) {
-      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
+      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.botId));
     }
     
     if (botsToExport.length === 0) {
@@ -245,7 +241,7 @@ const AdminPremiumBots = () => {
     
     const csvHeader = ["ID", "Tên Bot", "Trạng thái", "Tài khoản", "Lợi nhuận", "Ngày tạo"];
     const csvRows = botsToExport.map(bot => [
-      bot.id,
+      bot.botId,
       bot.name,
       bot.status,
       bot.users.toString(),
@@ -275,7 +271,7 @@ const AdminPremiumBots = () => {
     let botsToExport = filteredBots;
     
     if (selectedBots.length > 0) {
-      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.id));
+      botsToExport = filteredBots.filter(bot => selectedBots.includes(bot.botId));
     }
     
     if (botsToExport.length === 0) {
@@ -298,7 +294,7 @@ const AdminPremiumBots = () => {
         <tbody>
           ${botsToExport.map(bot => `
             <tr>
-              <td>${bot.id}</td>
+              <td>${bot.botId}</td>
               <td>${bot.name}</td>
               <td>${bot.status}</td>
               <td>${bot.users}</td>

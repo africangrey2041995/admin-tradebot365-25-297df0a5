@@ -43,7 +43,7 @@ export interface UserBotSettings {
 
 // Thông tin cơ bản của bot - Base bot interface with common properties
 export interface BaseBot {
-  botId: string; // Changed from id to botId for standardization
+  botId: string; // Standardized botId field
   name: string;
   description: string;
   status: BotStatus;

@@ -74,7 +74,7 @@ const IntegratedPremiumBotDetail = () => {
       <div className="space-y-6">
         <BotDetailHeader 
           botName={bot.name}
-          botId={bot.botId || bot.id}
+          botId={bot.botId}
           risk={bot.risk}
           backPath={USER_ROUTES.INTEGRATED_PREMIUM_BOTS}
         />

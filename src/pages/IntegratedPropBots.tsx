@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 // Mocking integrated prop trading bots data
 const integratedPropBots = [
   {
-    id: 'ptb-001',
+    botId: 'PROP-001',
     name: 'Prop Master',
     description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
     exchange: 'Coinstrat Pro',
@@ -32,7 +32,6 @@ const integratedPropBots = [
     imageUrl: null,
     colorScheme: 'blue',
     isIntegrated: true,
-    botId: 'PROP001',
     accounts: [
       {
         id: 'acc-001',
@@ -143,16 +142,16 @@ const IntegratedPropBots = () => {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filteredBots.map((bot, index) => (
               <motion.div
-                key={bot.id}
+                key={bot.botId}
                 custom={index}
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
-                onClick={() => handleBotClick(bot.id)}
+                onClick={() => handleBotClick(bot.botId)}
                 className="cursor-pointer"
               >
                 <PremiumBotCard 
-                  id={bot.id}
+                  botId={bot.botId}
                   name={bot.name}
                   description={bot.description}
                   exchange={bot.exchange}
@@ -166,7 +165,6 @@ const IntegratedPropBots = () => {
                   colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
                   isIntegrated={true}
                   accountCount={bot.accounts?.length.toString() || "0"}
-                  botId={bot.botId}
                 />
               </motion.div>
             ))}

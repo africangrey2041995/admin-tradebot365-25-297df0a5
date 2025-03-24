@@ -98,7 +98,7 @@ const AdminPremiumBotDetail = () => {
       
       setTimeout(() => {
         const mockBot: PremiumBot = {
-          id: botId || 'pb-001',
+          botId: botId || 'pb-001',
           name: 'Alpha Momentum',
           description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
           exchange: 'Coinstart Pro',
@@ -112,9 +112,10 @@ const AdminPremiumBotDetail = () => {
           imageUrl: null,
           colorScheme: 'green',
           isIntegrated: true,
-          botId: 'PRE7459',
           createdDate: '2023-01-15T10:20:30Z',
           lastUpdated: '2023-09-18T16:55:33Z',
+          users: 86,
+          profit: '+18.5%'
         };
         
         setBot(mockBot);
@@ -777,8 +778,8 @@ const AdminPremiumBotDetail = () => {
         </TabsContent>
         
         <TabsContent value="accounts">
-          <BotProfileTabs botId={bot.id} onAddAccount={() => {
-            console.log("Add account to premium bot", bot.id);
+          <BotProfileTabs botId={bot.botId} onAddAccount={() => {
+            console.log("Add account to premium bot", bot.botId);
             toast.success("Chức năng thêm tài khoản đang được phát triển");
           }} />
         </TabsContent>

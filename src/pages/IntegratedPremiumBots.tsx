@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -19,7 +20,7 @@ import { Account } from '@/types';
 
 const integratedPremiumBots: PremiumBot[] = [
   {
-    id: 'pb-001',
+    botId: 'PRE-001',
     name: 'Alpha Momentum',
     description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
     exchange: 'Coinstart Pro',
@@ -33,7 +34,6 @@ const integratedPremiumBots: PremiumBot[] = [
     imageUrl: null,
     colorScheme: 'green',
     isIntegrated: true,
-    botId: 'BOT7459',
     createdDate: '2023-10-15',
     lastUpdated: '2023-11-10',
     users: 86,
@@ -70,7 +70,7 @@ const integratedPremiumBots: PremiumBot[] = [
     ]
   },
   {
-    id: 'pb-004',
+    botId: 'PRE-004',
     name: 'Gamma Grid',
     description: 'Bot grid trading với chiến lược phân bổ thanh khoản thông minh dựa trên biến động thị trường.',
     exchange: 'Coinstart Pro',
@@ -84,7 +84,6 @@ const integratedPremiumBots: PremiumBot[] = [
     imageUrl: null,
     colorScheme: 'purple',
     isIntegrated: true,
-    botId: 'BOT8932',
     createdDate: '2023-11-05',
     lastUpdated: '2023-11-10',
     users: 98,
@@ -211,16 +210,16 @@ const IntegratedPremiumBots = () => {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filteredBots.map((bot, index) => (
               <motion.div
-                key={bot.id}
+                key={bot.botId}
                 custom={index}
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
-                onClick={() => handleBotClick(bot.id)}
+                onClick={() => handleBotClick(bot.botId)}
                 className="cursor-pointer"
               >
                 <PremiumBotCard 
-                  id={bot.id}
+                  botId={bot.botId}
                   name={bot.name}
                   description={bot.description || ''}
                   exchange={bot.exchange}
@@ -234,7 +233,6 @@ const IntegratedPremiumBots = () => {
                   colorScheme={bot.colorScheme}
                   isIntegrated={true}
                   accountCount={getAccountCount(bot.accounts)}
-                  botId={bot.botId}
                 />
               </motion.div>
             ))}
