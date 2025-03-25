@@ -129,9 +129,15 @@ export const getTotalCounts = (data: UserAccount[]) => {
  */
 export const getStatusBadge = (status: string) => {
   if (status.toLowerCase() === 'connected') {
-    return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Connected</Badge>;
+    return React.createElement(Badge, { 
+      variant: "outline", 
+      className: "bg-green-50 text-green-700 border-green-200" 
+    }, "Connected");
   } else {
-    return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Disconnected</Badge>;
+    return React.createElement(Badge, { 
+      variant: "outline", 
+      className: "bg-red-50 text-red-700 border-red-200" 
+    }, "Disconnected");
   }
 };
 
