@@ -1,15 +1,22 @@
 
 import { Account } from '@/types';
-import { UserAccount, CSPAccount, TradingAccount } from '../types/account-types';
+import { UserAccount, CSPAccount, TradingAccount, AccountsFilterParams } from '../types/account-types';
 import { Badge } from '@/components/ui/badge';
 import React from 'react';
 
 /**
- * Transforms flat account list into hierarchical structure
+ * SECTION: Hierarchical Data Structure Transformation
+ */
+
+/**
+ * Transform flat account list into hierarchical structure
+ * @param accounts - Flat array of accounts
+ * @returns Array of user accounts with nested CSP and trading accounts
  */
 export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount[] => {
   const userMap = new Map<string, UserAccount>();
   
+  // First pass: organize accounts by user
   accounts.forEach(account => {
     // Skip accounts without required fields
     if (!account.cspUserId || !account.cspUserEmail) return;
@@ -42,46 +49,65 @@ export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount
     }
     
     // Add trading account
-    cspAccount.tradingAccounts.push({
+    const tradingAccount: TradingAccount = {
       tradingAccountId: account.tradingAccountId || '',
       tradingAccountNumber: account.tradingAccountNumber || '',
       tradingAccountType: account.tradingAccountType || '',
       tradingAccountBalance: account.tradingAccountBalance || '',
       isLive: account.isLive || false,
       status: account.status || ''
-    });
+    };
+    
+    cspAccount.tradingAccounts.push(tradingAccount);
   });
   
   return Array.from(userMap.values());
 };
 
 /**
- * Apply filtering to hierarchical data
+ * SECTION: Filtering Functionality
+ */
+
+/**
+ * Apply filtering to hierarchical account data
+ * @param data - Hierarchical user accounts data
+ * @param filters - Filter parameters for searching and filtering
+ * @returns Filtered user accounts data
  */
 export const filterAccountData = (
   data: UserAccount[], 
-  filters: { searchQuery: string; filterStatus: string; filterLiveDemo: string; }
+  filters: AccountsFilterParams
 ): UserAccount[] => {
+  // If no filters are applied, return the original data
+  if (!filters.searchQuery && filters.filterStatus === 'all' && filters.filterLiveDemo === 'all') {
+    return data;
+  }
+  
   return data.filter(user => {
-    // Search functionality across all levels
+    // Apply search filtering
     if (filters.searchQuery) {
       const searchLower = filters.searchQuery.toLowerCase();
+      
+      // Check if user data matches search
       const matchesUser = 
         user.name.toLowerCase().includes(searchLower) || 
         user.email.toLowerCase().includes(searchLower) || 
         user.userId.toLowerCase().includes(searchLower);
-        
+      
+      // Check if any CSP account matches search  
       const matchesCSP = user.cspAccounts.some(csp => 
         (csp.cspAccountName?.toLowerCase() || '').includes(searchLower) ||
         (csp.apiName?.toLowerCase() || '').includes(searchLower)
       );
       
+      // Check if any trading account matches search
       const matchesTrading = user.cspAccounts.some(csp => 
         csp.tradingAccounts.some(trading => 
           (trading.tradingAccountNumber?.toLowerCase() || '').includes(searchLower)
         )
       );
       
+      // If nothing matches the search, exclude this user
       if (!(matchesUser || matchesCSP || matchesTrading)) {
         return false;
       }
@@ -112,20 +138,38 @@ export const filterAccountData = (
 };
 
 /**
+ * SECTION: Statistics and Aggregation
+ */
+
+/**
  * Calculate total counts for users, CSP accounts, and trading accounts
+ * @param data - Hierarchical user accounts data
+ * @returns Object with total counts
  */
 export const getTotalCounts = (data: UserAccount[]) => {
   const totalUsers = data.length;
-  const totalCSP = data.reduce((sum, user) => sum + user.cspAccounts.length, 0);
+  
+  const totalCSP = data.reduce((sum, user) => 
+    sum + user.cspAccounts.length, 0
+  );
+  
   const totalTrading = data.reduce((sum, user) => 
-    sum + user.cspAccounts.reduce((cspSum, csp) => cspSum + csp.tradingAccounts.length, 0), 0
+    sum + user.cspAccounts.reduce((cspSum, csp) => 
+      cspSum + csp.tradingAccounts.length, 0
+    ), 0
   );
   
   return { totalUsers, totalCSP, totalTrading };
 };
 
 /**
+ * SECTION: UI Components and Display Utils
+ */
+
+/**
  * Get styled status badge based on connection status
+ * @param status - Connection status string
+ * @returns React Badge component with appropriate styling
  */
 export const getStatusBadge = (status: string) => {
   if (status.toLowerCase() === 'connected') {
@@ -142,7 +186,16 @@ export const getStatusBadge = (status: string) => {
 };
 
 /**
- * Find the original account from flat list
+ * SECTION: Data Management and Lookup Utils
+ */
+
+/**
+ * Find the original account from flat list based on identifiers
+ * @param accounts - Flat array of accounts
+ * @param userId - User ID to match
+ * @param cspAccountId - CSP account ID to match
+ * @param tradingAccountId - Optional trading account ID to match
+ * @returns Matching account or undefined
  */
 export const findOriginalAccount = (
   accounts: Account[],
@@ -158,7 +211,13 @@ export const findOriginalAccount = (
 };
 
 /**
- * Prepare account data for export
+ * SECTION: Export and Data Transformation
+ */
+
+/**
+ * Prepare account data for export to CSV/Excel
+ * @param data - Hierarchical user accounts data
+ * @returns 2D array suitable for export
  */
 export const prepareExportData = (data: UserAccount[]): (string | number)[][] => {
   const exportData: (string | number)[][] = [];
