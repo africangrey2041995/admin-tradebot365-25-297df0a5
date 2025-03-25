@@ -52,14 +52,7 @@ export const useTradingViewLogs = ({
             status: 'Processed',
             signalToken: 'token123',
             maxLag: '5s',
-            investmentType: 'crypto',
-            parsedData: {
-              action: 'BUY',
-              symbol: 'BTCUSDT',
-              price: '50000',
-              stopLoss: '49000',
-              takeProfit: '51000',
-            }
+            investmentType: 'crypto'
           },
           {
             id: 'TV-12346',
@@ -71,14 +64,7 @@ export const useTradingViewLogs = ({
             status: 'Processed',
             signalToken: 'token456',
             maxLag: '5s',
-            investmentType: 'crypto',
-            parsedData: {
-              action: 'SELL',
-              symbol: 'ETHUSDT',
-              price: '3000',
-              stopLoss: '3100',
-              takeProfit: '2900',
-            }
+            investmentType: 'crypto'
           },
           {
             id: 'TV-12347',
