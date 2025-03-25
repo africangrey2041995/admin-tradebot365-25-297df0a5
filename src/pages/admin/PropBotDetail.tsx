@@ -55,6 +55,20 @@ const PropBotDetail: React.FC = () => {
     }, 800);
   };
 
+  const handleUpdateBot = (updatedData: Partial<PropBot>) => {
+    if (!propBot) return;
+    
+    // Update the local state
+    const updatedBot = { ...propBot, ...updatedData };
+    setPropBot(updatedBot);
+    
+    // In a real application, you would make an API call here
+    console.log("Bot updated:", updatedBot);
+    
+    // Show success toast
+    toast.success("Thông tin bot đã được cập nhật");
+  };
+
   // Fix for error 1: Wrapping goBack in a handler that accepts MouseEvent
   const handleBackClick = () => {
     goBack();
@@ -147,6 +161,7 @@ const PropBotDetail: React.FC = () => {
         minCapital={propBot.minCapital}
         maxDrawdown={propBot.maxDrawdown}
         challengeDuration={propBot.challengeDuration}
+        onUpdate={handleUpdateBot}
       />
       
       <PropBotEnhancedTabs 
