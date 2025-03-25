@@ -109,7 +109,7 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
         user.userId.toLowerCase().includes(searchLower);
         
       const matchesCSP = user.cspAccounts.some(csp => 
-        csp.account.cspAccountName.toLowerCase().includes(searchLower) ||
+        csp.account.cspAccountName?.toLowerCase().includes(searchLower) ||
         csp.account.apiName?.toLowerCase().includes(searchLower)
       );
       
@@ -259,7 +259,7 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                                       {tradingAccount.account.tradingAccountType} - {tradingAccount.account.isLive ? 'Live' : 'Demo'}
                                     </TableCell>
                                     <TableCell>{tradingAccount.account.tradingAccountBalance}</TableCell>
-                                    <TableCell>{getStatusBadge(tradingAccount.account.status)}</TableCell>
+                                    <TableCell>{getStatusBadge(tradingAccount.account.status || '')}</TableCell>
                                   </TableRow>
                                 ))}
                               </TableBody>

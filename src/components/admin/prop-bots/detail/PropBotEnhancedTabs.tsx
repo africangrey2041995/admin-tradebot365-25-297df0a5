@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import PropBotUsersTab from './PropBotUsersTab';
@@ -13,6 +12,7 @@ import { PropBot } from '@/types/bot';
 import LogsFilterBar from './LogsFilterBar';
 import ExportDataDropdown from './ExportDataDropdown';
 import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
+import { Account } from '@/types';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -37,7 +37,7 @@ interface PropBotEnhancedTabsProps {
   challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
   onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
-  connectedAccounts?: any[];
+  connectedAccounts?: Account[];
 }
 
 const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
