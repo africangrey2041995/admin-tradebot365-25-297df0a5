@@ -1,118 +1,127 @@
 
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export interface LogsFilterBarProps {
+interface LogsFilterBarProps {
   onFilterChange: (filters: any) => void;
-  filters: {
+  showExport?: boolean;
+  exportComponent?: React.ReactNode;
+  filters?: {
     search: string;
     status: string;
     time: string;
-    accountId: string;
-    userId: string;
-    action: string;
+    accountId?: string;
+    userId?: string;
+    action?: string;
   };
-  showExport?: boolean;
-  exportComponent?: React.ReactNode;
 }
 
-export const LogsFilterBar: React.FC<LogsFilterBarProps> = ({ 
+const LogsFilterBar: React.FC<LogsFilterBarProps> = ({ 
   onFilterChange,
-  filters,
   showExport = false,
-  exportComponent = null
+  exportComponent = null,
+  filters
 }) => {
+  const [searchValue, setSearchValue] = useState(filters?.search || '');
+  const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
+  const [timeRange, setTimeRange] = useState(filters?.time || 'all');
+
+  // Update local state when filters prop changes
+  useEffect(() => {
+    if (filters) {
+      setSearchValue(filters.search || '');
+      setStatusFilter(filters.status || 'all');
+      setTimeRange(filters.time || 'all');
+    }
+  }, [filters]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    applyFilters(value, statusFilter, timeRange);
+  };
+
+  const handleClearSearch = () => {
+    setSearchValue('');
+    applyFilters('', statusFilter, timeRange);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    applyFilters(searchValue, value, timeRange);
+  };
+
+  const handleTimeRangeChange = (value: string) => {
+    setTimeRange(value);
+    applyFilters(searchValue, statusFilter, value);
+  };
+
+  const applyFilters = (search: string, status: string, time: string) => {
+    onFilterChange({
+      search,
+      status,
+      time,
+      ...(filters?.accountId && { accountId: filters.accountId }),
+      ...(filters?.userId && { userId: filters.userId }),
+      ...(filters?.action && { action: filters.action })
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Tìm kiếm ID, cặp tiền, hành động..."
-            className="pl-9 bg-gray-900 border-gray-700"
-            value={filters.search}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Select 
-            value={filters.status} 
-            onValueChange={(value) => onFilterChange({ status: value })}
+    <div className="flex flex-col sm:flex-row gap-3 mb-4">
+      <div className="relative flex-1">
+        <Input
+          placeholder="Tìm kiếm theo ID, Symbol..."
+          value={searchValue}
+          onChange={handleSearchChange}
+          className="pl-9"
+        />
+        <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+        {searchValue && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-1 top-1 h-6 w-6 p-0 opacity-70"
+            onClick={handleClearSearch}
           >
-            <SelectTrigger className="w-[120px] bg-gray-900 border-gray-700">
-              <div className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Trạng thái" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="Processed">Thành công</SelectItem>
-              <SelectItem value="Failed">Thất bại</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select 
-            value={filters.time} 
-            onValueChange={(value) => onFilterChange({ time: value })}
-          >
-            <SelectTrigger className="w-[130px] bg-gray-900 border-gray-700">
-              <div className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Thời gian" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="last-hour">Giờ qua</SelectItem>
-              <SelectItem value="today">Hôm nay</SelectItem>
-              <SelectItem value="yesterday">Hôm qua</SelectItem>
-              <SelectItem value="last-week">Tuần qua</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select 
-            value={filters.action} 
-            onValueChange={(value) => onFilterChange({ action: value })}
-          >
-            <SelectTrigger className="w-[130px] bg-gray-900 border-gray-700">
-              <div className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Hành động" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="ENTER">Vào lệnh</SelectItem>
-              <SelectItem value="EXIT">Đóng lệnh</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {showExport && exportComponent}
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Input
-            placeholder="Lọc theo ID tài khoản..."
-            className="bg-gray-900 border-gray-700"
-            value={filters.accountId}
-            onChange={(e) => onFilterChange({ accountId: e.target.value })}
-          />
-        </div>
-        <div className="relative flex-1">
-          <Input
-            placeholder="Lọc theo ID người dùng..."
-            className="bg-gray-900 border-gray-700"
-            value={filters.userId}
-            onChange={(e) => onFilterChange({ userId: e.target.value })}
-          />
-        </div>
+      <div className="flex flex-row gap-3">
+        <Select value={statusFilter} onValueChange={handleStatusChange}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="success">Thành công</SelectItem>
+            <SelectItem value="error">Lỗi</SelectItem>
+            <SelectItem value="pending">Đang xử lý</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={timeRange} onValueChange={handleTimeRangeChange}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Thời gian" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả thời gian</SelectItem>
+            <SelectItem value="today">Hôm nay</SelectItem>
+            <SelectItem value="yesterday">Hôm qua</SelectItem>
+            <SelectItem value="week">Tuần này</SelectItem>
+            <SelectItem value="month">Tháng này</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {showExport && exportComponent}
       </div>
     </div>
   );
 };
+
+export default LogsFilterBar;
