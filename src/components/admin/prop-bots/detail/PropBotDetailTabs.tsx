@@ -27,7 +27,6 @@ interface PropBotDetailTabsProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
-    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;

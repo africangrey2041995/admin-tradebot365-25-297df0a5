@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
 
 interface BotStatsCardProps {
   stats: {
@@ -8,37 +8,30 @@ interface BotStatsCardProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
-    currentDrawdown: string;
   };
 }
 
 const BotStatsCard: React.FC<BotStatsCardProps> = ({ stats }) => {
   return (
-    <Card className="border-gray-200 dark:border-gray-800">
-      <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
-        <CardTitle className="text-lg font-medium">Thống Kê Bot</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="divide-y divide-gray-100 dark:divide-gray-800">
-          <div className="flex justify-between items-center p-4">
-            <span className="text-gray-600 dark:text-gray-300">Số Giao Dịch</span>
-            <span className="font-semibold text-gray-900 dark:text-white">{stats.totalTrades}</span>
+    <Card className="border border-gray-200 dark:border-gray-800">
+      <CardContent className="p-6">
+        <h3 className="font-medium mb-3 text-lg">Chỉ số Bot</h3>
+        <div className="space-y-2">
+          <div className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-600 dark:text-gray-400">Tổng giao dịch</span>
+            <span className="font-medium">{stats.totalTrades}</span>
           </div>
-          <div className="flex justify-between items-center p-4">
-            <span className="text-gray-600 dark:text-gray-300">Tỷ Lệ Thắng</span>
-            <span className="font-semibold text-green-600 dark:text-green-400">{stats.winRate}</span>
+          <div className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-600 dark:text-gray-400">Tỷ lệ thắng</span>
+            <span className="font-medium">{stats.winRate}</span>
           </div>
-          <div className="flex justify-between items-center p-4">
-            <span className="text-gray-600 dark:text-gray-300">Hệ Số Lợi Nhuận</span>
-            <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.profitFactor}</span>
+          <div className="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-600 dark:text-gray-400">Hệ số lợi nhuận</span>
+            <span className="font-medium">{stats.profitFactor}</span>
           </div>
-          <div className="flex justify-between items-center p-4">
-            <span className="text-gray-600 dark:text-gray-300">Tỷ Lệ Sharpe</span>
-            <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.sharpeRatio}</span>
-          </div>
-          <div className="flex justify-between items-center p-4">
-            <span className="text-gray-600 dark:text-gray-300">Drawdown Hiện Tại</span>
-            <span className="font-semibold text-red-600 dark:text-red-400">{stats.currentDrawdown}</span>
+          <div className="flex justify-between py-1">
+            <span className="text-gray-600 dark:text-gray-400">Tỷ lệ Sharpe</span>
+            <span className="font-medium">{stats.sharpeRatio}</span>
           </div>
         </div>
       </CardContent>
