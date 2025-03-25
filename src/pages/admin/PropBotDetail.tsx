@@ -9,6 +9,7 @@ import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from "sonner";
 import { mockPropBots } from '@/mocks/propBotsMock';
+import { BotRiskLevel } from '@/constants/botTypes';
 
 const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -48,6 +49,11 @@ const PropBotDetail: React.FC = () => {
     }, 800);
   };
 
+  // Fix for error 1: Wrapping goBack in a handler that accepts MouseEvent
+  const handleBackClick = () => {
+    goBack();
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -63,7 +69,7 @@ const PropBotDetail: React.FC = () => {
             Bot với ID {botId} không tồn tại hoặc đã bị xóa.
           </p>
           <button 
-            onClick={goBack}
+            onClick={handleBackClick}
             className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
           >
             Quay lại
@@ -115,9 +121,9 @@ const PropBotDetail: React.FC = () => {
       <PropBotDetailHeader 
         botName={propBot.name}
         botId={propBot.botId}
-        risk={propBot.risk || 'medium'}
+        risk={propBot.risk || BotRiskLevel.MEDIUM} // Fix for error 2: Using enum value instead of string literal
         status={propBot.status}
-        onBack={goBack}
+        onBack={handleBackClick}
       />
       
       <PropBotDetailTabs 
