@@ -46,7 +46,6 @@ export const useTradingViewLogs = ({
             id: 'TV-12345',
             timestamp: new Date().toISOString(),
             source: 'TradingView Alert',
-            content: 'Buy BTCUSDT at market price',
             action: 'ENTER_LONG',
             instrument: 'BTCUSDT',
             amount: '50000',
@@ -66,7 +65,6 @@ export const useTradingViewLogs = ({
             id: 'TV-12346',
             timestamp: new Date(Date.now() - 3600000).toISOString(),
             source: 'TradingView Alert',
-            content: 'Sell ETHUSDT at market price',
             action: 'EXIT_LONG',
             instrument: 'ETHUSDT',
             amount: '3000',
@@ -86,7 +84,6 @@ export const useTradingViewLogs = ({
             id: 'TV-12347',
             timestamp: new Date(Date.now() - 7200000).toISOString(),
             source: 'TradingView Alert',
-            content: 'Invalid signal format',
             status: 'Failed',
             errorMessage: 'Could not parse signal format',
             action: 'ENTER_LONG', // Adding required fields for BaseSignal
