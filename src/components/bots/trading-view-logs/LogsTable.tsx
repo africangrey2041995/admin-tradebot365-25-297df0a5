@@ -3,16 +3,23 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { TradingViewSignal } from '@/types';
+import { TradingViewSignal } from '@/types/signal';
 import ActionBadge from './ActionBadge';
 import StatusBadge from './StatusBadge';
 
-interface LogsTableProps {
+export interface LogsTableProps {
   logs: TradingViewSignal[];
+  selectedId?: string | null;
+  onSelectId?: (id: string) => void;
   onRefresh: () => void;
 }
 
-const LogsTable: React.FC<LogsTableProps> = ({ logs, onRefresh }) => {
+const LogsTable: React.FC<LogsTableProps> = ({ 
+  logs, 
+  selectedId, 
+  onSelectId, 
+  onRefresh 
+}) => {
   return (
     <div>
       <Table>
@@ -29,7 +36,11 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, onRefresh }) => {
         </TableHeader>
         <TableBody>
           {logs.map((log) => (
-            <TableRow key={log.id}>
+            <TableRow 
+              key={log.id} 
+              className={selectedId === log.id ? "bg-muted" : ""}
+              onClick={() => onSelectId && onSelectId(log.id)}
+            >
               <TableCell className="font-medium">{log.id}</TableCell>
               <TableCell>{log.instrument}</TableCell>
               <TableCell>

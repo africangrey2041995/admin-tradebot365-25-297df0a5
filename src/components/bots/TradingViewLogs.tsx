@@ -60,10 +60,10 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({
   return (
     <div className="space-y-4">
       <LogsTable 
-        logs={logs} 
-        selectedId={selectedId} 
-        onSelectId={setSelectedId} 
-        onRefresh={handleRefresh} 
+        logs={logs}
+        selectedId={selectedId}
+        onSelectId={setSelectedId}
+        onRefresh={handleRefresh}
       />
     </div>
   );
