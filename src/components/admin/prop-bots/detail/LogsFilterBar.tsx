@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,34 +9,16 @@ interface LogsFilterBarProps {
   onFilterChange: (filters: any) => void;
   showExport?: boolean;
   exportComponent?: React.ReactNode;
-  filters?: {
-    search: string;
-    status: string;
-    time: string;
-    accountId?: string;
-    userId?: string;
-    action?: string;
-  };
 }
 
 const LogsFilterBar: React.FC<LogsFilterBarProps> = ({ 
   onFilterChange,
   showExport = false,
-  exportComponent = null,
-  filters
+  exportComponent = null
 }) => {
-  const [searchValue, setSearchValue] = useState(filters?.search || '');
-  const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
-  const [timeRange, setTimeRange] = useState(filters?.time || 'all');
-
-  // Update local state when filters prop changes
-  useEffect(() => {
-    if (filters) {
-      setSearchValue(filters.search || '');
-      setStatusFilter(filters.status || 'all');
-      setTimeRange(filters.time || 'all');
-    }
-  }, [filters]);
+  const [searchValue, setSearchValue] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [timeRange, setTimeRange] = useState('all');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -63,10 +45,7 @@ const LogsFilterBar: React.FC<LogsFilterBarProps> = ({
     onFilterChange({
       search,
       status,
-      time,
-      ...(filters?.accountId && { accountId: filters.accountId }),
-      ...(filters?.userId && { userId: filters.userId }),
-      ...(filters?.action && { action: filters.action })
+      time
     });
   };
 
