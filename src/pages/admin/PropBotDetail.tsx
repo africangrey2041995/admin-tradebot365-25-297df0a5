@@ -124,17 +124,6 @@ const PropBotDetail: React.FC = () => {
     );
   }
 
-  // Challenge data for the overview tab
-  const challengeData = {
-    phase: "Verification",
-    progress: 65,
-    accountBalance: propBot.minCapital || "$10,000",
-    profitTarget: propBot.profit || "+10%",
-    maxDrawdown: propBot.maxDrawdown || "5%",
-    daysRemaining: propBot.challengeDuration ? propBot.challengeDuration.split(' ')[0] : "30",
-    description: propBot.description || "Prop Trading Bot cho Coinstrat Pro",
-  };
-
   // Bot stats for the overview tab
   const botStats = {
     totalTrades: 42,
@@ -200,7 +189,6 @@ const PropBotDetail: React.FC = () => {
         onRefresh={handleRefresh}
         isLoading={isLoading}
         propBot={propBot}
-        challengeData={challengeData}
         botStats={botStats}
         botInfo={botInfo}
         challengeRules={challengeRules}

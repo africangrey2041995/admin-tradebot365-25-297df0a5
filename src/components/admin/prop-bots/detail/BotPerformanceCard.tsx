@@ -26,31 +26,6 @@ const BotPerformanceCard: React.FC<BotPerformanceCardProps> = ({
     allTime: performance.allTime
   });
 
-  const colorSchemeClasses = {
-    blue: {
-      bg: 'bg-blue-50 dark:bg-blue-900/10',
-      border: 'border-blue-200 dark:border-blue-800/30'
-    },
-    green: {
-      bg: 'bg-green-50 dark:bg-green-900/10',
-      border: 'border-green-200 dark:border-green-800/30'
-    },
-    purple: {
-      bg: 'bg-purple-50 dark:bg-purple-900/10',
-      border: 'border-purple-200 dark:border-purple-800/30'
-    },
-    red: {
-      bg: 'bg-red-50 dark:bg-red-900/10',
-      border: 'border-red-200 dark:border-red-800/30'
-    },
-    default: {
-      bg: 'bg-slate-50 dark:bg-slate-900/10',
-      border: 'border-slate-200 dark:border-slate-800/30'
-    }
-  };
-  
-  const colors = colorSchemeClasses[colorScheme];
-
   const handleStartEditing = () => {
     setEditedPerformance({
       lastMonth: performance.lastMonth,
@@ -73,12 +48,19 @@ const BotPerformanceCard: React.FC<BotPerformanceCardProps> = ({
     toast.success('Đã cập nhật dữ liệu hiệu suất');
   };
 
+  // Get arrow color based on performance (green for positive, red for negative)
+  const getArrowColor = (value: string) => {
+    if (value.includes('+')) return 'text-green-600 dark:text-green-400';
+    if (value.includes('-')) return 'text-red-600 dark:text-red-400';
+    return 'text-gray-600 dark:text-gray-400';
+  };
+
   return (
-    <Card>
+    <Card className="border border-neutral-200 dark:border-neutral-800">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-base flex items-center">
-          <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
-          Hiệu suất
+          <BarChart2 className="h-4 w-4 mr-2 text-primary" />
+          Hiệu suất Bot
         </CardTitle>
         {!isEditing ? (
           <Button 
@@ -117,26 +99,26 @@ const BotPerformanceCard: React.FC<BotPerformanceCardProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {!isEditing ? (
             <>
-              <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất tháng trước</div>
+              <div className="p-4 rounded-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                <div className="text-sm text-neutral-600 dark:text-neutral-400">Hiệu suất tháng trước</div>
                 <div className="text-2xl font-bold mt-1 flex items-center">
                   {performance.lastMonth}
-                  <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                  <TrendingUp className={`ml-2 h-5 w-5 ${getArrowColor(performance.lastMonth)}`} />
                 </div>
               </div>
               
-              <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất từ đầu</div>
+              <div className="p-4 rounded-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                <div className="text-sm text-neutral-600 dark:text-neutral-400">Hiệu suất từ đầu</div>
                 <div className="text-2xl font-bold mt-1 flex items-center">
                   {performance.allTime}
-                  <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                  <TrendingUp className={`ml-2 h-5 w-5 ${getArrowColor(performance.allTime)}`} />
                 </div>
               </div>
             </>
           ) : (
             <>
               <div className="space-y-2">
-                <label className="text-sm text-slate-600 dark:text-slate-400">
+                <label className="text-sm text-neutral-600 dark:text-neutral-400">
                   Hiệu suất tháng trước
                 </label>
                 <Input
@@ -150,7 +132,7 @@ const BotPerformanceCard: React.FC<BotPerformanceCardProps> = ({
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm text-slate-600 dark:text-slate-400">
+                <label className="text-sm text-neutral-600 dark:text-neutral-400">
                   Hiệu suất từ đầu
                 </label>
                 <Input

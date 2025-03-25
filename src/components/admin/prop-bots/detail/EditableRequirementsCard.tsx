@@ -63,11 +63,11 @@ const EditableRequirementsCard: React.FC<EditableRequirementsCardProps> = ({
   };
 
   return (
-    <Card>
+    <Card className="border border-neutral-200 dark:border-neutral-800">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-base flex items-center">
-          <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
-          Yêu cầu
+          <CircleAlert className="h-4 w-4 mr-2 text-amber-600 dark:text-amber-400" />
+          Yêu cầu Bot
         </CardTitle>
         {!isEditing ? (
           <Button 
@@ -104,7 +104,7 @@ const EditableRequirementsCard: React.FC<EditableRequirementsCardProps> = ({
       </CardHeader>
       <CardContent>
         {!isEditing ? (
-          <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+          <ul className="list-disc pl-5 space-y-1 text-sm text-neutral-700 dark:text-neutral-300">
             {requirements.map((requirement, index) => (
               <li key={index}>{requirement}</li>
             ))}

@@ -63,11 +63,11 @@ const EditableFeaturesCard: React.FC<EditableFeaturesCardProps> = ({
   };
 
   return (
-    <Card>
+    <Card className="border border-neutral-200 dark:border-neutral-800">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-base flex items-center">
-          <Plus className="h-4 w-4 mr-2 text-green-500" />
-          Tính năng
+          <Plus className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
+          Tính năng Bot
         </CardTitle>
         {!isEditing ? (
           <Button 
@@ -104,7 +104,7 @@ const EditableFeaturesCard: React.FC<EditableFeaturesCardProps> = ({
       </CardHeader>
       <CardContent>
         {!isEditing ? (
-          <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+          <ul className="list-disc pl-5 space-y-1 text-sm text-neutral-700 dark:text-neutral-300">
             {features.map((feature, index) => (
               <li key={index}>{feature}</li>
             ))}

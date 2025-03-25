@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, BarChart, Cog, List, Users } from 'lucide-react';
+import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import PropBotOverviewTab from './PropBotOverviewTab';
@@ -21,15 +21,6 @@ interface PropBotEnhancedTabsProps {
   onRefresh: () => void;
   isLoading: boolean;
   propBot: PropBot;
-  challengeData: {
-    phase: string;
-    progress: number;
-    accountBalance: string;
-    profitTarget: string;
-    maxDrawdown: string;
-    daysRemaining: string;
-    description: string;
-  };
   botStats: {
     totalTrades: number;
     winRate: string;
@@ -54,7 +45,6 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   onRefresh,
   isLoading,
   propBot,
-  challengeData,
   botStats,
   botInfo,
   challengeRules,
@@ -82,7 +72,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
       <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="overview">
-          <BarChart className="h-4 w-4 mr-2" />
+          <BarChart2 className="h-4 w-4 mr-2" />
           Tổng quan
         </TabsTrigger>
         <TabsTrigger value="connected-accounts">
@@ -106,7 +96,6 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       <TabsContent value="overview" className="space-y-4">
         <PropBotOverviewTab 
           propBot={propBot}
-          challengeData={challengeData}
           botStats={botStats}
           botInfo={botInfo}
           challengeRules={challengeRules}
