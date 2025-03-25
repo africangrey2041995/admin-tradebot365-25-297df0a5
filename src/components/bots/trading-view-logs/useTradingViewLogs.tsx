@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { TradingViewSignal } from '@/types/signal';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface UseTradingViewLogsProps {
   botId: string;
@@ -40,14 +41,18 @@ export const useTradingViewLogs = ({
     debugComponent: 'TradingViewLogs'
   });
 
+  // Get admin status from useAdmin hook
+  const { isAdmin } = useAdmin();
+
   const fetchLogs = useCallback(() => {
-    // Validate userId before processing
-    if (!validateUserId(userId)) {
+    // Only validate userId format for non-admin users
+    if (!isAdmin && !validateUserId(userId)) {
       console.warn(`TradingViewLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
       // We still proceed but with a warning
     }
     
-    console.log(`TradingViewLogs - Fetching logs for userId: ${userId} (normalized: ${normalizeUserId(userId)})`);
+    console.log(`TradingViewLogs - Fetching logs for ${isAdmin ? 'admin' : `userId: ${userId}`} (normalized: ${normalizeUserId(userId)})`);
+    console.log(`TradingViewLogs - Admin status: ${isAdmin ? 'Yes' : 'No'}`);
     startLoading();
     setError(null);
     
@@ -95,24 +100,30 @@ export const useTradingViewLogs = ({
         ];
         
         try {
-          // Use normalizeUserId for consistent comparison
-          const normalizedInputUserId = normalizeUserId(userId);
-          console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
-          
-          const filteredLogs = mockLogs.filter(log => {
-            if (!log.userId) {
-              console.warn(`TradingViewLogs - Log ${log.id} is missing userId`);
-              return false;
-            }
+          // For admin users, don't filter by userId - show all logs
+          if (isAdmin) {
+            console.log(`TradingViewLogs - Admin user: showing all ${mockLogs.length} logs`);
+            setLogs(mockLogs);
+          } else {
+            // Use normalizeUserId for consistent comparison for regular users
+            const normalizedInputUserId = normalizeUserId(userId);
+            console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
             
-            const normalizedLogUserId = normalizeUserId(log.userId);
-            const match = normalizedLogUserId === normalizedInputUserId;
-            console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-            return match;
-          });
-          
-          console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
-          setLogs(filteredLogs);
+            const filteredLogs = mockLogs.filter(log => {
+              if (!log.userId) {
+                console.warn(`TradingViewLogs - Log ${log.id} is missing userId`);
+                return false;
+              }
+              
+              const normalizedLogUserId = normalizeUserId(log.userId);
+              const match = normalizedLogUserId === normalizedInputUserId;
+              console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+              return match;
+            });
+            
+            console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
+            setLogs(filteredLogs);
+          }
         } catch (filterErr) {
           console.error('Error filtering logs:', filterErr);
           setError(filterErr instanceof Error ? filterErr : new Error('Error filtering logs data'));
@@ -126,7 +137,7 @@ export const useTradingViewLogs = ({
         stopLoading();
       }
     }, 800);
-  }, [botId, userId, startLoading, stopLoading]);
+  }, [botId, userId, startLoading, stopLoading, isAdmin]);
 
   useEffect(() => {
     fetchLogs();

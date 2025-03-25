@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface UseCoinstratLogsProps {
   botId: string;
@@ -41,15 +42,19 @@ export const useCoinstratLogs = ({
   
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Get admin status from useAdmin hook
+  const { isAdmin } = useAdmin();
 
   const fetchLogs = useCallback(() => {
-    // Validate userId before processing
-    if (!validateUserId(userId)) {
+    // For non-admin users, validate userId format
+    if (!isAdmin && !validateUserId(userId)) {
       console.warn(`CoinstratLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
       // We still proceed but with a warning
     }
     
-    console.log(`CoinstratLogs - Fetching logs for userId: ${userId} (normalized: ${normalizeUserId(userId)}), botId: ${botId}`);
+    console.log(`CoinstratLogs - Fetching logs for ${isAdmin ? 'admin' : `userId: ${userId}`} (normalized: ${normalizeUserId(userId)}), botId: ${botId}`);
+    console.log(`CoinstratLogs - Admin status: ${isAdmin ? 'Yes' : 'No'}`);
     startLoading();
     setError(null);
     
@@ -61,28 +66,31 @@ export const useCoinstratLogs = ({
       // If initialData is provided, filter and use it
       if (initialData && initialData.length > 0) {
         try {
-          const filteredLogs = initialData.filter(log => {
-            // Check both processed and failed accounts with normalized comparison
-            const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
-              if (!account.userId) {
-                console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
-                return false;
-              }
-              return normalizeUserId(account.userId) === normalizedInputUserId;
-            });
-            
-            const hasFailedAccountsForUser = log.failedAccounts.some(account => {
-              if (!account.userId) {
-                console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
-                return false;
-              }
-              return normalizeUserId(account.userId) === normalizedInputUserId;
-            });
-            
-            return hasProcessedAccountsForUser || hasFailedAccountsForUser;
-          });
+          // For admin users, don't filter by userId - show all logs
+          const filteredLogs = isAdmin 
+            ? initialData 
+            : initialData.filter(log => {
+                // Check both processed and failed accounts with normalized comparison
+                const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+                  if (!account.userId) {
+                    console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
+                    return false;
+                  }
+                  return normalizeUserId(account.userId) === normalizedInputUserId;
+                });
+                
+                const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+                  if (!account.userId) {
+                    console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
+                    return false;
+                  }
+                  return normalizeUserId(account.userId) === normalizedInputUserId;
+                });
+                
+                return hasProcessedAccountsForUser || hasFailedAccountsForUser;
+              });
           
-          console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length} of ${initialData.length}`);
+          console.log(`CoinstratLogs - Filtered logs from initialData: ${filteredLogs.length} of ${initialData.length} ${isAdmin ? '(admin: showing all)' : ''}`);
           setLogs(filteredLogs);
         } catch (err) {
           console.error('Error filtering initialData logs:', err);
@@ -186,37 +194,40 @@ export const useCoinstratLogs = ({
           ];
           
           try {
-            const filteredLogs = mockLogs.filter(log => {
-              // Check processed accounts with normalized comparison
-              const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
-                if (!account.userId) {
-                  console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
-                  return false;
-                }
-                
-                const normalizedAccountUserId = normalizeUserId(account.userId);
-                const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-                return match;
-              });
-              
-              // Check failed accounts with normalized comparison
-              const hasFailedAccountsForUser = log.failedAccounts.some(account => {
-                if (!account.userId) {
-                  console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
-                  return false;
-                }
-                
-                const normalizedAccountUserId = normalizeUserId(account.userId);
-                const match = normalizedAccountUserId === normalizedInputUserId;
-                console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-                return match;
-              });
-              
-              return hasProcessedAccountsForUser || hasFailedAccountsForUser;
-            });
+            // For admin users, don't filter by userId - show all logs
+            const filteredLogs = isAdmin
+              ? mockLogs
+              : mockLogs.filter(log => {
+                  // Check processed accounts with normalized comparison
+                  const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
+                    if (!account.userId) {
+                      console.warn(`CoinstratLogs - Processed account ${account.accountId} is missing userId`);
+                      return false;
+                    }
+                    
+                    const normalizedAccountUserId = normalizeUserId(account.userId);
+                    const match = normalizedAccountUserId === normalizedInputUserId;
+                    console.log(`CoinstratLogs - Processed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                    return match;
+                  });
+                  
+                  // Check failed accounts with normalized comparison
+                  const hasFailedAccountsForUser = log.failedAccounts.some(account => {
+                    if (!account.userId) {
+                      console.warn(`CoinstratLogs - Failed account ${account.accountId} is missing userId`);
+                      return false;
+                    }
+                    
+                    const normalizedAccountUserId = normalizeUserId(account.userId);
+                    const match = normalizedAccountUserId === normalizedInputUserId;
+                    console.log(`CoinstratLogs - Failed account - Comparing: ${account.userId} (${normalizedAccountUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
+                    return match;
+                  });
+                  
+                  return hasProcessedAccountsForUser || hasFailedAccountsForUser;
+                });
             
-            console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length}`);
+            console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length} ${isAdmin ? '(admin: showing all)' : ''}`);
             setLogs(filteredLogs);
           } catch (filterErr) {
             console.error('Error filtering mock logs data:', filterErr);
@@ -237,7 +248,7 @@ export const useCoinstratLogs = ({
       setLogs([]);
       stopLoading();
     }
-  }, [botId, userId, initialData, startLoading, stopLoading]);
+  }, [botId, userId, initialData, startLoading, stopLoading, isAdmin]);
 
   useEffect(() => {
     fetchLogs();

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Accordion } from '@/components/ui/accordion';
 import { Account } from '@/types';
@@ -20,6 +19,7 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
+import { useAdmin } from '@/hooks/use-admin';
 
 interface HierarchicalAccountsTableProps {
   accounts: Account[];
@@ -36,6 +36,9 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   onDelete = (id) => toast.info(`Delete account ${id} functionality will be implemented`),
   onToggleConnection = (id) => toast.info(`Toggle connection for ${id} functionality will be implemented`)
 }) => {
+  // Get admin status
+  const { isAdmin } = useAdmin();
+  
   // State for filters
   const [filters, setFilters] = useState<AccountsFilterParams>({
     searchQuery: '',
@@ -94,34 +97,27 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
     const maxVisiblePages = 5;
     
     if (totalPages <= maxVisiblePages) {
-      // If there are not many pages, show all
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
       }
     } else {
-      // Always include first page
       pageNumbers.push(1);
       
-      // Calculate the middle range
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
       
-      // Add ellipsis after first page if needed
       if (startPage > 2) {
-        pageNumbers.push(-1); // -1 represents ellipsis
+        pageNumbers.push(-1);
       }
       
-      // Add middle pages
       for (let i = startPage; i <= endPage; i++) {
         pageNumbers.push(i);
       }
       
-      // Add ellipsis before last page if needed
       if (endPage < totalPages - 1) {
-        pageNumbers.push(-2); // -2 represents ellipsis
+        pageNumbers.push(-2);
       }
       
-      // Always include last page
       pageNumbers.push(totalPages);
     }
     
@@ -163,12 +159,10 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
         )}
       </div>
       
-      {/* Pagination controls - only show if there's more than one page */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
           <Pagination>
             <PaginationContent>
-              {/* Previous page button */}
               <PaginationItem>
                 <PaginationPrevious 
                   onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -176,7 +170,6 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                 />
               </PaginationItem>
               
-              {/* Page numbers */}
               {getPageNumbers().map((pageNum, index) => (
                 <PaginationItem key={`page-${pageNum}-${index}`}>
                   {pageNum < 0 ? (
@@ -193,7 +186,6 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                 </PaginationItem>
               ))}
               
-              {/* Next page button */}
               <PaginationItem>
                 <PaginationNext 
                   onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
@@ -205,10 +197,15 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
         </div>
       )}
       
-      {/* Display pagination info */}
       {totalPages > 1 && (
         <div className="text-center text-sm text-gray-500">
           Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalUsers)} of {totalUsers} accounts
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="text-center text-sm text-green-500 mt-2">
+          Admin view: Showing all accounts.
         </div>
       )}
     </div>
