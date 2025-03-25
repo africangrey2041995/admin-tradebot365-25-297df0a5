@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { TradingViewSignal } from '@/types/signal';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
@@ -34,17 +34,27 @@ export const useTradingViewLogs = ({
 }: UseTradingViewLogsProps): UseTradingViewLogsResult => {
   const [logs, setLogs] = useState<TradingViewSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const fetchInProgressRef = useRef(false);
   
   // Use our safe loading hook instead of raw useState
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 3000,
-    debugComponent: 'TradingViewLogs'
+    debugComponent: 'TradingViewLogs',
+    minLoadingDurationMs: 500 // Ensure a minimum loading time to avoid flickering
   });
 
   // Get admin status from useAdmin hook
   const { isAdmin } = useAdmin();
 
   const fetchLogs = useCallback(() => {
+    // Prevent multiple concurrent fetchLogs calls
+    if (fetchInProgressRef.current) {
+      console.log('TradingViewLogs - Fetch already in progress, skipping duplicate request');
+      return;
+    }
+    
+    fetchInProgressRef.current = true;
+    
     // Only validate userId format for non-admin users
     if (!isAdmin && !validateUserId(userId)) {
       console.warn(`TradingViewLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
@@ -135,8 +145,9 @@ export const useTradingViewLogs = ({
         setLogs([]);
       } finally {
         stopLoading();
+        fetchInProgressRef.current = false;
       }
-    }, 800);
+    }, 500); // Reduced from 800ms to 500ms
   }, [botId, userId, startLoading, stopLoading, isAdmin]);
 
   useEffect(() => {
