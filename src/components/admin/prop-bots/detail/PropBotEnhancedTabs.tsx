@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
-import PropBotOverviewTab from './PropBotOverviewTab';
+import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import PropBotUsersTab from './PropBotUsersTab';
 import PropBotSettingsTab from './PropBotSettingsTab';
 import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
@@ -94,11 +93,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       </TabsList>
       
       <TabsContent value="overview" className="space-y-4">
-        <PropBotOverviewTab 
+        <AdminPropBotOverviewTab 
           propBot={propBot}
           botStats={botStats}
           botInfo={botInfo}
-          challengeRules={challengeRules}
           onUpdateBot={onUpdateBot}
         />
       </TabsContent>
