@@ -1,14 +1,15 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Account } from '@/types';
 import { toast } from 'sonner';
 
-// Mock data for accounts with all required fields
+// Enhanced mock data for accounts with additional user information
 const mockAccounts: Account[] = [
+  // User 1: John Doe
   {
     cspAccountId: 'acc-001',
     cspAccountName: 'Main Trading Account',
-    cspUserEmail: 'user@example.com',
+    cspUserEmail: 'john@example.com',
     apiName: 'Binance API',
     tradingAccountType: 'Standard',
     tradingAccountNumber: '123456',
@@ -16,7 +17,6 @@ const mockAccounts: Account[] = [
     isLive: true,
     status: 'Connected',
     userAccount: 'John Doe',
-    // Adding required properties
     createdDate: '2023-10-15',
     lastUpdated: '2023-11-10',
     cspUserId: 'user-001',
@@ -26,7 +26,7 @@ const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-002',
     cspAccountName: 'Demo Testing Account',
-    cspUserEmail: 'user@example.com',
+    cspUserEmail: 'john@example.com',
     apiName: 'Bybit API',
     tradingAccountType: 'Pro',
     tradingAccountNumber: '654321',
@@ -34,7 +34,6 @@ const mockAccounts: Account[] = [
     isLive: false,
     status: 'Connected',
     userAccount: 'John Doe',
-    // Adding required properties
     createdDate: '2023-09-20',
     lastUpdated: '2023-11-05',
     cspUserId: 'user-001',
@@ -44,7 +43,7 @@ const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-003',
     cspAccountName: 'Challenge Account',
-    cspUserEmail: 'user@example.com',
+    cspUserEmail: 'john@example.com',
     apiName: 'Coinstrat Pro API',
     tradingAccountType: 'VIP',
     tradingAccountNumber: '789012',
@@ -52,12 +51,100 @@ const mockAccounts: Account[] = [
     isLive: true,
     status: 'Disconnected',
     userAccount: 'John Doe',
-    // Adding required properties
     createdDate: '2023-11-01',
     lastUpdated: '2023-11-15',
     cspUserId: 'user-001',
     apiId: 'api-003',
     tradingAccountId: 'trade-003'
+  },
+  
+  // User 2: Jane Smith
+  {
+    cspAccountId: 'acc-004',
+    cspAccountName: 'Jane Main Account',
+    cspUserEmail: 'jane@example.com',
+    apiName: 'Binance API',
+    tradingAccountType: 'Standard',
+    tradingAccountNumber: '111222',
+    tradingAccountBalance: '$8,120.75',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Jane Smith',
+    createdDate: '2023-10-05',
+    lastUpdated: '2023-11-12',
+    cspUserId: 'user-002',
+    apiId: 'api-004',
+    tradingAccountId: 'trade-004'
+  },
+  {
+    cspAccountId: 'acc-005',
+    cspAccountName: 'Jane Prop Account',
+    cspUserEmail: 'jane@example.com',
+    apiName: 'Coinstrat Pro API',
+    tradingAccountType: 'Challenge',
+    tradingAccountNumber: '333444',
+    tradingAccountBalance: '$100,000.00',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Jane Smith',
+    createdDate: '2023-11-01',
+    lastUpdated: '2023-11-20',
+    cspUserId: 'user-002',
+    apiId: 'api-005',
+    tradingAccountId: 'trade-005'
+  },
+  
+  // User 3: Alex Wong
+  {
+    cspAccountId: 'acc-006',
+    cspAccountName: 'Alex Trading Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'MT4 API',
+    tradingAccountType: 'Premium',
+    tradingAccountNumber: '555666',
+    tradingAccountBalance: '$15,340.20',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-09-15',
+    lastUpdated: '2023-11-15',
+    cspUserId: 'user-003',
+    apiId: 'api-006',
+    tradingAccountId: 'trade-006'
+  },
+  {
+    cspAccountId: 'acc-007',
+    cspAccountName: 'Alex Demo Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'MT5 API',
+    tradingAccountType: 'Standard',
+    tradingAccountNumber: '777888',
+    tradingAccountBalance: '$10,000.00',
+    isLive: false,
+    status: 'Connected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-09-20',
+    lastUpdated: '2023-10-30',
+    cspUserId: 'user-003',
+    apiId: 'api-007',
+    tradingAccountId: 'trade-007'
+  },
+  {
+    cspAccountId: 'acc-008',
+    cspAccountName: 'Alex Prop Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'Coinstrat Pro API',
+    tradingAccountType: 'Challenge Plus',
+    tradingAccountNumber: '999000',
+    tradingAccountBalance: '$200,000.00',
+    isLive: true,
+    status: 'Disconnected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-10-25',
+    lastUpdated: '2023-11-18',
+    cspUserId: 'user-003',
+    apiId: 'api-008',
+    tradingAccountId: 'trade-008'
   }
 ];
 
@@ -82,6 +169,13 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
       }
     }, 800);
   }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    if (initialData.length === 0) {
+      fetchAccounts();
+    }
+  }, [fetchAccounts, initialData.length]);
 
   const handleRefresh = () => {
     toast.info('Đang làm mới danh sách tài khoản...');
@@ -120,6 +214,49 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
     const actionText = account?.status === 'Connected' ? 'ngắt kết nối' : 'kết nối';
     toast.success(`Tài khoản đã được ${actionText}`);
   };
+  
+  // Group accounts by user, CSP account, and trading account
+  const getHierarchicalAccounts = () => {
+    const userMap = new Map();
+    
+    accounts.forEach(account => {
+      const userId = account.cspUserId;
+      const cspAccountId = account.cspAccountId;
+      
+      if (!userMap.has(userId)) {
+        userMap.set(userId, {
+          userId,
+          name: account.userAccount || '',
+          email: account.cspUserEmail || '',
+          cspAccounts: new Map()
+        });
+      }
+      
+      const user = userMap.get(userId);
+      
+      if (!user.cspAccounts.has(cspAccountId)) {
+        user.cspAccounts.set(cspAccountId, {
+          ...account,
+          tradingAccounts: []
+        });
+      }
+      
+      const cspAccount = user.cspAccounts.get(cspAccountId);
+      cspAccount.tradingAccounts.push({
+        ...account
+      });
+    });
+    
+    // Transform maps to arrays for easier consumption
+    const result = Array.from(userMap.values()).map(user => ({
+      ...user,
+      cspAccounts: Array.from(user.cspAccounts.values()).map(cspAccount => ({
+        ...cspAccount,
+      }))
+    }));
+    
+    return result;
+  };
 
   return {
     accounts,
@@ -131,6 +268,7 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
     updateAccount,
     deleteAccount,
     toggleAccountStatus,
-    setAccounts
+    setAccounts,
+    hierarchicalAccounts: getHierarchicalAccounts()
   };
 };

@@ -12,6 +12,7 @@ import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { PropBot } from '@/types/bot';
 import LogsFilterBar from './LogsFilterBar';
 import ExportDataDropdown from './ExportDataDropdown';
+import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -36,6 +37,7 @@ interface PropBotEnhancedTabsProps {
   challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
   onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
+  connectedAccounts?: any[];
 }
 
 const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
@@ -50,7 +52,8 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   botInfo,
   challengeRules,
   onUpdateBot = () => {},
-  onUpdateChallengeRules = () => {}
+  onUpdateChallengeRules = () => {},
+  connectedAccounts = []
 }) => {
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
@@ -116,10 +119,9 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
                 fileName={`prop-bot-${botId}-accounts`}
               />
             </div>
-            <BotAccountsTable 
-              botId={botId} 
-              userId={userId}
-              botType="prop"
+            <HierarchicalAccountsTable 
+              accounts={connectedAccounts || []}
+              onRefresh={onRefresh}
             />
           </CardContent>
         </Card>

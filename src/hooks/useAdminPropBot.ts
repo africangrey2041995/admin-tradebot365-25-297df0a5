@@ -1,128 +1,148 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PropBot } from '@/types/bot';
-import { BotStatus } from '@/constants/botTypes';
-import { mockPropBots } from '@/mocks/propBotsMock';
 import { toast } from "sonner";
+import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
+import { useBotAccounts } from './useBotAccounts';
 
-interface UsePropBotReturn {
+const mockPropBot: PropBot = {
+  botId: 'PROP-001',
+  name: 'Cơ Bản Prop Bot',
+  description: "Bot phân tích thị trường 24/7 tối ưu hóa cho thương mại Prop Trading.",
+  performanceLastMonth: '+15.8%',
+  performanceAllTime: '+42.3%',
+  risk: BotRiskLevel.MEDIUM,
+  exchange: 'Binance Futures',
+  propFirm: 'FTMO & MyForexFunds',
+  status: BotStatus.ACTIVE,
+  users: 156,
+  createdDate: '2023-06-15',
+  lastUpdated: '2023-11-10',
+  minCapital: '$5,000',
+  maxDrawdown: '5%',
+  challengeDuration: '30 ngày'
+};
+
+interface UseAdminPropBotReturn {
   propBot: PropBot | null;
   isLoading: boolean;
+  error: Error | null;
   handleRefresh: () => void;
   handleUpdateBot: (updatedData: Partial<PropBot>) => void;
   handleUpdateStatus: (newStatus: BotStatus) => void;
-  connectedAccounts: number;
-  processedSignals: number;
-  updateChallengeRules: (propFirm: string, rules: string[]) => void;
+  connectedAccounts: any[];
+  processedSignals: any[];
   challengeRules: Record<string, string[]>;
+  updateChallengeRules: (propFirm: string, rules: string[]) => void;
 }
 
-export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
-  const [isLoading, setIsLoading] = useState(true);
+export const useAdminPropBot = (botId?: string): UseAdminPropBotReturn => {
   const [propBot, setPropBot] = useState<PropBot | null>(null);
-  const [connectedAccounts, setConnectedAccounts] = useState(0);
-  const [processedSignals, setProcessedSignals] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [processedSignals, setProcessedSignals] = useState<any[]>([]);
   const [challengeRules, setChallengeRules] = useState<Record<string, string[]>>({
-    "Coinstrat Pro": [
-      "Đạt mục tiêu lợi nhuận tối thiểu 10% trong vòng 30 ngày",
-      "Không vượt quá 5% drawdown trong bất kỳ thời điểm nào",
-      "Giao dịch ít nhất 15 ngày trong tháng",
-      "Không sử dụng martingale hoặc grid trading",
-      "Không có lệnh mở qua đêm vào cuối tuần",
-      "Duy trì lợi nhuận ổn định, không có ngày lỗ quá 2%"
+    'FTMO': [
+      'Max Daily Loss: 5% of account balance',
+      'Max Total Loss: 10% of account balance',
+      'Profit Target: 10% of account within 30 days',
+      'Trading Days Required: At least 10 trading days',
+      'Time Period: Complete all trading within 30 days'
+    ],
+    'MyForexFunds': [
+      'Max Daily Loss: 5% of account balance',
+      'Max Total Loss: 12% of account balance',
+      'Profit Target: 8% of account within 30 days',
+      'No weekend trading allowed',
+      'Time Period: Complete all trading within 30 days'
     ]
   });
+  
+  // Use our enhanced bot accounts hook to fetch account data
+  const { 
+    accounts: connectedAccounts, 
+    fetchAccounts, 
+    loading: accountsLoading 
+  } = useBotAccounts(botId || '', 'admin', []);
 
-  useEffect(() => {
-    // In a real application, we would fetch the data from an API
-    // For now, we'll use mock data and simulate a loading state
+  const fetchPropBot = useCallback(() => {
+    // This would normally be an API call
     setIsLoading(true);
     
     setTimeout(() => {
-      console.log("Looking for botId:", botId);
-      console.log("Available bots:", mockPropBots.map(b => b.botId));
-      
-      const foundBot = mockPropBots.find(bot => bot.botId === botId);
-      if (foundBot) {
-        console.log("Found bot:", foundBot);
-        setPropBot(foundBot);
-        
-        // Simulate fetching connected accounts and processed signals
-        setConnectedAccounts(Math.floor(Math.random() * 20) + 5); // Random 5-25 accounts
-        setProcessedSignals(Math.floor(Math.random() * 500) + 100); // Random 100-600 signals
-      } else {
-        console.log("Bot not found");
-        toast.error("Không tìm thấy bot với ID đã cung cấp");
+      try {
+        // Using mock data for development purposes
+        // In a real implementation, fetch from API based on botId
+        setPropBot({
+          ...mockPropBot,
+          botId: botId || 'PROP-001'
+        });
+        setIsLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch prop bot'));
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 800);
+    }, 1000);
   }, [botId]);
 
+  // Initial fetch
+  useEffect(() => {
+    fetchPropBot();
+  }, [fetchPropBot]);
+
   const handleRefresh = () => {
-    setIsLoading(true);
-    // Simulate API call to refresh data
-    setTimeout(() => {
-      const foundBot = mockPropBots.find(bot => bot.botId === botId);
-      if (foundBot) {
-        setPropBot(foundBot);
-        
-        // Update the simulation counts on refresh
-        setConnectedAccounts(Math.floor(Math.random() * 20) + 5);
-        setProcessedSignals(Math.floor(Math.random() * 500) + 100);
-        
-        toast.success("Đã làm mới dữ liệu");
-      } else {
-        toast.error("Không tìm thấy bot với ID đã cung cấp");
-      }
-      setIsLoading(false);
-    }, 800);
+    toast.info("Đang làm mới dữ liệu...");
+    fetchPropBot();
+    fetchAccounts();
   };
 
   const handleUpdateBot = (updatedData: Partial<PropBot>) => {
-    if (!propBot) return;
-    
-    // Update the local state
-    const updatedBot = { ...propBot, ...updatedData };
-    setPropBot(updatedBot);
-    
-    // In a real application, you would make an API call here
-    console.log("Bot updated:", updatedBot);
-    
-    // Show success toast
-    toast.success("Thông tin bot đã được cập nhật");
+    if (propBot) {
+      const updatedBot = {
+        ...propBot,
+        ...updatedData,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      };
+      setPropBot(updatedBot);
+      toast.success("Bot đã được cập nhật thành công");
+    }
   };
 
   const handleUpdateStatus = (newStatus: BotStatus) => {
-    if (!propBot) return;
-    
-    // Update the local state with the new status
-    const updatedBot = { ...propBot, status: newStatus };
-    setPropBot(updatedBot);
-    
-    // In a real application, you would make an API call here
-    console.log("Bot status updated:", updatedBot);
+    if (propBot) {
+      setPropBot({
+        ...propBot,
+        status: newStatus,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      });
+      
+      const statusText = 
+        newStatus === BotStatus.ACTIVE ? 'Hoạt động' :
+        newStatus === BotStatus.INACTIVE ? 'Không hoạt động' :
+        newStatus === BotStatus.PAUSED ? 'Tạm dừng' : 'Đang bảo trì';
+      
+      toast.success(`Trạng thái của bot đã được cập nhật thành: ${statusText}`);
+    }
   };
 
   const updateChallengeRules = (propFirm: string, rules: string[]) => {
-    // In a real application, you would make an API call here
     setChallengeRules(prev => ({
       ...prev,
       [propFirm]: rules
     }));
-    
-    console.log(`Updated challenge rules for ${propFirm}:`, rules);
-    // No toast here as the component will show its own success message
+    toast.success(`Quy tắc thử thách cho ${propFirm} đã được cập nhật`);
   };
 
   return {
     propBot,
-    isLoading,
+    isLoading: isLoading || accountsLoading,
+    error,
     handleRefresh,
     handleUpdateBot,
     handleUpdateStatus,
     connectedAccounts,
     processedSignals,
-    updateChallengeRules,
-    challengeRules
+    challengeRules,
+    updateChallengeRules
   };
 };

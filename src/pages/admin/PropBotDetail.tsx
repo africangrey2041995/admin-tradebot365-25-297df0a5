@@ -106,6 +106,7 @@ const PropBotDetail: React.FC = () => {
         challengeRules={challengeRules}
         onUpdateBot={handleUpdateBot}
         onUpdateChallengeRules={updateChallengeRules}
+        connectedAccounts={connectedAccounts}
       />
     </div>
   );
