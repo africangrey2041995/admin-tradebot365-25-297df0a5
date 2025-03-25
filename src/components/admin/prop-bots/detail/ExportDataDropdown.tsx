@@ -18,6 +18,7 @@ interface ExportDataDropdownProps {
   headers: string[];
   fileName: string;
   disabled?: boolean;
+  className?: string;
 }
 
 const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
@@ -25,6 +26,7 @@ const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
   headers,
   fileName,
   disabled = false,
+  className = "",
 }) => {
   // Transform data for export (array of objects to array of arrays)
   const prepareExportData = (): (string | number)[][] => {
@@ -67,7 +69,7 @@ const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={disabled} className="flex gap-1">
+        <Button variant="outline" size="sm" disabled={disabled} className={`flex gap-1 ${className}`}>
           <Download className="h-4 w-4 mr-1" />
           Xuất dữ liệu
         </Button>

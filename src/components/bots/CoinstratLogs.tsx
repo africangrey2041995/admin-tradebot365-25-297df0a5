@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -164,10 +163,9 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
             data={prepareLogsForExport()}
             headers={logsExportHeaders}
             fileName={`${botType}-bot-${botId}-logs`}
-            className="mr-2"
           />
         )}
-        <Button variant="outline" size="sm" onClick={handleRefresh}>
+        <Button variant="outline" size="sm" onClick={handleRefresh} className="ml-2">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh Logs
         </Button>

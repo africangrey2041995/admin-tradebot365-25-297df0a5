@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { Account } from '@/types';
 import { toast } from 'sonner';
 
-// Mock data for accounts
+// Mock data for accounts with all required fields
 const mockAccounts: Account[] = [
   {
     cspAccountId: 'acc-001',
@@ -16,6 +16,12 @@ const mockAccounts: Account[] = [
     isLive: true,
     status: 'Connected',
     userAccount: 'John Doe',
+    // Adding required properties
+    createdDate: '2023-10-15',
+    lastUpdated: '2023-11-10',
+    cspUserId: 'user-001',
+    apiId: 'api-001',
+    tradingAccountId: 'trade-001'
   },
   {
     cspAccountId: 'acc-002',
@@ -28,6 +34,12 @@ const mockAccounts: Account[] = [
     isLive: false,
     status: 'Connected',
     userAccount: 'John Doe',
+    // Adding required properties
+    createdDate: '2023-09-20',
+    lastUpdated: '2023-11-05',
+    cspUserId: 'user-001',
+    apiId: 'api-002',
+    tradingAccountId: 'trade-002'
   },
   {
     cspAccountId: 'acc-003',
@@ -40,6 +52,12 @@ const mockAccounts: Account[] = [
     isLive: true,
     status: 'Disconnected',
     userAccount: 'John Doe',
+    // Adding required properties
+    createdDate: '2023-11-01',
+    lastUpdated: '2023-11-15',
+    cspUserId: 'user-001',
+    apiId: 'api-003',
+    tradingAccountId: 'trade-003'
   }
 ];
 

@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit3, MoreVertical, Link2, LinkOff } from 'lucide-react';
+import { Trash2, Edit3, MoreVertical, Link2, Link2Off } from 'lucide-react';
 import { Account } from '@/types';
 import { ConnectionStatus } from '@/types/connection';
 import {
@@ -128,7 +127,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
                       
                       {account.status === 'Connected' ? (
                         <DropdownMenuItem onClick={() => onToggleStatus(account)}>
-                          <LinkOff className="h-4 w-4 mr-2" />
+                          <Link2Off className="h-4 w-4 mr-2" />
                           Ngắt kết nối
                         </DropdownMenuItem>
                       ) : (
