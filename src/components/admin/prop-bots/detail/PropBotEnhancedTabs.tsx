@@ -35,6 +35,7 @@ interface PropBotEnhancedTabsProps {
   };
   challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
+  onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
 }
 
 const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
@@ -48,7 +49,8 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   botStats,
   botInfo,
   challengeRules,
-  onUpdateBot = () => {}
+  onUpdateBot = () => {},
+  onUpdateChallengeRules = () => {}
 }) => {
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
@@ -100,6 +102,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
           botInfo={botInfo}
           challengeRules={challengeRules}
           onUpdateBot={onUpdateBot}
+          onUpdateChallengeRules={onUpdateChallengeRules}
         />
       </TabsContent>
       

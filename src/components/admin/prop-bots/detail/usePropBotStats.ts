@@ -14,7 +14,6 @@ interface PropBotStats {
     lastUpdated: string;
     botId: string;
   };
-  challengeRules: Record<string, string[]>;
 }
 
 export const usePropBotStats = (propBot: PropBot | null): PropBotStats => {
@@ -35,33 +34,8 @@ export const usePropBotStats = (propBot: PropBot | null): PropBotStats => {
     botId: propBot?.botId || '',
   };
 
-  // Challenge rules grouped by Prop Firm types
-  const challengeRules: Record<string, string[]> = {
-    "FTMO": [
-      "Đạt mục tiêu lợi nhuận tối thiểu 10% trong vòng 30 ngày",
-      "Không vượt quá 5% drawdown trong bất kỳ thời điểm nào",
-      "Giao dịch ít nhất 15 ngày trong tháng",
-      "Không sử dụng martingale hoặc grid trading"
-    ],
-    "MyForexFunds": [
-      "Đạt mục tiêu lợi nhuận 8% trong vòng 30 ngày",
-      "Không vượt quá 4% drawdown trong bất kỳ thời điểm nào",
-      "Không có lệnh mở qua đêm vào cuối tuần",
-      "Duy trì lợi nhuận ổn định, không có ngày lỗ quá 2%"
-    ],
-    "Default": [
-      "Đạt mục tiêu lợi nhuận tối thiểu 10% trong vòng 30 ngày",
-      "Không vượt quá 5% drawdown trong bất kỳ thời điểm nào",
-      "Giao dịch ít nhất 15 ngày trong tháng",
-      "Không sử dụng martingale hoặc grid trading",
-      "Không có lệnh mở qua đêm vào cuối tuần",
-      "Duy trì lợi nhuận ổn định, không có ngày lỗ quá 2%"
-    ]
-  };
-
   return {
     botStats,
-    botInfo,
-    challengeRules
+    botInfo
   };
 };

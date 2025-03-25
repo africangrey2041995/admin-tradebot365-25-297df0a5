@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { BarChart2, Users, Settings, FileText, AlertCircle } from 'lucide-react';
 import EditableFeaturesCard from './EditableFeaturesCard';
 import EditableRequirementsCard from './EditableRequirementsCard';
+import EditableChallengeRulesCard from './EditableChallengeRulesCard';
 import { PropBot } from '@/types/bot';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
@@ -24,6 +24,7 @@ interface AdminPropBotOverviewTabProps {
   };
   challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
+  onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
 }
 
 const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
@@ -31,7 +32,8 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   botStats,
   botInfo,
   challengeRules,
-  onUpdateBot = () => {}
+  onUpdateBot = () => {},
+  onUpdateChallengeRules = () => {}
 }) => {
   // Initial features and requirements
   const [features, setFeatures] = useState([
@@ -47,7 +49,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
     'Phù hợp với giai đoạn Challenger hoặc Verification'
   ]);
 
-  const [selectedPropFirm, setSelectedPropFirm] = useState<string>("Default");
+  const coinstratRules = challengeRules["Coinstrat Pro"] || [];
 
   const handleUpdateFeatures = (updatedFeatures: string[]) => {
     setFeatures(updatedFeatures);
@@ -63,8 +65,9 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
     toast.success('Đã cập nhật yêu cầu bot');
   };
 
-  // Get the challenge rules for the selected prop firm
-  const currentRules = challengeRules[selectedPropFirm] || challengeRules["Default"];
+  const handleUpdateChallengeRules = (updatedRules: string[]) => {
+    onUpdateChallengeRules("Coinstrat Pro", updatedRules);
+  };
 
   return (
     <div className="space-y-6">
@@ -125,41 +128,11 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
             </CardContent>
           </Card>
           
-          {/* Challenge Rules Card - with tabs for different prop firms */}
-          <Card className="border border-neutral-200 dark:border-neutral-800">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center">
-                <FileText className="h-4 w-4 mr-2 text-primary" />
-                Quy tắc Challenge theo Prop Firm
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={selectedPropFirm} onValueChange={setSelectedPropFirm} className="w-full">
-                <TabsList className="mb-4">
-                  {Object.keys(challengeRules).map(firm => (
-                    <TabsTrigger key={firm} value={firm}>
-                      {firm}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-                
-                {Object.entries(challengeRules).map(([firm, rules]) => (
-                  <TabsContent key={firm} value={firm}>
-                    <ul className="space-y-2">
-                      {rules.map((rule, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 text-sm font-medium">
-                            {idx + 1}
-                          </div>
-                          <span className="text-gray-700 dark:text-gray-300">{rule}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </CardContent>
-          </Card>
+          {/* Editable Challenge Rules Card */}
+          <EditableChallengeRulesCard 
+            rules={coinstratRules}
+            onUpdate={handleUpdateChallengeRules}
+          />
           
           {/* Admin-only editable cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

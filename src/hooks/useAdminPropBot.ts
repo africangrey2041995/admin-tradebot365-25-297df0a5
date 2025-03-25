@@ -13,6 +13,8 @@ interface UsePropBotReturn {
   handleUpdateStatus: (newStatus: BotStatus) => void;
   connectedAccounts: number;
   processedSignals: number;
+  updateChallengeRules: (propFirm: string, rules: string[]) => void;
+  challengeRules: Record<string, string[]>;
 }
 
 export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
@@ -20,6 +22,16 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
   const [propBot, setPropBot] = useState<PropBot | null>(null);
   const [connectedAccounts, setConnectedAccounts] = useState(0);
   const [processedSignals, setProcessedSignals] = useState(0);
+  const [challengeRules, setChallengeRules] = useState<Record<string, string[]>>({
+    "Coinstrat Pro": [
+      "Đạt mục tiêu lợi nhuận tối thiểu 10% trong vòng 30 ngày",
+      "Không vượt quá 5% drawdown trong bất kỳ thời điểm nào",
+      "Giao dịch ít nhất 15 ngày trong tháng",
+      "Không sử dụng martingale hoặc grid trading",
+      "Không có lệnh mở qua đêm vào cuối tuần",
+      "Duy trì lợi nhuận ổn định, không có ngày lỗ quá 2%"
+    ]
+  });
 
   useEffect(() => {
     // In a real application, we would fetch the data from an API
@@ -91,6 +103,17 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
     console.log("Bot status updated:", updatedBot);
   };
 
+  const updateChallengeRules = (propFirm: string, rules: string[]) => {
+    // In a real application, you would make an API call here
+    setChallengeRules(prev => ({
+      ...prev,
+      [propFirm]: rules
+    }));
+    
+    console.log(`Updated challenge rules for ${propFirm}:`, rules);
+    // No toast here as the component will show its own success message
+  };
+
   return {
     propBot,
     isLoading,
@@ -98,6 +121,8 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
     handleUpdateBot,
     handleUpdateStatus,
     connectedAccounts,
-    processedSignals
+    processedSignals,
+    updateChallengeRules,
+    challengeRules
   };
 };
