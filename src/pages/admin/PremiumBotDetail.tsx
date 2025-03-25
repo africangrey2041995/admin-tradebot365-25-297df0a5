@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -40,6 +41,9 @@ import BotProfileTabs from '@/components/bots/BotProfileTabs';
 import { toast } from 'sonner';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar, ComposedChart, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
+import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
+import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 
 const tradePerformanceData = [
   { name: 'Jan', profit: 12.5, trades: 24 },
@@ -88,6 +92,10 @@ const AdminPremiumBotDetail = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editableBot, setEditableBot] = useState<Partial<PremiumBot>>({});
   
+  // New state for features and trading pairs
+  const [features, setFeatures] = useState<string[]>([]);
+  const [tradingPairs, setTradingPairs] = useState<string[]>([]);
+  
   const fromUserDetail = location.state?.from === 'userDetail';
   const userId = location.state?.userId;
 
@@ -99,7 +107,7 @@ const AdminPremiumBotDetail = () => {
         const mockBot: PremiumBot = {
           botId: botId || 'pb-001',
           name: 'Alpha Momentum',
-          description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
+          description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao. Được thiết kế để tận dụng các thời điểm biến động mạnh của thị trường và tối ưu lợi nhuận trong các giai đoạn tăng trưởng. Bot sử dụng kết hợp nhiều chỉ báo kỹ thuật để đưa ra quyết định mua/bán chính xác.',
           exchange: 'Coinstart Pro',
           type: BotType.PREMIUM_BOT,
           performanceLastMonth: '+18.5%',
@@ -119,6 +127,24 @@ const AdminPremiumBotDetail = () => {
         
         setBot(mockBot);
         setEditableBot(mockBot);
+        
+        // Initialize features and trading pairs
+        setFeatures([
+          'Giao dịch tự động dựa trên tín hiệu',
+          'Phân tích kỹ thuật theo xu hướng',
+          'Tối ưu hóa vào lệnh theo momentum',
+          'Quản lý rủi ro động',
+          'Báo cáo hiệu suất chi tiết'
+        ]);
+        
+        setTradingPairs([
+          'BTC/USDT',
+          'ETH/USDT',
+          'BNB/USDT',
+          'SOL/USDT',
+          'XRP/USDT'
+        ]);
+        
         setIsLoading(false);
       }, 500);
     };
@@ -166,6 +192,21 @@ const AdminPremiumBotDetail = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setEditableBot(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateFeatures = (updatedFeatures: string[]) => {
+    setFeatures(updatedFeatures);
+    toast.success('Đã cập nhật tính năng bot');
+  };
+
+  const handleUpdateDescription = (updatedDescription: string) => {
+    setEditableBot(prev => ({ ...prev, description: updatedDescription }));
+    // We don't need to show toast here since EditableDescriptionCard already does that
+  };
+
+  const handleUpdateTradingPairs = (updatedPairs: string[]) => {
+    setTradingPairs(updatedPairs);
+    // We don't need to show toast here since EditableTradingPairsCard already does that
   };
 
   const refreshTabData = () => {
@@ -295,6 +336,24 @@ const AdminPremiumBotDetail = () => {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
+              {/* Description Card */}
+              <EditableDescriptionCard 
+                description={editableBot.description || ''}
+                onUpdate={handleUpdateDescription}
+              />
+              
+              {/* Features Card */}
+              <EditableFeaturesCard 
+                features={features}
+                onUpdate={handleUpdateFeatures}
+              />
+              
+              {/* Trading Pairs Card */}
+              <EditableTradingPairsCard 
+                tradingPairs={tradingPairs}
+                onUpdate={handleUpdateTradingPairs}
+              />
+              
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Biểu đồ hiệu suất</CardTitle>
@@ -493,15 +552,6 @@ const AdminPremiumBotDetail = () => {
                           value={editableBot.name || ''} 
                           onChange={handleInputChange} 
                           className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Mô tả</label>
-                        <Textarea 
-                          name="description" 
-                          value={editableBot.description || ''} 
-                          onChange={handleInputChange} 
-                          className="mt-1 min-h-[100px]"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
