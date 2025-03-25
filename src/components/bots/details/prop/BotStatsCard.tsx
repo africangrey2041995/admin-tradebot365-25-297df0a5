@@ -8,6 +8,7 @@ interface BotStatsCardProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
+    currentDrawdown: string;
   };
 }
 
@@ -34,6 +35,10 @@ const BotStatsCard: React.FC<BotStatsCardProps> = ({ stats }) => {
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Tỷ Lệ Sharpe</span>
             <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.sharpeRatio}</span>
+          </div>
+          <div className="flex justify-between items-center p-4">
+            <span className="text-gray-600 dark:text-gray-300">Drawdown Hiện Tại</span>
+            <span className="font-semibold text-red-600 dark:text-red-400">{stats.currentDrawdown}</span>
           </div>
         </div>
       </CardContent>

@@ -1,22 +1,21 @@
 
 import React, { useState } from 'react';
-import BotStatsCard from '@/components/bots/details/prop/BotStatsCard';
-import BotInfoCard from '@/components/bots/details/prop/BotInfoCard';
-import { BarChart2, Users, Settings, FileText } from 'lucide-react';
+import { BarChart2, Users, Settings, FileText, AlertCircle } from 'lucide-react';
 import EditableFeaturesCard from './EditableFeaturesCard';
 import EditableRequirementsCard from './EditableRequirementsCard';
-import BotPerformanceCard from './BotPerformanceCard';
+import EditableChallengeRulesCard from './EditableChallengeRulesCard';
 import { PropBot } from '@/types/bot';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner';
 
-interface PropBotOverviewTabProps {
+interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
   botStats: {
     totalTrades: number;
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
+    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;
@@ -28,7 +27,7 @@ interface PropBotOverviewTabProps {
   onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
 }
 
-const AdminPropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
+const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   propBot,
   botStats,
   botInfo,
@@ -50,6 +49,8 @@ const AdminPropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
     'Phù hợp với giai đoạn Challenger hoặc Verification'
   ]);
 
+  const coinstratRules = challengeRules["Coinstrat Pro"] || [];
+
   const handleUpdateFeatures = (updatedFeatures: string[]) => {
     setFeatures(updatedFeatures);
     // Here you would typically update the backend
@@ -64,24 +65,18 @@ const AdminPropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
     toast.success('Đã cập nhật yêu cầu bot');
   };
 
-  const handleUpdatePerformance = (performance: { lastMonth: string; allTime: string }) => {
-    // Update the bot with new performance data
-    onUpdateBot({
-      performanceLastMonth: performance.lastMonth,
-      performanceAllTime: performance.allTime
-    });
-    
-    console.log('Performance updated:', performance);
+  const handleUpdateChallengeRules = (updatedRules: string[]) => {
+    onUpdateChallengeRules("Coinstrat Pro", updatedRules);
   };
 
   return (
     <div className="space-y-6">
-      {/* Admin Dashboard Summary */}
+      {/* Admin Dashboard Summary with real metrics */}
       <Card className="border border-neutral-200 dark:border-neutral-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-medium flex items-center">
             <BarChart2 className="h-5 w-5 mr-2 text-primary" />
-            Tổng Quan Bot Quản Lý
+            Thông tin Tổng quan
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -97,32 +92,47 @@ const AdminPropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
               <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 flex items-center">
                 <Settings className="h-4 w-4 mr-1 text-purple-600 dark:text-purple-400" />
-                Bot Type
+                Prop Firm
               </div>
-              <div className="text-2xl font-bold">{propBot.propFirm || "Standard"}</div>
+              <div className="text-2xl font-bold">{propBot.propFirm || "Chưa xác định"}</div>
             </div>
             
             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
               <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 flex items-center">
                 <FileText className="h-4 w-4 mr-1 text-green-600 dark:text-green-400" />
-                Lợi nhuận tiêu chuẩn
+                Thời gian Challenge
               </div>
-              <div className="text-2xl font-bold">{propBot.profit || "N/A"}</div>
+              <div className="text-2xl font-bold">{propBot.challengeDuration || "30 ngày"}</div>
             </div>
           </div>
         </CardContent>
       </Card>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column */}
+        {/* Left column - Main content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Bot Performance Chart Placeholder - for future implementation */}
-          <div className="flex items-center justify-center h-64 bg-neutral-50 dark:bg-neutral-900/50 rounded border border-neutral-200 dark:border-neutral-800">
-            <div className="text-center text-neutral-500 dark:text-neutral-400 flex flex-col items-center">
-              <BarChart2 className="h-8 w-8 mb-2 opacity-50" />
-              <p>Biểu đồ hiệu suất tổng hợp</p>
-            </div>
-          </div>
+          {/* Notice card about performance metrics */}
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-amber-800 dark:text-amber-300">Thông báo về dữ liệu hiệu suất</h4>
+                  <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                    Hiện tại hệ thống chưa theo dõi chi tiết hiệu suất giao dịch thực tế. 
+                    Các số liệu hiển thị là mục tiêu cho người dùng cần đạt được trong quá trình 
+                    tham gia Prop Trading Challenge.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Editable Challenge Rules Card */}
+          <EditableChallengeRulesCard 
+            rules={coinstratRules}
+            onUpdate={handleUpdateChallengeRules}
+          />
           
           {/* Admin-only editable cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,23 +146,59 @@ const AdminPropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
               onUpdate={handleUpdateRequirements}
             />
           </div>
-          
-          <BotPerformanceCard 
-            performance={{
-              lastMonth: propBot.performanceLastMonth,
-              allTime: propBot.performanceAllTime
-            }}
-            onUpdate={handleUpdatePerformance}
-            colorScheme="green"
-          />
         </div>
         
-        {/* Right column */}
+        {/* Right column - Info cards */}
         <div className="space-y-6">
-          <BotStatsCard stats={botStats} />
-          <BotInfoCard botInfo={botInfo} />
+          <Card className="border border-neutral-200 dark:border-neutral-800">
+            <CardContent className="p-6">
+              <h3 className="font-medium mb-3 text-lg">Mục tiêu Bot</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Tổng giao dịch mục tiêu</span>
+                  <span className="font-medium">{botStats.totalTrades}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ thắng mục tiêu</span>
+                  <span className="font-medium">{botStats.winRate}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Hệ số lợi nhuận mục tiêu</span>
+                  <span className="font-medium">{botStats.profitFactor}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ Sharpe mục tiêu</span>
+                  <span className="font-medium">{botStats.sharpeRatio}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-neutral-600 dark:text-neutral-400">Drawdown tối đa cho phép</span>
+                  <span className="font-medium">{botStats.currentDrawdown}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
-          {/* Admin Notes Card - New */}
+          <Card className="border border-neutral-200 dark:border-neutral-800">
+            <CardContent className="p-6">
+              <h3 className="font-medium mb-3 text-lg">Thông tin Bot</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">ID Bot</span>
+                  <span className="font-medium">{botInfo.botId}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Ngày tạo</span>
+                  <span className="font-medium">{botInfo.createdDate}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-neutral-600 dark:text-neutral-400">Cập nhật lần cuối</span>
+                  <span className="font-medium">{botInfo.lastUpdated}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Admin Notes Card */}
           <Card className="border border-neutral-200 dark:border-neutral-800">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Admin Notes</CardTitle>

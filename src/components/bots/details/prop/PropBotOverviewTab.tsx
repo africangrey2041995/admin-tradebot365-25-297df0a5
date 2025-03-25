@@ -5,7 +5,6 @@ import BotStatsCard from './BotStatsCard';
 import WarningCard from './WarningCard';
 import BotInfoCard from './BotInfoCard';
 import ChallengeRulesCard from './ChallengeRulesCard';
-import { BarChart } from 'lucide-react';
 
 interface PropBotOverviewTabProps {
   challengeData: {
@@ -22,6 +21,7 @@ interface PropBotOverviewTabProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
+    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;
@@ -66,3 +66,6 @@ const PropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
 };
 
 export default PropBotOverviewTab;
+
+// Import the BarChart icon
+import { BarChart } from 'lucide-react';
