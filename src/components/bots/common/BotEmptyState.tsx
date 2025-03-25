@@ -28,6 +28,16 @@ interface BotEmptyStateProps {
    * Optional message override
    */
   message?: string;
+
+  /**
+   * Optional action button label
+   */
+  actionLabel?: string;
+  
+  /**
+   * Optional action callback
+   */
+  onAction?: () => void;
 }
 
 const BotEmptyState: React.FC<BotEmptyStateProps> = ({
@@ -35,7 +45,9 @@ const BotEmptyState: React.FC<BotEmptyStateProps> = ({
   dataType = 'general',
   onRefresh,
   title,
-  message
+  message,
+  actionLabel,
+  onAction
 }) => {
   // Get icon based on bot type
   const getIcon = () => {
@@ -127,16 +139,29 @@ const BotEmptyState: React.FC<BotEmptyStateProps> = ({
       <h3 className="text-lg font-medium mb-2">{displayTitle}</h3>
       <p className="text-muted-foreground mb-6 max-w-md mx-auto">{displayMessage}</p>
       
-      {onRefresh && (
-        <Button 
-          variant="outline" 
-          onClick={onRefresh}
-          className={`mt-2 ${buttonClasses}`}
-        >
-          <Info className="h-4 w-4 mr-2" />
-          Làm mới dữ liệu
-        </Button>
-      )}
+      <div className="flex flex-col sm:flex-row gap-2 justify-center">
+        {onAction && actionLabel && (
+          <Button 
+            variant="outline" 
+            onClick={onAction}
+            className={`mt-2 ${buttonClasses}`}
+          >
+            <AlertCircle className="h-4 w-4 mr-2" />
+            {actionLabel}
+          </Button>
+        )}
+        
+        {onRefresh && (
+          <Button 
+            variant="outline" 
+            onClick={onRefresh}
+            className={`mt-2 ${buttonClasses}`}
+          >
+            <Info className="h-4 w-4 mr-2" />
+            Làm mới dữ liệu
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
