@@ -106,6 +106,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
               signalSourceLabel="TB365 ID"
               refreshTrigger={refreshLoading}
               botType="prop"
+              isLoading={refreshLoading} // Pass the loading state from parent
             />
           </CardContent>
         </Card>

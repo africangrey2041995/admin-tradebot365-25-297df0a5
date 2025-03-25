@@ -20,10 +20,12 @@ interface CoinstratLogsProps {
   refreshTrigger?: boolean;
   botType?: 'premium' | 'prop' | 'user';
   showFilters?: boolean;
-  // New props for consolidated state management
+  // Props for consolidated state management
   filteredLogs?: CoinstratSignal[];
   onSignalSelect?: (signal: CoinstratSignal) => void;
   onRefreshRequest?: () => void;
+  // External loading state prop
+  isLoading?: boolean;
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
@@ -37,19 +39,25 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   // Use filtered logs from parent if provided
   filteredLogs: externalFilteredLogs,
   onSignalSelect,
-  onRefreshRequest
+  onRefreshRequest,
+  // Use external loading state if provided
+  isLoading: externalLoading
 }) => {
   // Local state for signal details modal
   const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
   const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
   
   // Use the hook to fetch logs data - parent component can control this via refreshTrigger
-  const { logs: allLogs, error, loading, fetchLogs } = useCoinstratLogs({
+  const { logs: allLogs, error, loading: internalLoading, fetchLogs } = useCoinstratLogs({
     botId,
     userId,
     initialData,
-    refreshTrigger
+    refreshTrigger,
+    skipLoadingState: externalLoading !== undefined // Skip internal loading if external loading is provided
   });
+
+  // Use external loading state if provided, otherwise use internal loading state
+  const loading = externalLoading !== undefined ? externalLoading : internalLoading;
 
   // Determine which logs to display - either from parent (if provided) or all logs from hook
   const displayLogs = externalFilteredLogs || allLogs;

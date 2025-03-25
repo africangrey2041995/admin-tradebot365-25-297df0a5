@@ -37,44 +37,35 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const queryClient = useQueryClient();
 
-  // Centralized logs state using hooks
+  // Centralized loading state
+  const [refreshLoading, setRefreshLoading] = useState(isLoading);
+
+  // Update loading state based on parent isLoading
+  useEffect(() => {
+    setRefreshLoading(isLoading);
+  }, [isLoading]);
+
+  // Centralized logs state using hooks with skipLoadingState=true
   const { 
     logs: tradingViewLogs, 
-    loading: tvLogsLoading, 
     fetchLogs: fetchTvLogs 
   } = useTradingViewLogs({
     botId,
     userId,
-    refreshTrigger: refreshTrigger > 0
+    refreshTrigger: refreshTrigger > 0,
+    skipLoadingState: true
   });
 
   const {
     logs: coinstratLogs,
-    loading: csLogsLoading,
     fetchLogs: fetchCsLogs
   } = useCoinstratLogs({
     botId,
     userId,
     initialData: logsData,
-    refreshTrigger: refreshTrigger > 0
+    refreshTrigger: refreshTrigger > 0,
+    skipLoadingState: true
   });
-
-  // Track loading state
-  const [refreshLoading, setRefreshLoading] = useState(false);
-
-  // Update loading state based on hooks and parent loading
-  useEffect(() => {
-    const isLoggingLoading = tvLogsLoading || csLogsLoading;
-    setRefreshLoading(isLoading || isLoggingLoading);
-    
-    // Safety timeout to ensure refreshLoading is eventually reset
-    if (isLoggingLoading || isLoading) {
-      const timer = setTimeout(() => {
-        setRefreshLoading(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, tvLogsLoading, csLogsLoading]);
 
   console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}`);
 
@@ -89,6 +80,8 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
 
   const handleRefresh = () => {
     console.log("UserBotDetailTabs - handleRefresh called");
+    // Set loading state to true
+    setRefreshLoading(true);
     setRefreshTrigger(prev => prev + 1);
     
     // Invalidate React Query cache for this bot's accounts
@@ -97,6 +90,11 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
     if (onRefresh) {
       onRefresh();
     }
+
+    // Set a timeout to reset loading state after a consistent delay
+    setTimeout(() => {
+      setRefreshLoading(false);
+    }, 800);
   };
 
   return (
@@ -128,6 +126,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             userId={userId}
             refreshTrigger={refreshTrigger > 0}
             botType={botType}
+            isLoading={refreshLoading} // Pass the consolidated loading state
           />
         </TabsContent>
         
@@ -139,6 +138,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             signalSourceLabel={signalSourceLabel}
             refreshTrigger={refreshTrigger > 0}
             botType={botType}
+            isLoading={refreshLoading} // Pass the consolidated loading state
           />
         </TabsContent>
       </Tabs>

@@ -62,12 +62,21 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [refreshLogsCounter, setRefreshLogsCounter] = useState(0);
 
-  // Use the hook to fetch all logs
-  const { logs: allLogs, loading: logsLoading, fetchLogs } = useCoinstratLogs({
+  // Use the hook to fetch all logs with skipLoadingState=true to use parent's loading state
+  const { logs: allLogs, fetchLogs } = useCoinstratLogs({
     botId,
     userId,
     refreshTrigger: refreshLogsCounter > 0,
+    skipLoadingState: true // Skip internal loading state management
   });
+
+  // Use a consolidated loading state that reflects the parent component's loading state
+  const [logsLoading, setLogsLoading] = useState(isLoading);
+
+  // Update logsLoading when parent isLoading changes
+  useEffect(() => {
+    setLogsLoading(isLoading);
+  }, [isLoading]);
 
   // Memoized filtered logs to prevent unnecessary recalculations
   const filteredLogs = useMemo(() => {
@@ -158,8 +167,15 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   };
 
   const handleRefreshLogs = () => {
+    // Set loading state to true before refreshing
+    setLogsLoading(true);
     setRefreshLogsCounter(prev => prev + 1);
     fetchLogs();
+    
+    // Set a timeout to ensure loading state is shown for at least 500ms
+    setTimeout(() => {
+      setLogsLoading(false);
+    }, 500);
   };
 
   const accountsExportHeaders = [
@@ -282,6 +298,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
               onSignalSelect={handleSignalSelect}
               onRefreshRequest={handleRefreshLogs}
               refreshTrigger={refreshLogsCounter > 0}
+              isLoading={logsLoading} // Pass the consolidated loading state
             />
           </CardContent>
         </Card>

@@ -1,38 +1,45 @@
 
-import React from 'react';
-import { toast } from 'sonner';
-import BotEmptyState from './common/BotEmptyState';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
+import LogsTable from './trading-view-logs/LogsTable';
 import LoadingState from './trading-view-logs/LoadingState';
 import ErrorState from './trading-view-logs/ErrorState';
-import LogsTable from './trading-view-logs/LogsTable';
-import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 
 interface TradingViewLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
   botType?: 'premium' | 'prop' | 'user';
+  isLoading?: boolean; // New prop for external loading state
 }
 
 const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ 
   botId, 
   userId, 
   refreshTrigger = false,
-  botType = 'user'
+  botType = 'user',
+  isLoading: externalLoading // Accept external loading state
 }) => {
-  const { logs, error, loading, fetchLogs } = useTradingViewLogs({
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  // Pass skipLoadingState to use the external loading state if provided
+  const { logs, loading: internalLoading, error, fetchLogs } = useTradingViewLogs({
     botId,
     userId,
-    refreshTrigger
+    refreshTrigger,
+    skipLoadingState: externalLoading !== undefined
   });
 
+  // Use external loading state if provided, otherwise use internal loading state
+  const loading = externalLoading !== undefined ? externalLoading : internalLoading;
+  
   const handleRefresh = () => {
-    toast.info('Refreshing logs...');
     fetchLogs();
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <LoadingState botType={botType} />;
   }
 
   if (error) {
@@ -41,17 +48,25 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({
 
   if (logs.length === 0) {
     return (
-      <BotEmptyState
-        botType={botType}
-        dataType="logs"
-        onRefresh={handleRefresh}
-        title="Không có TradingView logs"
-        message="Chưa có log TradingView nào được ghi nhận cho bot này"
-      />
+      <div className="bg-gray-50 dark:bg-gray-800/30 rounded-lg p-6 text-center">
+        <p className="text-gray-500 dark:text-gray-400 mb-4">No TradingView logs found for this bot.</p>
+        <Button variant="outline" size="sm" onClick={handleRefresh}>
+          Refresh Logs
+        </Button>
+      </div>
     );
   }
 
-  return <LogsTable logs={logs} onRefresh={handleRefresh} />;
+  return (
+    <div className="space-y-4">
+      <LogsTable 
+        logs={logs} 
+        selectedId={selectedId} 
+        onSelectId={setSelectedId} 
+        onRefresh={handleRefresh} 
+      />
+    </div>
+  );
 };
 
 export default TradingViewLogs;

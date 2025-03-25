@@ -10,6 +10,7 @@ interface UseCoinstratLogsProps {
   userId: string;
   initialData?: CoinstratSignal[];
   refreshTrigger?: boolean;
+  skipLoadingState?: boolean; // New prop to skip internal loading state management
 }
 
 interface UseCoinstratLogsResult {
@@ -26,19 +27,22 @@ interface UseCoinstratLogsResult {
  * @param userId ID of the user, should follow the USR-XXX format
  * @param initialData Optional initial data to use instead of fetching
  * @param refreshTrigger Trigger to refresh logs when changed
+ * @param skipLoadingState Skip internal loading state management if true
  * @returns Logs data, loading state, error and refresh function
  */
 export const useCoinstratLogs = ({
   botId,
   userId,
   initialData = [],
-  refreshTrigger = false
+  refreshTrigger = false,
+  skipLoadingState = false
 }: UseCoinstratLogsProps): UseCoinstratLogsResult => {
   // Use our safe loading hook instead of raw useState
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 3000,
     debugComponent: 'CoinstratLogs',
-    minLoadingDurationMs: 500 // Ensure a minimum loading time to avoid flickering
+    minLoadingDurationMs: 500, // Ensure a minimum loading time to avoid flickering
+    skipLoading: skipLoadingState // Skip loading state management if requested
   });
   
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
@@ -66,8 +70,10 @@ export const useCoinstratLogs = ({
     console.log(`CoinstratLogs - Fetching logs for ${isAdmin ? 'admin' : `userId: ${userId}`} (normalized: ${normalizeUserId(userId)}), botId: ${botId}`);
     console.log(`CoinstratLogs - Admin status: ${isAdmin ? 'Yes' : 'No'}`);
     
-    // Only change loading state if we're not already loading
-    startLoading();
+    // Only change loading state if we're not already loading and not skipping loading state
+    if (!skipLoadingState) {
+      startLoading();
+    }
     setError(null);
     
     try {
@@ -111,7 +117,9 @@ export const useCoinstratLogs = ({
             setError(err instanceof Error ? err : new Error('Failed to filter logs data'));
             setLogs([]);
           } finally {
-            stopLoading();
+            if (!skipLoadingState) {
+              stopLoading();
+            }
             fetchInProgressRef.current = false;
           }
         }, 300); // Reduced delay for initialData
@@ -256,7 +264,9 @@ export const useCoinstratLogs = ({
           setError(mockErr instanceof Error ? mockErr : new Error('Failed to process mock logs data'));
           setLogs([]);
         } finally {
-          stopLoading();
+          if (!skipLoadingState) {
+            stopLoading();
+          }
           fetchInProgressRef.current = false;
         }
       }, 500); // Reduced from 800ms to 500ms
@@ -264,10 +274,12 @@ export const useCoinstratLogs = ({
       console.error('Error in fetchLogs:', error);
       setError(error instanceof Error ? error : new Error('An unexpected error occurred fetching logs'));
       setLogs([]);
-      stopLoading();
+      if (!skipLoadingState) {
+        stopLoading();
+      }
       fetchInProgressRef.current = false;
     }
-  }, [botId, userId, initialData, startLoading, stopLoading, isAdmin]);
+  }, [botId, userId, initialData, startLoading, stopLoading, isAdmin, skipLoadingState]);
 
   useEffect(() => {
     fetchLogs();

@@ -1,160 +1,112 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { toast } from 'sonner';
-import { TradingViewSignal } from '@/types/signal';
-import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
+import { useState, useEffect, useCallback } from 'react';
+import { TradingViewLog } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
-import { useAdmin } from '@/hooks/use-admin';
 
 interface UseTradingViewLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
+  skipLoadingState?: boolean; // Add ability to skip internal loading state
 }
 
 interface UseTradingViewLogsResult {
-  logs: TradingViewSignal[];
-  error: Error | null;
+  logs: TradingViewLog[];
   loading: boolean;
+  error: Error | null;
   fetchLogs: () => void;
 }
 
-/**
- * Custom hook để lấy và xử lý nhật ký tín hiệu từ TradingView
- * 
- * @param botId ID của bot, cần tuân theo định dạng BOT-XXX, PREMIUM-XXX hoặc PROP-XXX
- * @param userId ID của người dùng, cần tuân theo định dạng USR-XXX
- * @param refreshTrigger Kích hoạt refresh nhật ký khi giá trị thay đổi
- * @returns Nhật ký tín hiệu, trạng thái loading, lỗi và hàm fetchLogs để tải lại dữ liệu
- */
-export const useTradingViewLogs = ({
-  botId,
+export const useTradingViewLogs = ({ 
+  botId, 
   userId,
-  refreshTrigger = false
+  refreshTrigger = false,
+  skipLoadingState = false
 }: UseTradingViewLogsProps): UseTradingViewLogsResult => {
-  const [logs, setLogs] = useState<TradingViewSignal[]>([]);
+  const [logs, setLogs] = useState<TradingViewLog[]>([]);
   const [error, setError] = useState<Error | null>(null);
-  const fetchInProgressRef = useRef(false);
-  
-  // Use our safe loading hook instead of raw useState
-  const { loading, startLoading, stopLoading } = useSafeLoading({
-    timeoutMs: 3000,
-    debugComponent: 'TradingViewLogs',
-    minLoadingDurationMs: 500 // Ensure a minimum loading time to avoid flickering
+  const { loading, startLoading, stopLoading } = useSafeLoading({ 
+    timeoutMs: 10000,
+    minLoadingDurationMs: 500,
+    skipLoading: skipLoadingState // Skip loading state if requested
   });
 
-  // Get admin status from useAdmin hook
-  const { isAdmin } = useAdmin();
-
   const fetchLogs = useCallback(() => {
-    // Prevent multiple concurrent fetchLogs calls
-    if (fetchInProgressRef.current) {
-      console.log('TradingViewLogs - Fetch already in progress, skipping duplicate request');
-      return;
+    if (!skipLoadingState) {
+      startLoading();
     }
-    
-    fetchInProgressRef.current = true;
-    
-    // Only validate userId format for non-admin users
-    if (!isAdmin && !validateUserId(userId)) {
-      console.warn(`TradingViewLogs - Invalid userId format: ${userId}, should be in format USR-XXX`);
-      // We still proceed but with a warning
-    }
-    
-    console.log(`TradingViewLogs - Fetching logs for ${isAdmin ? 'admin' : `userId: ${userId}`} (normalized: ${normalizeUserId(userId)})`);
-    console.log(`TradingViewLogs - Admin status: ${isAdmin ? 'Yes' : 'No'}`);
-    startLoading();
     setError(null);
-    
+
+    // Simulated API call with a delay
     setTimeout(() => {
       try {
-        // Mock data with standardized userId format (USR-XXX)
-        const mockLogs: TradingViewSignal[] = [
+        // Mock data for development
+        const mockLogs: TradingViewLog[] = [
           {
-            id: 'SIG001',
-            action: 'ENTER_LONG',
-            instrument: 'BTCUSDT',
+            id: 'TV-12345',
+            originalSignalId: '123456',
             timestamp: new Date().toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '1.5',
+            source: 'TradingView Alert',
+            content: 'Buy BTCUSDT at market price',
+            action: 'BUY',
+            symbol: 'BTCUSDT',
+            price: '50000',
             status: 'Processed',
-            userId: 'USR-001' // Standardized format with dash
+            parsedData: {
+              action: 'BUY',
+              symbol: 'BTCUSDT',
+              price: '50000',
+              stopLoss: '49000',
+              takeProfit: '51000',
+            }
           },
           {
-            id: 'SIG002',
-            action: 'EXIT_LONG',
-            instrument: 'ETHUSDT',
+            id: 'TV-12346',
+            originalSignalId: '123457',
             timestamp: new Date(Date.now() - 3600000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '2.3',
+            source: 'TradingView Alert',
+            content: 'Sell ETHUSDT at market price',
+            action: 'SELL',
+            symbol: 'ETHUSDT',
+            price: '3000',
             status: 'Processed',
-            userId: 'USR-001' // Standardized format with dash
+            parsedData: {
+              action: 'SELL',
+              symbol: 'ETHUSDT',
+              price: '3000',
+              stopLoss: '3100',
+              takeProfit: '2900',
+            }
           },
           {
-            id: 'SIG003',
-            action: 'ENTER_SHORT',
-            instrument: 'SOLUSDT',
+            id: 'TV-12347',
+            originalSignalId: '123458',
             timestamp: new Date(Date.now() - 7200000).toISOString(),
-            signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '3.7',
+            source: 'TradingView Alert',
+            content: 'Invalid signal format',
             status: 'Failed',
-            errorMessage: 'Invalid account configuration',
-            userId: 'USR-002' // Standardized format with dash
+            errorMessage: 'Could not parse signal format',
           },
         ];
-        
-        try {
-          // For admin users, don't filter by userId - show all logs
-          if (isAdmin) {
-            console.log(`TradingViewLogs - Admin user: showing all ${mockLogs.length} logs`);
-            setLogs(mockLogs);
-          } else {
-            // Use normalizeUserId for consistent comparison for regular users
-            const normalizedInputUserId = normalizeUserId(userId);
-            console.log(`TradingViewLogs - Normalized input userId: ${userId} → ${normalizedInputUserId}`);
-            
-            const filteredLogs = mockLogs.filter(log => {
-              if (!log.userId) {
-                console.warn(`TradingViewLogs - Log ${log.id} is missing userId`);
-                return false;
-              }
-              
-              const normalizedLogUserId = normalizeUserId(log.userId);
-              const match = normalizedLogUserId === normalizedInputUserId;
-              console.log(`TradingViewLogs - Comparing: ${log.userId} (${normalizedLogUserId}) with ${userId} (${normalizedInputUserId}) - Match: ${match}`);
-              return match;
-            });
-            
-            console.log(`TradingViewLogs - Filtered logs: ${filteredLogs.length} of ${mockLogs.length}`);
-            setLogs(filteredLogs);
-          }
-        } catch (filterErr) {
-          console.error('Error filtering logs:', filterErr);
-          setError(filterErr instanceof Error ? filterErr : new Error('Error filtering logs data'));
-          setLogs([]);
+
+        setLogs(mockLogs);
+        if (!skipLoadingState) {
+          stopLoading();
         }
-      } catch (error) {
-        console.error('Error processing logs:', error);
-        setError(error instanceof Error ? error : new Error('Error processing logs data'));
-        setLogs([]);
-      } finally {
-        stopLoading();
-        fetchInProgressRef.current = false;
+      } catch (err) {
+        console.error('Error fetching TradingView logs:', err);
+        setError(err instanceof Error ? err : new Error('Failed to fetch TradingView logs'));
+        if (!skipLoadingState) {
+          stopLoading();
+        }
       }
-    }, 500); // Reduced from 800ms to 500ms
-  }, [botId, userId, startLoading, stopLoading, isAdmin]);
+    }, 600);
+  }, [botId, userId, startLoading, stopLoading, skipLoadingState]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
-  // Handle refresh trigger from parent
   useEffect(() => {
     if (refreshTrigger) {
       fetchLogs();
@@ -163,8 +115,8 @@ export const useTradingViewLogs = ({
 
   return {
     logs,
-    error,
     loading,
+    error,
     fetchLogs
   };
 };
