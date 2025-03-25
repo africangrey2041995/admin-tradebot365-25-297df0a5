@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
+import { Activity, BarChart2, Cog, List, Users, NetworkIcon } from 'lucide-react';
 import { toast } from "sonner";
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
@@ -16,6 +16,7 @@ import ExportDataDropdown from './ExportDataDropdown';
 import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
 import { CoinstratSignal } from '@/types/signal';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
+import UnifiedSignalLogsTab from './UnifiedSignalLogsTab';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -213,7 +214,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="overview">
           <BarChart2 className="h-4 w-4 mr-2" />
           Tổng quan
@@ -221,6 +222,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
         <TabsTrigger value="connected-accounts">
           <List className="h-4 w-4 mr-2" />
           Tài khoản kết nối
+        </TabsTrigger>
+        <TabsTrigger value="signal-tracking">
+          <NetworkIcon className="h-4 w-4 mr-2" />
+          Signal Tracking
         </TabsTrigger>
         <TabsTrigger value="coinstrat-logs">
           <Activity className="h-4 w-4 mr-2" />
@@ -272,6 +277,13 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
             )}
           </CardContent>
         </Card>
+      </TabsContent>
+      
+      <TabsContent value="signal-tracking">
+        <UnifiedSignalLogsTab
+          botId={botId}
+          userId={userId}
+        />
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">
