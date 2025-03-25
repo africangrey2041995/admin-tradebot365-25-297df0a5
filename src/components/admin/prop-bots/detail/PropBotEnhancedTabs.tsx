@@ -41,6 +41,7 @@ interface PropBotEnhancedTabsProps {
     botId: string;
   };
   challengeRules: string[];
+  onUpdateBot?: (updatedData: Partial<PropBot>) => void;
 }
 
 const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
@@ -54,7 +55,8 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   challengeData,
   botStats,
   botInfo,
-  challengeRules
+  challengeRules,
+  onUpdateBot = () => {}
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
@@ -88,6 +90,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
           botStats={botStats}
           botInfo={botInfo}
           challengeRules={challengeRules}
+          onUpdateBot={onUpdateBot}
         />
       </TabsContent>
       

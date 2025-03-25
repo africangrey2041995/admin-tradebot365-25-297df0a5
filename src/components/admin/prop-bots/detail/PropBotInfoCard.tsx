@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { PropBot } from '@/types/bot';
 
 interface PropBotInfoCardProps {
   botId: string;
@@ -39,6 +40,7 @@ interface PropBotInfoCardProps {
   minCapital?: string;
   maxDrawdown?: string;
   challengeDuration?: string;
+  onUpdate?: (updatedData: Partial<PropBot>) => void;
 }
 
 const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
@@ -55,7 +57,8 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   colorScheme = 'green',
   minCapital,
   maxDrawdown,
-  challengeDuration
+  challengeDuration,
+  onUpdate = () => {}
 }) => {
   // State for edited values
   const [editedDescription, setEditedDescription] = useState(description);
@@ -113,52 +116,81 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
 
   const handleSaveDescription = () => {
     // In a real app, this would call an API to save the changes
-    // For now, we'll just close the popover and show a toast
+    if (onUpdate) {
+      onUpdate({ description: editedDescription });
+    }
     setDescriptionPopoverOpen(false);
     toast.success("Đã cập nhật mô tả");
   };
 
   const handleSavePropFirm = () => {
+    if (onUpdate) {
+      onUpdate({ propFirm: editedPropFirm });
+    }
     setPropFirmPopoverOpen(false);
     toast.success("Đã cập nhật Prop Firm");
   };
 
   const handleSaveExchange = () => {
+    if (onUpdate) {
+      onUpdate({ exchange: editedExchange });
+    }
     setExchangePopoverOpen(false);
     toast.success("Đã cập nhật sàn giao dịch");
   };
 
   const handleSaveMinCapital = () => {
+    if (onUpdate) {
+      onUpdate({ minCapital: editedMinCapital });
+    }
     setMinCapitalPopoverOpen(false);
     toast.success("Đã cập nhật vốn tối thiểu");
   };
 
   const handleSaveMaxDrawdown = () => {
+    if (onUpdate) {
+      onUpdate({ maxDrawdown: editedMaxDrawdown });
+    }
     setMaxDrawdownPopoverOpen(false);
     toast.success("Đã cập nhật drawdown tối đa");
   };
 
   const handleSaveChallengeDuration = () => {
+    if (onUpdate) {
+      onUpdate({ challengeDuration: editedChallengeDuration });
+    }
     setChallengeDurationPopoverOpen(false);
     toast.success("Đã cập nhật thời gian thử thách");
   };
 
   const handleSavePerformanceLastMonth = () => {
+    if (onUpdate) {
+      onUpdate({ performanceLastMonth: editedPerformanceLastMonth });
+    }
     setPerformanceLastMonthPopoverOpen(false);
     toast.success("Đã cập nhật hiệu suất tháng trước");
   };
 
   const handleSavePerformanceAllTime = () => {
+    if (onUpdate) {
+      onUpdate({ performanceAllTime: editedPerformanceAllTime });
+    }
     setPerformanceAllTimePopoverOpen(false);
     toast.success("Đã cập nhật hiệu suất tổng");
   };
 
   const handleSaveStatus = () => {
+    if (onUpdate) {
+      onUpdate({ status: editedStatus });
+    }
     setStatusPopoverOpen(false);
     toast.success("Đã cập nhật trạng thái");
   };
 
   const handleSaveRisk = () => {
+    if (onUpdate) {
+      onUpdate({ risk: editedRisk });
+    }
     setRiskPopoverOpen(false);
     toast.success("Đã cập nhật mức độ rủi ro");
   };
@@ -697,4 +729,3 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
 };
 
 export default PropBotInfoCard;
-

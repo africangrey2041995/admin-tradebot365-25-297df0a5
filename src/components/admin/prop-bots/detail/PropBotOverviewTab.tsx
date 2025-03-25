@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ChallengeProgressCard from '@/components/bots/details/prop/ChallengeProgressCard';
 import BotStatsCard from '@/components/bots/details/prop/BotStatsCard';
