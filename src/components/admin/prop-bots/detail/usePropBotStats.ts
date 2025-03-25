@@ -7,7 +7,6 @@ interface PropBotStats {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
-    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;
@@ -24,7 +23,6 @@ export const usePropBotStats = (propBot: PropBot | null): PropBotStats => {
     winRate: "68%",
     profitFactor: 2.4,
     sharpeRatio: 1.8,
-    currentDrawdown: propBot?.maxDrawdown || "2.3%",
   };
 
   // Bot info for the info card
