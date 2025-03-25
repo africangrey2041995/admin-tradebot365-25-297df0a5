@@ -88,8 +88,9 @@ const PropBotDetail: React.FC = () => {
         minCapital={propBot.minCapital}
         maxDrawdown={propBot.maxDrawdown}
         challengeDuration={propBot.challengeDuration}
-        connectedAccounts={connectedAccounts}
-        processedSignals={processedSignals}
+        // Fix error: Pass the length of arrays instead of the arrays themselves
+        connectedAccounts={connectedAccounts.length}
+        processedSignals={processedSignals.length}
         onUpdate={handleUpdateBot}
       />
       

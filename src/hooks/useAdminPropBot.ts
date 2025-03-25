@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PropBot } from '@/types/bot';
 import { toast } from "sonner";
-import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
+import { BotStatus, BotRiskLevel, BotType } from '@/constants/botTypes';
 import { useBotAccounts } from './useBotAccounts';
 
 const mockPropBot: PropBot = {
@@ -20,7 +20,10 @@ const mockPropBot: PropBot = {
   lastUpdated: '2023-11-10',
   minCapital: '$5,000',
   maxDrawdown: '5%',
-  challengeDuration: '30 ngày'
+  challengeDuration: '30 ngày',
+  // Add missing properties required by PropBot type
+  type: BotType.PROP_BOT,
+  profit: '+22.5%'
 };
 
 interface UseAdminPropBotReturn {
@@ -119,7 +122,9 @@ export const useAdminPropBot = (botId?: string): UseAdminPropBotReturn => {
       const statusText = 
         newStatus === BotStatus.ACTIVE ? 'Hoạt động' :
         newStatus === BotStatus.INACTIVE ? 'Không hoạt động' :
-        newStatus === BotStatus.PAUSED ? 'Tạm dừng' : 'Đang bảo trì';
+        // Fix the PAUSED reference which doesn't exist in BotStatus
+        // Using a proper value from BotStatus enum
+        newStatus === BotStatus.MAINTENANCE ? 'Tạm dừng' : 'Đang bảo trì';
       
       toast.success(`Trạng thái của bot đã được cập nhật thành: ${statusText}`);
     }

@@ -236,23 +236,30 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
       
       if (!user.cspAccounts.has(cspAccountId)) {
         user.cspAccounts.set(cspAccountId, {
-          ...account,
+          cspAccountId: account.cspAccountId,
+          cspAccountName: account.cspAccountName,
+          apiName: account.apiName,
+          status: account.status,
+          email: account.cspUserEmail,
           tradingAccounts: []
         });
       }
       
       const cspAccount = user.cspAccounts.get(cspAccountId);
       cspAccount.tradingAccounts.push({
-        ...account
+        tradingAccountId: account.tradingAccountId,
+        tradingAccountNumber: account.tradingAccountNumber,
+        tradingAccountType: account.tradingAccountType,
+        tradingAccountBalance: account.tradingAccountBalance,
+        isLive: account.isLive,
+        status: account.status
       });
     });
     
     // Transform maps to arrays for easier consumption
     const result = Array.from(userMap.values()).map(user => ({
       ...user,
-      cspAccounts: Array.from(user.cspAccounts.values()).map(cspAccount => ({
-        ...cspAccount,
-      }))
+      cspAccounts: Array.from(user.cspAccounts.values())
     }));
     
     return result;
