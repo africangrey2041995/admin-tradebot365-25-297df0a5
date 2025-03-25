@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,7 +10,6 @@ import LoadingSignalLogs from './signal-logs/LoadingSignalLogs';
 import EmptySignalLogs from './signal-logs/EmptySignalLogs';
 import ErrorState from './coinstrat-logs/ErrorState';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
-import LogsFilterBar from '@/components/admin/prop-bots/detail/LogsFilterBar';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 
 interface CoinstratLogsProps {
@@ -20,6 +20,10 @@ interface CoinstratLogsProps {
   refreshTrigger?: boolean;
   botType?: 'premium' | 'prop' | 'user';
   showFilters?: boolean;
+  // New props for consolidated state management
+  filteredLogs?: CoinstratSignal[];
+  onSignalSelect?: (signal: CoinstratSignal) => void;
+  onRefreshRequest?: () => void;
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
@@ -29,88 +33,46 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   signalSourceLabel = "TradingView ID",
   refreshTrigger = false,
   botType = 'user',
-  showFilters = true
+  showFilters = true,
+  // Use filtered logs from parent if provided
+  filteredLogs: externalFilteredLogs,
+  onSignalSelect,
+  onRefreshRequest
 }) => {
+  // Local state for signal details modal
+  const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
+  const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
+  
+  // Use the hook to fetch logs data - parent component can control this via refreshTrigger
   const { logs: allLogs, error, loading, fetchLogs } = useCoinstratLogs({
     botId,
     userId,
     initialData,
     refreshTrigger
   });
-  
-  const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
-  const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
-  const [filteredLogs, setFilteredLogs] = useState<CoinstratSignal[]>([]);
-  const [filters, setFilters] = useState({ search: '', status: 'all', time: 'all' });
 
-  useEffect(() => {
-    setFilteredLogs(allLogs);
-  }, [allLogs]);
+  // Determine which logs to display - either from parent (if provided) or all logs from hook
+  const displayLogs = externalFilteredLogs || allLogs;
 
   const handleRefresh = () => {
     toast.info('Refreshing logs...');
     fetchLogs();
+    if (onRefreshRequest) {
+      onRefreshRequest();
+    }
   };
 
   const handleViewSignalDetails = (signal: CoinstratSignal) => {
     setSelectedSignal(signal);
     setSignalDetailsOpen(true);
-  };
-
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-    
-    // Apply filters
-    let filtered = [...allLogs];
-    
-    // Apply search filter
-    if (newFilters.search) {
-      const searchLower = newFilters.search.toLowerCase();
-      filtered = filtered.filter(log => 
-        (log.originalSignalId?.toString().toLowerCase().includes(searchLower)) ||
-        (log.instrument?.toLowerCase().includes(searchLower)) ||
-        (log.action?.toLowerCase().includes(searchLower))
-      );
+    if (onSignalSelect) {
+      onSignalSelect(signal);
     }
-    
-    // Apply status filter
-    if (newFilters.status !== 'all') {
-      filtered = filtered.filter(log => log.status?.toLowerCase() === newFilters.status.toLowerCase());
-    }
-    
-    // Apply time filter
-    if (newFilters.time !== 'all') {
-      const now = new Date();
-      let startDate = new Date();
-      
-      switch (newFilters.time) {
-        case 'today':
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'yesterday':
-          startDate.setDate(now.getDate() - 1);
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'week':
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case 'month':
-          startDate.setMonth(now.getMonth() - 1);
-          break;
-      }
-      
-      filtered = filtered.filter(log => {
-        const logDate = new Date(log.timestamp);
-        return logDate >= startDate;
-      });
-    }
-    
-    setFilteredLogs(filtered);
   };
 
   // Prepare logs for export
   const prepareLogsForExport = () => {
-    return filteredLogs.map(log => ({
+    return displayLogs.map(log => ({
       'ID': log.originalSignalId || '',
       'Symbol': log.instrument || '',
       'Thời gian': new Date(log.timestamp).toLocaleString(),
@@ -123,7 +85,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   const logsExportHeaders = ['ID', 'Symbol', 'Thời gian', 'Hành động', 'Trạng thái', 'Ghi chú'];
 
   if (loading) {
-    return <LoadingSignalLogs />;
+    return <LoadingSignalLogs botType={botType} />;
   }
 
   if (error) {
@@ -135,23 +97,9 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   }
 
   return (
-    <div>
-      {showFilters && (
-        <LogsFilterBar 
-          onFilterChange={handleFilterChange}
-          showExport={true}
-          exportComponent={
-            <ExportDataDropdown 
-              data={prepareLogsForExport()}
-              headers={logsExportHeaders}
-              fileName={`${botType}-bot-${botId}-logs`}
-            />
-          }
-        />
-      )}
-      
+    <div className="space-y-4 animate-in fade-in-50 duration-300">
       <SignalLogsTable
-        logs={filteredLogs}
+        logs={displayLogs}
         userId={userId}
         onViewDetails={handleViewSignalDetails}
         signalSourceLabel={signalSourceLabel}

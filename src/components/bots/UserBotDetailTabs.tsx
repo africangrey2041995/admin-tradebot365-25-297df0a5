@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
@@ -9,6 +9,8 @@ import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
+import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
+import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -32,24 +34,49 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   botType = 'user'
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
-  const [refreshLoading, setRefreshLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const queryClient = useQueryClient();
 
+  // Centralized logs state using hooks
+  const { 
+    logs: tradingViewLogs, 
+    loading: tvLogsLoading, 
+    fetchLogs: fetchTvLogs 
+  } = useTradingViewLogs({
+    botId,
+    userId,
+    refreshTrigger: refreshTrigger > 0
+  });
+
+  const {
+    logs: coinstratLogs,
+    loading: csLogsLoading,
+    fetchLogs: fetchCsLogs
+  } = useCoinstratLogs({
+    botId,
+    userId,
+    initialData: logsData,
+    refreshTrigger: refreshTrigger > 0
+  });
+
+  // Track loading state
+  const [refreshLoading, setRefreshLoading] = useState(false);
+
+  // Update loading state based on hooks and parent loading
   useEffect(() => {
-    // Sync refreshLoading with parent isLoading
-    setRefreshLoading(isLoading);
+    const isLoggingLoading = tvLogsLoading || csLogsLoading;
+    setRefreshLoading(isLoading || isLoggingLoading);
     
     // Safety timeout to ensure refreshLoading is eventually reset
-    if (isLoading) {
+    if (isLoggingLoading || isLoading) {
       const timer = setTimeout(() => {
         setRefreshLoading(false);
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [isLoading]);
+  }, [isLoading, tvLogsLoading, csLogsLoading]);
 
   console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}`);
-  console.log(`UserBotDetailTabs - accountsData length: ${accountsData?.length || 0}, logsData length: ${logsData?.length || 0}`);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -61,8 +88,8 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   };
 
   const handleRefresh = () => {
-    console.log("UserBotDetailTabs - handleRefresh called, setting refreshLoading to true");
-    setRefreshLoading(true);
+    console.log("UserBotDetailTabs - handleRefresh called");
+    setRefreshTrigger(prev => prev + 1);
     
     // Invalidate React Query cache for this bot's accounts
     queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
@@ -70,12 +97,6 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
     if (onRefresh) {
       onRefresh();
     }
-    
-    // In case the parent doesn't reset the loading state
-    setTimeout(() => {
-      console.log("UserBotDetailTabs - Resetting refreshLoading to false after timeout");
-      setRefreshLoading(false);
-    }, 1500);
   };
 
   return (
@@ -92,31 +113,31 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
           <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="accounts">
+        <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
           <BotAccountsTable 
             botId={botId} 
             userId={userId} 
             initialData={accountsData} 
-            refreshTrigger={refreshLoading}
+            refreshTrigger={refreshTrigger > 0}
           />
         </TabsContent>
         
-        <TabsContent value="tradingview-logs">
+        <TabsContent value="tradingview-logs" className="animate-in fade-in-50 duration-200">
           <TradingViewLogs 
             botId={botId} 
             userId={userId}
-            refreshTrigger={refreshLoading}
+            refreshTrigger={refreshTrigger > 0}
             botType={botType}
           />
         </TabsContent>
         
-        <TabsContent value="coinstrat-logs">
+        <TabsContent value="coinstrat-logs" className="animate-in fade-in-50 duration-200">
           <CoinstratLogs 
             botId={botId} 
             userId={userId} 
             initialData={logsData}
             signalSourceLabel={signalSourceLabel}
-            refreshTrigger={refreshLoading}
+            refreshTrigger={refreshTrigger > 0}
             botType={botType}
           />
         </TabsContent>

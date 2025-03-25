@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
-import { toast } from "sonner"; // Import toast from sonner
+import { toast } from "sonner";
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import PropBotUsersTab from './PropBotUsersTab';
@@ -13,6 +14,8 @@ import { Account } from '@/types';
 import LogsFilterBar from './LogsFilterBar';
 import ExportDataDropdown from './ExportDataDropdown';
 import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
+import { CoinstratSignal } from '@/types/signal';
+import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -55,15 +58,81 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   onUpdateChallengeRules = () => {},
   connectedAccounts = []
 }) => {
+  // Centralized state for logs
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
-  const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
-  const [accountsExportData, setAccountsExportData] = useState<(string | number)[][]>([]);
-  const [logsExportData, setLogsExportData] = useState<(string | number)[][]>([]);
+  const [refreshLogsCounter, setRefreshLogsCounter] = useState(0);
 
-  const handleLogsFilterChange = (filters: any) => {
-    console.log("Applied filters:", filters);
-    setLogsFilters(filters);
-  };
+  // Use the hook to fetch all logs
+  const { logs: allLogs, loading: logsLoading, fetchLogs } = useCoinstratLogs({
+    botId,
+    userId,
+    refreshTrigger: refreshLogsCounter > 0,
+  });
+
+  // Memoized filtered logs to prevent unnecessary recalculations
+  const filteredLogs = useMemo(() => {
+    // Start with all logs
+    let filtered = [...allLogs];
+    
+    // Apply search filter
+    if (logsFilters.search) {
+      const searchLower = logsFilters.search.toLowerCase();
+      filtered = filtered.filter(log => 
+        (log.originalSignalId?.toString().toLowerCase().includes(searchLower)) ||
+        (log.instrument?.toLowerCase().includes(searchLower)) ||
+        (log.action?.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // Apply status filter
+    if (logsFilters.status !== 'all') {
+      filtered = filtered.filter(log => log.status?.toLowerCase() === logsFilters.status.toLowerCase());
+    }
+    
+    // Apply time filter
+    if (logsFilters.time !== 'all') {
+      const now = new Date();
+      let startDate = new Date();
+      
+      switch (logsFilters.time) {
+        case 'today':
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'yesterday':
+          startDate.setDate(now.getDate() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+      }
+      
+      filtered = filtered.filter(log => {
+        const logDate = new Date(log.timestamp);
+        return logDate >= startDate;
+      });
+    }
+    
+    return filtered;
+  }, [allLogs, logsFilters]);
+
+  // Central state for accounts data
+  const [accountsExportData, setAccountsExportData] = useState<(string | number)[][]>([]);
+  
+  // Memoized logs export data
+  const logsExportData = useMemo(() => {
+    return filteredLogs.map(log => [
+      log.originalSignalId || '',
+      log.instrument || '',
+      new Date(log.timestamp).toLocaleString(),
+      log.action || '',
+      log.status || '',
+      log.errorMessage || ''
+    ]);
+  }, [filteredLogs]);
 
   useEffect(() => {
     if (connectedAccounts && connectedAccounts.length > 0) {
@@ -79,14 +148,19 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
     }
   }, [connectedAccounts]);
 
-  useEffect(() => {
-    const mockLogsExport = [
-      ['LOG-001', 'BTC/USDT', '2023-11-01 14:30:22', 'BUY', 'Completed', 'Entry at $35,400'],
-      ['LOG-002', 'ETH/USDT', '2023-11-02 09:15:45', 'SELL', 'Completed', 'Exit at $1,890'],
-      ['LOG-003', 'BNB/USDT', '2023-11-03 11:22:33', 'BUY', 'Failed', 'Insufficient balance'],
-    ];
-    setLogsExportData(mockLogsExport);
-  }, []);
+  const handleLogsFilterChange = (filters: any) => {
+    console.log("Applied filters:", filters);
+    setLogsFilters(filters);
+  };
+
+  const handleSignalSelect = (signal: CoinstratSignal) => {
+    console.log("Selected signal:", signal.id);
+  };
+
+  const handleRefreshLogs = () => {
+    setRefreshLogsCounter(prev => prev + 1);
+    fetchLogs();
+  };
 
   const accountsExportHeaders = [
     'Tên tài khoản',
@@ -204,6 +278,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
               signalSourceLabel="TB365 ID"
               botType="prop"
               showFilters={false}
+              filteredLogs={filteredLogs}
+              onSignalSelect={handleSignalSelect}
+              onRefreshRequest={handleRefreshLogs}
+              refreshTrigger={refreshLogsCounter > 0}
             />
           </CardContent>
         </Card>
