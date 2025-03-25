@@ -43,7 +43,10 @@ const BotAccountsTable = ({
     error, 
     fetchAccounts, 
     handleRefresh,
-    setAccounts 
+    addAccount,
+    updateAccount,
+    deleteAccount,
+    toggleAccountStatus
   } = useBotAccounts(botId, userId, initialData);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -72,40 +75,19 @@ const BotAccountsTable = ({
   };
 
   const handleToggleAccountStatus = (account: Account) => {
-    const newStatus = account.status === 'Connected' ? 'Disconnected' : 'Connected';
-    const updatedAccount = { ...account, status: newStatus };
-    
-    // Update the account in the accounts array
-    const updatedAccounts = accounts.map(acc => 
-      acc.cspAccountId === account.cspAccountId ? updatedAccount : acc
-    );
-    
-    setAccounts(updatedAccounts);
-    toast.success(`Tài khoản đã được ${newStatus === 'Connected' ? 'kết nối' : 'ngắt kết nối'}`);
+    toggleAccountStatus(account.cspAccountId);
   };
 
   const handleDeleteAccount = (account: Account) => {
-    // Filter out the account to delete
-    const updatedAccounts = accounts.filter(acc => 
-      acc.cspAccountId !== account.cspAccountId
-    );
-    
-    setAccounts(updatedAccounts);
-    toast.success("Tài khoản đã được xóa");
+    deleteAccount(account.cspAccountId);
   };
 
   const handleAddSubmit = (formData: any) => {
-    // Add the new account to the accounts array
-    setAccounts([...accounts, formData]);
+    addAccount(formData);
   };
 
   const handleEditSubmit = (formData: any) => {
-    // Update the account in the accounts array
-    const updatedAccounts = accounts.map(acc => 
-      acc.cspAccountId === formData.cspAccountId ? formData : acc
-    );
-    
-    setAccounts(updatedAccounts);
+    updateAccount(formData);
   };
 
   // Prepare account data for export

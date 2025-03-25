@@ -46,13 +46,13 @@ export const useBotAccounts = (
     refresh 
   } = useAccountsFetch(initialData);
   
-  // Use the CRUD hook for account operations
+  // Use the CRUD hook for account operations, passing the accounts state and setter
   const { 
     addAccount, 
     updateAccount, 
     deleteAccount, 
     toggleAccountStatus 
-  } = useAccountsCrud(accounts);
+  } = useAccountsCrud(accounts, setAccounts);
   
   // Use the transform hook to get hierarchical data
   const hierarchicalData = useAccountsTransform(accounts);
