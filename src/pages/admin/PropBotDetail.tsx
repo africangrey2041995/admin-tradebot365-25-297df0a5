@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { PropBot } from '@/types/bot';
 import PropBotDetailHeader from '@/components/admin/prop-bots/detail/PropBotDetailHeader';
-import PropBotDetailTabs from '@/components/admin/prop-bots/detail/PropBotDetailTabs';
+import PropBotEnhancedTabs from '@/components/admin/prop-bots/detail/PropBotEnhancedTabs';
+import PropBotInfoCard from '@/components/admin/prop-bots/detail/PropBotInfoCard';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from "sonner";
@@ -131,13 +132,28 @@ const PropBotDetail: React.FC = () => {
         onBack={handleBackClick}
       />
       
-      <PropBotDetailTabs 
+      <PropBotInfoCard
+        botId={propBot.botId}
+        description={propBot.description || ""}
+        createdDate={propBot.createdDate}
+        lastUpdated={propBot.lastUpdated}
+        performanceLastMonth={propBot.performanceLastMonth}
+        performanceAllTime={propBot.performanceAllTime}
+        propFirm={propBot.propFirm}
+        exchange={propBot.exchange}
+        status={propBot.status || BotStatus.ACTIVE}
+        risk={propBot.risk || BotRiskLevel.MEDIUM}
+        colorScheme="green"
+      />
+      
+      <PropBotEnhancedTabs 
         activeTab={activeTab}
         onTabChange={setActiveTab}
         userId="admin" // For admin context
         botId={propBot.botId}
         onRefresh={handleRefresh}
         isLoading={isLoading}
+        propBot={propBot}
         challengeData={challengeData}
         botStats={botStats}
         botInfo={botInfo}
