@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { standardizeBotId } from '@/utils/idUtils';
+import { BotType } from '@/constants/botTypes';
 
 interface BotInfoCardProps {
   botInfo: {
@@ -11,6 +13,9 @@ interface BotInfoCardProps {
 }
 
 const BotInfoCard: React.FC<BotInfoCardProps> = ({ botInfo }) => {
+  // Ensure the botId is in the standardized format for PROP bots
+  const formattedBotId = standardizeBotId(botInfo.botId, BotType.PROP_BOT);
+  
   return (
     <Card className="border-gray-200 dark:border-gray-800">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
@@ -28,7 +33,7 @@ const BotInfoCard: React.FC<BotInfoCardProps> = ({ botInfo }) => {
           </div>
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Mã Bot</span>
-            <span className="font-mono text-sm bg-gray-100 dark:bg-gray-800 py-1 px-2 rounded">{botInfo.botId}</span>
+            <span className="font-mono text-sm bg-gray-100 dark:bg-gray-800 py-1 px-2 rounded">{formattedBotId}</span>
           </div>
         </div>
       </CardContent>

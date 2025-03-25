@@ -697,3 +697,4 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
 };
 
 export default PropBotInfoCard;
+
