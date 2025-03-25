@@ -40,11 +40,10 @@ export const useTradingViewLogs = ({
     // Simulated API call with a delay
     setTimeout(() => {
       try {
-        // Mock data for development
+        // Mock data for development - ensure we conform to TradingViewSignal interface
         const mockLogs: TradingViewSignal[] = [
           {
             id: 'TV-12345',
-            originalSignalId: '123456',
             timestamp: new Date().toISOString(),
             source: 'TradingView Alert',
             content: 'Buy BTCUSDT at market price',
@@ -65,7 +64,6 @@ export const useTradingViewLogs = ({
           },
           {
             id: 'TV-12346',
-            originalSignalId: '123457',
             timestamp: new Date(Date.now() - 3600000).toISOString(),
             source: 'TradingView Alert',
             content: 'Sell ETHUSDT at market price',
@@ -86,7 +84,6 @@ export const useTradingViewLogs = ({
           },
           {
             id: 'TV-12347',
-            originalSignalId: '123458',
             timestamp: new Date(Date.now() - 7200000).toISOString(),
             source: 'TradingView Alert',
             content: 'Invalid signal format',
