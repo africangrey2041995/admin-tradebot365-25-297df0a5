@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -60,7 +59,6 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   challengeDuration,
   onUpdate = () => {}
 }) => {
-  // State for edited values
   const [editedDescription, setEditedDescription] = useState(description);
   const [editedPropFirm, setEditedPropFirm] = useState(propFirm || '');
   const [editedExchange, setEditedExchange] = useState(exchange || '');
@@ -72,7 +70,6 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   const [editedStatus, setEditedStatus] = useState(status);
   const [editedRisk, setEditedRisk] = useState(risk);
 
-  // Open/closed states for popovers
   const [descriptionPopoverOpen, setDescriptionPopoverOpen] = useState(false);
   const [propFirmPopoverOpen, setPropFirmPopoverOpen] = useState(false);
   const [exchangePopoverOpen, setExchangePopoverOpen] = useState(false);
@@ -107,15 +104,14 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
 
   const formatPerformance = (perf: string) => {
     if (perf.startsWith('+')) {
-      return <span className="text-green-500">{perf}</span>;
+      return <span className="text-green-500 font-semibold">{perf}</span>;
     } else if (perf.startsWith('-')) {
-      return <span className="text-red-500">{perf}</span>;
+      return <span className="text-red-500 font-semibold">{perf}</span>;
     }
-    return <span>{perf}</span>;
+    return <span className="text-white font-semibold">{perf}</span>;
   };
 
   const handleSaveDescription = () => {
-    // In a real app, this would call an API to save the changes
     if (onUpdate) {
       onUpdate({ description: editedDescription });
     }
@@ -199,20 +195,17 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
     <Card className="border-gray-700 bg-gray-800/50">
       <CardContent className="pt-6">
         <div className="flex items-start gap-4">
-          {/* Bot Avatar */}
           <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${getColorSchemeClasses()}`}>
             <BarChart4 className="w-8 h-8 text-white" />
           </div>
           
-          {/* Bot Info */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="text-lg font-semibold text-white">{botId}</h3>
               
-              {/* Status with Edit Button */}
               <div className="flex items-center">
                 <div className={`w-3 h-3 rounded-full ${getStatusColorClass()}`}></div>
-                <span className="text-sm text-gray-400 ml-1">{BOT_STATUS_DISPLAY[editedStatus]}</span>
+                <span className="text-sm text-gray-200 ml-1">{BOT_STATUS_DISPLAY[editedStatus]}</span>
                 
                 <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
                   <PopoverTrigger asChild>
@@ -260,9 +253,8 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </div>
             </div>
             
-            {/* Description with Edit Button */}
             <div className="group relative mb-4">
-              <p className="text-gray-300">{editedDescription}</p>
+              <p className="text-gray-100">{editedDescription}</p>
               <Popover open={descriptionPopoverOpen} onOpenChange={setDescriptionPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button 
@@ -302,31 +294,29 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </Popover>
             </div>
             
-            {/* Bot Details */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="group relative">
                 <p className="text-xs text-gray-400 mb-1 flex items-center">
                   <Calendar className="w-3 h-3 mr-1" />
                   Ngày tạo
                 </p>
-                <p className="text-sm">{createdDate}</p>
+                <p className="text-sm text-white">{createdDate}</p>
               </div>
               <div className="group relative">
                 <p className="text-xs text-gray-400 mb-1 flex items-center">
                   <Calendar className="w-3 h-3 mr-1" />
                   Cập nhật
                 </p>
-                <p className="text-sm">{lastUpdated}</p>
+                <p className="text-sm text-white">{lastUpdated}</p>
               </div>
               
-              {/* Exchange with Edit Button */}
               <div className="group relative">
                 <p className="text-xs text-gray-400 mb-1 flex items-center">
                   <ArrowLeftRight className="w-3 h-3 mr-1" />
                   Sàn giao dịch
                 </p>
                 <div className="flex items-center">
-                  <p className="text-sm">{editedExchange || 'Không xác định'}</p>
+                  <p className="text-sm text-white font-medium">{editedExchange || 'Không xác định'}</p>
                   <Popover open={exchangePopoverOpen} onOpenChange={setExchangePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button 
@@ -372,14 +362,13 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
                 </div>
               </div>
               
-              {/* PropFirm with Edit Button */}
               <div className="group relative">
                 <p className="text-xs text-gray-400 mb-1 flex items-center">
                   <Briefcase className="w-3 h-3 mr-1" />
                   Prop Firm
                 </p>
                 <div className="flex items-center">
-                  <p className="text-sm">{editedPropFirm || 'Không xác định'}</p>
+                  <p className="text-sm text-white font-medium">{editedPropFirm || 'Không xác định'}</p>
                   <Popover open={propFirmPopoverOpen} onOpenChange={setPropFirmPopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button 
@@ -427,10 +416,8 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </div>
             </div>
             
-            {/* Performance Stats */}
             <div className="grid grid-cols-2 gap-4 mt-4">
-              {/* Performance Last Month with Edit Button */}
-              <div className="bg-gray-700/30 p-3 rounded-md group relative">
+              <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
                 <p className="text-xs text-gray-400 mb-1">Hiệu suất tháng trước</p>
                 <div className="flex items-center">
                   <p className="text-xl font-bold">{formatPerformance(editedPerformanceLastMonth)}</p>
@@ -473,8 +460,7 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
                 </div>
               </div>
               
-              {/* Performance All Time with Edit Button */}
-              <div className="bg-gray-700/30 p-3 rounded-md group relative">
+              <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
                 <p className="text-xs text-gray-400 mb-1">Hiệu suất tổng</p>
                 <div className="flex items-center">
                   <p className="text-xl font-bold">{formatPerformance(editedPerformanceAllTime)}</p>
@@ -518,9 +504,8 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </div>
             </div>
             
-            {/* Risk Level with Edit Button */}
             <div className="flex items-center gap-2 mt-4">
-              <span className="text-sm text-gray-400">Mức độ rủi ro:</span>
+              <span className="text-sm text-gray-300">Mức độ rủi ro:</span>
               <Badge variant="outline" className={editedRisk === BotRiskLevel.LOW ? 'bg-green-500/20 text-green-400' : 
                                                 editedRisk === BotRiskLevel.MEDIUM ? 'bg-amber-500/20 text-amber-400' : 
                                                 'bg-red-500/20 text-red-400'}>
@@ -570,18 +555,16 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </Popover>
             </div>
             
-            {/* Prop Trading Info Grid */}
             {(editedMinCapital || editedMaxDrawdown || editedChallengeDuration) && (
               <div className="grid grid-cols-3 gap-4 mt-4">
-                {/* Min Capital with Edit Button */}
                 {editedMinCapital && (
-                  <div className="bg-gray-700/30 p-3 rounded-md group relative">
+                  <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
                     <p className="text-xs text-gray-400 mb-1 flex items-center">
                       <DollarSign className="w-3 h-3 mr-1" />
                       Vốn tối thiểu
                     </p>
                     <div className="flex items-center">
-                      <p className="text-sm font-medium">{editedMinCapital}</p>
+                      <p className="text-sm font-medium text-white">{editedMinCapital}</p>
                       <Popover open={minCapitalPopoverOpen} onOpenChange={setMinCapitalPopoverOpen}>
                         <PopoverTrigger asChild>
                           <Button 
@@ -622,15 +605,14 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
                   </div>
                 )}
                 
-                {/* Max Drawdown with Edit Button */}
                 {editedMaxDrawdown && (
-                  <div className="bg-gray-700/30 p-3 rounded-md group relative">
+                  <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
                     <p className="text-xs text-gray-400 mb-1 flex items-center">
                       <Percent className="w-3 h-3 mr-1" />
                       Drawdown tối đa
                     </p>
                     <div className="flex items-center">
-                      <p className="text-sm font-medium">{editedMaxDrawdown}</p>
+                      <p className="text-sm font-medium text-white">{editedMaxDrawdown}</p>
                       <Popover open={maxDrawdownPopoverOpen} onOpenChange={setMaxDrawdownPopoverOpen}>
                         <PopoverTrigger asChild>
                           <Button 
@@ -671,15 +653,14 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
                   </div>
                 )}
                 
-                {/* Challenge Duration with Edit Button */}
                 {editedChallengeDuration && (
-                  <div className="bg-gray-700/30 p-3 rounded-md group relative">
+                  <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
                     <p className="text-xs text-gray-400 mb-1 flex items-center">
                       <Calendar className="w-3 h-3 mr-1" />
                       Thời gian thử thách
                     </p>
                     <div className="flex items-center">
-                      <p className="text-sm font-medium">{editedChallengeDuration}</p>
+                      <p className="text-sm font-medium text-white">{editedChallengeDuration}</p>
                       <Popover open={challengeDurationPopoverOpen} onOpenChange={setChallengeDurationPopoverOpen}>
                         <PopoverTrigger asChild>
                           <Button 
