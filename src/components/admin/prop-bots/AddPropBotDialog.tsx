@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ADMIN_API } from '@/constants/apiEndpoints';
 import { BotStatus, BotRiskLevel, BotType } from '@/constants/botTypes';
+import { PropBot } from '@/types/bot';
 
 import {
   Dialog,
@@ -50,7 +50,6 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 
-// Define the form schema with Zod
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tên bot phải có ít nhất 2 ký tự",
@@ -80,7 +79,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface AddPropBotDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (newBot: PropBot) => void;
 }
 
 const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
@@ -92,7 +91,6 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
-  // Default values for the form
   const defaultValues: Partial<FormValues> = {
     name: '',
     description: '',
@@ -117,42 +115,33 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      // Prepare the data to send to the API
-      const propBotData = {
+      const propBotData: PropBot = {
         ...data,
+        botId: `PROP${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}`,
         type: BotType.PROP_BOT,
         createdDate: format(data.createdDate || new Date(), 'yyyy-MM-dd'),
         lastUpdated: format(new Date(), 'yyyy-MM-dd'),
-        users: 0, // New bot starts with 0 users
+        users: 0,
         profit: data.performanceAllTime || '+0.0%',
+        performanceLastMonth: data.performanceLastMonth || '+0.0%',
+        performanceAllTime: data.performanceAllTime || '+0.0%',
+        minCapital: data.minCapital || '$500',
+        name: data.name,
+        description: data.description || '',
+        status: (data.status as BotStatus) || BotStatus.INACTIVE,
+        accountSizes: data.accountSizes ? data.accountSizes.split(',').map(size => size.trim()) : [],
       };
 
-      // Mock API call - in a real app, replace with actual API call
-      console.log('Sending data to API:', propBotData);
-      
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // API call would be something like:
-      // const response = await fetch(ADMIN_API.BOTS.PROP, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(propBotData),
-      // });
-      
-      // if (!response.ok) throw new Error('Failed to create Prop Trading Bot');
-
       toast({
         title: "Tạo Prop Bot thành công",
         description: `Prop Trading Bot "${data.name}" đã được tạo thành công.`,
       });
 
-      // Reset form and close dialog
       form.reset(defaultValues);
       onOpenChange(false);
-      onSuccess();
+      onSuccess(propBotData);
     } catch (error) {
       console.error('Error creating Prop Bot:', error);
       toast({
@@ -184,7 +173,6 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
                 <TabsTrigger value="settings">Cài đặt nâng cao</TabsTrigger>
               </TabsList>
 
-              {/* Basic Information Tab */}
               <TabsContent value="basic" className="space-y-4">
                 <FormField
                   control={form.control}
@@ -343,7 +331,6 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
                 </div>
               </TabsContent>
 
-              {/* Performance Tab */}
               <TabsContent value="performance" className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
@@ -434,7 +421,6 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
                 </div>
               </TabsContent>
 
-              {/* Advanced Settings Tab */}
               <TabsContent value="settings" className="space-y-4">
                 <FormField
                   control={form.control}

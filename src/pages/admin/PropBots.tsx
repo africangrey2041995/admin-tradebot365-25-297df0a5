@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import AddPropBotDialog from '@/components/admin/prop-bots/AddPropBotDialog';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES } from '@/constants/routes';
+import { PropBot } from '@/types/bot';
 
 const PropBots: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +53,8 @@ const PropBots: React.FC = () => {
     setIsAddDialogOpen(true);
   };
 
-  const handleAddSuccess = (newBot: any) => {
+  // Fix: Update the type definition of handleAddSuccess to accept a PropBot parameter
+  const handleAddSuccess = (newBot: PropBot) => {
     // In a real application, we would fetch the updated data from the API
     // For now, we'll just add the new bot to our local state and refresh
     setPropBots(prevBots => [newBot, ...prevBots]);
@@ -98,6 +100,7 @@ const PropBots: React.FC = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         totalPages={totalPages}
+        onRowClick={navigateToBotDetail}
       />
 
       <AddPropBotDialog 
