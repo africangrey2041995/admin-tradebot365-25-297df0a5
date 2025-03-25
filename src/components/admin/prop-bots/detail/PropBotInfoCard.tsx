@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
-import { BarChart4, Briefcase, Calendar, Exchange } from 'lucide-react';
+import { BarChart4, Briefcase, Calendar, ArrowLeftRight } from 'lucide-react';
 
 interface PropBotInfoCardProps {
   botId: string;
@@ -98,7 +98,7 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1 flex items-center">
-                  <Exchange className="w-3 h-3 mr-1" />
+                  <ArrowLeftRight className="w-3 h-3 mr-1" />
                   Sàn giao dịch
                 </p>
                 <p className="text-sm">{exchange || 'Không xác định'}</p>
