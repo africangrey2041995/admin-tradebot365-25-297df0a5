@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
-import BotInfoCard from '@/components/bots/details/prop/BotInfoCard';
-import { BarChart2, Users, Settings, FileText } from 'lucide-react';
+import { BarChart2, Users, Settings, FileText, AlertCircle } from 'lucide-react';
 import EditableFeaturesCard from './EditableFeaturesCard';
 import EditableRequirementsCard from './EditableRequirementsCard';
-import BotPerformanceCard from './BotPerformanceCard';
 import { PropBot } from '@/types/bot';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
@@ -23,6 +22,7 @@ interface AdminPropBotOverviewTabProps {
     lastUpdated: string;
     botId: string;
   };
+  challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
 }
 
@@ -30,6 +30,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   propBot,
   botStats,
   botInfo,
+  challengeRules,
   onUpdateBot = () => {}
 }) => {
   // Initial features and requirements
@@ -46,6 +47,8 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
     'Phù hợp với giai đoạn Challenger hoặc Verification'
   ]);
 
+  const [selectedPropFirm, setSelectedPropFirm] = useState<string>("Default");
+
   const handleUpdateFeatures = (updatedFeatures: string[]) => {
     setFeatures(updatedFeatures);
     // Here you would typically update the backend
@@ -60,19 +63,12 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
     toast.success('Đã cập nhật yêu cầu bot');
   };
 
-  const handleUpdatePerformance = (performance: { lastMonth: string; allTime: string }) => {
-    // Update the bot with new performance data
-    onUpdateBot({
-      performanceLastMonth: performance.lastMonth,
-      performanceAllTime: performance.allTime
-    });
-    
-    console.log('Performance updated:', performance);
-  };
+  // Get the challenge rules for the selected prop firm
+  const currentRules = challengeRules[selectedPropFirm] || challengeRules["Default"];
 
   return (
     <div className="space-y-6">
-      {/* Admin Dashboard Summary */}
+      {/* Admin Dashboard Summary with real metrics */}
       <Card className="border border-neutral-200 dark:border-neutral-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-medium flex items-center">
@@ -93,32 +89,77 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
               <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 flex items-center">
                 <Settings className="h-4 w-4 mr-1 text-purple-600 dark:text-purple-400" />
-                Sàn Giao Dịch
+                Prop Firm
               </div>
-              <div className="text-2xl font-bold">{propBot.propFirm || "Coinstrat Pro"}</div>
+              <div className="text-2xl font-bold">{propBot.propFirm || "Chưa xác định"}</div>
             </div>
             
             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
               <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 flex items-center">
                 <FileText className="h-4 w-4 mr-1 text-green-600 dark:text-green-400" />
-                Lợi nhuận tiêu chuẩn
+                Thời gian Challenge
               </div>
-              <div className="text-2xl font-bold">{propBot.profit || "N/A"}</div>
+              <div className="text-2xl font-bold">{propBot.challengeDuration || "30 ngày"}</div>
             </div>
           </div>
         </CardContent>
       </Card>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column */}
+        {/* Left column - Main content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Bot Performance Chart Placeholder - for future implementation */}
-          <div className="flex items-center justify-center h-64 bg-neutral-50 dark:bg-neutral-900/50 rounded border border-neutral-200 dark:border-neutral-800">
-            <div className="text-center text-neutral-500 dark:text-neutral-400 flex flex-col items-center">
-              <BarChart2 className="h-8 w-8 mb-2 opacity-50" />
-              <p>Biểu đồ hiệu suất tổng hợp</p>
-            </div>
-          </div>
+          {/* Notice card about performance metrics */}
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-amber-800 dark:text-amber-300">Thông báo về dữ liệu hiệu suất</h4>
+                  <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                    Hiện tại hệ thống chưa theo dõi chi tiết hiệu suất giao dịch thực tế. 
+                    Các số liệu hiển thị là mục tiêu cho người dùng cần đạt được trong quá trình 
+                    tham gia Prop Trading Challenge.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Challenge Rules Card - with tabs for different prop firms */}
+          <Card className="border border-neutral-200 dark:border-neutral-800">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center">
+                <FileText className="h-4 w-4 mr-2 text-primary" />
+                Quy tắc Challenge theo Prop Firm
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={selectedPropFirm} onValueChange={setSelectedPropFirm} className="w-full">
+                <TabsList className="mb-4">
+                  {Object.keys(challengeRules).map(firm => (
+                    <TabsTrigger key={firm} value={firm}>
+                      {firm}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                
+                {Object.entries(challengeRules).map(([firm, rules]) => (
+                  <TabsContent key={firm} value={firm}>
+                    <ul className="space-y-2">
+                      {rules.map((rule, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 text-sm font-medium">
+                            {idx + 1}
+                          </div>
+                          <span className="text-gray-700 dark:text-gray-300">{rule}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </CardContent>
+          </Card>
           
           {/* Admin-only editable cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,41 +173,32 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
               onUpdate={handleUpdateRequirements}
             />
           </div>
-          
-          <BotPerformanceCard 
-            performance={{
-              lastMonth: propBot.performanceLastMonth,
-              allTime: propBot.performanceAllTime
-            }}
-            onUpdate={handleUpdatePerformance}
-            colorScheme="green"
-          />
         </div>
         
-        {/* Right column */}
+        {/* Right column - Info cards */}
         <div className="space-y-6">
           <Card className="border border-neutral-200 dark:border-neutral-800">
             <CardContent className="p-6">
-              <h3 className="font-medium mb-3 text-lg">Thông số Bot</h3>
+              <h3 className="font-medium mb-3 text-lg">Mục tiêu Bot</h3>
               <div className="space-y-2">
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
-                  <span className="text-neutral-600 dark:text-neutral-400">Tổng giao dịch</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Tổng giao dịch mục tiêu</span>
                   <span className="font-medium">{botStats.totalTrades}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
-                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ thắng</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ thắng mục tiêu</span>
                   <span className="font-medium">{botStats.winRate}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
-                  <span className="text-neutral-600 dark:text-neutral-400">Hệ số lợi nhuận</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Hệ số lợi nhuận mục tiêu</span>
                   <span className="font-medium">{botStats.profitFactor}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
-                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ Sharpe</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ Sharpe mục tiêu</span>
                   <span className="font-medium">{botStats.sharpeRatio}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-neutral-600 dark:text-neutral-400">Drawdown hiện tại</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Drawdown tối đa cho phép</span>
                   <span className="font-medium">{botStats.currentDrawdown}</span>
                 </div>
               </div>

@@ -23,10 +23,12 @@ const PropBotDetail: React.FC = () => {
     isLoading, 
     handleRefresh, 
     handleUpdateBot, 
-    handleUpdateStatus 
+    handleUpdateStatus,
+    connectedAccounts,
+    processedSignals
   } = useAdminPropBot(botId);
 
-  // Custom hook for generating bot stats
+  // Custom hook for generating bot stats and challenge rules
   const { botStats, botInfo, challengeRules } = usePropBotStats(propBot);
 
   // Fix for error 1: Wrapping goBack in a handler that accepts MouseEvent
@@ -84,6 +86,8 @@ const PropBotDetail: React.FC = () => {
         minCapital={propBot.minCapital}
         maxDrawdown={propBot.maxDrawdown}
         challengeDuration={propBot.challengeDuration}
+        connectedAccounts={connectedAccounts}
+        processedSignals={processedSignals}
         onUpdate={handleUpdateBot}
       />
       

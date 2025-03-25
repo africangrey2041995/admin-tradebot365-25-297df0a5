@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +33,7 @@ interface PropBotEnhancedTabsProps {
     lastUpdated: string;
     botId: string;
   };
-  challengeRules: string[];
+  challengeRules: Record<string, string[]>;
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
 }
 
@@ -97,6 +98,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
           propBot={propBot}
           botStats={botStats}
           botInfo={botInfo}
+          challengeRules={challengeRules}
           onUpdateBot={onUpdateBot}
         />
       </TabsContent>

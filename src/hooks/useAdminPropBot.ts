@@ -11,11 +11,15 @@ interface UsePropBotReturn {
   handleRefresh: () => void;
   handleUpdateBot: (updatedData: Partial<PropBot>) => void;
   handleUpdateStatus: (newStatus: BotStatus) => void;
+  connectedAccounts: number;
+  processedSignals: number;
 }
 
 export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [propBot, setPropBot] = useState<PropBot | null>(null);
+  const [connectedAccounts, setConnectedAccounts] = useState(0);
+  const [processedSignals, setProcessedSignals] = useState(0);
 
   useEffect(() => {
     // In a real application, we would fetch the data from an API
@@ -30,6 +34,10 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
       if (foundBot) {
         console.log("Found bot:", foundBot);
         setPropBot(foundBot);
+        
+        // Simulate fetching connected accounts and processed signals
+        setConnectedAccounts(Math.floor(Math.random() * 20) + 5); // Random 5-25 accounts
+        setProcessedSignals(Math.floor(Math.random() * 500) + 100); // Random 100-600 signals
       } else {
         console.log("Bot not found");
         toast.error("Không tìm thấy bot với ID đã cung cấp");
@@ -45,6 +53,11 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
       const foundBot = mockPropBots.find(bot => bot.botId === botId);
       if (foundBot) {
         setPropBot(foundBot);
+        
+        // Update the simulation counts on refresh
+        setConnectedAccounts(Math.floor(Math.random() * 20) + 5);
+        setProcessedSignals(Math.floor(Math.random() * 500) + 100);
+        
         toast.success("Đã làm mới dữ liệu");
       } else {
         toast.error("Không tìm thấy bot với ID đã cung cấp");
@@ -83,6 +96,8 @@ export const useAdminPropBot = (botId?: string): UsePropBotReturn => {
     isLoading,
     handleRefresh,
     handleUpdateBot,
-    handleUpdateStatus
+    handleUpdateStatus,
+    connectedAccounts,
+    processedSignals
   };
 };
