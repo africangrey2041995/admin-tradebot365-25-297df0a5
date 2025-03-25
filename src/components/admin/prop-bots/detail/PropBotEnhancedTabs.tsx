@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart, Cog, List, Users } from 'lucide-react';
@@ -10,6 +10,8 @@ import PropBotUsersTab from './PropBotUsersTab';
 import PropBotSettingsTab from './PropBotSettingsTab';
 import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { PropBot } from '@/types/bot';
+import LogsFilterBar from './LogsFilterBar';
+import ExportDataDropdown from './ExportDataDropdown';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -58,6 +60,24 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   challengeRules,
   onUpdateBot = () => {}
 }) => {
+  const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
+  const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
+
+  // Handler for logs filter changes
+  const handleLogsFilterChange = (filters: any) => {
+    console.log("Applied filters:", filters);
+    setLogsFilters(filters);
+    // The actual filtering will be done in the CoinstratLogs component
+  };
+
+  // Prepare data for export - accounts
+  const accountsExportHeaders = ['Tên tài khoản', 'Email', 'API', 'Loại tài khoản', 'Trạng thái', 'Số dư'];
+  const accountsExportData = []; // This will be populated from BotAccountsTable
+  
+  // Prepare data for export - logs
+  const logsExportHeaders = ['ID', 'Symbol', 'Thời gian', 'Hành động', 'Trạng thái', 'Ghi chú'];
+  const logsExportData = []; // This will be populated from CoinstratLogs
+
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
       <TabsList className="grid w-full grid-cols-5">
@@ -97,6 +117,13 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       <TabsContent value="connected-accounts">
         <Card>
           <CardContent className="p-6">
+            <div className="flex justify-end mb-4">
+              <ExportDataDropdown 
+                data={accountsExportData}
+                headers={accountsExportHeaders}
+                fileName={`prop-bot-${botId}-accounts`}
+              />
+            </div>
             <BotAccountsTable 
               botId={botId} 
               userId={userId}
@@ -109,6 +136,17 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       <TabsContent value="coinstrat-logs">
         <Card>
           <CardContent className="p-6">
+            <LogsFilterBar 
+              onFilterChange={handleLogsFilterChange}
+              showExport={true}
+              exportComponent={
+                <ExportDataDropdown 
+                  data={logsExportData}
+                  headers={logsExportHeaders}
+                  fileName={`prop-bot-${botId}-logs`}
+                />
+              }
+            />
             <CoinstratLogs 
               botId={botId} 
               userId={userId}
