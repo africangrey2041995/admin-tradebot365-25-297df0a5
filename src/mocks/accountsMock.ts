@@ -1,0 +1,147 @@
+
+import { Account } from '@/types';
+
+// Enhanced mock data for accounts with additional user information
+export const mockAccounts: Account[] = [
+  // User 1: John Doe
+  {
+    cspAccountId: 'acc-001',
+    cspAccountName: 'Main Trading Account',
+    cspUserEmail: 'john@example.com',
+    apiName: 'Binance API',
+    tradingAccountType: 'Standard',
+    tradingAccountNumber: '123456',
+    tradingAccountBalance: '$5,240.50',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'John Doe',
+    createdDate: '2023-10-15',
+    lastUpdated: '2023-11-10',
+    cspUserId: 'user-001',
+    apiId: 'api-001',
+    tradingAccountId: 'trade-001'
+  },
+  {
+    cspAccountId: 'acc-002',
+    cspAccountName: 'Demo Testing Account',
+    cspUserEmail: 'john@example.com',
+    apiName: 'Bybit API',
+    tradingAccountType: 'Pro',
+    tradingAccountNumber: '654321',
+    tradingAccountBalance: '$12,750.25',
+    isLive: false,
+    status: 'Connected',
+    userAccount: 'John Doe',
+    createdDate: '2023-09-20',
+    lastUpdated: '2023-11-05',
+    cspUserId: 'user-001',
+    apiId: 'api-002',
+    tradingAccountId: 'trade-002'
+  },
+  {
+    cspAccountId: 'acc-003',
+    cspAccountName: 'Challenge Account',
+    cspUserEmail: 'john@example.com',
+    apiName: 'Coinstrat Pro API',
+    tradingAccountType: 'VIP',
+    tradingAccountNumber: '789012',
+    tradingAccountBalance: '$50,000.00',
+    isLive: true,
+    status: 'Disconnected',
+    userAccount: 'John Doe',
+    createdDate: '2023-11-01',
+    lastUpdated: '2023-11-15',
+    cspUserId: 'user-001',
+    apiId: 'api-003',
+    tradingAccountId: 'trade-003'
+  },
+  
+  // User 2: Jane Smith
+  {
+    cspAccountId: 'acc-004',
+    cspAccountName: 'Jane Main Account',
+    cspUserEmail: 'jane@example.com',
+    apiName: 'Binance API',
+    tradingAccountType: 'Standard',
+    tradingAccountNumber: '111222',
+    tradingAccountBalance: '$8,120.75',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Jane Smith',
+    createdDate: '2023-10-05',
+    lastUpdated: '2023-11-12',
+    cspUserId: 'user-002',
+    apiId: 'api-004',
+    tradingAccountId: 'trade-004'
+  },
+  {
+    cspAccountId: 'acc-005',
+    cspAccountName: 'Jane Prop Account',
+    cspUserEmail: 'jane@example.com',
+    apiName: 'Coinstrat Pro API',
+    tradingAccountType: 'Challenge',
+    tradingAccountNumber: '333444',
+    tradingAccountBalance: '$100,000.00',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Jane Smith',
+    createdDate: '2023-11-01',
+    lastUpdated: '2023-11-20',
+    cspUserId: 'user-002',
+    apiId: 'api-005',
+    tradingAccountId: 'trade-005'
+  },
+  
+  // User 3: Alex Wong
+  {
+    cspAccountId: 'acc-006',
+    cspAccountName: 'Alex Trading Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'MT4 API',
+    tradingAccountType: 'Premium',
+    tradingAccountNumber: '555666',
+    tradingAccountBalance: '$15,340.20',
+    isLive: true,
+    status: 'Connected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-09-15',
+    lastUpdated: '2023-11-15',
+    cspUserId: 'user-003',
+    apiId: 'api-006',
+    tradingAccountId: 'trade-006'
+  },
+  {
+    cspAccountId: 'acc-007',
+    cspAccountName: 'Alex Demo Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'MT5 API',
+    tradingAccountType: 'Standard',
+    tradingAccountNumber: '777888',
+    tradingAccountBalance: '$10,000.00',
+    isLive: false,
+    status: 'Connected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-09-20',
+    lastUpdated: '2023-10-30',
+    cspUserId: 'user-003',
+    apiId: 'api-007',
+    tradingAccountId: 'trade-007'
+  },
+  {
+    cspAccountId: 'acc-008',
+    cspAccountName: 'Alex Prop Account',
+    cspUserEmail: 'alex@example.com',
+    apiName: 'Coinstrat Pro API',
+    tradingAccountType: 'Challenge Plus',
+    tradingAccountNumber: '999000',
+    tradingAccountBalance: '$200,000.00',
+    isLive: true,
+    status: 'Disconnected',
+    userAccount: 'Alex Wong',
+    createdDate: '2023-10-25',
+    lastUpdated: '2023-11-18',
+    cspUserId: 'user-003',
+    apiId: 'api-008',
+    tradingAccountId: 'trade-008'
+  }
+];
