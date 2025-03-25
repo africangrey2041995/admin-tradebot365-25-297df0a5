@@ -14,11 +14,15 @@ export interface LogsFilterBarProps {
     userId: string;
     action: string;
   };
+  showExport?: boolean;
+  exportComponent?: React.ReactNode;
 }
 
 export const LogsFilterBar: React.FC<LogsFilterBarProps> = ({ 
   onFilterChange,
-  filters
+  filters,
+  showExport = false,
+  exportComponent = null
 }) => {
   return (
     <div className="space-y-4">
@@ -87,6 +91,8 @@ export const LogsFilterBar: React.FC<LogsFilterBarProps> = ({
             </SelectContent>
           </Select>
         </div>
+        
+        {showExport && exportComponent}
       </div>
       
       <div className="flex flex-col sm:flex-row gap-3">

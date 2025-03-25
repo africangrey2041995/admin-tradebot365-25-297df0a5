@@ -9,7 +9,7 @@ import LoadingSignalLogs from './signal-logs/LoadingSignalLogs';
 import EmptySignalLogs from './signal-logs/EmptySignalLogs';
 import ErrorState from './coinstrat-logs/ErrorState';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
-import LogsFilterBar from '@/components/admin/prop-bots/detail/LogsFilterBar';
+import { LogsFilterBar } from '@/components/admin/prop-bots/detail/LogsFilterBar';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 
 interface CoinstratLogsProps {
@@ -31,17 +31,17 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   botType = 'user',
   showFilters = true
 }) => {
+  const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
+  const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
+  const [filteredLogs, setFilteredLogs] = useState<CoinstratSignal[]>([]);
+  const [filters, setFilters] = useState({ search: '', status: 'all', time: 'all', accountId: '', userId: '', action: 'all' });
+
   const { logs: allLogs, error, loading, fetchLogs } = useCoinstratLogs({
     botId,
     userId,
     initialData,
     refreshTrigger
   });
-  
-  const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
-  const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
-  const [filteredLogs, setFilteredLogs] = useState<CoinstratSignal[]>([]);
-  const [filters, setFilters] = useState({ search: '', status: 'all', time: 'all' });
 
   useEffect(() => {
     setFilteredLogs(allLogs);
@@ -58,14 +58,13 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   };
 
   const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
     
-    // Apply filters
     let filtered = [...allLogs];
     
-    // Apply search filter
-    if (newFilters.search) {
-      const searchLower = newFilters.search.toLowerCase();
+    if (updatedFilters.search) {
+      const searchLower = updatedFilters.search.toLowerCase();
       filtered = filtered.filter(log => 
         (log.originalSignalId?.toString().toLowerCase().includes(searchLower)) ||
         (log.instrument?.toLowerCase().includes(searchLower)) ||
@@ -73,17 +72,15 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
       );
     }
     
-    // Apply status filter
-    if (newFilters.status !== 'all') {
-      filtered = filtered.filter(log => log.status?.toLowerCase() === newFilters.status.toLowerCase());
+    if (updatedFilters.status !== 'all') {
+      filtered = filtered.filter(log => log.status?.toLowerCase() === updatedFilters.status.toLowerCase());
     }
     
-    // Apply time filter
-    if (newFilters.time !== 'all') {
+    if (updatedFilters.time !== 'all') {
       const now = new Date();
       let startDate = new Date();
       
-      switch (newFilters.time) {
+      switch (updatedFilters.time) {
         case 'today':
           startDate.setHours(0, 0, 0, 0);
           break;
@@ -108,7 +105,6 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
     setFilteredLogs(filtered);
   };
 
-  // Prepare logs for export
   const prepareLogsForExport = () => {
     return filteredLogs.map(log => ({
       'ID': log.originalSignalId || '',
@@ -139,6 +135,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
       {showFilters && (
         <LogsFilterBar 
           onFilterChange={handleFilterChange}
+          filters={filters}
           showExport={true}
           exportComponent={
             <ExportDataDropdown 
