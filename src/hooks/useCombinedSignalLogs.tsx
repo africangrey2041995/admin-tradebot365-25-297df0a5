@@ -1,8 +1,9 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import { useTradingViewLogs } from '@/components/bots/trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
+import { useSafeLoading } from '@/hooks/useSafeLoading';
 
 interface UseCombinedSignalLogsProps {
   botId: string;
@@ -24,7 +25,17 @@ export const useCombinedSignalLogs = ({
   userId,
   refreshTrigger = false
 }: UseCombinedSignalLogsProps): UseCombinedSignalLogsResult => {
-  // Use both hooks for fetching different log types
+  // Use the safeLoading hook with timeout
+  const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 10000, // 10 seconds timeout
+    debugComponent: 'CombinedSignalLogs',
+    minLoadingDurationMs: 300 // Ensure minimum loading duration to prevent flicker
+  });
+  
+  // Track if fetch is in progress to prevent duplicate requests
+  const fetchInProgressRef = useRef(false);
+  
+  // Use both hooks for fetching different log types with skipLoadingState
   const {
     logs: tradingViewLogs,
     loading: tvLoading,
@@ -33,7 +44,8 @@ export const useCombinedSignalLogs = ({
   } = useTradingViewLogs({
     botId,
     userId,
-    refreshTrigger
+    refreshTrigger,
+    skipLoadingState: true // Skip internal loading state in the hook
   });
 
   const {
@@ -44,7 +56,8 @@ export const useCombinedSignalLogs = ({
   } = useCoinstratLogs({
     botId,
     userId,
-    refreshTrigger
+    refreshTrigger,
+    skipLoadingState: true // Skip internal loading state in the hook
   });
 
   const [availableUsers, setAvailableUsers] = useState<{ id: string; name: string }[]>([]);
@@ -84,13 +97,52 @@ export const useCombinedSignalLogs = ({
   }, [coinstratLogs]);
 
   const refreshLogs = useCallback(() => {
+    // Prevent concurrent fetches
+    if (fetchInProgressRef.current) {
+      console.log('CombinedSignalLogs - Fetch already in progress, skipping duplicate request');
+      return;
+    }
+    
+    fetchInProgressRef.current = true;
+    startLoading();
+    
+    // Start a safety timeout to prevent infinite loading
+    const safetyTimeout = setTimeout(() => {
+      if (fetchInProgressRef.current) {
+        console.warn('CombinedSignalLogs - Safety timeout reached, forcing loading state reset');
+        stopLoading();
+        fetchInProgressRef.current = false;
+      }
+    }, 10000);
+    
+    // Call both fetch functions
     fetchTvLogs();
     fetchCsLogs();
-  }, [fetchTvLogs, fetchCsLogs]);
+    
+    // Set up another effect to detect when both fetches have completed
+    const checkInterval = setInterval(() => {
+      if (!tvLoading && !csLoading) {
+        clearInterval(checkInterval);
+        clearTimeout(safetyTimeout);
+        stopLoading();
+        fetchInProgressRef.current = false;
+      }
+    }, 300);
+    
+    // Clean up interval and timeout if component unmounts during fetch
+    return () => {
+      clearInterval(checkInterval);
+      clearTimeout(safetyTimeout);
+    };
+  }, [fetchTvLogs, fetchCsLogs, startLoading, stopLoading, tvLoading, csLoading]);
 
-  // Combine loading states
-  const loading = tvLoading || csLoading;
-  
+  // Handle refresh trigger
+  useEffect(() => {
+    if (refreshTrigger) {
+      refreshLogs();
+    }
+  }, [refreshTrigger, refreshLogs]);
+
   // Combine error states, prioritizing the first error
   const error = tvError || csError;
 

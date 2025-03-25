@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -8,6 +8,7 @@ import AdvancedSignalFilter, { SignalFilters } from '@/components/bots/trading-v
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
+import { Progress } from "@/components/ui/progress";
 
 interface UnifiedSignalLogsTabProps {
   botId: string;
@@ -32,7 +33,10 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
   const [filteredTvLogs, setFilteredTvLogs] = useState<TradingViewSignal[]>([]);
   const [filteredCsLogs, setFilteredCsLogs] = useState<CoinstratSignal[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
-
+  
+  // Add timeout reference for safety
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Use the combined logs hook
   const {
     tradingViewLogs,
@@ -47,10 +51,31 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     refreshTrigger
   });
 
-  // Handle manual refresh
+  // Handle manual refresh with safety timeout
   const handleRefresh = () => {
+    console.log('UnifiedSignalLogsTab - Manual refresh triggered');
     setRefreshTrigger(!refreshTrigger);
+    
+    // Set a safety timeout to prevent infinite loading state
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+    
+    loadingTimeoutRef.current = setTimeout(() => {
+      console.warn('UnifiedSignalLogsTab - Safety timeout reached, forcing refresh completion');
+      // Force refreshTrigger to change to ensure we don't get stuck
+      setRefreshTrigger(prev => !prev);
+    }, 15000); // 15 second safety timeout
   };
+  
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Apply filters to both log types
   useEffect(() => {
@@ -259,9 +284,19 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
               </h3>
               <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+                {loading ? 'Refreshing...' : 'Refresh'}
               </Button>
             </div>
+            
+            {loading && (
+              <div className="py-2">
+                <Progress 
+                  value={100} 
+                  className="h-1" 
+                  indicatorClassName="animate-pulse bg-blue-500" 
+                />
+              </div>
+            )}
             
             <UnifiedSignalView
               tradingViewLogs={filteredTvLogs}

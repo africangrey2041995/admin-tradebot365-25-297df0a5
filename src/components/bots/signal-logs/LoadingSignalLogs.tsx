@@ -3,15 +3,18 @@ import React from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
 
 interface LoadingSignalLogsProps {
   message?: string;
   botType?: 'premium' | 'prop' | 'user';
+  showProgress?: boolean;
 }
 
 const LoadingSignalLogs: React.FC<LoadingSignalLogsProps> = ({
   message = "Loading logs...",
-  botType = 'user'
+  botType = 'user',
+  showProgress = true
 }) => {
   // Get loading class based on bot type
   const getLoadingClass = () => {
@@ -31,9 +34,21 @@ const LoadingSignalLogs: React.FC<LoadingSignalLogsProps> = ({
   // Render skeleton table for smoother UX
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      <div className="flex items-center justify-center py-4">
-        <RefreshCw className={`h-5 w-5 animate-spin mr-2 ${iconClass}`} />
-        <p className="text-sm text-muted-foreground">{message}</p>
+      <div className="flex flex-col items-center justify-center py-4">
+        <div className="flex items-center mb-2">
+          <RefreshCw className={`h-5 w-5 animate-spin mr-2 ${iconClass}`} />
+          <p className="text-sm text-muted-foreground">{message}</p>
+        </div>
+        
+        {showProgress && (
+          <div className="w-full max-w-xs mt-2">
+            <Progress 
+              value={100} 
+              className="h-1" 
+              indicatorClassName="animate-pulse bg-blue-500" 
+            />
+          </div>
+        )}
       </div>
       
       <Table>
