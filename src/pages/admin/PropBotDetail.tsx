@@ -89,10 +89,10 @@ const PropBotDetail: React.FC = () => {
   const challengeData = {
     phase: "Verification",
     progress: 65,
-    accountBalance: "$12,500",
-    profitTarget: "$1,250",
-    maxDrawdown: "$625",
-    daysRemaining: "15",
+    accountBalance: propBot.minCapital || "$10,000",
+    profitTarget: propBot.profit || "+10%",
+    maxDrawdown: propBot.maxDrawdown || "5%",
+    daysRemaining: propBot.challengeDuration ? propBot.challengeDuration.split(' ')[0] : "30",
     description: propBot.description || "Prop Trading Bot cho Coinstrat Pro",
   };
 
@@ -102,7 +102,7 @@ const PropBotDetail: React.FC = () => {
     winRate: "68%",
     profitFactor: 2.4,
     sharpeRatio: 1.8,
-    currentDrawdown: "2.3%",
+    currentDrawdown: propBot.maxDrawdown || "2.3%",
   };
 
   // Bot info for the info card
@@ -144,6 +144,9 @@ const PropBotDetail: React.FC = () => {
         status={propBot.status || BotStatus.ACTIVE}
         risk={propBot.risk || BotRiskLevel.MEDIUM}
         colorScheme="green"
+        minCapital={propBot.minCapital}
+        maxDrawdown={propBot.maxDrawdown}
+        challengeDuration={propBot.challengeDuration}
       />
       
       <PropBotEnhancedTabs 

@@ -8,6 +8,8 @@ import { PropBotsTable } from "@/components/admin/prop-bots/PropBotsTable";
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { useToast } from "@/hooks/use-toast";
 import AddPropBotDialog from '@/components/admin/prop-bots/AddPropBotDialog';
+import { useNavigate } from 'react-router-dom';
+import { ADMIN_ROUTES } from '@/constants/routes';
 
 const PropBots: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +19,7 @@ const PropBots: React.FC = () => {
   const [propBots, setPropBots] = useState(mockPropBots);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const itemsPerPage = 10;
 
   // Filter and pagination logic
@@ -49,10 +52,19 @@ const PropBots: React.FC = () => {
     setIsAddDialogOpen(true);
   };
 
-  const handleAddSuccess = () => {
+  const handleAddSuccess = (newBot: any) => {
     // In a real application, we would fetch the updated data from the API
-    // For now, we'll simulate refreshing the data
-    refreshData();
+    // For now, we'll just add the new bot to our local state and refresh
+    setPropBots(prevBots => [newBot, ...prevBots]);
+    toast({
+      title: "Thêm bot thành công",
+      description: `Đã thêm bot ${newBot.name} vào hệ thống`,
+    });
+    setIsAddDialogOpen(false);
+  };
+
+  const navigateToBotDetail = (botId: string) => {
+    navigate(ADMIN_ROUTES.PROP_BOT_DETAIL(botId));
   };
 
   return (

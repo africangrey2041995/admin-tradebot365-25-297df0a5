@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
-import { BarChart4, Briefcase, Calendar, ArrowLeftRight } from 'lucide-react';
+import { BarChart4, Briefcase, Calendar, ArrowLeftRight, DollarSign, Percent } from 'lucide-react';
 
 interface PropBotInfoCardProps {
   botId: string;
@@ -17,6 +17,9 @@ interface PropBotInfoCardProps {
   status: BotStatus;
   risk: BotRiskLevel;
   colorScheme?: string;
+  minCapital?: string;
+  maxDrawdown?: string;
+  challengeDuration?: string;
 }
 
 const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
@@ -31,6 +34,9 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   status,
   risk,
   colorScheme = 'green',
+  minCapital,
+  maxDrawdown,
+  challengeDuration
 }) => {
   const getColorSchemeClasses = () => {
     switch (colorScheme) {
@@ -122,6 +128,41 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
                 <p className="text-xl font-bold">{formatPerformance(performanceAllTime)}</p>
               </div>
             </div>
+            
+            {/* Thông tin Prop Trading */}
+            {(minCapital || maxDrawdown || challengeDuration) && (
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                {minCapital && (
+                  <div className="bg-gray-700/30 p-3 rounded-md">
+                    <p className="text-xs text-gray-400 mb-1 flex items-center">
+                      <DollarSign className="w-3 h-3 mr-1" />
+                      Vốn tối thiểu
+                    </p>
+                    <p className="text-sm font-medium">{minCapital}</p>
+                  </div>
+                )}
+                
+                {maxDrawdown && (
+                  <div className="bg-gray-700/30 p-3 rounded-md">
+                    <p className="text-xs text-gray-400 mb-1 flex items-center">
+                      <Percent className="w-3 h-3 mr-1" />
+                      Drawdown tối đa
+                    </p>
+                    <p className="text-sm font-medium">{maxDrawdown}</p>
+                  </div>
+                )}
+                
+                {challengeDuration && (
+                  <div className="bg-gray-700/30 p-3 rounded-md">
+                    <p className="text-xs text-gray-400 mb-1 flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Thời gian thử thách
+                    </p>
+                    <p className="text-sm font-medium">{challengeDuration}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

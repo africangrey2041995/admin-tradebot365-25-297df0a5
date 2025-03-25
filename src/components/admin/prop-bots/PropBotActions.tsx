@@ -1,30 +1,21 @@
 
 import React from 'react';
-import { 
-  PlusCircle, 
-  Download, 
-  Search, 
-  RefreshCw, 
-  Play, 
-  Pause
-} from 'lucide-react';
+import { Search, RefreshCw, Filter } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { BotStatus } from '@/constants/botTypes';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface PropBotActionsProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   statusFilter: string;
-  setStatusFilter: (status: string) => void;
+  setStatusFilter: (filter: string) => void;
   isLoading: boolean;
   refreshData: () => void;
 }
@@ -35,67 +26,48 @@ export const PropBotActions: React.FC<PropBotActionsProps> = ({
   statusFilter,
   setStatusFilter,
   isLoading,
-  refreshData
+  refreshData,
 }) => {
   return (
-    <>
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="flex-1 max-w-md">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
-            <Input
-              type="search"
-              placeholder="Tìm kiếm theo tên Bot hoặc ID..."
-              className="pl-8 bg-zinc-800 border-zinc-700 text-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Select 
-            value={statusFilter} 
-            onValueChange={setStatusFilter}
-          >
-            <SelectTrigger className="w-[180px] bg-zinc-800 border-zinc-700 text-white">
-              <SelectValue placeholder="Trạng thái" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value={BotStatus.ACTIVE}>Đang hoạt động</SelectItem>
-              <SelectItem value={BotStatus.INACTIVE}>Không hoạt động</SelectItem>
-              <SelectItem value={BotStatus.MAINTENANCE}>Đang bảo trì</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            variant="outline" 
-            onClick={refreshData} 
-            disabled={isLoading} 
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Làm mới
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Xuất dữ liệu
-          </Button>
-        </div>
+    <div className="flex flex-col sm:flex-row gap-3">
+      <div className="relative flex-1">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
+        <Input
+          placeholder="Tìm kiếm bằng ID hoặc tên bot..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-9 bg-zinc-900 border-zinc-800 text-white"
+        />
       </div>
-
-      <ToggleGroup type="multiple" className="mt-4 justify-start">
-        <ToggleGroupItem value="activate" className="border-zinc-700 text-green-500 hover:bg-zinc-800 data-[state=on]:bg-zinc-800">
-          <Play className="h-4 w-4 mr-2" />
-          Kích hoạt
-        </ToggleGroupItem>
-        <ToggleGroupItem value="pause" className="border-zinc-700 text-yellow-500 hover:bg-zinc-800 data-[state=on]:bg-zinc-800">
-          <Pause className="h-4 w-4 mr-2" />
-          Tạm dừng
-        </ToggleGroupItem>
-      </ToggleGroup>
-    </>
+      
+      <Select
+        value={statusFilter}
+        onValueChange={setStatusFilter}
+      >
+        <SelectTrigger className="w-full sm:w-[180px] bg-zinc-900 border-zinc-800 text-white">
+          <Filter className="mr-2 h-4 w-4" />
+          <SelectValue placeholder="Trạng thái" />
+        </SelectTrigger>
+        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+          <SelectItem value="all">Tất cả trạng thái</SelectItem>
+          <SelectItem value="active">Đang hoạt động</SelectItem>
+          <SelectItem value="inactive">Không hoạt động</SelectItem>
+          <SelectItem value="maintenance">Bảo trì</SelectItem>
+          <SelectItem value="error">Lỗi</SelectItem>
+          <SelectItem value="suspended">Đã dừng</SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <Button 
+        variant="outline" 
+        size="default" 
+        onClick={refreshData}
+        disabled={isLoading}
+        className="bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800 hover:text-white"
+      >
+        <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+        Làm mới
+      </Button>
+    </div>
   );
 };

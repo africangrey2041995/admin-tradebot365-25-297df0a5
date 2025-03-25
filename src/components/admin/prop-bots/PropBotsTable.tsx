@@ -28,6 +28,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PropBot } from '@/types';
+import { useNavigation } from '@/hooks/useNavigation';
+import { ADMIN_ROUTES } from '@/constants/routes';
+import { useNavigate } from 'react-router-dom';
 
 interface PropBotsTableProps {
   currentBots: PropBot[];
@@ -51,6 +54,12 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
   setCurrentPage,
   totalPages
 }) => {
+  const navigate = useNavigate();
+  
+  const viewBotDetails = (botId: string) => {
+    navigate(ADMIN_ROUTES.PROP_BOT_DETAIL(botId));
+  };
+
   return (
     <Card className="bg-zinc-900 border-zinc-800">
       <CardHeader className="pb-2 border-b border-zinc-800">
@@ -72,7 +81,11 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
           <TableBody>
             {currentBots.length > 0 ? (
               currentBots.map((bot) => (
-                <TableRow key={bot.botId} className="hover:bg-zinc-800/50 border-zinc-800">
+                <TableRow 
+                  key={bot.botId} 
+                  className="hover:bg-zinc-800/50 border-zinc-800 cursor-pointer"
+                  onClick={() => viewBotDetails(bot.botId)}
+                >
                   <TableCell className="font-medium text-zinc-300">
                     <Badge variant="outline" className="bg-zinc-800 border-zinc-700 text-zinc-300">{bot.botId}</Badge>
                   </TableCell>
@@ -85,7 +98,7 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                     {bot.profit}
                   </TableCell>
                   <TableCell className="text-zinc-300">{formatDate(bot.createdDate)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
@@ -94,7 +107,7 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white">
-                        <DropdownMenuItem onClick={() => console.log('View details', bot.botId)} className="hover:bg-zinc-800 cursor-pointer">
+                        <DropdownMenuItem onClick={() => viewBotDetails(bot.botId)} className="hover:bg-zinc-800 cursor-pointer">
                           Xem chi tiết
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => console.log('Edit', bot.botId)} className="hover:bg-zinc-800 cursor-pointer">
