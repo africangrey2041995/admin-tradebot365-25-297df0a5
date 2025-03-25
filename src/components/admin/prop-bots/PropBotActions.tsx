@@ -18,7 +18,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { BotStatus } from '@/constants/botTypes';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface PropBotActionsProps {
   searchTerm: string;
@@ -67,35 +66,27 @@ export const PropBotActions: React.FC<PropBotActionsProps> = ({
               <SelectItem value={BotStatus.MAINTENANCE}>Đang bảo trì</SelectItem>
             </SelectContent>
           </Select>
-          <Button 
-            variant="outline" 
-            onClick={refreshData} 
-            disabled={isLoading} 
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-          >
+          <Button variant="outline" onClick={refreshData} disabled={isLoading} className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Làm mới
           </Button>
-          <Button 
-            variant="outline" 
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-          >
+          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">
             <Download className="h-4 w-4 mr-2" />
             Xuất dữ liệu
           </Button>
         </div>
       </div>
 
-      <ToggleGroup type="multiple" className="mt-4 justify-start">
-        <ToggleGroupItem value="activate" className="border-zinc-700 text-green-500 hover:bg-zinc-800 data-[state=on]:bg-zinc-800">
+      <div className="flex space-x-2">
+        <Button variant="outline" size="sm" className="border-zinc-700 text-green-500 hover:bg-zinc-800">
           <Play className="h-4 w-4 mr-2" />
           Kích hoạt
-        </ToggleGroupItem>
-        <ToggleGroupItem value="pause" className="border-zinc-700 text-yellow-500 hover:bg-zinc-800 data-[state=on]:bg-zinc-800">
+        </Button>
+        <Button variant="outline" size="sm" className="border-zinc-700 text-yellow-500 hover:bg-zinc-800">
           <Pause className="h-4 w-4 mr-2" />
           Tạm dừng
-        </ToggleGroupItem>
-      </ToggleGroup>
+        </Button>
+      </div>
     </>
   );
 };

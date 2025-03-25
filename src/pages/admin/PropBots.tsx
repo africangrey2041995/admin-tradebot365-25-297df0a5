@@ -6,14 +6,12 @@ import { PropBotStatsCards } from "@/components/admin/prop-bots/PropBotStatsCard
 import { PropBotActions } from "@/components/admin/prop-bots/PropBotActions";
 import { PropBotsTable } from "@/components/admin/prop-bots/PropBotsTable";
 import { mockPropBots } from '@/mocks/propBotsMock';
-import { useToast } from "@/hooks/use-toast";
 
 const PropBots: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const itemsPerPage = 10;
 
   // Filter and pagination logic
@@ -35,18 +33,7 @@ const PropBots: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Dữ liệu đã được làm mới",
-        description: "Dữ liệu Prop Trading Bots đã được cập nhật",
-      });
     }, 800);
-  };
-
-  const handleAddNewBot = () => {
-    toast({
-      title: "Chức năng đang phát triển",
-      description: "Tính năng thêm mới Prop Bot sẽ sớm được phát hành",
-    });
   };
 
   return (
@@ -58,7 +45,7 @@ const PropBots: React.FC = () => {
             Quản lý và cấu hình các Prop Trading Bots trong hệ thống
           </p>
         </div>
-        <Button className="bg-tradebot text-zinc-900 hover:bg-tradebot/90" onClick={handleAddNewBot}>
+        <Button className="bg-tradebot text-zinc-900 hover:bg-tradebot/90" onClick={() => console.log('Add new prop bot')}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Thêm Prop Bot mới
         </Button>

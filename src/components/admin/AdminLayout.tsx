@@ -3,7 +3,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import { cn } from '@/lib/utils';
-import { Toaster } from "@/components/ui/sonner";
 
 /**
  * AdminLayout component
@@ -21,7 +20,6 @@ const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
-      <Toaster position="top-right" theme="dark" />
     </div>
   );
 };
