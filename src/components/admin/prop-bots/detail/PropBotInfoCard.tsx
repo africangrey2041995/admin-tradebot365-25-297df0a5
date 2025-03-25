@@ -11,7 +11,9 @@ import {
   Percent, 
   Edit,
   Check,
-  X
+  X,
+  Users,
+  Activity
 } from 'lucide-react';
 import { 
   Popover,
@@ -39,6 +41,8 @@ interface PropBotInfoCardProps {
   minCapital?: string;
   maxDrawdown?: string;
   challengeDuration?: string;
+  connectedAccounts: number;
+  processedSignals: number;
   onUpdate?: (updatedData: Partial<PropBot>) => void;
 }
 
@@ -57,6 +61,8 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   minCapital,
   maxDrawdown,
   challengeDuration,
+  connectedAccounts,
+  processedSignals,
   onUpdate = () => {}
 }) => {
   const [editedDescription, setEditedDescription] = useState(description);
@@ -418,88 +424,22 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
             
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
-                <p className="text-xs text-gray-400 mb-1">Hiệu suất tháng trước</p>
+                <p className="text-xs text-gray-400 mb-1 flex items-center">
+                  <Users className="w-3 h-3 mr-1" />
+                  Tài khoản kết nối
+                </p>
                 <div className="flex items-center">
-                  <p className="text-xl font-bold">{formatPerformance(editedPerformanceLastMonth)}</p>
-                  <Popover open={performanceLastMonthPopoverOpen} onOpenChange={setPerformanceLastMonthPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-6 w-6 ml-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-56 p-3">
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-sm">Hiệu suất tháng trước</h4>
-                        <Input 
-                          value={editedPerformanceLastMonth}
-                          onChange={(e) => setEditedPerformanceLastMonth(e.target.value)}
-                          placeholder="Ví dụ: +12.5%"
-                        />
-                        <div className="flex justify-end gap-2 pt-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setPerformanceLastMonthPopoverOpen(false)}
-                          >
-                            <X className="h-3 w-3 mr-1" /> Hủy
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            onClick={handleSavePerformanceLastMonth}
-                          >
-                            <Check className="h-3 w-3 mr-1" /> Lưu
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  <p className="text-xl font-bold text-white">{connectedAccounts}</p>
                 </div>
               </div>
               
               <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
-                <p className="text-xs text-gray-400 mb-1">Hiệu suất tổng</p>
+                <p className="text-xs text-gray-400 mb-1 flex items-center">
+                  <Activity className="w-3 h-3 mr-1" />
+                  Tín hiệu đã xử lý
+                </p>
                 <div className="flex items-center">
-                  <p className="text-xl font-bold">{formatPerformance(editedPerformanceAllTime)}</p>
-                  <Popover open={performanceAllTimePopoverOpen} onOpenChange={setPerformanceAllTimePopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-6 w-6 ml-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-56 p-3">
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-sm">Hiệu suất tổng</h4>
-                        <Input 
-                          value={editedPerformanceAllTime}
-                          onChange={(e) => setEditedPerformanceAllTime(e.target.value)}
-                          placeholder="Ví dụ: +42.1%"
-                        />
-                        <div className="flex justify-end gap-2 pt-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setPerformanceAllTimePopoverOpen(false)}
-                          >
-                            <X className="h-3 w-3 mr-1" /> Hủy
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            onClick={handleSavePerformanceAllTime}
-                          >
-                            <Check className="h-3 w-3 mr-1" /> Lưu
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  <p className="text-xl font-bold text-white">{processedSignals}</p>
                 </div>
               </div>
             </div>
