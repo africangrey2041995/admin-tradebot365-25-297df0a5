@@ -176,44 +176,6 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
     }
   }, [fetchAccounts, initialData.length]);
 
-  const handleRefresh = () => {
-    toast.info('Đang làm mới danh sách tài khoản...');
-    fetchAccounts();
-  };
-
-  const addAccount = (account: Account) => {
-    setAccounts(prev => [...prev, account]);
-    toast.success('Tài khoản đã được thêm thành công');
-  };
-
-  const updateAccount = (updatedAccount: Account) => {
-    setAccounts(prev => 
-      prev.map(acc => acc.cspAccountId === updatedAccount.cspAccountId ? updatedAccount : acc)
-    );
-    toast.success('Tài khoản đã được cập nhật');
-  };
-
-  const deleteAccount = (accountId: string) => {
-    setAccounts(prev => prev.filter(acc => acc.cspAccountId !== accountId));
-    toast.success('Tài khoản đã được xóa');
-  };
-
-  const toggleAccountStatus = (accountId: string) => {
-    setAccounts(prev => 
-      prev.map(acc => {
-        if (acc.cspAccountId === accountId) {
-          const newStatus = acc.status === 'Connected' ? 'Disconnected' : 'Connected';
-          return { ...acc, status: newStatus };
-        }
-        return acc;
-      })
-    );
-    
-    const account = accounts.find(acc => acc.cspAccountId === accountId);
-    const actionText = account?.status === 'Connected' ? 'ngắt kết nối' : 'kết nối';
-    toast.success(`Tài khoản đã được ${actionText}`);
-  };
-  
   // Group accounts by user, CSP account, and trading account
   const getHierarchicalAccounts = () => {
     const userMap = new Map();
@@ -221,6 +183,11 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
     accounts.forEach(account => {
       const userId = account.cspUserId;
       const cspAccountId = account.cspAccountId;
+      
+      if (!userId || !cspAccountId) {
+        console.warn('Account is missing required fields:', account);
+        return;
+      }
       
       if (!userMap.has(userId)) {
         userMap.set(userId, {

@@ -28,11 +28,20 @@ import { toast } from 'sonner';
 
 // Type definitions for our hierarchical structure
 interface TradingAccount {
-  account: Account;
+  tradingAccountId: string;
+  tradingAccountNumber: string;
+  tradingAccountType: string;
+  tradingAccountBalance: string;
+  isLive: boolean;
+  status: string;
 }
 
 interface CSPAccount {
-  account: Account;
+  cspAccountId: string;
+  cspAccountName: string;
+  apiName: string;
+  status: string;
+  email: string;
   tradingAccounts: TradingAccount[];
 }
 
@@ -77,11 +86,15 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
       const user = userMap.get(account.cspUserId)!;
       
       // Find or create CSP account
-      let cspAccount = user.cspAccounts.find(csp => csp.account.cspAccountId === account.cspAccountId);
+      let cspAccount = user.cspAccounts.find(csp => csp.cspAccountId === account.cspAccountId);
       
       if (!cspAccount) {
         cspAccount = {
-          account: { ...account },
+          cspAccountId: account.cspAccountId || '',
+          cspAccountName: account.cspAccountName || '',
+          apiName: account.apiName || '',
+          status: account.status || '',
+          email: account.cspUserEmail || '',
           tradingAccounts: []
         };
         user.cspAccounts.push(cspAccount);
@@ -89,7 +102,12 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
       
       // Add trading account
       cspAccount.tradingAccounts.push({
-        account: { ...account }
+        tradingAccountId: account.tradingAccountId || '',
+        tradingAccountNumber: account.tradingAccountNumber || '',
+        tradingAccountType: account.tradingAccountType || '',
+        tradingAccountBalance: account.tradingAccountBalance || '',
+        isLive: account.isLive || false,
+        status: account.status || ''
       });
     });
     
@@ -109,13 +127,13 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
         user.userId.toLowerCase().includes(searchLower);
         
       const matchesCSP = user.cspAccounts.some(csp => 
-        csp.account.cspAccountName?.toLowerCase().includes(searchLower) ||
-        csp.account.apiName?.toLowerCase().includes(searchLower)
+        (csp.cspAccountName?.toLowerCase() || '').includes(searchLower) ||
+        (csp.apiName?.toLowerCase() || '').includes(searchLower)
       );
       
       const matchesTrading = user.cspAccounts.some(csp => 
         csp.tradingAccounts.some(trading => 
-          trading.account.tradingAccountNumber?.toLowerCase().includes(searchLower)
+          (trading.tradingAccountNumber?.toLowerCase() || '').includes(searchLower)
         )
       );
       
@@ -227,11 +245,11 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                 <div className="pl-4 border-l">
                   <div className="space-y-2">
                     {user.cspAccounts.map((cspAccount, cspIndex) => (
-                      <Collapsible key={`csp-${cspAccount.account.cspAccountId}`} className="border rounded-md">
+                      <Collapsible key={`csp-${cspAccount.cspAccountId}`} className="border rounded-md">
                         <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left">
                           <div className="flex items-center">
-                            <div className="font-medium">{cspAccount.account.cspAccountName}</div>
-                            <div className="text-sm text-gray-500 ml-2">({cspAccount.account.apiName})</div>
+                            <div className="font-medium">{cspAccount.cspAccountName}</div>
+                            <div className="text-sm text-gray-500 ml-2">({cspAccount.apiName})</div>
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
@@ -253,13 +271,13 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                               </TableHeader>
                               <TableBody>
                                 {cspAccount.tradingAccounts.map((tradingAccount, tradingIndex) => (
-                                  <TableRow key={`trading-${tradingAccount.account.tradingAccountId}`}>
-                                    <TableCell>{tradingAccount.account.tradingAccountNumber}</TableCell>
+                                  <TableRow key={`trading-${tradingAccount.tradingAccountId}-${tradingIndex}`}>
+                                    <TableCell>{tradingAccount.tradingAccountNumber}</TableCell>
                                     <TableCell>
-                                      {tradingAccount.account.tradingAccountType} - {tradingAccount.account.isLive ? 'Live' : 'Demo'}
+                                      {tradingAccount.tradingAccountType} - {tradingAccount.isLive ? 'Live' : 'Demo'}
                                     </TableCell>
-                                    <TableCell>{tradingAccount.account.tradingAccountBalance}</TableCell>
-                                    <TableCell>{getStatusBadge(tradingAccount.account.status || '')}</TableCell>
+                                    <TableCell>{tradingAccount.tradingAccountBalance}</TableCell>
+                                    <TableCell>{getStatusBadge(tradingAccount.status)}</TableCell>
                                   </TableRow>
                                 ))}
                               </TableBody>

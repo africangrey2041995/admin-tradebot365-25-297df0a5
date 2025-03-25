@@ -9,10 +9,10 @@ import PropBotUsersTab from './PropBotUsersTab';
 import PropBotSettingsTab from './PropBotSettingsTab';
 import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { PropBot } from '@/types/bot';
+import { Account } from '@/types';
 import LogsFilterBar from './LogsFilterBar';
 import ExportDataDropdown from './ExportDataDropdown';
 import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
-import { Account } from '@/types';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -119,10 +119,16 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
                 fileName={`prop-bot-${botId}-accounts`}
               />
             </div>
-            <HierarchicalAccountsTable 
-              accounts={connectedAccounts || []}
-              onRefresh={onRefresh}
-            />
+            {connectedAccounts && connectedAccounts.length > 0 ? (
+              <HierarchicalAccountsTable 
+                accounts={connectedAccounts}
+                onRefresh={onRefresh}
+              />
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                No connected accounts found for this bot.
+              </div>
+            )}
           </CardContent>
         </Card>
       </TabsContent>
