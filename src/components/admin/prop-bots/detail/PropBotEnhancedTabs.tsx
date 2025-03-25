@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
 import { toast } from "sonner"; // Import toast from sonner
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import PropBotUsersTab from './PropBotUsersTab';
 import PropBotSettingsTab from './PropBotSettingsTab';
@@ -14,6 +13,7 @@ import { Account } from '@/types';
 import LogsFilterBar from './LogsFilterBar';
 import ExportDataDropdown from './ExportDataDropdown';
 import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
+import AdminPropBotLogs from './logs/AdminPropBotLogs';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -185,27 +185,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">
-        <Card>
-          <CardContent className="p-6">
-            <LogsFilterBar 
-              onFilterChange={handleLogsFilterChange}
-              showExport={true}
-              exportComponent={
-                <ExportDataDropdown 
-                  data={logsExportData}
-                  headers={logsExportHeaders}
-                  fileName={`prop-bot-${botId}-logs`}
-                />
-              }
-            />
-            <CoinstratLogs 
-              botId={botId} 
-              userId={userId}
-              signalSourceLabel="TB365 ID"
-              botType="prop"
-            />
-          </CardContent>
-        </Card>
+        <AdminPropBotLogs botId={botId} userId={userId} />
       </TabsContent>
       
       <TabsContent value="users">
