@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -20,6 +21,14 @@ interface CoinstratLogsProps {
   refreshTrigger?: boolean;
   botType?: 'premium' | 'prop' | 'user';
   showFilters?: boolean;
+  filters?: {
+    search: string;
+    status: string;
+    time: string;
+    accountId?: string;
+    userId?: string;
+    action?: string;
+  };
 }
 
 const CoinstratLogs: React.FC<CoinstratLogsProps> = ({ 
@@ -29,7 +38,8 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   signalSourceLabel = "TradingView ID",
   refreshTrigger = false,
   botType = 'user',
-  showFilters = true
+  showFilters = true,
+  filters
 }) => {
   const { logs: allLogs, error, loading, fetchLogs } = useCoinstratLogs({
     botId,
@@ -41,11 +51,29 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   const [selectedSignal, setSelectedSignal] = useState<CoinstratSignal | null>(null);
   const [signalDetailsOpen, setSignalDetailsOpen] = useState(false);
   const [filteredLogs, setFilteredLogs] = useState<CoinstratSignal[]>([]);
-  const [filters, setFilters] = useState({ search: '', status: 'all', time: 'all' });
+  const [localFilters, setLocalFilters] = useState({ 
+    search: filters?.search || '', 
+    status: filters?.status || 'all', 
+    time: filters?.time || 'all',
+    ...(filters?.accountId && { accountId: filters.accountId }),
+    ...(filters?.userId && { userId: filters.userId }),
+    ...(filters?.action && { action: filters.action })
+  });
 
+  // Update local filters when external filters change
   useEffect(() => {
-    setFilteredLogs(allLogs);
-  }, [allLogs]);
+    if (filters) {
+      setLocalFilters(prevFilters => ({
+        ...prevFilters,
+        ...filters
+      }));
+    }
+  }, [filters]);
+
+  // Initial filtering when logs or filters change
+  useEffect(() => {
+    applyFilters(localFilters);
+  }, [allLogs, localFilters]);
 
   const handleRefresh = () => {
     toast.info('Refreshing logs...');
@@ -58,8 +86,11 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
   };
 
   const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-    
+    setLocalFilters(newFilters);
+    applyFilters(newFilters);
+  };
+
+  const applyFilters = (newFilters: any) => {
     // Apply filters
     let filtered = [...allLogs];
     
@@ -104,6 +135,39 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
         return logDate >= startDate;
       });
     }
+
+    // Apply account filter if provided
+    if (newFilters.accountId) {
+      filtered = filtered.filter(log => {
+        const hasProcessedAccount = log.processedAccounts.some(
+          account => account.accountId === newFilters.accountId
+        );
+        const hasFailedAccount = log.failedAccounts.some(
+          account => account.accountId === newFilters.accountId
+        );
+        return hasProcessedAccount || hasFailedAccount;
+      });
+    }
+
+    // Apply user filter if provided (different from the main userId used for fetching)
+    if (newFilters.userId) {
+      filtered = filtered.filter(log => {
+        const hasProcessedAccount = log.processedAccounts.some(
+          account => account.userId === newFilters.userId
+        );
+        const hasFailedAccount = log.failedAccounts.some(
+          account => account.userId === newFilters.userId
+        );
+        return hasProcessedAccount || hasFailedAccount;
+      });
+    }
+
+    // Apply action filter if provided
+    if (newFilters.action && newFilters.action !== 'all') {
+      filtered = filtered.filter(log => 
+        log.action.toLowerCase() === newFilters.action.toLowerCase()
+      );
+    }
     
     setFilteredLogs(filtered);
   };
@@ -147,6 +211,7 @@ const CoinstratLogs: React.FC<CoinstratLogsProps> = ({
               fileName={`${botType}-bot-${botId}-logs`}
             />
           }
+          filters={localFilters}
         />
       )}
       
