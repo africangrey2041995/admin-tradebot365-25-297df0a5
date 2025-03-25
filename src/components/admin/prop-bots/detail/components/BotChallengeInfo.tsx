@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DollarSign, Percent, Calendar, Edit, Check, X } from 'lucide-react';
+import { DollarSign, Calendar, Edit, Check, X } from 'lucide-react';
 import { 
   Popover,
   PopoverTrigger,
@@ -51,7 +51,7 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-4 mt-4">
+    <div className="grid grid-cols-2 gap-4 mt-4">
       {minCapital && (
         <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
           <p className="text-xs text-gray-400 mb-1 flex items-center">
@@ -89,54 +89,6 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
                     <Button 
                       size="sm" 
                       onClick={handleSaveMinCapital}
-                    >
-                      <Check className="h-3 w-3 mr-1" /> Lưu
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-      )}
-      
-      {maxDrawdown && (
-        <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
-          <p className="text-xs text-gray-400 mb-1 flex items-center">
-            <Percent className="w-3 h-3 mr-1" />
-            Drawdown tối đa
-          </p>
-          <div className="flex items-center">
-            <p className="text-sm font-medium text-white">{editedMaxDrawdown}</p>
-            <Popover open={maxDrawdownPopoverOpen} onOpenChange={setMaxDrawdownPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6 ml-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56 p-3">
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Drawdown tối đa</h4>
-                  <Input 
-                    value={editedMaxDrawdown}
-                    onChange={(e) => setEditedMaxDrawdown(e.target.value)}
-                    placeholder="Ví dụ: 5%"
-                  />
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setMaxDrawdownPopoverOpen(false)}
-                    >
-                      <X className="h-3 w-3 mr-1" /> Hủy
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      onClick={handleSaveMaxDrawdown}
                     >
                       <Check className="h-3 w-3 mr-1" /> Lưu
                     </Button>
