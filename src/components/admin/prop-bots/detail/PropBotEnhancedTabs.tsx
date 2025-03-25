@@ -2,13 +2,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, BarChart2, Cog, List, Users, NetworkIcon } from 'lucide-react';
+import { Activity, BarChart2, List, NetworkIcon } from 'lucide-react';
 import { toast } from "sonner";
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
-import PropBotUsersTab from './PropBotUsersTab';
-import PropBotSettingsTab from './PropBotSettingsTab';
-import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { PropBot } from '@/types/bot';
 import { Account } from '@/types';
 import LogsFilterBar from './LogsFilterBar';
@@ -214,7 +211,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-6">
+      <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="overview">
           <BarChart2 className="h-4 w-4 mr-2" />
           Tổng quan
@@ -230,14 +227,6 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
         <TabsTrigger value="coinstrat-logs">
           <Activity className="h-4 w-4 mr-2" />
           Prop Trading Logs
-        </TabsTrigger>
-        <TabsTrigger value="users">
-          <Users className="h-4 w-4 mr-2" />
-          Người dùng
-        </TabsTrigger>
-        <TabsTrigger value="settings">
-          <Cog className="h-4 w-4 mr-2" />
-          Cài đặt
         </TabsTrigger>
       </TabsList>
       
@@ -314,27 +303,6 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
             />
           </CardContent>
         </Card>
-      </TabsContent>
-      
-      <TabsContent value="users">
-        <PropBotUsersTab botId={botId} />
-      </TabsContent>
-      
-      <TabsContent value="settings">
-        <PropBotSettingsTab 
-          botId={botId} 
-          initialData={{
-            name: propBot.name,
-            description: propBot.description || '',
-            exchange: propBot.exchange,
-            propFirm: propBot.propFirm,
-            risk: propBot.risk || BotRiskLevel.MEDIUM,
-            status: propBot.status || BotStatus.ACTIVE,
-            isPromoted: false,
-            isArchived: false,
-            adminNotes: ''
-          }}
-        />
       </TabsContent>
     </Tabs>
   );

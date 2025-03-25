@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
-import { ArrowLeft, Edit, Power, Trash2, AlertTriangle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Edit, Power, Trash2, AlertTriangle, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { BotRiskLevel, BotStatus, BOT_RISK_DISPLAY, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
 import { toast } from 'sonner';
 import {
@@ -25,6 +26,7 @@ interface PropBotDetailHeaderProps {
   onUpdateStatus?: (newStatus: BotStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  onUpdateName?: (newName: string) => void;
 }
 
 const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
@@ -36,9 +38,19 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
   onUpdateStatus = () => {},
   onDelete = () => {},
   onEdit = () => {},
+  onUpdateName = () => {},
 }) => {
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(botName);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditingName]);
 
   const getRiskColor = (risk: BotRiskLevel) => {
     switch (risk) {
@@ -87,6 +99,35 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
     setIsDeleteDialogOpen(false);
   };
 
+  const startEditingName = () => {
+    setIsEditingName(true);
+    setEditedName(botName);
+  };
+
+  const cancelEditingName = () => {
+    setIsEditingName(false);
+    setEditedName(botName);
+  };
+
+  const saveBotName = () => {
+    if (editedName.trim() === '') {
+      toast.error('Tên bot không được để trống');
+      return;
+    }
+
+    onUpdateName(editedName);
+    setIsEditingName(false);
+    toast.success('Đã cập nhật tên bot thành công');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      saveBotName();
+    } else if (e.key === 'Escape') {
+      cancelEditingName();
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 mb-6">
       <div className="flex items-center gap-2">
@@ -94,7 +135,32 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
           <ArrowLeft className="h-4 w-4 mr-1" />
           Quay lại
         </Button>
-        <h2 className="text-xl font-bold text-white">{botName}</h2>
+        
+        {isEditingName ? (
+          <div className="flex items-center">
+            <Input
+              ref={nameInputRef}
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="h-8 w-auto mr-2 bg-background"
+            />
+            <Button size="sm" variant="ghost" onClick={saveBotName} className="p-0 w-8 h-8 mr-1">
+              <Check className="h-4 w-4 text-green-500" />
+            </Button>
+            <Button size="sm" variant="ghost" onClick={cancelEditingName} className="p-0 w-8 h-8">
+              <X className="h-4 w-4 text-red-500" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center">
+            <h2 className="text-xl font-bold text-white">{botName}</h2>
+            <Button variant="ghost" size="sm" onClick={startEditingName} className="ml-1 p-0 w-8 h-8">
+              <Edit className="h-4 w-4 text-gray-400 hover:text-white" />
+            </Button>
+          </div>
+        )}
+        
         <Badge className={getRiskColor(risk)}>
           Rủi ro: {BOT_RISK_DISPLAY[risk] || 'Không xác định'}
         </Badge>

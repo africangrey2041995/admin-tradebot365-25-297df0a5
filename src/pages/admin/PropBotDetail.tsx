@@ -65,6 +65,10 @@ const PropBotDetail: React.FC = () => {
     goBack();
   };
 
+  const handleUpdateBotName = (newName: string) => {
+    handleUpdateBot({ name: newName });
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -84,6 +88,7 @@ const PropBotDetail: React.FC = () => {
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDeleteBot}
         onEdit={handleEditBot}
+        onUpdateName={handleUpdateBotName}
       />
       
       <PropBotInfoCard
