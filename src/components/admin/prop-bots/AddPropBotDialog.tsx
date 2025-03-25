@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -123,8 +124,11 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
           ? BotRiskLevel.HIGH 
           : BotRiskLevel.MEDIUM;
 
+      // Generate a random ID with leading zeros for consistent formatting
+      const randomId = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      
       const propBotData: PropBot = {
-        botId: `PROP-${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}`,
+        botId: `PROP-${randomId}`, // Use standardized ID format with hyphen
         type: BotType.PROP_BOT,
         createdDate: format(data.createdDate || new Date(), 'yyyy-MM-dd'),
         lastUpdated: format(new Date(), 'yyyy-MM-dd'),

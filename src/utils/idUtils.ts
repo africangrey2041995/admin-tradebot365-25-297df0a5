@@ -9,6 +9,7 @@
  */
 
 import { normalizeUserId } from './normalizeUserId';
+import { BotType } from '@/constants/botTypes';
 
 /**
  * Standardize and normalize a user ID to the proper format (USR-XXXX)
@@ -29,124 +30,55 @@ export function standardizeUserId(userId: string): string {
 export function standardizeAccountId(accountId: string): string {
   if (!accountId) return '';
   
-  // If already in standard format, return as is
-  if (accountId.startsWith('ACC-')) {
-    return accountId;
-  }
+  // If already in correct format, return as is
+  if (accountId.startsWith('ACC-')) return accountId;
   
-  // Remove any existing prefixes if present
-  let cleanId = accountId;
-  const knownPrefixes = ['acc-', 'account-', 'account_', 'a-', 'a_'];
+  // If it has some other prefix, remove it
+  const numericPart = accountId.replace(/^[A-Za-z]+-?/, '').replace(/^0+/, '');
   
-  for (const prefix of knownPrefixes) {
-    if (cleanId.toLowerCase().startsWith(prefix)) {
-      cleanId = cleanId.substring(prefix.length);
+  // Format with leading zeros
+  const formattedId = numericPart.padStart(3, '0');
+  
+  return `ACC-${formattedId}`;
+}
+
+/**
+ * Standardize and normalize a bot ID to the proper format based on bot type
+ * 
+ * @param botId The bot ID to normalize
+ * @param botType The type of bot
+ * @returns Normalized bot ID in standard format
+ */
+export function standardizeBotId(botId: string, botType: BotType): string {
+  if (!botId) return '';
+  
+  let prefix: string;
+  
+  switch (botType) {
+    case BotType.USER_BOT:
+      prefix = 'MY-';
       break;
-    }
+    case BotType.PREMIUM_BOT:
+      prefix = 'PRE-';
+      break;
+    case BotType.PROP_BOT:
+      prefix = 'PROP-';
+      break;
+    default:
+      prefix = 'BOT-';
   }
   
-  // Add standard prefix
-  return `ACC-${cleanId}`;
-}
-
-/**
- * Convert legacy ID formats to standardized IDs throughout the application
- * 
- * @param data The data object or array to standardize
- * @returns The same data with standardized IDs
- */
-export function standardizeAllIds<T extends Record<string, any>>(data: T): T;
-export function standardizeAllIds<T extends Record<string, any>>(data: T[]): T[];
-export function standardizeAllIds<T extends Record<string, any>>(data: T | T[]): T | T[] {
-  if (Array.isArray(data)) {
-    return data.map(item => standardizeAllIds(item));
-  }
+  // If already in correct format, return as is
+  if (botId.startsWith(prefix)) return botId;
   
-  const result = { ...data };
+  // Remove any existing prefix and get numeric part
+  const numericMatch = botId.match(/\d+/);
+  if (!numericMatch) return `${prefix}001`; // Default if no numeric part found
   
-  // Convert id to appropriate entity ID if entity type can be determined
-  if ('id' in result) {
-    // Determine entity type and convert accordingly
-    if ('type' in result && typeof result.type === 'string') {
-      if (result.type.includes('BOT') || result.type.includes('bot')) {
-        // This is a bot entity - use botId
-        if (!result.botId) {
-          // @ts-ignore
-          result.botId = result.id;
-        }
-        // @ts-ignore
-        delete result.id;
-      } else if (result.type.includes('USER') || result.type.includes('user')) {
-        // This is a user entity - use userId
-        if (!result.userId) {
-          // @ts-ignore
-          result.userId = standardizeUserId(result.id);
-        }
-        // @ts-ignore
-        delete result.id;
-      } else if (result.type.includes('ACCOUNT') || result.type.includes('account')) {
-        // This is an account entity - use accountId
-        if (!result.accountId) {
-          // @ts-ignore
-          result.accountId = standardizeAccountId(result.id);
-        }
-        // @ts-ignore
-        delete result.id;
-      }
-    }
-  }
+  const numericPart = numericMatch[0];
   
-  // Standardize all IDs in nested objects
-  for (const key in result) {
-    if (typeof result[key] === 'object' && result[key] !== null) {
-      result[key] = standardizeAllIds(result[key]);
-    }
-  }
+  // Format with leading zeros (3 digits)
+  const formattedId = numericPart.padStart(3, '0');
   
-  return result;
-}
-
-/**
- * Migration function to help transition from using generic 'id' to specific entity IDs
- * 
- * @param dataArray Array of entities to migrate
- * @param entityType Type of entity to perform the migration for
- * @returns Migrated data with standardized IDs
- */
-export function migrateGenericIdToSpecificId<T extends Record<string, any>>(
-  dataArray: T[],
-  entityType: 'bot' | 'user' | 'account'
-): T[] {
-  return dataArray.map(item => {
-    const result = { ...item };
-    
-    if ('id' in result) {
-      switch (entityType) {
-        case 'bot':
-          if (!result.botId) {
-            // @ts-ignore
-            result.botId = result.id;
-          }
-          break;
-        case 'user':
-          if (!result.userId) {
-            // @ts-ignore
-            result.userId = standardizeUserId(result.id);
-          }
-          break;
-        case 'account':
-          if (!result.accountId) {
-            // @ts-ignore
-            result.accountId = standardizeAccountId(result.id);
-          }
-          break;
-      }
-      
-      // Remove the original id field
-      // @ts-ignore
-      delete result.id;
-    }
-    
-    return result;
-  });
+  return `${prefix}${formattedId}`;
 }

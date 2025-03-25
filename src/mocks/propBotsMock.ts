@@ -4,7 +4,7 @@ import { BotRiskLevel, BotStatus, BotType } from '@/constants/botTypes';
 
 export const mockPropBots: PropBot[] = [
   {
-    botId: 'PROP001',
+    botId: 'PROP-001',
     name: 'Coinstrat Pro Challenge Master',
     description: 'Bot tối ưu chiến lược vượt qua thử thách Prop Trading',
     type: BotType.PROP_BOT,
@@ -24,7 +24,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$5,000', '$10,000', '$25,000', '$50,000']
   },
   {
-    botId: 'PROP002',
+    botId: 'PROP-002',
     name: 'Scalping Wizard Prop',
     description: 'Bot scalping tối ưu cho Prop Trading với tỷ lệ thắng cao',
     type: BotType.PROP_BOT,
@@ -44,7 +44,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$10,000', '$25,000', '$50,000', '$100,000']
   },
   {
-    botId: 'PROP003',
+    botId: 'PROP-003',
     name: 'Low Risk Prop Trader',
     description: 'Bot giao dịch rủi ro thấp, tập trung vào bảo toàn vốn',
     type: BotType.PROP_BOT,
@@ -64,7 +64,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$5,000', '$10,000', '$20,000']
   },
   {
-    botId: 'PROP004',
+    botId: 'PROP-004',
     name: 'Swing Trader Pro',
     description: 'Bot chuyên về giao dịch swing trading cho Prop Firms',
     type: BotType.PROP_BOT,
@@ -84,7 +84,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$10,000', '$25,000', '$50,000']
   },
   {
-    botId: 'PROP005',
+    botId: 'PROP-005',
     name: 'Conservative Prop Bot',
     description: 'Bot với chiến lược bảo toàn vốn, rủi ro cực thấp',
     type: BotType.PROP_BOT,
@@ -104,7 +104,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$5,000', '$10,000', '$15,000']
   },
   {
-    botId: 'PROP006',
+    botId: 'PROP-006',
     name: 'TopstepTrader Ninja',
     description: 'Bot chuyên biệt cho nền tảng TopstepTrader',
     type: BotType.PROP_BOT,
@@ -124,7 +124,7 @@ export const mockPropBots: PropBot[] = [
     accountSizes: ['$15,000', '$30,000', '$50,000']
   },
   {
-    botId: 'PROP007',
+    botId: 'PROP-007',
     name: 'Forex Prop Master',
     description: 'Bot chuyên dụng cho thị trường Forex trong Prop Trading',
     type: BotType.PROP_BOT,

@@ -14,73 +14,31 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
-import { BotType, BotRiskLevel } from '@/constants/botTypes';
+import { BotType, BotRiskLevel, BotStatus } from '@/constants/botTypes';
+import { mockPropBots } from '@/mocks/propBotsMock';
 
-// Mocking prop trading bot data
-const propTradingBots = [
-  {
-    botId: 'ptb-001',
-    name: 'Prop Master',
-    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
-    exchange: 'Coinstrat Pro',
-    type: BotType.PROP_BOT,
-    performanceLastMonth: '+11.2%',
-    performanceAllTime: '+45.8%',
-    risk: BotRiskLevel.LOW,
-    minCapital: '$500',
-    status: 'active',
-    subscribers: 120,
-    imageUrl: null,
-    colorScheme: 'blue'
-  },
-  {
-    botId: 'ptb-002',
-    name: 'Risk Manager Pro',
-    description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
-    exchange: 'Coinstrat Pro',
-    type: BotType.PROP_BOT,
-    performanceLastMonth: '+8.5%',
-    performanceAllTime: '+38.9%',
-    risk: BotRiskLevel.LOW,
-    minCapital: '$700',
-    status: 'active',
-    subscribers: 95,
-    imageUrl: null,
-    colorScheme: 'green'
-  },
-  {
-    botId: 'ptb-003',
-    name: 'Consistent Trader',
-    description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
-    exchange: 'Coinstrat Pro',
-    type: BotType.PROP_BOT,
-    performanceLastMonth: '+9.7%',
-    performanceAllTime: '+42.3%',
-    risk: BotRiskLevel.MEDIUM,
-    status: 'active',
-    minCapital: '$600',
-    subscribers: 83,
-    imageUrl: null,
-    colorScheme: 'purple'
-  },
-];
+// Create standardized prop trading bot data for the user route, based on mockPropBots
+const propTradingBots = mockPropBots.slice(0, 3).map(bot => ({
+  botId: bot.botId,
+  name: bot.name,
+  description: bot.description,
+  exchange: bot.exchange || 'Coinstrat Pro',
+  type: BotType.PROP_BOT,
+  performanceLastMonth: bot.performanceLastMonth,
+  performanceAllTime: bot.performanceAllTime,
+  risk: bot.risk,
+  minCapital: bot.minCapital,
+  status: bot.status,
+  subscribers: bot.users,
+  imageUrl: null,
+  colorScheme: bot.botId === 'PROP-001' ? 'blue' : 
+               bot.botId === 'PROP-002' ? 'green' : 'purple'
+}));
 
-// Mocking integrated prop trading bots data
+// Create standardized integrated prop bots data based on mockPropBots
 const integratedPropBots = [
   {
-    botId: 'PROP001',
-    name: 'Prop Master',
-    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
-    exchange: 'Coinstrat Pro',
-    type: BotType.PROP_BOT,
-    performanceLastMonth: '+11.2%',
-    performanceAllTime: '+45.8%',
-    risk: BotRiskLevel.LOW,
-    minCapital: '$500',
-    status: 'active',
-    subscribers: 120,
-    imageUrl: null,
-    colorScheme: 'blue',
+    ...mockPropBots[0],
     isIntegrated: true,
     accounts: [
       {

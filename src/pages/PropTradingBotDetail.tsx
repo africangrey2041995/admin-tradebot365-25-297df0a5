@@ -9,94 +9,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle } from 'lucide-react';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
+import { mockPropBots } from '@/mocks/propBotsMock';
+import { BotRiskLevel } from '@/constants/botTypes';
 
-const propTradingBots = [
-  {
-    id: 'ptb-001',
-    name: 'Prop Master',
-    description: 'Bot đặc biệt thiết kế để vượt qua các bài kiểm tra của Coinstrat Pro Prop Trading với tỷ lệ thành công cao.',
-    exchange: 'Coinstrat Pro',
-    type: 'prop',
-    performanceLastMonth: '+11.2%',
-    performanceAllTime: '+45.8%',
-    risk: 'low',
-    minCapital: '$500',
-    status: 'active',
-    subscribers: 120,
-    imageUrl: null,
-    colorScheme: 'blue',
-    features: [
-      'Tối ưu hóa để vượt qua các bài kiểm tra Prop Trading',
-      'Quản lý rủi ro tự động theo yêu cầu của Coinstrat Pro',
-      'Báo cáo hiệu suất chi tiết theo các tiêu chí đánh giá Prop Trading',
-      'Chiến lược giao dịch nhất quán với tỷ lệ win cao'
-    ],
-    requirements: [
-      'Vốn tối thiểu $500',
-      'Tài khoản Coinstrat Pro đã xác minh',
-      'Phù hợp với giai đoạn Challenger hoặc Verification'
-    ]
-  },
-  {
-    id: 'ptb-002',
-    name: 'Risk Manager Pro',
-    description: 'Bot tối ưu quản lý rủi ro để đáp ứng các yêu cầu nghiêm ngặt của Prop Trading, giúp giữ tỷ lệ drawdown thấp.',
-    exchange: 'Coinstrat Pro',
-    type: 'prop',
-    performanceLastMonth: '+8.5%',
-    performanceAllTime: '+38.9%',
-    risk: 'low',
-    minCapital: '$700',
-    status: 'active',
-    subscribers: 95,
-    imageUrl: null,
-    colorScheme: 'green',
-    features: [
-      'Kiểm soát chặt chẽ tỷ lệ rủi ro trên từng giao dịch',
-      'Giữ mức drawdown tối đa dưới 5%',
-      'Tự động điều chỉnh kích thước vị thế dựa trên biến động thị trường',
-      'Báo cáo phân tích rủi ro chi tiết'
-    ],
-    requirements: [
-      'Vốn tối thiểu $700',
-      'Tài khoản Coinstrat Pro đã xác minh',
-      'Phù hợp cho giai đoạn Verification hoặc Funded'
-    ]
-  },
-  {
-    id: 'ptb-003',
-    name: 'Consistent Trader',
-    description: 'Bot tập trung vào tính nhất quán trong giao dịch, điều kiện cần thiết để vượt qua các vòng thử thách Prop Trading.',
-    exchange: 'Coinstrat Pro',
-    type: 'prop',
-    performanceLastMonth: '+9.7%',
-    performanceAllTime: '+42.3%',
-    risk: 'medium',
-    status: 'active',
-    minCapital: '$600',
-    subscribers: 83,
-    imageUrl: null,
-    colorScheme: 'purple',
-    features: [
-      'Tính nhất quán cao trong mọi điều kiện thị trường',
-      'Tỷ lệ win/loss ổn định trên 65%',
-      'Thời gian nắm giữ giao dịch tối ưu',
-      'Cơ chế tự động tránh các sự kiện thị trường biến động mạnh'
-    ],
-    requirements: [
-      'Vốn tối thiểu $600',
-      'Tài khoản Coinstrat Pro đã xác minh',
-      'Phù hợp với tất cả các giai đoạn Prop Trading'
-    ]
-  }
-];
+const propTradingBots = mockPropBots.map(bot => ({
+  ...bot,
+  id: bot.botId,
+  features: [
+    'Tối ưu hóa để vượt qua các bài kiểm tra Prop Trading',
+    'Quản lý rủi ro tự động theo yêu cầu của Prop Firm',
+    'Báo cáo hiệu suất chi tiết theo các tiêu chí đánh giá Prop Trading',
+    'Chiến lược giao dịch nhất quán với tỷ lệ win cao'
+  ],
+  requirements: [
+    `Vốn tối thiểu ${bot.minCapital}`,
+    'Tài khoản Coinstrat Pro đã xác minh',
+    'Phù hợp với giai đoạn Challenger hoặc Verification'
+  ],
+  subscribers: bot.users,
+  colorScheme: bot.botId === 'PROP-001' ? 'blue' : 
+               bot.botId === 'PROP-002' ? 'green' : 
+               bot.botId === 'PROP-003' ? 'purple' : 
+               bot.botId === 'PROP-004' ? 'red' : 'default'
+}));
 
 const PropTradingBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
   
-  const bot = propTradingBots.find(b => b.id === botId);
+  const bot = propTradingBots.find(b => b.botId === botId || b.id === botId);
   
   if (!bot) {
     return (
@@ -116,19 +58,19 @@ const PropTradingBotDetail = () => {
     );
   }
   
-  const getColorByRisk = (risk: string) => {
+  const getColorByRisk = (risk: BotRiskLevel) => {
     switch (risk) {
-      case 'low': return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400';
-      case 'medium': return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400';
-      case 'high': return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
+      case BotRiskLevel.LOW: return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400';
+      case BotRiskLevel.MEDIUM: return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400';
+      case BotRiskLevel.HIGH: return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
       default: return 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400';
     }
   };
   
   const riskLabel = {
-    'low': 'Thấp',
-    'medium': 'Trung bình',
-    'high': 'Cao'
+    [BotRiskLevel.LOW]: 'Thấp',
+    [BotRiskLevel.MEDIUM]: 'Trung bình',
+    [BotRiskLevel.HIGH]: 'Cao'
   }[bot.risk];
   
   const riskColor = getColorByRisk(bot.risk);
