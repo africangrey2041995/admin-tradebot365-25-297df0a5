@@ -50,6 +50,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 
+// Updated the schema to use enum values for risk
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tên bot phải có ít nhất 2 ký tự",
@@ -115,9 +116,15 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      // Convert string risk to BotRiskLevel enum
+      const riskLevel = data.risk === 'low' 
+        ? BotRiskLevel.LOW 
+        : data.risk === 'high' 
+          ? BotRiskLevel.HIGH 
+          : BotRiskLevel.MEDIUM;
+
       const propBotData: PropBot = {
-        ...data,
-        botId: `PROP${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}`,
+        botId: `PROP-${Math.floor(Math.random() * 10000).toString().padStart(3, '0')}`,
         type: BotType.PROP_BOT,
         createdDate: format(data.createdDate || new Date(), 'yyyy-MM-dd'),
         lastUpdated: format(new Date(), 'yyyy-MM-dd'),
@@ -129,7 +136,11 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
         name: data.name,
         description: data.description || '',
         status: (data.status as BotStatus) || BotStatus.INACTIVE,
+        risk: riskLevel, // Use the converted enum value
         accountSizes: data.accountSizes ? data.accountSizes.split(',').map(size => size.trim()) : [],
+        propFirm: data.propFirm,
+        challengeDuration: data.challengeDuration,
+        exchange: data.exchange,
       };
 
       await new Promise(resolve => setTimeout(resolve, 800));
