@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
+import { toast } from "sonner"; // Import toast from sonner
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import PropBotUsersTab from './PropBotUsersTab';
