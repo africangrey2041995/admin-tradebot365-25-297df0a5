@@ -7,6 +7,8 @@ import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import TabContentWrapper from './tabs/TabContentWrapper';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
+import { useQueryClient } from '@tanstack/react-query';
+import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -31,6 +33,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Sync refreshLoading with parent isLoading
@@ -60,9 +63,14 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   const handleRefresh = () => {
     console.log("UserBotDetailTabs - handleRefresh called, setting refreshLoading to true");
     setRefreshLoading(true);
+    
+    // Invalidate React Query cache for this bot's accounts
+    queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
+    
     if (onRefresh) {
       onRefresh();
     }
+    
     // In case the parent doesn't reset the loading state
     setTimeout(() => {
       console.log("UserBotDetailTabs - Resetting refreshLoading to false after timeout");

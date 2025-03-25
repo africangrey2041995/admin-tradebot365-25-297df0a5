@@ -1,11 +1,13 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import { CoinstratSignal } from '@/types/signal';
 import { Account } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 
 interface PropTradingBotTabsProps {
   activeTab: string;
@@ -30,6 +32,17 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
   overviewContent,
   refreshTabData
 }) => {
+  const queryClient = useQueryClient();
+
+  // Function to handle data refresh with React Query
+  const handleRefresh = () => {
+    // Invalidate React Query cache for this bot's accounts
+    queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
+    
+    // Also call the provided refresh function
+    refreshTabData();
+  };
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800 p-0 h-auto rounded-none">
@@ -57,7 +70,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
         {overviewContent}
       </TabsContent>
       
-      <TabsContent value="accounts" className="mt-6">
+      <TabsContent value="accounts">
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
             <CardTitle className="text-lg font-medium">Tài Khoản Kết Nối</CardTitle>
@@ -70,13 +83,14 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
               botId={botId} 
               userId={userId} 
               initialData={accounts}
+              refreshTrigger={refreshLoading}
               botType="prop"
             />
           </CardContent>
         </Card>
       </TabsContent>
       
-      <TabsContent value="logs" className="mt-6">
+      <TabsContent value="logs">
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
             <CardTitle className="text-lg font-medium">Coinstrat Pro Logs</CardTitle>
@@ -90,6 +104,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
               userId={userId}
               initialData={logs}
               signalSourceLabel="TB365 ID"
+              refreshTrigger={refreshLoading}
               botType="prop"
             />
           </CardContent>

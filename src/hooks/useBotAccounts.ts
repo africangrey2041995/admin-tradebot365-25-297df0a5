@@ -1,8 +1,7 @@
 
 import { useCallback } from 'react';
 import { Account } from '@/types';
-import { useAccountsFetch } from './accounts/useAccountsFetch';
-import { useAccountsCrud } from './accounts/useAccountsCrud';
+import { useAccountsQuery } from './accounts/useAccountsQuery';
 import { useAccountsTransform, UserAccount, HierarchicalData } from './accounts/useAccountsTransform';
 
 /**
@@ -18,14 +17,17 @@ interface UseBotAccountsReturn {
   updateAccount: (updatedAccount: Account) => void;
   deleteAccount: (accountId: string) => void;
   toggleAccountStatus: (accountId: string) => void;
-  setAccounts: React.Dispatch<React.SetStateAction<Account[]>>;
   hierarchicalAccounts: UserAccount[];
   hierarchicalData: HierarchicalData;
+  isAddingAccount: boolean;
+  isUpdatingAccount: boolean;
+  isDeletingAccount: boolean;
+  isTogglingStatus: boolean;
 }
 
 /**
  * Custom hook for managing bot accounts
- * Combines fetching, CRUD operations, and data transformation
+ * Uses React Query for robust data fetching and mutation handling
  * @param botId The ID of the bot to fetch accounts for
  * @param userId The ID of the user who owns the bot
  * @param initialData Optional initial data to use
@@ -36,31 +38,25 @@ export const useBotAccounts = (
   userId: string, 
   initialData: Account[] = []
 ): UseBotAccountsReturn => {
-  // Use the fetch hook for loading and error states
+  // Use the new React Query hook for data fetching and CRUD operations
   const { 
     accounts, 
-    setAccounts, 
     loading, 
     error, 
-    fetchAccounts, 
-    refresh 
-  } = useAccountsFetch(initialData);
-  
-  // Use the CRUD hook for account operations, passing the accounts state and setter
-  const { 
-    addAccount, 
-    updateAccount, 
-    deleteAccount, 
-    toggleAccountStatus 
-  } = useAccountsCrud(accounts, setAccounts);
+    fetchAccounts,
+    handleRefresh,
+    addAccount,
+    updateAccount,
+    deleteAccount,
+    toggleAccountStatus,
+    isAddingAccount,
+    isUpdatingAccount,
+    isDeletingAccount,
+    isTogglingStatus
+  } = useAccountsQuery(botId, initialData);
   
   // Use the transform hook to get hierarchical data
   const hierarchicalData = useAccountsTransform(accounts);
-  
-  // Simple alias for the refresh function
-  const handleRefresh = useCallback(() => {
-    refresh();
-  }, [refresh]);
   
   return {
     // Data
@@ -77,6 +73,11 @@ export const useBotAccounts = (
     updateAccount,
     deleteAccount,
     toggleAccountStatus,
-    setAccounts
+    
+    // Mutation states
+    isAddingAccount,
+    isUpdatingAccount,
+    isDeletingAccount,
+    isTogglingStatus
   };
 };

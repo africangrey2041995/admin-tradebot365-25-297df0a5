@@ -1,16 +1,24 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { BotProfileTabsProps } from '@/types/admin-types';
+import { useQueryClient } from '@tanstack/react-query';
+import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 
 const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) => {
   const [accountsData, setAccountsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleRefresh = () => {
     setIsLoading(true);
+    
+    // Invalidate React Query cache for this bot's accounts
+    queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
+    
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Đã làm mới dữ liệu tài khoản");
@@ -42,9 +50,9 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
             disabled={isLoading}
           >
             {isLoading ? (
-              <span className="animate-spin mr-2">&#8635;</span>
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <span className="mr-2">&#8635;</span>
+              <RefreshCw className="h-4 w-4 mr-2" />
             )}
             Làm mới
           </Button>

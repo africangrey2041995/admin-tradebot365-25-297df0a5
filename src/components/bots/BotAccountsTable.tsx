@@ -46,12 +46,17 @@ const BotAccountsTable = ({
     addAccount,
     updateAccount,
     deleteAccount,
-    toggleAccountStatus
+    toggleAccountStatus,
+    isAddingAccount,
+    isUpdatingAccount,
+    isDeletingAccount,
+    isTogglingStatus
   } = useBotAccounts(botId, userId, initialData);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetchAccounts();
@@ -84,10 +89,23 @@ const BotAccountsTable = ({
 
   const handleAddSubmit = (formData: any) => {
     addAccount(formData);
+    setIsAddDialogOpen(false);
   };
 
   const handleEditSubmit = (formData: any) => {
     updateAccount(formData);
+    setIsEditDialogOpen(false);
+  };
+
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    handleRefresh();
+    
+    // Reset refreshing state after a timeout even if the query is still in progress
+    // This prevents UI from being stuck in loading state if there's an issue
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 2000);
   };
 
   // Prepare account data for export
@@ -106,7 +124,8 @@ const BotAccountsTable = ({
     'Tên tài khoản', 'Email', 'API', 'Loại tài khoản', 'Trạng thái', 'Số dư'
   ];
 
-  if (loading) {
+  // Show loading state when initial data is loading or explicitly refreshing
+  if (loading && !isRefreshing) {
     return <LoadingAccounts message="Đang tải tài khoản..." />;
   }
 
@@ -124,6 +143,7 @@ const BotAccountsTable = ({
           onOpenChange={setIsAddDialogOpen}
           onSubmit={handleAddSubmit}
           mode="add"
+          isSubmitting={isAddingAccount}
         />
       </>
     );
@@ -134,13 +154,31 @@ const BotAccountsTable = ({
       <div className="flex justify-between items-center mb-4">
         <div className="space-x-2">
           {showAddAccount && (
-            <Button variant="outline" size="sm" onClick={handleAddAccount}>
-              <Plus className="h-4 w-4 mr-2" />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAddAccount}
+              disabled={isAddingAccount}
+            >
+              {isAddingAccount ? (
+                <span className="animate-spin mr-2">⟳</span>
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
               Thêm tài khoản
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleManualRefresh}
+            disabled={isRefreshing || loading}
+          >
+            {isRefreshing || loading ? (
+              <span className="animate-spin mr-2">⟳</span>
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
             Làm mới
           </Button>
         </div>
@@ -157,6 +195,8 @@ const BotAccountsTable = ({
         onEdit={handleEditAccount}
         onDelete={handleDeleteAccount}
         onToggleStatus={handleToggleAccountStatus}
+        isTogglingStatus={isTogglingStatus}
+        isDeletingAccount={isDeletingAccount}
       />
 
       <AccountManagementDialog
@@ -164,6 +204,7 @@ const BotAccountsTable = ({
         onOpenChange={setIsAddDialogOpen}
         onSubmit={handleAddSubmit}
         mode="add"
+        isSubmitting={isAddingAccount}
       />
       
       <AccountManagementDialog
@@ -172,6 +213,7 @@ const BotAccountsTable = ({
         account={selectedAccount}
         onSubmit={handleEditSubmit}
         mode="edit"
+        isSubmitting={isUpdatingAccount}
       />
     </div>
   );

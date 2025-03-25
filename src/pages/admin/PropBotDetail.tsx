@@ -11,11 +11,14 @@ import PropBotNotFound from '@/components/admin/prop-bots/detail/PropBotNotFound
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from "sonner";
 import { BotStatus } from '@/constants/botTypes';
+import { useQueryClient } from '@tanstack/react-query';
+import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 
 const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
   const [activeTab, setActiveTab] = useState('overview');
   const { goBack } = useNavigation();
+  const queryClient = useQueryClient();
   
   // Custom hook for fetching and managing the prop bot data
   const { 
@@ -33,7 +36,17 @@ const PropBotDetail: React.FC = () => {
   // Custom hook for generating bot stats and challenge rules
   const { botStats, botInfo } = usePropBotStats(propBot);
 
-  // Fix for error 1: Wrapping goBack in a handler that accepts MouseEvent
+  // Enhanced refresh function that also invalidates React Query cache
+  const handleEnhancedRefresh = () => {
+    if (botId) {
+      // Invalidate the accounts query for this bot
+      queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
+    }
+    
+    // Call the original refresh function
+    handleRefresh();
+  };
+
   const handleBackClick = () => {
     goBack();
   };
@@ -88,7 +101,6 @@ const PropBotDetail: React.FC = () => {
         minCapital={propBot.minCapital}
         maxDrawdown={propBot.maxDrawdown}
         challengeDuration={propBot.challengeDuration}
-        // Fix error: Pass the length of arrays instead of the arrays themselves
         connectedAccounts={connectedAccounts.length}
         processedSignals={processedSignals.length}
         onUpdate={handleUpdateBot}
@@ -99,7 +111,7 @@ const PropBotDetail: React.FC = () => {
         onTabChange={setActiveTab}
         userId="admin" // For admin context
         botId={propBot.botId}
-        onRefresh={handleRefresh}
+        onRefresh={handleEnhancedRefresh}
         isLoading={isLoading}
         propBot={propBot}
         botStats={botStats}
