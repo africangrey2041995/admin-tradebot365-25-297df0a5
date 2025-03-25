@@ -29,7 +29,7 @@ export const useCombinedSignalLogs = ({
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 10000, // 10 seconds timeout
     debugComponent: 'CombinedSignalLogs',
-    minLoadingDurationMs: 300 // Ensure minimum loading duration to prevent flicker
+    minLoadingDurationMs: 500 // Ensure minimum loading duration to prevent flicker
   });
   
   // Track if fetch is in progress to prevent duplicate requests
@@ -119,13 +119,35 @@ export const useCombinedSignalLogs = ({
     fetchTvLogs();
     fetchCsLogs();
     
-    // Set up another effect to detect when both fetches have completed
+    // Use a more reliable approach to detect completion
+    let tvDone = false;
+    let csDone = false;
+    
+    // Set up a check interval with a counter to ensure we eventually stop waiting
+    let checkCount = 0;
+    const maxChecks = 40; // 40 checks * 300ms = 12 seconds max wait time
+    
     const checkInterval = setInterval(() => {
-      if (!tvLoading && !csLoading) {
+      checkCount++;
+      
+      // Check if individual fetches are done
+      if (!tvLoading) tvDone = true;
+      if (!csLoading) csDone = true;
+      
+      // Debug log
+      console.log(`CombinedSignalLogs - Check ${checkCount}: TV: ${tvDone ? 'done' : 'loading'}, CS: ${csDone ? 'done' : 'loading'}`);
+      
+      // If both are done or we've reached max checks
+      if ((tvDone && csDone) || checkCount >= maxChecks) {
         clearInterval(checkInterval);
         clearTimeout(safetyTimeout);
-        stopLoading();
-        fetchInProgressRef.current = false;
+        
+        // Small delay before setting loading to false to ensure UI stability
+        setTimeout(() => {
+          stopLoading();
+          fetchInProgressRef.current = false;
+          console.log('CombinedSignalLogs - All fetches complete, loading state cleared');
+        }, 300);
       }
     }, 300);
     

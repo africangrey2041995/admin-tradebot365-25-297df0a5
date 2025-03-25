@@ -1,9 +1,9 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
 import { useAdmin } from '@/hooks/use-admin';
+import { mockLogs } from '@/pages/admin/components/user-bot-detail/mock-data';
 
 interface UseCoinstratLogsProps {
   botId: string;
@@ -68,7 +68,6 @@ export const useCoinstratLogs = ({
     }
     
     console.log(`CoinstratLogs - Fetching logs for ${isAdmin ? 'admin' : `userId: ${userId}`} (normalized: ${normalizeUserId(userId)}), botId: ${botId}`);
-    console.log(`CoinstratLogs - Admin status: ${isAdmin ? 'Yes' : 'No'}`);
     
     // Only change loading state if we're not already loading and not skipping loading state
     if (!skipLoadingState) {
@@ -126,103 +125,17 @@ export const useCoinstratLogs = ({
         return;
       }
       
-      // Otherwise use mock data
+      // Otherwise use mock data - ensure this has consistent IDs with TradingView signals
       setTimeout(() => {
         try {
-          // Same mock data as before
-          const mockLogs: CoinstratSignal[] = [
-            {
-              id: 'CSP-78952364',
-              originalSignalId: 'SIG001',
-              action: 'ENTER_LONG',
-              instrument: 'BTCUSDT',
-              timestamp: new Date().toISOString(),
-              signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-              maxLag: '5s',
-              investmentType: 'crypto',
-              amount: '1.5',
-              status: 'Processed',
-              processedAccounts: [
-                {
-                  accountId: 'ACC-001',
-                  userId: 'USR-001', // Standardized format with dash
-                  name: 'Binance Spot Account',
-                  timestamp: new Date().toISOString(),
-                  status: 'success'
-                },
-                {
-                  accountId: 'ACC-002',
-                  userId: 'USR-001', // Standardized format with dash
-                  name: 'Coinstart Pro Account',
-                  timestamp: new Date().toISOString(),
-                  status: 'success'
-                }
-              ],
-              failedAccounts: []
-            },
-            {
-              id: 'CSP-78956789',
-              originalSignalId: 'SIG002',
-              action: 'EXIT_LONG',
-              instrument: 'ETHUSDT',
-              timestamp: new Date(Date.now() - 3600000).toISOString(),
-              signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-              maxLag: '5s',
-              investmentType: 'crypto',
-              amount: '2.3',
-              status: 'Processed',
-              processedAccounts: [
-                {
-                  accountId: 'ACC-001',
-                  userId: 'USR-001', // Standardized format with dash
-                  name: 'Binance Spot Account',
-                  timestamp: new Date(Date.now() - 3600000).toISOString(),
-                  status: 'success'
-                }
-              ],
-              failedAccounts: []
-            },
-            {
-              id: 'CSP-78959012',
-              originalSignalId: 'SIG003',
-              action: 'ENTER_SHORT',
-              instrument: 'SOLUSDT',
-              timestamp: new Date(Date.now() - 7200000).toISOString(),
-              signalToken: `CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`,
-              maxLag: '5s',
-              investmentType: 'crypto',
-              amount: '3.7',
-              status: 'Failed',
-              processedAccounts: [],
-              failedAccounts: [
-                {
-                  accountId: 'ACC-003',
-                  userId: 'USR-002', // Standardized format with dash
-                  name: 'FTX Account',
-                  timestamp: new Date(Date.now() - 7200000).toISOString(),
-                  reason: 'Invalid account configuration',
-                  errorCode: 'ACC_CONFIG_ERROR',
-                  status: 'failed'
-                },
-                {
-                  accountId: 'ACC-004',
-                  userId: 'USR-001', // Standardized format with dash
-                  name: 'Bybit Account',
-                  timestamp: new Date(Date.now() - 7200000).toISOString(),
-                  reason: 'API key expired',
-                  errorCode: 'API_KEY_EXPIRED',
-                  status: 'failed'
-                }
-              ],
-              errorMessage: 'Invalid account configuration'
-            },
-          ];
+          // Use mockLogs imported from mock-data.ts for consistency
+          const consistentMockLogs = mockLogs;
           
           try {
             // For admin users, don't filter by userId - show all logs
             const filteredLogs = isAdmin
-              ? mockLogs
-              : mockLogs.filter(log => {
+              ? consistentMockLogs
+              : consistentMockLogs.filter(log => {
                   // Check processed accounts with normalized comparison
                   const hasProcessedAccountsForUser = log.processedAccounts.some(account => {
                     if (!account.userId) {
@@ -252,7 +165,7 @@ export const useCoinstratLogs = ({
                   return hasProcessedAccountsForUser || hasFailedAccountsForUser;
                 });
             
-            console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${mockLogs.length} ${isAdmin ? '(admin: showing all)' : ''}`);
+            console.log(`CoinstratLogs - Filtered logs from mockData: ${filteredLogs.length} of ${consistentMockLogs.length} ${isAdmin ? '(admin: showing all)' : ''}`);
             setLogs(filteredLogs);
           } catch (filterErr) {
             console.error('Error filtering mock logs data:', filterErr);

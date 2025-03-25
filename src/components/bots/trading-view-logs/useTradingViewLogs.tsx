@@ -41,9 +41,10 @@ export const useTradingViewLogs = ({
     setTimeout(() => {
       try {
         // Mock data for development - ensure we conform to TradingViewSignal interface
+        // IMPORTANT: IDs need to match with originalSignalId from Coinstrat signals
         const mockLogs: TradingViewSignal[] = [
           {
-            id: 'TV-12345',
+            id: 'SIG001', // This matches originalSignalId in Coinstrat signals
             timestamp: new Date().toISOString(),
             source: 'TradingView Alert',
             action: 'ENTER_LONG',
@@ -55,7 +56,7 @@ export const useTradingViewLogs = ({
             investmentType: 'crypto'
           },
           {
-            id: 'TV-12346',
+            id: 'SIG002', // This matches originalSignalId in Coinstrat signals
             timestamp: new Date(Date.now() - 3600000).toISOString(),
             source: 'TradingView Alert',
             action: 'EXIT_LONG',
@@ -67,17 +68,17 @@ export const useTradingViewLogs = ({
             investmentType: 'crypto'
           },
           {
-            id: 'TV-12347',
+            id: 'SIG003', // This matches originalSignalId in Coinstrat signals
             timestamp: new Date(Date.now() - 7200000).toISOString(),
             source: 'TradingView Alert',
             status: 'Failed',
             errorMessage: 'Could not parse signal format',
-            action: 'ENTER_LONG', // Adding required fields for BaseSignal
-            instrument: 'UNKNOWN',
+            action: 'ENTER_LONG',
+            instrument: 'SOLUSDT',
             signalToken: 'token789',
             maxLag: '5s',
             investmentType: 'crypto',
-            amount: '0',
+            amount: '3700', // Add consistent amount value
           },
         ];
 

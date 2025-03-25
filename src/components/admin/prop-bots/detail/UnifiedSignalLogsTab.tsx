@@ -9,6 +9,8 @@ import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignal
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 import { Progress } from "@/components/ui/progress";
+import LoadingSignalLogs from '@/components/bots/signal-logs/LoadingSignalLogs';
+import { toast } from "sonner";
 
 interface UnifiedSignalLogsTabProps {
   botId: string;
@@ -33,6 +35,7 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
   const [filteredTvLogs, setFilteredTvLogs] = useState<TradingViewSignal[]>([]);
   const [filteredCsLogs, setFilteredCsLogs] = useState<CoinstratSignal[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
+  const [manualRefreshAttempted, setManualRefreshAttempted] = useState(false);
   
   // Add timeout reference for safety
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,6 +57,7 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
   // Handle manual refresh with safety timeout
   const handleRefresh = () => {
     console.log('UnifiedSignalLogsTab - Manual refresh triggered');
+    setManualRefreshAttempted(true);
     setRefreshTrigger(!refreshTrigger);
     
     // Set a safety timeout to prevent infinite loading state
@@ -61,10 +65,14 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       clearTimeout(loadingTimeoutRef.current);
     }
     
+    toast.info("Refreshing signal logs...");
+    
     loadingTimeoutRef.current = setTimeout(() => {
       console.warn('UnifiedSignalLogsTab - Safety timeout reached, forcing refresh completion');
       // Force refreshTrigger to change to ensure we don't get stuck
       setRefreshTrigger(prev => !prev);
+      setManualRefreshAttempted(false);
+      toast.error("Refresh timed out. Please try again.");
     }, 15000); // 15 second safety timeout
   };
   
@@ -76,6 +84,17 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       }
     };
   }, []);
+  
+  // Reset manual refresh flag when loading completes
+  useEffect(() => {
+    if (!loading && manualRefreshAttempted) {
+      setManualRefreshAttempted(false);
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
+    }
+  }, [loading, manualRefreshAttempted]);
 
   // Apply filters to both log types
   useEffect(() => {
@@ -258,6 +277,21 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     'Execution Summary'
   ];
 
+  // If loading and no data yet, show full loading state
+  if (loading && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <LoadingSignalLogs 
+            message="Fetching signal logs..." 
+            botType="prop" 
+            showProgress={true} 
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -282,7 +316,12 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
               <h3 className="text-lg font-medium">
                 Integrated Signal Tracking
               </h3>
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRefresh} 
+                disabled={loading}
+              >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 {loading ? 'Refreshing...' : 'Refresh'}
               </Button>

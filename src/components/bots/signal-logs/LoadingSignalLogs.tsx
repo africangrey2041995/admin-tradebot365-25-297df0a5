@@ -45,7 +45,7 @@ const LoadingSignalLogs: React.FC<LoadingSignalLogsProps> = ({
             <Progress 
               value={100} 
               className="h-1" 
-              indicatorClassName="animate-pulse bg-blue-500" 
+              indicatorClassName={`animate-pulse ${botType === 'prop' ? 'bg-blue-500' : botType === 'premium' ? 'bg-yellow-500' : 'bg-primary'}`} 
             />
           </div>
         )}
@@ -54,7 +54,8 @@ const LoadingSignalLogs: React.FC<LoadingSignalLogsProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            <TableHead className="w-10"></TableHead>
+            <TableHead>Source ID</TableHead>
             <TableHead>Symbol</TableHead>
             <TableHead>Time</TableHead>
             <TableHead>Action</TableHead>
@@ -66,12 +67,13 @@ const LoadingSignalLogs: React.FC<LoadingSignalLogsProps> = ({
         <TableBody>
           {Array.from({ length: 5 }).map((_, index) => (
             <TableRow key={`skeleton-row-${index}`}>
-              <TableCell><Skeleton className="h-4 w-14" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-4 rounded-full" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-24" /></TableCell>
               <TableCell><Skeleton className="h-4 w-20" /></TableCell>
               <TableCell><Skeleton className="h-4 w-32" /></TableCell>
               <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
               <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-24" /></TableCell>
               <TableCell className="text-right">
                 <Skeleton className="h-8 w-20 ml-auto" />
               </TableCell>
