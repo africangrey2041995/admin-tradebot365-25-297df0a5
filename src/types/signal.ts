@@ -119,6 +119,9 @@ export interface CoinstratSignal extends BaseSignal {
  * @property errorCode Mã lỗi (nếu có)
  * @property errorSeverity Mức độ nghiêm trọng của lỗi
  * @property coinstratLogId ID của bản ghi Coinstrat Pro
+ * @property originalSignalId ID của tín hiệu gốc
+ * @property processedAccounts Danh sách các tài khoản đã xử lý thành công
+ * @property failedAccounts Danh sách các tài khoản xử lý thất bại
  */
 export interface ExtendedSignal extends TradingViewSignal {
   userId?: string;
@@ -133,6 +136,10 @@ export interface ExtendedSignal extends TradingViewSignal {
   errorCode?: string;
   errorSeverity?: 'low' | 'medium' | 'high' | 'critical';
   coinstratLogId?: string; // ID của bản ghi Coinstrat Pro
+  // Thêm các trường từ CoinstratSignal để hỗ trợ chức năng Admin Prop Bot Logs
+  originalSignalId?: string;
+  processedAccounts?: AccountSignalStatus[];
+  failedAccounts?: AccountSignalStatus[];
 }
 
 /**
