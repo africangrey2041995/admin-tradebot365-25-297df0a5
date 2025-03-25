@@ -69,6 +69,31 @@ const PropBotDetail: React.FC = () => {
     toast.success("Thông tin bot đã được cập nhật");
   };
 
+  const handleUpdateStatus = (newStatus: BotStatus) => {
+    if (!propBot) return;
+    
+    // Update the local state with the new status
+    const updatedBot = { ...propBot, status: newStatus };
+    setPropBot(updatedBot);
+    
+    // In a real application, you would make an API call here
+    console.log("Bot status updated:", updatedBot);
+  };
+
+  const handleDeleteBot = () => {
+    // In a real application, you would make an API call to delete the bot
+    console.log("Deleting bot:", botId);
+    
+    // Navigate back to the list view
+    toast.success("Bot đã được xóa thành công");
+    goBack();
+  };
+
+  const handleEditBot = () => {
+    // In a real application, this might open a dedicated edit form
+    toast.info("Đang mở form chỉnh sửa bot");
+  };
+
   // Fix for error 1: Wrapping goBack in a handler that accepts MouseEvent
   const handleBackClick = () => {
     goBack();
@@ -144,6 +169,9 @@ const PropBotDetail: React.FC = () => {
         risk={propBot.risk || BotRiskLevel.MEDIUM}
         status={propBot.status || BotStatus.ACTIVE}
         onBack={handleBackClick}
+        onUpdateStatus={handleUpdateStatus}
+        onDelete={handleDeleteBot}
+        onEdit={handleEditBot}
       />
       
       <PropBotInfoCard
@@ -176,6 +204,7 @@ const PropBotDetail: React.FC = () => {
         botStats={botStats}
         botInfo={botInfo}
         challengeRules={challengeRules}
+        onUpdateBot={handleUpdateBot}
       />
     </div>
   );

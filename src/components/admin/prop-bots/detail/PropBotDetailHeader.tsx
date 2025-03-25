@@ -1,10 +1,20 @@
 
-import React from 'react';
-import { ArrowLeft, Edit, Power, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Edit, Power, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BotRiskLevel, BotStatus, BOT_RISK_DISPLAY, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface PropBotDetailHeaderProps {
   botName: string;
@@ -12,6 +22,9 @@ interface PropBotDetailHeaderProps {
   risk: BotRiskLevel;
   status: BotStatus;
   onBack: () => void;
+  onUpdateStatus?: (newStatus: BotStatus) => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
@@ -20,7 +33,13 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
   risk,
   status,
   onBack,
+  onUpdateStatus = () => {},
+  onDelete = () => {},
+  onEdit = () => {},
 }) => {
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const getRiskColor = (risk: BotRiskLevel) => {
     switch (risk) {
       case BotRiskLevel.LOW: return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
@@ -42,23 +61,30 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
   };
 
   const handleEdit = () => {
-    toast.info(`Chỉnh sửa Bot: ${botName}`);
+    onEdit();
   };
 
   const handleToggleStatus = () => {
+    setIsStatusDialogOpen(true);
+  };
+
+  const confirmStatusChange = () => {
     const newStatus = status === BotStatus.ACTIVE ? BotStatus.INACTIVE : BotStatus.ACTIVE;
+    onUpdateStatus(newStatus);
+    
     const actionText = status === BotStatus.ACTIVE ? 'vô hiệu hóa' : 'kích hoạt';
     toast.success(`Đã ${actionText} bot: ${botName}`);
+    
+    setIsStatusDialogOpen(false);
   };
 
   const handleDelete = () => {
-    toast.warning(`Xóa Bot: ${botName}`, {
-      description: "Tính năng này chưa được triển khai",
-      action: {
-        label: "Hủy",
-        onClick: () => toast.dismiss(),
-      },
-    });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete();
+    setIsDeleteDialogOpen(false);
   };
 
   return (
@@ -97,6 +123,52 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
           Xóa
         </Button>
       </div>
+
+      {/* Status change confirmation dialog */}
+      <AlertDialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {status === BotStatus.ACTIVE 
+                ? "Vô hiệu hóa Bot Trading?" 
+                : "Kích hoạt Bot Trading?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {status === BotStatus.ACTIVE 
+                ? "Bot sẽ ngừng giao dịch và không xử lý tín hiệu mới. Bạn có thể kích hoạt lại nó bất cứ lúc nào."
+                : "Bot sẽ bắt đầu xử lý tín hiệu giao dịch. Đảm bảo rằng cấu hình đã được thiết lập đúng."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusChange}>
+              {status === BotStatus.ACTIVE ? "Vô hiệu hóa" : "Kích hoạt"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center text-red-600">
+              <AlertTriangle className="h-5 w-5 mr-2" />
+              Xóa Bot Trading?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Thao tác này không thể hoàn tác. Bot sẽ bị xóa vĩnh viễn khỏi hệ thống và tất cả dữ liệu liên quan sẽ bị mất.
+              Tất cả người dùng đã đăng ký sẽ mất quyền truy cập vào bot này.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Xóa vĩnh viễn
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
