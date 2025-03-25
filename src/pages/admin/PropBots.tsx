@@ -7,17 +7,20 @@ import { PropBotActions } from "@/components/admin/prop-bots/PropBotActions";
 import { PropBotsTable } from "@/components/admin/prop-bots/PropBotsTable";
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { useToast } from "@/hooks/use-toast";
+import AddPropBotDialog from '@/components/admin/prop-bots/AddPropBotDialog';
 
 const PropBots: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [propBots, setPropBots] = useState(mockPropBots);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { toast } = useToast();
   const itemsPerPage = 10;
 
   // Filter and pagination logic
-  const filteredBots = mockPropBots.filter(bot => {
+  const filteredBots = propBots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           bot.botId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || bot.status === statusFilter;
@@ -43,10 +46,13 @@ const PropBots: React.FC = () => {
   };
 
   const handleAddNewBot = () => {
-    toast({
-      title: "Chức năng đang phát triển",
-      description: "Tính năng thêm mới Prop Bot sẽ sớm được phát hành",
-    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleAddSuccess = () => {
+    // In a real application, we would fetch the updated data from the API
+    // For now, we'll simulate refreshing the data
+    refreshData();
   };
 
   return (
@@ -64,7 +70,7 @@ const PropBots: React.FC = () => {
         </Button>
       </div>
 
-      <PropBotStatsCards bots={mockPropBots} />
+      <PropBotStatsCards bots={propBots} />
 
       <PropBotActions 
         searchTerm={searchTerm}
@@ -80,6 +86,12 @@ const PropBots: React.FC = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         totalPages={totalPages}
+      />
+
+      <AddPropBotDialog 
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSuccess={handleAddSuccess}
       />
     </div>
   );
