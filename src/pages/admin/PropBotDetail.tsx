@@ -9,7 +9,7 @@ import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from "sonner";
 import { mockPropBots } from '@/mocks/propBotsMock';
-import { BotRiskLevel } from '@/constants/botTypes';
+import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 
 const PropBotDetail: React.FC = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -24,10 +24,15 @@ const PropBotDetail: React.FC = () => {
     setIsLoading(true);
     
     setTimeout(() => {
+      console.log("Looking for botId:", botId);
+      console.log("Available bots:", mockPropBots.map(b => b.botId));
+      
       const foundBot = mockPropBots.find(bot => bot.botId === botId);
       if (foundBot) {
+        console.log("Found bot:", foundBot);
         setPropBot(foundBot);
       } else {
+        console.log("Bot not found");
         toast.error("Không tìm thấy bot với ID đã cung cấp");
       }
       setIsLoading(false);
@@ -121,8 +126,8 @@ const PropBotDetail: React.FC = () => {
       <PropBotDetailHeader 
         botName={propBot.name}
         botId={propBot.botId}
-        risk={propBot.risk || BotRiskLevel.MEDIUM} // Fix for error 2: Using enum value instead of string literal
-        status={propBot.status}
+        risk={propBot.risk || BotRiskLevel.MEDIUM}
+        status={propBot.status || BotStatus.ACTIVE}
         onBack={handleBackClick}
       />
       
