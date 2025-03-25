@@ -15,6 +15,7 @@ interface AccountManagementDialogProps {
   account?: Account | null;
   onSubmit: (data: any) => void;
   mode: 'add' | 'edit';
+  isSubmitting?: boolean; // Added this property
 }
 
 const AccountManagementDialog: React.FC<AccountManagementDialogProps> = ({
@@ -22,7 +23,8 @@ const AccountManagementDialog: React.FC<AccountManagementDialogProps> = ({
   onOpenChange,
   account,
   onSubmit,
-  mode
+  mode,
+  isSubmitting = false // Add default value
 }) => {
   const [formData, setFormData] = useState({
     cspAccountName: account?.cspAccountName || '',
@@ -212,10 +214,16 @@ const AccountManagementDialog: React.FC<AccountManagementDialogProps> = ({
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Hủy
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <span className="mr-2">
+                  <span className="animate-spin inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                </span>
+              ) : null}
               {mode === 'add' ? 'Thêm tài khoản' : 'Lưu thay đổi'}
             </Button>
           </DialogFooter>

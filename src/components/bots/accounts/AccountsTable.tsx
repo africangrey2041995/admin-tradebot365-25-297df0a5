@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -30,13 +31,17 @@ interface AccountsTableProps {
   onEdit?: (account: Account) => void;
   onDelete?: (account: Account) => void;
   onToggleStatus?: (account: Account) => void;
+  isTogglingStatus?: boolean; // Added this property
+  isDeletingAccount?: boolean; // Added this property
 }
 
 const AccountsTable: React.FC<AccountsTableProps> = ({ 
   accounts,
   onEdit = () => {},
   onDelete = () => {},
-  onToggleStatus = () => {}
+  onToggleStatus = () => {},
+  isTogglingStatus = false, // Add default value
+  isDeletingAccount = false // Add default value
 }) => {
   const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -113,27 +118,29 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
                         variant="ghost" 
                         size="sm" 
                         className="h-8 w-8 p-0"
+                        disabled={isTogglingStatus || isDeletingAccount}
                       >
                         <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Tùy chọn tài khoản</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onEdit(account)}>
+                      <DropdownMenuItem onClick={() => onEdit(account)} disabled={isTogglingStatus || isDeletingAccount}>
                         <Edit3 className="h-4 w-4 mr-2" />
                         Chỉnh sửa
                       </DropdownMenuItem>
                       
                       {account.status === 'Connected' ? (
-                        <DropdownMenuItem onClick={() => onToggleStatus(account)}>
+                        <DropdownMenuItem onClick={() => onToggleStatus(account)} disabled={isTogglingStatus}>
                           <Link2Off className="h-4 w-4 mr-2" />
-                          Ngắt kết nối
+                          {isTogglingStatus ? 'Đang xử lý...' : 'Ngắt kết nối'}
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={() => onToggleStatus(account)}>
+                        <DropdownMenuItem onClick={() => onToggleStatus(account)} disabled={isTogglingStatus}>
                           <Link2 className="h-4 w-4 mr-2" />
-                          Kết nối lại
+                          {isTogglingStatus ? 'Đang xử lý...' : 'Kết nối lại'}
                         </DropdownMenuItem>
                       )}
                       
@@ -141,9 +148,10 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
                       <DropdownMenuItem 
                         className="text-red-600 focus:text-red-600" 
                         onClick={() => handleDeleteClick(account)}
+                        disabled={isDeletingAccount}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Xóa tài khoản
+                        {isDeletingAccount ? 'Đang xóa...' : 'Xóa tài khoản'}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -163,9 +171,20 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Xác nhận xóa
+            <AlertDialogCancel disabled={isDeletingAccount}>Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isDeletingAccount}
+            >
+              {isDeletingAccount ? (
+                <>
+                  <span className="animate-spin inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xác nhận xóa'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
