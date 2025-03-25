@@ -42,7 +42,7 @@ import AdminManagement from "./pages/admin/AdminManagement";
 import AdminPremiumBots from "./pages/admin/PremiumBots";
 import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
 import AdminPropBots from "./pages/admin/PropBots";
-// Removing the import for PropBotDetail since it's no longer needed at this stage
+import AdminPropBotDetail from "./pages/admin/PropBotDetail"; // Import the new PropBotDetail component
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
 import AdminBotErrors from "./pages/admin/BotErrors";
@@ -117,7 +117,7 @@ const App = () => (
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
-                  {/* Removing the PropBotDetail route since the component doesn't exist yet */}
+                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} /> {/* Add new route for PropBotDetail */}
                   <Route path="user-bots" element={<AdminUserBots />} />
                   <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="packages" element={<AdminPackages />} />
