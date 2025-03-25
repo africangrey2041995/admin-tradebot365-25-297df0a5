@@ -15,6 +15,7 @@ interface AdminPropBotOverviewTabProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
+    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;
@@ -165,9 +166,13 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
                   <span className="text-neutral-600 dark:text-neutral-400">Hệ số lợi nhuận mục tiêu</span>
                   <span className="font-medium">{botStats.profitFactor}</span>
                 </div>
-                <div className="flex justify-between py-1">
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
                   <span className="text-neutral-600 dark:text-neutral-400">Tỷ lệ Sharpe mục tiêu</span>
                   <span className="font-medium">{botStats.sharpeRatio}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-neutral-600 dark:text-neutral-400">Drawdown tối đa cho phép</span>
+                  <span className="font-medium">{botStats.currentDrawdown}</span>
                 </div>
               </div>
             </CardContent>

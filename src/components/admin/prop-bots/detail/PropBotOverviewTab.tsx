@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import BotStatsCard from '@/components/bots/details/prop/BotStatsCard';
 import BotInfoCard from '@/components/bots/details/prop/BotInfoCard';
@@ -16,6 +17,7 @@ interface PropBotOverviewTabProps {
     winRate: string;
     profitFactor: number;
     sharpeRatio: number;
+    currentDrawdown: string;
   };
   botInfo: {
     createdDate: string;
