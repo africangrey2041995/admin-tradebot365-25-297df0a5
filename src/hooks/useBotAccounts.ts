@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { Account } from '@/types';
 import { toast } from 'sonner';
@@ -147,7 +148,59 @@ const mockAccounts: Account[] = [
   }
 ];
 
-export const useBotAccounts = (botId: string, userId: string, initialData: Account[] = []) => {
+// Define better types for our hierarchical structure
+interface TradingAccount {
+  tradingAccountId: string;
+  tradingAccountNumber: string;
+  tradingAccountType: string;
+  tradingAccountBalance: string;
+  isLive: boolean;
+  status: string;
+}
+
+interface CSPAccount {
+  cspAccountId: string;
+  cspAccountName: string;
+  apiName: string;
+  status: string;
+  email: string;
+  tradingAccounts: TradingAccount[];
+}
+
+interface UserAccount {
+  userId: string;
+  name: string;
+  email: string;
+  cspAccounts: CSPAccount[];
+}
+
+interface HierarchicalData {
+  users: UserAccount[];
+  totalUsers: number;
+  totalCSPAccounts: number;
+  totalTradingAccounts: number;
+}
+
+interface UseBotAccountsReturn {
+  accounts: Account[];
+  loading: boolean;
+  error: Error | null;
+  fetchAccounts: () => void;
+  handleRefresh: () => void;
+  addAccount: (account: Account) => void;
+  updateAccount: (updatedAccount: Account) => void;
+  deleteAccount: (accountId: string) => void;
+  toggleAccountStatus: (accountId: string) => void;
+  setAccounts: React.Dispatch<React.SetStateAction<Account[]>>;
+  hierarchicalAccounts: UserAccount[];
+  hierarchicalData: HierarchicalData;
+}
+
+export const useBotAccounts = (
+  botId: string, 
+  userId: string, 
+  initialData: Account[] = []
+): UseBotAccountsReturn => {
   const [accounts, setAccounts] = useState<Account[]>(initialData.length > 0 ? initialData : []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -176,9 +229,9 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
     }
   }, [fetchAccounts, initialData.length]);
 
-  // Group accounts by user, CSP account, and trading account
-  const getHierarchicalAccounts = () => {
-    const userMap = new Map();
+  // Group accounts by user, CSP account, and trading account with improved type safety
+  const getHierarchicalData = (): HierarchicalData => {
+    const userMap = new Map<string, UserAccount>();
     
     accounts.forEach(account => {
       const userId = account.cspUserId;
@@ -194,42 +247,59 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
           userId,
           name: account.userAccount || '',
           email: account.cspUserEmail || '',
-          cspAccounts: new Map()
+          cspAccounts: []
         });
       }
       
-      const user = userMap.get(userId);
+      const user = userMap.get(userId)!;
       
-      if (!user.cspAccounts.has(cspAccountId)) {
-        user.cspAccounts.set(cspAccountId, {
+      // Find the CSP account in this user's accounts
+      let cspAccount = user.cspAccounts.find(csp => csp.cspAccountId === cspAccountId);
+      
+      if (!cspAccount) {
+        cspAccount = {
           cspAccountId: account.cspAccountId,
-          cspAccountName: account.cspAccountName,
-          apiName: account.apiName,
-          status: account.status,
-          email: account.cspUserEmail,
+          cspAccountName: account.cspAccountName || '',
+          apiName: account.apiName || '',
+          status: account.status || '',
+          email: account.cspUserEmail || '',
           tradingAccounts: []
-        });
+        };
+        user.cspAccounts.push(cspAccount);
       }
       
-      const cspAccount = user.cspAccounts.get(cspAccountId);
+      // Add the trading account to this CSP account
       cspAccount.tradingAccounts.push({
-        tradingAccountId: account.tradingAccountId,
-        tradingAccountNumber: account.tradingAccountNumber,
-        tradingAccountType: account.tradingAccountType,
-        tradingAccountBalance: account.tradingAccountBalance,
-        isLive: account.isLive,
-        status: account.status
+        tradingAccountId: account.tradingAccountId || '',
+        tradingAccountNumber: account.tradingAccountNumber || '',
+        tradingAccountType: account.tradingAccountType || '',
+        tradingAccountBalance: account.tradingAccountBalance || '',
+        isLive: account.isLive || false,
+        status: account.status || ''
       });
     });
     
-    // Transform maps to arrays for easier consumption
-    const result = Array.from(userMap.values()).map(user => ({
-      ...user,
-      cspAccounts: Array.from(user.cspAccounts.values())
-    }));
+    // Transform map to array
+    const users = Array.from(userMap.values());
     
-    return result;
+    // Calculate totals
+    const totalUsers = users.length;
+    const totalCSPAccounts = users.reduce((sum, user) => sum + user.cspAccounts.length, 0);
+    const totalTradingAccounts = users.reduce(
+      (sum, user) => sum + user.cspAccounts.reduce(
+        (cspSum, csp) => cspSum + csp.tradingAccounts.length, 0
+      ), 0
+    );
+    
+    return {
+      users,
+      totalUsers,
+      totalCSPAccounts,
+      totalTradingAccounts
+    };
   };
+
+  const hierarchicalData = getHierarchicalData();
 
   return {
     accounts,
@@ -267,6 +337,7 @@ export const useBotAccounts = (botId: string, userId: string, initialData: Accou
       toast.success(`Tài khoản đã được ${actionText}`);
     },
     setAccounts,
-    hierarchicalAccounts: getHierarchicalAccounts()
+    hierarchicalAccounts: hierarchicalData.users,
+    hierarchicalData
   };
 };

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, BarChart2, Cog, List, Users } from 'lucide-react';
@@ -57,6 +57,8 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
 }) => {
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
+  const [accountsExportData, setAccountsExportData] = useState<(string | number)[][]>([]);
+  const [logsExportData, setLogsExportData] = useState<(string | number)[][]>([]);
 
   // Handler for logs filter changes
   const handleLogsFilterChange = (filters: any) => {
@@ -65,13 +67,58 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
     // The actual filtering will be done in the CoinstratLogs component
   };
 
-  // Prepare data for export - accounts
+  // Prepare export data for accounts
+  useEffect(() => {
+    if (connectedAccounts && connectedAccounts.length > 0) {
+      const exportData = connectedAccounts.map(account => [
+        account.cspAccountName || '',
+        account.cspUserEmail || '',
+        account.apiName || '',
+        account.tradingAccountType || '',
+        account.status || '',
+        account.tradingAccountBalance || ''
+      ]);
+      setAccountsExportData(exportData);
+    }
+  }, [connectedAccounts]);
+
+  // Prepare export data for logs
+  // Note: In a real implementation, this would be populated from actual log data
+  useEffect(() => {
+    // Mock data for logs export
+    const mockLogsExport = [
+      ['LOG-001', 'BTC/USDT', '2023-11-01 14:30:22', 'BUY', 'Completed', 'Entry at $35,400'],
+      ['LOG-002', 'ETH/USDT', '2023-11-02 09:15:45', 'SELL', 'Completed', 'Exit at $1,890'],
+      ['LOG-003', 'BNB/USDT', '2023-11-03 11:22:33', 'BUY', 'Failed', 'Insufficient balance'],
+    ];
+    setLogsExportData(mockLogsExport);
+  }, []);
+
+  // Define headers for export
   const accountsExportHeaders = ['Tên tài khoản', 'Email', 'API', 'Loại tài khoản', 'Trạng thái', 'Số dư'];
-  const accountsExportData = []; // This will be populated from BotAccountsTable
-  
-  // Prepare data for export - logs
   const logsExportHeaders = ['ID', 'Symbol', 'Thời gian', 'Hành động', 'Trạng thái', 'Ghi chú'];
-  const logsExportData = []; // This will be populated from CoinstratLogs
+
+  // Handler for account actions
+  const handleEditAccount = (account: Account) => {
+    console.log("Edit account:", account);
+    // In a real implementation, this would open an edit dialog
+    // For now, just show a toast
+    toast.info(`Editing account: ${account.cspAccountName}`);
+  };
+
+  const handleDeleteAccount = (accountId: string) => {
+    console.log("Delete account:", accountId);
+    // In a real implementation, this would show a confirmation dialog
+    // For now, just show a toast
+    toast.info(`Deleting account: ${accountId}`);
+  };
+
+  const handleToggleConnection = (accountId: string) => {
+    console.log("Toggle connection:", accountId);
+    // In a real implementation, this would make an API call
+    // For now, just show a toast
+    toast.info(`Toggling connection for account: ${accountId}`);
+  };
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
@@ -123,6 +170,9 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
               <HierarchicalAccountsTable 
                 accounts={connectedAccounts}
                 onRefresh={onRefresh}
+                onEdit={handleEditAccount}
+                onDelete={handleDeleteAccount}
+                onToggleConnection={handleToggleConnection}
               />
             ) : (
               <div className="text-center py-10 text-gray-500">

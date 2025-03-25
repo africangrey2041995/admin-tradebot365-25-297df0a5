@@ -13,7 +13,15 @@ import {
 } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { 
+  MoreHorizontal, 
+  Search, 
+  Pencil, 
+  Trash, 
+  Link, 
+  Link2Off,
+  RefreshCw
+} from 'lucide-react';
 import { 
   Table, 
   TableHeader, 
@@ -25,6 +33,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Account } from '@/types';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Type definitions for our hierarchical structure
 interface TradingAccount {
@@ -55,11 +71,17 @@ interface UserAccount {
 interface HierarchicalAccountsTableProps {
   accounts: Account[];
   onRefresh: () => void;
+  onEdit?: (account: Account) => void;
+  onDelete?: (accountId: string) => void;
+  onToggleConnection?: (accountId: string) => void;
 }
 
 const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({ 
   accounts,
-  onRefresh
+  onRefresh,
+  onEdit = () => toast.info("Edit functionality will be implemented"),
+  onDelete = (id) => toast.info(`Delete account ${id} functionality will be implemented`),
+  onToggleConnection = (id) => toast.info(`Toggle connection for ${id} functionality will be implemented`)
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -142,6 +164,26 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
       }
     }
     
+    // Filter by status if not 'all'
+    if (filterStatus !== 'all') {
+      const statusMatches = user.cspAccounts.some(csp => 
+        csp.status.toLowerCase() === filterStatus ||
+        csp.tradingAccounts.some(account => account.status.toLowerCase() === filterStatus)
+      );
+      
+      if (!statusMatches) return false;
+    }
+    
+    // Filter by live/demo if not 'all'
+    if (filterLiveDemo !== 'all') {
+      const isLive = filterLiveDemo === 'live';
+      const liveStatusMatches = user.cspAccounts.some(csp => 
+        csp.tradingAccounts.some(account => account.isLive === isLive)
+      );
+      
+      if (!liveStatusMatches) return false;
+    }
+    
     return true;
   });
 
@@ -164,6 +206,37 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
     } else {
       return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Disconnected</Badge>;
     }
+  };
+
+  // Find original account from flat list
+  const findOriginalAccount = (userId: string, cspAccountId: string, tradingAccountId?: string): Account | undefined => {
+    return accounts.find(acc => 
+      acc.cspUserId === userId && 
+      acc.cspAccountId === cspAccountId && 
+      (tradingAccountId ? acc.tradingAccountId === tradingAccountId : true)
+    );
+  };
+
+  // Prepare data for export
+  const prepareExportData = (): (string | number)[][] => {
+    const exportData: (string | number)[][] = [];
+    
+    hierarchicalData.forEach(user => {
+      user.cspAccounts.forEach(cspAccount => {
+        cspAccount.tradingAccounts.forEach(tradingAccount => {
+          exportData.push([
+            tradingAccount.tradingAccountNumber,
+            user.email,
+            cspAccount.apiName,
+            tradingAccount.tradingAccountType,
+            tradingAccount.status,
+            tradingAccount.tradingAccountBalance
+          ]);
+        });
+      });
+    });
+    
+    return exportData;
   };
 
   return (
@@ -218,7 +291,7 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
             size="sm" 
             onClick={onRefresh}
           >
-            Refresh
+            <RefreshCw className="h-4 w-4 mr-1" /> Refresh
           </Button>
         </div>
       </div>
@@ -237,6 +310,23 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                       {user.cspAccounts.length} CSP Accounts
                     </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>User Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => toast.info(`View all accounts for ${user.name}`)}>
+                          View All Accounts
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toast.info(`Contact ${user.name}`)}>
+                          Contact User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </AccordionTrigger>
@@ -252,9 +342,37 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                             <div className="text-sm text-gray-500 ml-2">({cspAccount.apiName})</div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {getStatusBadge(cspAccount.status)}
                             <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                               {cspAccount.tradingAccounts.length} Trading Accounts
                             </Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>CSP Account Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => {
+                                  const originalAccount = findOriginalAccount(user.userId, cspAccount.cspAccountId);
+                                  if (originalAccount) onEdit(originalAccount);
+                                }}>
+                                  <Pencil className="h-4 w-4 mr-2" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onDelete(cspAccount.cspAccountId)}>
+                                  <Trash className="h-4 w-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onToggleConnection(cspAccount.cspAccountId)}>
+                                  {cspAccount.status === 'Connected' ? (
+                                    <><Link2Off className="h-4 w-4 mr-2" /> Disconnect</>
+                                  ) : (
+                                    <><Link className="h-4 w-4 mr-2" /> Connect</>
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </CollapsibleTrigger>
                         
@@ -267,6 +385,7 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                                   <TableHead>Type</TableHead>
                                   <TableHead>Balance</TableHead>
                                   <TableHead>Status</TableHead>
+                                  <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -278,6 +397,39 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
                                     </TableCell>
                                     <TableCell>{tradingAccount.tradingAccountBalance}</TableCell>
                                     <TableCell>{getStatusBadge(tradingAccount.status)}</TableCell>
+                                    <TableCell className="text-right">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                          <DropdownMenuLabel>Trading Account Actions</DropdownMenuLabel>
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuItem onClick={() => {
+                                            const originalAccount = findOriginalAccount(
+                                              user.userId, 
+                                              cspAccount.cspAccountId, 
+                                              tradingAccount.tradingAccountId
+                                            );
+                                            if (originalAccount) onEdit(originalAccount);
+                                          }}>
+                                            <Pencil className="h-4 w-4 mr-2" /> Edit
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem onClick={() => onDelete(tradingAccount.tradingAccountId)}>
+                                            <Trash className="h-4 w-4 mr-2" /> Delete
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem onClick={() => onToggleConnection(tradingAccount.tradingAccountId)}>
+                                            {tradingAccount.status === 'Connected' ? (
+                                              <><Link2Off className="h-4 w-4 mr-2" /> Disconnect</>
+                                            ) : (
+                                              <><Link className="h-4 w-4 mr-2" /> Connect</>
+                                            )}
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </TableCell>
                                   </TableRow>
                                 ))}
                               </TableBody>
