@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -12,6 +13,7 @@ import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
+import PremiumBotStatsCards from '@/components/admin/premium-bots/detail/PremiumBotStatsCards';
 
 // Import the hierarchical accounts table component and its utilities
 import HierarchicalAccountsTable from '@/components/admin/prop-bots/detail/components/HierarchicalAccountsTable';
@@ -27,6 +29,7 @@ import EditableStatisticsCard from '@/components/admin/premium-bots/detail/Edita
 // Import components from user view to enhance admin view
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
+import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
 
 // Mock Premium Bot data
 const mockPremiumBots = [{
@@ -230,6 +233,14 @@ const PremiumBotDetail = () => {
   // Get bot data
   const bot = mockPremiumBots.find(b => b.id === botId);
 
+  // Get signal logs data for signal count
+  const { 
+    coinstratLogs 
+  } = useCombinedSignalLogs({
+    botId: botId || '',
+    userId: 'admin'
+  });
+
   // Set up accounts data for the selected bot using the same hook as prop bots
   const {
     accounts,
@@ -240,6 +251,18 @@ const PremiumBotDetail = () => {
     deleteAccount,
     toggleAccountStatus
   } = useBotAccounts(botId || '', 'admin', mockAccounts);
+
+  // Calculate statistics
+  const uniqueUsers = React.useMemo(() => {
+    const userIds = new Set(accounts.map(account => account.cspUserId));
+    return userIds.size;
+  }, [accounts]);
+
+  const tradingAccountsCount = accounts.length;
+  
+  const processedSignalsCount = React.useMemo(() => {
+    return coinstratLogs.length;
+  }, [coinstratLogs]);
 
   // Export data headers
   const accountsExportHeaders = ['Tên tài khoản', 'Email', 'API', 'Loại tài khoản', 'Trạng thái', 'Số dư'];
@@ -358,6 +381,13 @@ const PremiumBotDetail = () => {
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Stats Cards - Add at the top */}
+      <PremiumBotStatsCards 
+        registeredUsers={uniqueUsers}
+        tradingAccounts={tradingAccountsCount}
+        processedSignals={processedSignalsCount}
+      />
 
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
