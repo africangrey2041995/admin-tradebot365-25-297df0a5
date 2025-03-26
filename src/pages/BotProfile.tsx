@@ -4,6 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { RefreshCw, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BotCardProps } from '@/components/bots/BotCard';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import BotProfileHeader from '@/components/bots/BotProfileHeader';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';
@@ -12,7 +13,6 @@ import { toast } from 'sonner';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId } from '@/utils/normalizeUserId';
-import NewAccountDialog from '@/components/bots/accounts/NewAccountDialog';
 
 const BotProfile = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -20,7 +20,6 @@ const BotProfile = () => {
   const [bot, setBot] = useState<BotCardProps | null>(null);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
-  const [accounts, setAccounts] = useState<Account[]>([]);
   
   // Dữ liệu mẫu cho tài khoản
   const mockAccounts: Account[] = [
@@ -150,18 +149,8 @@ const BotProfile = () => {
     fetchBotDetails();
   }, [botId]);
 
-  const handleAddAccount = (accountData: Partial<Account>) => {
+  const handleAddAccount = (accountData: any) => {
     console.log('Adding account:', accountData, 'to bot:', botId);
-    
-    // Add the new account to the accounts list
-    const newAccount: Account = {
-      ...accountData as Account,
-      cspAccountId: accountData.cspAccountId || `ACC-${Date.now()}`,
-      createdDate: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-    };
-    
-    setAccounts(prev => [...prev, newAccount]);
     toast.success('Thêm tài khoản thành công!');
   };
 
@@ -212,8 +201,8 @@ const BotProfile = () => {
     <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
-          botId={bot?.botId || ''}
-          status={bot?.status || 'Unknown'} 
+          botId={bot.botId}
+          status={bot.status} 
           botDetails={bot}
           onUpdateBot={handleUpdateBot}
         />
@@ -232,23 +221,21 @@ const BotProfile = () => {
         </div>
         
         <UserBotDetailTabs 
-          botId={bot?.botId || ''}
+          botId={bot.botId}
           userId={userId}
           onRefresh={refreshData}
           isLoading={refreshLoading}
           signalSourceLabel="TradingView ID"
-          accountsData={accounts}
+          accountsData={mockAccounts}
           logsData={mockLogs}
           botType="user"
-          onAddAccount={() => setIsAddAccountDialogOpen(true)}
         />
       </div>
       
-      <NewAccountDialog 
+      <AddAccountDialog 
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot?.botId || ''}
-        botName={bot?.title}
+        botId={bot.botId}
         onAddAccount={handleAddAccount}
       />
     </MainLayout>

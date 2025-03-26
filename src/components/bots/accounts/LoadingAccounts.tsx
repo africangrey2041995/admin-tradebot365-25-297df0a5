@@ -1,18 +1,19 @@
 
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface LoadingAccountsProps {
   message?: string;
 }
 
 const LoadingAccounts: React.FC<LoadingAccountsProps> = ({ 
-  message = 'Loading accounts...' 
+  message = "Đang tải tài khoản..." 
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-      <p className="text-lg font-medium">{message}</p>
+    <div className="py-8 text-center">
+      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
+      <p className="text-muted-foreground">{message}</p>
+      <p className="text-xs text-muted-foreground mt-2">Vui lòng đợi trong giây lát...</p>
     </div>
   );
 };
