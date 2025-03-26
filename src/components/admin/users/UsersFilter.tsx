@@ -11,6 +11,16 @@ type UsersFilterProps = {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFilterClick: (status: string | null) => void;
   onPlanFilterChange: (value: string | null) => void;
+  searchPlaceholder?: string;
+  statusOptions?: {
+    value: string | null;
+    label: string;
+  }[];
+  planOptions?: {
+    value: string;
+    label: string;
+  }[];
+  planPlaceholder?: string;
 };
 
 export const UsersFilter = ({
@@ -19,7 +29,11 @@ export const UsersFilter = ({
   planFilter,
   onSearchChange,
   onFilterClick,
-  onPlanFilterChange
+  onPlanFilterChange,
+  searchPlaceholder = "Tìm kiếm người dùng...",
+  statusOptions,
+  planOptions,
+  planPlaceholder
 }: UsersFilterProps) => {
   return (
     <div className="flex flex-col gap-4 mb-6">
@@ -27,11 +41,13 @@ export const UsersFilter = ({
         <SearchInput 
           searchTerm={searchTerm}
           onSearchChange={onSearchChange}
+          placeholder={searchPlaceholder}
         />
         
         <StatusFilterButtons 
           filterStatus={filterStatus}
           onFilterClick={onFilterClick}
+          options={statusOptions}
         />
       </div>
       
@@ -39,6 +55,8 @@ export const UsersFilter = ({
         <PlanFilterSelect 
           planFilter={planFilter}
           onPlanFilterChange={onPlanFilterChange}
+          options={planOptions}
+          placeholder={planPlaceholder}
         />
       </div>
     </div>

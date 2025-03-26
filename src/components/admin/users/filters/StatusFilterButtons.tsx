@@ -1,43 +1,44 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
 
 interface StatusFilterButtonsProps {
   filterStatus: string | null;
   onFilterClick: (status: string | null) => void;
+  options?: {
+    value: string | null;
+    label: string;
+  }[];
 }
 
 export const StatusFilterButtons: React.FC<StatusFilterButtonsProps> = ({
   filterStatus,
-  onFilterClick
+  onFilterClick,
+  options = [
+    { value: null, label: 'Tất cả' },
+    { value: 'active', label: 'Hoạt động' },
+    { value: 'inactive', label: 'Không hoạt động' }
+  ]
 }) => {
   return (
-    <div className="flex gap-2">
-      <Button 
-        variant="outline" 
-        className={`border-zinc-700 ${filterStatus === 'active' ? 'bg-green-500/20 text-green-500' : 'text-zinc-400'}`}
-        onClick={() => onFilterClick('active')}
-      >
-        <Check className="h-4 w-4 mr-2" />
-        Hoạt động
-      </Button>
-      <Button 
-        variant="outline" 
-        className={`border-zinc-700 ${filterStatus === 'inactive' ? 'bg-yellow-500/20 text-yellow-500' : 'text-zinc-400'}`}
-        onClick={() => onFilterClick('inactive')}
-      >
-        <X className="h-4 w-4 mr-2" />
-        Không hoạt động
-      </Button>
-      <Button 
-        variant="outline" 
-        className={`border-zinc-700 ${filterStatus === 'suspended' ? 'bg-red-500/20 text-red-500' : 'text-zinc-400'}`}
-        onClick={() => onFilterClick('suspended')}
-      >
-        <X className="h-4 w-4 mr-2" />
-        Đã khóa
-      </Button>
+    <div className="flex items-center flex-wrap gap-2">
+      {options.map((option, index) => (
+        <Button
+          key={index}
+          variant={filterStatus === option.value ? "default" : "outline"}
+          size="sm"
+          className={`
+            h-8 px-3 
+            ${filterStatus === option.value ? 
+              'bg-primary text-white border-transparent' : 
+              'border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800'
+            }
+          `}
+          onClick={() => onFilterClick(option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
     </div>
   );
 };

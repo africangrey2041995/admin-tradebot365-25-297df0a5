@@ -35,9 +35,11 @@ import {
   ArrowLeft,
   Eye,
   Search,
-  Package
+  Package,
+  Database
 } from "lucide-react";
 import { UserPackageManagement } from '@/components/admin/users/UserPackageManagement';
+import UserAccountsTab from '@/components/admin/users/accounts/UserAccountsTab';
 
 const RoleBadge = ({ role }: { role: string }) => {
   return (
@@ -281,6 +283,10 @@ const AdminUserDetail = () => {
           <TabsTrigger value="bots" className="data-[state=active]:bg-zinc-700">
             <Bot className="h-4 w-4 mr-2" />
             Bot & Trading
+          </TabsTrigger>
+          <TabsTrigger value="accounts" className="data-[state=active]:bg-zinc-700">
+            <Database className="h-4 w-4 mr-2" />
+            Tài khoản
           </TabsTrigger>
           <TabsTrigger value="subscription" className="data-[state=active]:bg-zinc-700">
             <CreditCard className="h-4 w-4 mr-2" />
@@ -585,6 +591,10 @@ const AdminUserDetail = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="accounts" className="space-y-6">
+          <UserAccountsTab userId={userId || ''} />
+        </TabsContent>
+
         <TabsContent value="subscription" className="space-y-6">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
@@ -802,3 +812,4 @@ const AdminUserDetail = () => {
 };
 
 export default AdminUserDetail;
+
