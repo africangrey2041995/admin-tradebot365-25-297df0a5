@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import EmptyAccountsState from './EmptyAccountsState';
 import LoadingAccounts from './LoadingAccounts';
 import ErrorState from './ErrorState';
+import AccountsFilter from './AccountsFilter';
+
+interface AccountsFilterParams {
+  searchQuery: string;
+  filterStatus: string;
+  filterLiveDemo: string;
+}
 
 interface UserHierarchicalAccountsTableProps {
   accounts: Account[];
@@ -79,6 +86,64 @@ const getStatusBadge = (status: string) => {
   return <Badge variant="outline" className={colorClass}>{status}</Badge>;
 };
 
+// Helper function to filter accounts based on search and filters
+const filterAccounts = (
+  cspAccounts: CSPAccount[],
+  filters: AccountsFilterParams
+): CSPAccount[] => {
+  if (!filters.searchQuery && filters.filterStatus === 'all' && filters.filterLiveDemo === 'all') {
+    return cspAccounts;
+  }
+
+  return cspAccounts.filter(cspAccount => {
+    // Apply search filter
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      
+      // Check if CSP account matches
+      const cspMatches = 
+        cspAccount.cspAccountName.toLowerCase().includes(query) ||
+        cspAccount.apiName.toLowerCase().includes(query) ||
+        cspAccount.email.toLowerCase().includes(query);
+      
+      // Check if any trading account matches
+      const tradingMatches = cspAccount.tradingAccounts.some(
+        ta => ta.tradingAccountNumber.toLowerCase().includes(query) ||
+             ta.tradingAccountType.toLowerCase().includes(query)
+      );
+      
+      if (!cspMatches && !tradingMatches) {
+        return false;
+      }
+    }
+    
+    // Apply status filter
+    if (filters.filterStatus !== 'all') {
+      const statusMatches = 
+        cspAccount.status.toLowerCase() === filters.filterStatus.toLowerCase() ||
+        cspAccount.tradingAccounts.some(ta => 
+          ta.status.toLowerCase() === filters.filterStatus.toLowerCase()
+        );
+      
+      if (!statusMatches) {
+        return false;
+      }
+    }
+    
+    // Apply live/demo filter
+    if (filters.filterLiveDemo !== 'all') {
+      const isLive = filters.filterLiveDemo === 'live';
+      const liveMatches = cspAccount.tradingAccounts.some(ta => ta.isLive === isLive);
+      
+      if (!liveMatches) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+};
+
 const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps> = ({
   accounts,
   isLoading,
@@ -92,6 +157,13 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
 }) => {
   // Store expanded CSP accounts
   const [expandedCSPs, setExpandedCSPs] = useState<string[]>([]);
+  
+  // State for filters
+  const [filters, setFilters] = useState<AccountsFilterParams>({
+    searchQuery: '',
+    filterStatus: 'all',
+    filterLiveDemo: 'all'
+  });
   
   // Toggle expansion of a CSP account
   const toggleCSPExpansion = (cspId: string) => {
@@ -134,6 +206,25 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
     );
   };
   
+  // Handle filter changes
+  const handleFilterChange = (newFilters: AccountsFilterParams) => {
+    setFilters(newFilters);
+  };
+  
+  // Organize accounts hierarchically
+  const organizedAccounts = useMemo(() => organizeAccounts(accounts), [accounts]);
+  
+  // Apply filters
+  const filteredAccounts = useMemo(() => 
+    filterAccounts(organizedAccounts, filters), 
+    [organizedAccounts, filters]
+  );
+  
+  // Calculate total trading accounts
+  const totalTradingAccounts = useMemo(() => {
+    return accounts.length;
+  }, [accounts]);
+  
   // Show loading state
   if (isLoading) {
     return <LoadingAccounts message="Đang tải tài khoản..." />;
@@ -154,9 +245,6 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
       />
     );
   }
-  
-  // Organize accounts hierarchically
-  const cspAccounts = organizeAccounts(accounts);
   
   return (
     <div className="space-y-4">
@@ -181,8 +269,14 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
         </div>
       </div>
       
+      {/* Add filter component */}
+      <AccountsFilter 
+        onFilterChange={handleFilterChange}
+        totalAccounts={totalTradingAccounts}
+      />
+      
       <Accordion type="multiple" className="w-full space-y-2">
-        {cspAccounts.map((cspAccount) => (
+        {filteredAccounts.map((cspAccount) => (
           <AccordionItem 
             value={cspAccount.cspAccountId}
             key={cspAccount.cspAccountId}
