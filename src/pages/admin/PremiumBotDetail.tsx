@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -27,6 +28,10 @@ import EditableStatisticsCard from '@/components/admin/premium-bots/detail/Edita
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
+
+// Import components for Signal Tracking tab
+import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
+import AdvancedSignalFilter from '@/components/bots/trading-view-logs/AdvancedSignalFilter';
 
 // Mock Premium Bot data
 const mockPremiumBots = [{
@@ -230,9 +235,13 @@ const PremiumBotDetail = () => {
   // Get bot data
   const bot = mockPremiumBots.find(b => b.id === botId);
 
-  // Get signal logs data for signal count
+  // Get signal logs data for signal count and Signal Tracking tab
   const { 
-    coinstratLogs 
+    coinstratLogs,
+    tradingViewLogs,
+    refreshLogs,
+    loading: logsLoading,
+    availableUsers 
   } = useCombinedSignalLogs({
     botId: botId || '',
     userId: 'admin'
@@ -332,6 +341,12 @@ const PremiumBotDetail = () => {
     console.log("Updated bot information:", info);
   };
 
+  // Handle refresh for Signal Tracking tab
+  const handleRefreshSignals = () => {
+    refreshLogs();
+    toast.success("Đã làm mới dữ liệu tín hiệu");
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -388,9 +403,10 @@ const PremiumBotDetail = () => {
 
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
+          <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab - Enhanced with charts and visualizations */}
@@ -466,6 +482,53 @@ const PremiumBotDetail = () => {
               </CardDescription>
               
               <HierarchicalAccountsTable accounts={accounts} onRefresh={refreshAccounts} onEdit={handleEditAccount} onDelete={handleDeleteAccount} onToggleConnection={handleToggleConnection} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Signal Tracking Tab - NEW */}
+        <TabsContent value="signal-tracking">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <CardTitle className="mb-2">Signal Tracking</CardTitle>
+                  <CardDescription>
+                    Theo dõi hành trình tín hiệu từ TradingView đến các tài khoản giao dịch trên Coinstrat Pro
+                  </CardDescription>
+                </div>
+                <Button 
+                  onClick={handleRefreshSignals} 
+                  disabled={logsLoading}
+                  className="min-w-[120px]"
+                >
+                  {logsLoading ? "Đang làm mới..." : "Làm mới"}
+                </Button>
+              </div>
+              
+              {/* Advanced filtering for signals */}
+              <div className="mb-6">
+                <AdvancedSignalFilter 
+                  onFilterChange={() => {/* Handle filter changes */}} 
+                  availableUsers={availableUsers}
+                  showExport={true}
+                  exportComponent={
+                    <ExportDataDropdown 
+                      data={[]} 
+                      headers={['ID', 'Signal', 'Action', 'Timestamp', 'Status']} 
+                      fileName={`premium-bot-${botId}-signals`} 
+                    />
+                  }
+                />
+              </div>
+              
+              {/* Unified hierarchical signal view */}
+              <UnifiedSignalView 
+                tradingViewLogs={tradingViewLogs} 
+                coinstratLogs={coinstratLogs} 
+                onRefresh={refreshLogs} 
+                isLoading={logsLoading} 
+              />
             </CardContent>
           </Card>
         </TabsContent>
