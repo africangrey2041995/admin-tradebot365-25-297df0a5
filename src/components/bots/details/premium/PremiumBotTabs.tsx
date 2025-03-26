@@ -40,11 +40,9 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
           Tổng quan
         </TabsTrigger>
         <TabsTrigger value="connected-accounts" className={getTabTriggerClassName('premium')}>
-          {getTabIcon('accounts', 'premium')}
           Tài khoản kết nối
         </TabsTrigger>
         <TabsTrigger value="coinstrat-logs" className={getTabTriggerClassName('premium')}>
-          {getTabIcon('logs', 'premium')}
           Premium Logs
         </TabsTrigger>
       </TabsList>

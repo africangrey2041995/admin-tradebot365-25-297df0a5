@@ -31,8 +31,7 @@ const IntegratedPremiumBotDetail = () => {
     chartData,
     tradePerformanceData,
     statisticsData,
-    refreshTabData,
-    accountsData
+    refreshTabData
   } = usePremiumBotDetail(botId, CURRENT_USER_ID);
 
   const goBack = () => {
@@ -99,7 +98,6 @@ const IntegratedPremiumBotDetail = () => {
               bot={simplifiedBot}
             />
           }
-          accountsData={accountsData}
           signalSourceLabel="TB365 ID"
         />
       </div>
