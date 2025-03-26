@@ -59,7 +59,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
   if (tradingViewLogs.length === 0 && coinstratLogs.length === 0 && !isLoading) {
     return (
       <div className="bg-muted/50 p-6 rounded-lg text-center">
-        <AlertTriangle className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+        <AlertTriangle className="h-10 w-10 text-muted-foreground mx-auto mb-3" aria-label="No signal logs found" />
         <h3 className="text-lg font-medium mb-1">No signal logs found</h3>
         <p className="text-sm text-muted-foreground mb-4">There are no signal logs available for this bot.</p>
         <Button variant="outline" size="sm" onClick={onRefresh}>
@@ -155,12 +155,22 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                             </div>
                             
                             {/* Show account details if there are any */}
-                            {(csLog.processedAccounts.length > 0 || csLog.failedAccounts.length > 0) && (
+                            {csLog.processedAccounts.length > 0 && (
                               <AccountSection
-                                accounts={csLog.processedAccounts}
                                 title="Processed Accounts"
                                 type="success"
+                                processedAccounts={csLog.processedAccounts}
                                 userId={signal.userId || 'USR-001'}
+                              />
+                            )}
+                            
+                            {csLog.failedAccounts.length > 0 && (
+                              <AccountSection
+                                title="Failed Accounts"
+                                type="failed"
+                                failedAccounts={csLog.failedAccounts}
+                                userId={signal.userId || 'USR-001'}
+                                titleClassName="text-red-600 dark:text-red-400"
                               />
                             )}
                             

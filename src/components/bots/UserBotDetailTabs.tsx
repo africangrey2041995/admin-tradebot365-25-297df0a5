@@ -10,7 +10,7 @@ import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
 import AccountsTabContent from './details/tabs/AccountsTabContent';
-import SignalTrackingTab from '@/pages/admin/components/user-bot-detail/SignalTrackingTab';
+import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -21,7 +21,7 @@ interface UserBotDetailTabsProps {
   isLoading?: boolean;
   signalSourceLabel?: string;
   botType?: 'premium' | 'prop' | 'user';
-  isAdminView?: boolean; // New prop to determine if this is admin view
+  isAdminView?: boolean;
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
@@ -33,7 +33,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   isLoading = false,
   signalSourceLabel = "TradingView ID",
   botType = 'user',
-  isAdminView = false // Default to false
+  isAdminView = false
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -109,7 +109,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
       <Tabs defaultValue="accounts" value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="mb-6">
           <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
-          {isAdminView && <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>}
+          <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
         </TabsList>
         
         <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
@@ -134,15 +134,13 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
           )}
         </TabsContent>
         
-        {isAdminView && (
-          <TabsContent value="signal-tracking" className="animate-in fade-in-50 duration-200">
-            <SignalTrackingTab 
-              botId={botId} 
-              userId={userId} 
-              isAdminView={true}
-            />
-          </TabsContent>
-        )}
+        <TabsContent value="signal-tracking" className="animate-in fade-in-50 duration-200">
+          <SignalTrackingTab 
+            botId={botId} 
+            userId={userId} 
+            isAdminView={isAdminView}
+          />
+        </TabsContent>
       </Tabs>
     </TabContentWrapper>
   );

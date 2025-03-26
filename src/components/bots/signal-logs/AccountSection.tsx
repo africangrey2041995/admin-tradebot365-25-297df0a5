@@ -5,7 +5,9 @@ import AccountListItem from './AccountListItem';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
 
 interface AccountSectionProps {
-  accounts: AccountSignalStatus[];
+  accounts?: AccountSignalStatus[];
+  processedAccounts?: AccountSignalStatus[];
+  failedAccounts?: AccountSignalStatus[];
   title: string;
   type: 'success' | 'failed';
   titleClassName?: string;
@@ -16,20 +18,29 @@ interface AccountSectionProps {
  * Hiển thị danh sách các tài khoản đã xử lý hoặc bị lỗi cho một tín hiệu cụ thể
  * Lọc theo userId để đảm bảo người dùng chỉ thấy tài khoản của họ
  * 
- * @param accounts Danh sách tài khoản cần hiển thị
+ * @param accounts Danh sách tài khoản cần hiển thị (cách cũ)
+ * @param processedAccounts Danh sách tài khoản đã xử lý thành công (cách mới)
+ * @param failedAccounts Danh sách tài khoản xử lý thất bại (cách mới)
  * @param title Tiêu đề của phần
  * @param type Loại của danh sách (thành công / thất bại)
  * @param titleClassName Class CSS bổ sung cho tiêu đề
  * @param userId ID của người dùng hiện tại, cần tuân theo định dạng USR-XXX
  */
 const AccountSection: React.FC<AccountSectionProps> = ({ 
-  accounts, 
+  accounts,
+  processedAccounts,
+  failedAccounts,
   title, 
   type, 
   titleClassName = '',
   userId
 }) => {
-  if (!accounts) {
+  // Determine which accounts to use
+  const accountsToDisplay = accounts || 
+    (type === 'success' ? processedAccounts : failedAccounts) || 
+    [];
+  
+  if (!accountsToDisplay) {
     console.warn('AccountSection - accounts array is undefined');
     return null;
   }
@@ -44,7 +55,7 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   const normalizedInputUserId = normalizeUserId(userId);
   
   // Lọc tài khoản theo userId đã chuẩn hóa
-  const userAccounts = accounts.filter(account => {
+  const userAccounts = accountsToDisplay.filter(account => {
     if (!account.userId) {
       console.warn(`AccountSection - Account ${account.accountId} is missing userId`);
       return false;
@@ -57,7 +68,7 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   });
   
   console.log(`AccountSection - Filtering accounts for userId: ${userId} (normalized: ${normalizedInputUserId})`);
-  console.log(`AccountSection - Found ${userAccounts.length} matching accounts out of ${accounts.length} total`);
+  console.log(`AccountSection - Found ${userAccounts.length} matching accounts out of ${accountsToDisplay.length} total`);
   
   return (
     <div className="border-t pt-4">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -229,6 +228,7 @@ const BotProfile = () => {
           signalSourceLabel="TradingView ID"
           accountsData={mockAccounts}
           logsData={mockLogs}
+          botType="user"
         />
       </div>
       
