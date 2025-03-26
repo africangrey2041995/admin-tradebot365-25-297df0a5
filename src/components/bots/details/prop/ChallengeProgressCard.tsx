@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Users, Target, AlertTriangle, Clock } from 'lucide-react';
 
-export interface ChallengeProgressCardProps {
+interface ChallengeProgressCardProps {
   challengeData: {
     phase: string;
     progress: number;
@@ -17,29 +17,6 @@ export interface ChallengeProgressCardProps {
 }
 
 const ChallengeProgressCard: React.FC<ChallengeProgressCardProps> = ({ challengeData }) => {
-  if (!challengeData) {
-    return (
-      <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/30">
-        <CardHeader className="pb-2">
-          <div className="flex items-center gap-2">
-            <BarChart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <CardTitle className="text-xl font-bold text-blue-800 dark:text-blue-400">
-              Tiến Độ Challenge
-            </CardTitle>
-          </div>
-          <CardDescription className="text-blue-700 dark:text-blue-300">
-            Đang tải dữ liệu...
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-40 flex items-center justify-center">
-            <p className="text-blue-700 dark:text-blue-300">Đang tải thông tin về tiến độ challenge</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/30">
       <CardHeader className="pb-2">

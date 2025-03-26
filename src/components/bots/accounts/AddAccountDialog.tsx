@@ -19,7 +19,7 @@ interface AddAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   botId: string;
-  botName?: string;
+  botName?: string; // Added botName as optional prop
   onAddAccount: (accountData: any) => void;
 }
 
@@ -27,20 +27,19 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   open,
   onOpenChange,
   botId,
-  botName = "Bot",
+  botName, // Added botName in destructuring
   onAddAccount
 }) => {
   const [formData, setFormData] = useState({
     cspAccountName: '',
-    apiName: 'CT Pro',
+    apiName: '',
     tradingAccountNumber: '',
-    isLive: 'demo',
-    tradingAccountType: 'HEDGED'
+    volumeMultiplier: '1.0'
   });
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -51,143 +50,116 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
     
     // Validate form
-    if (!formData.cspAccountName) {
-      toast.error("Tên tài khoản không được để trống");
-      setIsLoading(false);
+    if (!formData.cspAccountName || !formData.apiName || !formData.tradingAccountNumber) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      setIsSubmitting(false);
       return;
     }
     
-    if (!formData.tradingAccountNumber) {
-      toast.error("Số tài khoản giao dịch không được để trống");
-      setIsLoading(false);
-      return;
-    }
+    // Generate unique IDs for the new account
+    const newAccount = {
+      ...formData,
+      cspAccountId: `csp-${Date.now()}`,
+      tradingAccountId: `trading-${Date.now()}`,
+      status: 'Connected',
+      createdDate: new Date().toISOString().split('T')[0],
+      lastUpdated: new Date().toISOString().split('T')[0],
+      isLive: true,
+      tradingAccountBalance: '$0.00',
+      tradingAccountType: 'HEDGED'
+    };
     
-    // Simulating API call
-    setTimeout(() => {
-      const accountData = {
-        ...formData,
-        botId,
-        isLive: formData.isLive === 'live',
-        cspAccountId: `CSP-${Math.floor(Math.random() * 10000)}`,
-        tradingAccountId: `TA-${Math.floor(Math.random() * 10000)}`,
-        status: 'Connected',
-        createdDate: new Date().toISOString(),
-        lastUpdated: new Date().toISOString(),
-        tradingAccountBalance: '$10,000',
-        cspUserId: 'USR-001'
-      };
-      
-      onAddAccount(accountData);
-      setIsLoading(false);
-      onOpenChange(false);
-      
-      // Reset form
-      setFormData({
-        cspAccountName: '',
-        apiName: 'CT Pro',
-        tradingAccountNumber: '',
-        isLive: 'demo',
-        tradingAccountType: 'HEDGED'
-      });
-    }, 1000);
+    // Call the onAddAccount callback
+    onAddAccount(newAccount);
+    
+    // Reset form and close dialog
+    setFormData({
+      cspAccountName: '',
+      apiName: '',
+      tradingAccountNumber: '',
+      volumeMultiplier: '1.0'
+    });
+    setIsSubmitting(false);
   };
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Thêm tài khoản cho {botName}</DialogTitle>
+          <DialogTitle>Thêm Tài Khoản Mới{botName ? ` vào ${botName}` : ''}</DialogTitle>
           <DialogDescription>
-            Thêm tài khoản Coinstrat Pro để kết nối với bot trading
+            Thêm tài khoản mới để kết nối với Bot
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-1 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="cspAccountName">Tên tài khoản CSP</Label>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="cspAccountName" className="text-right">
+                Tài khoản CSP
+              </Label>
               <Input
                 id="cspAccountName"
                 name="cspAccountName"
-                placeholder="Nhập tên tài khoản CSP"
                 value={formData.cspAccountName}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                className="col-span-3"
+                placeholder="Tên tài khoản CSP"
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="apiName">API Provider</Label>
-              <Select 
-                defaultValue={formData.apiName} 
-                onValueChange={(value) => handleSelectChange('apiName', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn API Provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CT Pro">CT Pro</SelectItem>
-                  <SelectItem value="MetaTrader">MetaTrader</SelectItem>
-                  <SelectItem value="Binance">Binance</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="apiName" className="text-right">
+                API Key
+              </Label>
+              <Input
+                id="apiName"
+                name="apiName"
+                value={formData.apiName}
+                onChange={handleChange}
+                className="col-span-3"
+                placeholder="Tên API (Binance, Bybit...)"
+              />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="tradingAccountNumber">Số tài khoản giao dịch</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="tradingAccountNumber" className="text-right">
+                Tài khoản giao dịch
+              </Label>
               <Input
                 id="tradingAccountNumber"
                 name="tradingAccountNumber"
-                placeholder="Nhập số tài khoản giao dịch"
                 value={formData.tradingAccountNumber}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                className="col-span-3"
+                placeholder="Số tài khoản giao dịch"
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="isLive">Loại tài khoản</Label>
-                <Select 
-                  defaultValue={formData.isLive} 
-                  onValueChange={(value) => handleSelectChange('isLive', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn loại tài khoản" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="live">Live</SelectItem>
-                    <SelectItem value="demo">Demo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="tradingAccountType">Kiểu tài khoản</Label>
-                <Select 
-                  defaultValue={formData.tradingAccountType} 
-                  onValueChange={(value) => handleSelectChange('tradingAccountType', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn kiểu tài khoản" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="HEDGED">HEDGED</SelectItem>
-                    <SelectItem value="NETTED">NETTED</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="volumeMultiplier" className="text-right">
+                Khối lượng giao dịch
+              </Label>
+              <Input
+                id="volumeMultiplier"
+                name="volumeMultiplier"
+                type="number"
+                step="0.1"
+                min="0.1"
+                value={formData.volumeMultiplier}
+                onChange={handleChange}
+                className="col-span-3"
+                placeholder="Hệ số nhân khối lượng (mặc định: 1.0)"
+              />
             </div>
           </div>
           
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Đang thêm...' : 'Thêm tài khoản'}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Đang xử lý...' : 'Thêm tài khoản'}
             </Button>
           </DialogFooter>
         </form>

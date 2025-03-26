@@ -1,17 +1,12 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import { CoinstratSignal } from '@/types/signal';
 import { Account } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
-import UserHierarchicalAccountsTable from '@/components/bots/accounts/UserHierarchicalAccountsTable';
-import { useBotAccounts } from '@/hooks/useBotAccounts';
-import { filterAccountsByUserId } from '@/utils/accountSecurityUtils';
-import LoadingAccounts from '@/components/bots/accounts/LoadingAccounts';
-
 interface PropTradingBotTabsProps {
   activeTab: string;
   setActiveTab: (value: string) => void;
@@ -23,7 +18,6 @@ interface PropTradingBotTabsProps {
   overviewContent: React.ReactNode;
   refreshTabData: () => void;
 }
-
 const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
   activeTab,
   setActiveTab,
@@ -37,20 +31,8 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  // Use the hook to get account data and management functions
-  const {
-    accounts: filteredAccounts,
-    loading,
-    error,
-    handleRefresh,
-    addAccount,
-    updateAccount,
-    deleteAccount,
-    toggleAccountStatus
-  } = useBotAccounts(botId, userId, accounts || [], 'prop');
-
   // Function to handle data refresh with React Query
-  const handleRefreshData = () => {
+  const handleRefresh = () => {
     // Invalidate React Query cache for this bot's accounts
     queryClient.invalidateQueries({
       queryKey: accountsQueryKeys.byBot(botId)
@@ -58,30 +40,8 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
 
     // Also call the provided refresh function
     refreshTabData();
-    
-    // Call the hook's refresh function
-    handleRefresh();
   };
-
-  // Fix the type mismatch by creating wrapper functions with correct signatures
-  const handleAddAccount = (account: Account) => {
-    addAccount(account);
-  };
-
-  const handleUpdateAccount = (account: Account) => {
-    updateAccount(account);
-  };
-
-  const handleDeleteAccount = (accountId: string) => {
-    deleteAccount(accountId);
-  };
-
-  const handleToggleAccountStatus = (accountId: string) => {
-    toggleAccountStatus(accountId);
-  };
-
-  return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+  return <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800 p-0 h-auto rounded-none">
         <TabsTrigger value="overview" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
           Tổng Quan
@@ -105,21 +65,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
-            {loading || refreshLoading ? (
-              <LoadingAccounts message="Đang tải tài khoản kết nối..." />
-            ) : (
-              <UserHierarchicalAccountsTable
-                accounts={filteredAccounts}
-                isLoading={loading || refreshLoading}
-                error={error}
-                onRefresh={handleRefreshData}
-                onAddAccount={handleAddAccount}
-                onEditAccount={handleUpdateAccount}
-                onDeleteAccount={handleDeleteAccount}
-                onToggleStatus={handleToggleAccountStatus}
-                botType="prop"
-              />
-            )}
+            <BotAccountsTable botId={botId} userId={userId} initialData={accounts} refreshTrigger={refreshLoading} botType="prop" />
           </CardContent>
         </Card>
       </TabsContent>
@@ -133,12 +79,11 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
-            <CoinstratLogs botId={botId} userId={userId} initialData={logs} signalSourceLabel="TB365 ID" refreshTrigger={refreshLoading} botType="prop" isLoading={refreshLoading} />
+            <CoinstratLogs botId={botId} userId={userId} initialData={logs} signalSourceLabel="TB365 ID" refreshTrigger={refreshLoading} botType="prop" isLoading={refreshLoading} // Pass the loading state from parent
+          />
           </CardContent>
         </Card>
       </TabsContent>
-    </Tabs>
-  );
+    </Tabs>;
 };
-
 export default PropTradingBotTabs;
