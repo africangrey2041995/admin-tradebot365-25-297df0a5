@@ -6,6 +6,7 @@ import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
+import { BotType, BotStatus } from '@/constants/botTypes';
 
 interface PropBotDetailTabsProps {
   activeTab: string;
@@ -62,10 +63,10 @@ const PropBotDetailTabs: React.FC<PropBotDetailTabsProps> = ({
         <AdminPropBotOverviewTab 
           propBot={{
             botId: botId,
-            type: 'prop',
+            type: BotType.PROP_BOT,
             name: '',
             description: '',
-            status: 'active',
+            status: BotStatus.ACTIVE,
             createdDate: botInfo.createdDate,
             lastUpdated: botInfo.lastUpdated,
             performanceLastMonth: '',
