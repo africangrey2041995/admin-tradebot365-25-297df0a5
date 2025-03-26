@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -7,10 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle, BriefcaseIcon } from 'lucide-react';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 import { mockPropBots } from '@/mocks/propBotsMock';
-import { BotRiskLevel } from '@/constants/botTypes';
+import { BotStatus } from '@/constants/botTypes';
 
 const propTradingBots = mockPropBots.map(bot => ({
   ...bot,
@@ -211,24 +212,24 @@ const PropTradingBotDetail = () => {
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base flex items-center">
                           <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
-                          Hiệu suất
+                          Thống kê
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                            <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất tháng trước</div>
+                            <div className="text-sm text-slate-600 dark:text-slate-400">Người dùng đăng ký</div>
                             <div className="text-2xl font-bold mt-1 flex items-center">
-                              {bot.performanceLastMonth}
-                              <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                              {bot.subscribers}
+                              <Users className="ml-2 h-5 w-5 text-blue-500" />
                             </div>
                           </div>
                           
                           <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                            <div className="text-sm text-slate-600 dark:text-slate-400">Hiệu suất từ đầu</div>
+                            <div className="text-sm text-slate-600 dark:text-slate-400">Tài khoản kết nối</div>
                             <div className="text-2xl font-bold mt-1 flex items-center">
-                              {bot.performanceAllTime}
-                              <TrendingUp className="ml-2 h-5 w-5 text-green-500" />
+                              {Math.round(bot.subscribers * 1.5)}
+                              <BriefcaseIcon className="ml-2 h-5 w-5 text-purple-500" />
                             </div>
                           </div>
                         </div>
