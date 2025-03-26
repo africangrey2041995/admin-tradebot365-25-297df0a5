@@ -3,7 +3,21 @@ import React, { useEffect, useState, memo } from 'react';
 import BetaTag from './BetaTag';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useSidebar } from '@/components/ui/sidebar';
+
+// Create a safe hook that won't throw errors when used outside provider
+const useSidebarSafe = () => {
+  try {
+    // Import dynamically to avoid immediate error if not in a provider
+    const { useSidebar } = require('@/components/ui/sidebar');
+    return useSidebar();
+  } catch (error) {
+    // Return default values that match the shape expected by components
+    return {
+      openMobile: false,
+      state: "expanded"
+    };
+  }
+};
 
 interface TradeBotLogoProps {
   size?: 'small' | 'medium' | 'large';
@@ -38,7 +52,8 @@ const TradeBotLogo: React.FC<TradeBotLogoProps> = memo(({
 }) => {
   const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
-  const { openMobile } = useSidebar();
+  const sidebarContext = useSidebarSafe();
+  const openMobile = sidebarContext?.openMobile || false;
   
   // Determine height based on size prop
   const height = isMobile 
