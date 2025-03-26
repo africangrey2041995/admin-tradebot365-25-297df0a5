@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import AdminLayout from '@/components/layout/AdminLayout';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pencil, MoreVertical, ChevronLeft } from 'lucide-react';
@@ -16,11 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
-import { usePremiumBotsAPI } from '@/hooks/usePremiumBotsAPI';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
-import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
-import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
-import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
@@ -30,6 +25,9 @@ import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDr
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import { Account } from '@/types';
 import { ADMIN_ROUTES } from '@/constants/routes';
+import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
+import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
+import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
 
 // Mock Premium Bot data
 const mockPremiumBots = [
@@ -326,6 +324,12 @@ const PremiumBotDetail = () => {
     console.log("Updated pairs:", pairs);
   };
 
+  // Handle update performance data
+  const handleUpdatePerformance = (performance: { lastMonth: string; allTime: string }) => {
+    toast.success("Bot performance data updated");
+    console.log("Updated performance:", performance);
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -400,11 +404,11 @@ const PremiumBotDetail = () => {
               <div className="md:col-span-2 space-y-4">
                 <EditableDescriptionCard 
                   description={bot.longDescription} 
-                  onSave={handleUpdateDescription}
+                  onUpdate={handleUpdateDescription}
                 />
                 <EditableTradingPairsCard 
-                  pairs={bot.pairs}
-                  onSave={handleUpdateTradingPairs}
+                  tradingPairs={bot.pairs}
+                  onUpdate={handleUpdateTradingPairs}
                 />
               </div>
               <div className="space-y-4">
@@ -440,8 +444,11 @@ const PremiumBotDetail = () => {
                   </CardContent>
                 </Card>
                 <BotPerformanceCard
-                  performanceLastMonth={bot.performanceLastMonth}
-                  performanceAllTime={bot.performanceAllTime}
+                  performance={{
+                    lastMonth: bot.performanceLastMonth,
+                    allTime: bot.performanceAllTime
+                  }}
+                  onUpdate={handleUpdatePerformance}
                 />
               </div>
             </div>
@@ -484,7 +491,7 @@ const PremiumBotDetail = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <TradingViewLogs botId={botId || ''} userId="admin" signalSourceLabel="TB365 ID" />
+                <TradingViewLogs botId={botId || ''} userId="admin" />
               </CardContent>
             </Card>
           </TabsContent>

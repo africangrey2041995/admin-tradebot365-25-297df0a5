@@ -12,6 +12,7 @@ interface TradingViewLogsProps {
   refreshTrigger?: boolean;
   botType?: 'premium' | 'prop' | 'user';
   isLoading?: boolean; // New prop for external loading state
+  signalSourceLabel?: string; // Make this prop optional
 }
 
 const TradingViewLogs: React.FC<TradingViewLogsProps> = ({ 
@@ -19,7 +20,8 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({
   userId, 
   refreshTrigger = false,
   botType = 'user',
-  isLoading: externalLoading // Accept external loading state
+  isLoading: externalLoading, // Accept external loading state
+  signalSourceLabel = "TradingView ID" // Provide default value
 }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   
@@ -64,6 +66,7 @@ const TradingViewLogs: React.FC<TradingViewLogsProps> = ({
         selectedId={selectedId}
         onSelectId={setSelectedId}
         onRefresh={handleRefresh}
+        signalSourceLabel={signalSourceLabel} // Pass the label to LogsTable
       />
     </div>
   );
