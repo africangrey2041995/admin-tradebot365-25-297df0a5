@@ -32,10 +32,8 @@ import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFe
 import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
 
 // Import components from user view to enhance admin view
-import PerformanceChart from '@/components/bots/details/PerformanceChart';
-import TradeDetailsChart from '@/components/bots/details/TradeDetailsChart';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
-import { useChartData } from '@/hooks/useChartData';
+import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 
 // Mock Premium Bot data
 const mockPremiumBots = [
@@ -252,11 +250,9 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChartPeriod, setSelectedChartPeriod] = useState("month");
   
-  // Get statistics and chart data from the hooks
-  const { tradePerformanceData, statisticsData } = useBotStatistics();
-  const { chartData, generateChartData } = useChartData();
+  // Get statistics data from the hook
+  const { statisticsData } = useBotStatistics();
   
   // Get bot data
   const bot = mockPremiumBots.find(b => b.id === botId);
@@ -355,16 +351,6 @@ const PremiumBotDetail = () => {
     console.log("Updated bot information:", info);
   };
 
-  // Generate chart data based on selected period
-  const getChartData = () => {
-    // Using chart data from the hook instead of relying on bot.monthlyPerformance
-    if (selectedChartPeriod === "month") {
-      return chartData; // Use the data from useChartData hook
-    } else {
-      return generateChartData(); // Generate data based on period
-    }
-  };
-
   if (isLoading) {
     return <LoadingState />;
   }
@@ -435,18 +421,29 @@ const PremiumBotDetail = () => {
                 onUpdate={handleUpdateDescription}
               />
               
-              {/* Performance Chart - Added from user view */}
-              <PerformanceChart
-                selectedPeriod={selectedChartPeriod}
-                onPeriodChange={setSelectedChartPeriod}
-                chartData={getChartData()}
-              />
-              
-              {/* Trade Details Chart - Added from user view */}
-              <TradeDetailsChart
-                tradePerformanceData={tradePerformanceData}
-                statisticsData={statisticsData}
-              />
+              {/* Trade Statistics - Keeping only the statistics data without the chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Chi tiết giao dịch</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-4 gap-4 mb-2">
+                    {statisticsData.map((stat, index) => (
+                      <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          {stat.icon}
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                            {stat.name}
+                          </span>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {stat.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
               
               <EditableTradingPairsCard 
                 tradingPairs={bot.pairs}
@@ -505,7 +502,7 @@ const PremiumBotDetail = () => {
                 onUpdate={handleUpdatePerformance}
               />
               
-              {/* Bot Integration Info - Moved here below performance card */}
+              {/* Bot Integration Info - Kept below performance card */}
               <BotIntegrationInfo botId={bot.id} />
             </div>
           </div>
