@@ -417,9 +417,6 @@ const PremiumBotDetail = () => {
         </div>
       </div>
 
-      {/* Add Integration Info Card */}
-      <BotIntegrationInfo botId={bot.id} />
-
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
@@ -507,6 +504,9 @@ const PremiumBotDetail = () => {
                 }}
                 onUpdate={handleUpdatePerformance}
               />
+              
+              {/* Bot Integration Info - Moved here below performance card */}
+              <BotIntegrationInfo botId={bot.id} />
             </div>
           </div>
         </TabsContent>
