@@ -12,13 +12,14 @@ import {
 } from '@/components/ui/table';
 import ActionBadge from './ActionBadge';
 import StatusBadge from './StatusBadge';
+import FormatDateTime from '../signal-logs/FormatDateTime';
 
 interface LogsTableProps {
   logs: any[];
   selectedId: string | null;
   onSelectId: (id: string | null) => void;
   onRefresh: () => void;
-  signalSourceLabel?: string; // Add this prop
+  signalSourceLabel?: string;
 }
 
 const LogsTable: React.FC<LogsTableProps> = ({ 
@@ -26,7 +27,7 @@ const LogsTable: React.FC<LogsTableProps> = ({
   selectedId,
   onSelectId,
   onRefresh,
-  signalSourceLabel = "TradingView ID" // Default value
+  signalSourceLabel = "TradingView ID"
 }) => {
   return (
     <div className="space-y-4">
@@ -41,10 +42,10 @@ const LogsTable: React.FC<LogsTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Time</TableHead>
               <TableHead>{signalSourceLabel}</TableHead>
-              <TableHead>Signal</TableHead>
               <TableHead>Symbol</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Quantity</TableHead>
               <TableHead>Action</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -56,10 +57,12 @@ const LogsTable: React.FC<LogsTableProps> = ({
                 className={selectedId === log.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
                 onClick={() => onSelectId(selectedId === log.id ? null : log.id)}
               >
-                <TableCell>{new Date(log.timestamp).toLocaleString()}</TableCell>
-                <TableCell>{log.sourceId}</TableCell>
-                <TableCell>{log.signalName}</TableCell>
-                <TableCell className="font-mono">{log.symbol}</TableCell>
+                <TableCell>{log.id || log.sourceId}</TableCell>
+                <TableCell className="font-mono">{log.instrument || log.symbol}</TableCell>
+                <TableCell>
+                  <FormatDateTime timestamp={log.timestamp} />
+                </TableCell>
+                <TableCell>{log.amount || '0.01'}</TableCell>
                 <TableCell>
                   <ActionBadge action={log.action} />
                 </TableCell>

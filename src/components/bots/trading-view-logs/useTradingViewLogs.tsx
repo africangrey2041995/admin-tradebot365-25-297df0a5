@@ -3,92 +3,113 @@ import { useState, useEffect, useCallback } from 'react';
 import { TradingViewSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/useSafeLoading';
 
+// Mock data for trading view logs
+const mockTradingViewLogs: TradingViewSignal[] = [
+  {
+    id: 'TV-SIG-001',
+    action: 'ENTER_LONG',
+    instrument: 'BTC/USDT',
+    timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
+    signalToken: 'token123',
+    maxLag: '10s',
+    investmentType: 'crypto',
+    amount: '0.01',
+    status: 'Processed',
+    source: 'TradingView',
+    accountName: 'Primary Trading Account'
+  },
+  {
+    id: 'TV-SIG-002',
+    action: 'EXIT_LONG',
+    instrument: 'BTC/USDT',
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    signalToken: 'token456',
+    maxLag: '10s',
+    investmentType: 'crypto',
+    amount: '0.01',
+    status: 'Processed',
+    source: 'TradingView',
+    accountName: 'Primary Trading Account'
+  },
+  {
+    id: 'TV-SIG-003',
+    action: 'ENTER_SHORT',
+    instrument: 'ETH/USDT',
+    timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+    signalToken: 'token789',
+    maxLag: '10s',
+    investmentType: 'crypto',
+    amount: '0.15',
+    status: 'Pending',
+    source: 'TradingView',
+    accountName: 'Secondary Trading Account'
+  },
+  {
+    id: 'TV-SIG-004',
+    action: 'EXIT_SHORT',
+    instrument: 'ETH/USDT',
+    timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
+    signalToken: 'tokenABC',
+    maxLag: '10s',
+    investmentType: 'crypto',
+    amount: '0.15',
+    status: 'Failed',
+    source: 'TradingView',
+    accountName: 'Secondary Trading Account',
+    errorMessage: 'Network timeout'
+  }
+];
+
+// More realistic interface for the hook
 interface UseTradingViewLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
-  skipLoadingState?: boolean; // Add ability to skip internal loading state
+  skipLoadingState?: boolean;
+  initialData?: TradingViewSignal[];
 }
 
-interface UseTradingViewLogsResult {
-  logs: TradingViewSignal[];
-  loading: boolean;
-  error: Error | null;
-  fetchLogs: () => void;
-}
-
-export const useTradingViewLogs = ({ 
-  botId, 
+export const useTradingViewLogs = ({
+  botId,
   userId,
   refreshTrigger = false,
-  skipLoadingState = false
-}: UseTradingViewLogsProps): UseTradingViewLogsResult => {
-  const [logs, setLogs] = useState<TradingViewSignal[]>([]);
+  skipLoadingState = false,
+  initialData
+}: UseTradingViewLogsProps) => {
+  const [logs, setLogs] = useState<TradingViewSignal[]>(initialData || []);
   const [error, setError] = useState<Error | null>(null);
-  const { loading, startLoading, stopLoading } = useSafeLoading({ 
-    timeoutMs: 10000,
-    minLoadingDurationMs: 500,
-    skipLoading: skipLoadingState // Skip loading state if requested
+  
+  // Use the safeLoading hook with improved settings
+  const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 5000, // 5 seconds timeout
+    debugComponent: 'TradingViewLogs',
+    skipLoading: skipLoadingState, // Skip loading if requested
+    minLoadingDurationMs: 300 // Ensure minimum loading duration to prevent flicker
   });
 
+  // Fetch logs function - simulates API call
   const fetchLogs = useCallback(() => {
     if (!skipLoadingState) {
       startLoading();
     }
+    
     setError(null);
-
-    // Simulated API call with a delay
+    
+    // Simulate API call with setTimeout
     setTimeout(() => {
       try {
-        // Mock data for development - ensure we conform to TradingViewSignal interface
-        // IMPORTANT: IDs need to match with originalSignalId from Coinstrat signals
-        const mockLogs: TradingViewSignal[] = [
-          {
-            id: 'SIG001', // This matches originalSignalId in Coinstrat signals
-            timestamp: new Date().toISOString(),
-            source: 'TradingView Alert',
-            action: 'ENTER_LONG',
-            instrument: 'BTCUSDT',
-            amount: '50000',
-            status: 'Processed',
-            signalToken: 'token123',
-            maxLag: '5s',
-            investmentType: 'crypto'
-          },
-          {
-            id: 'SIG002', // This matches originalSignalId in Coinstrat signals
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            source: 'TradingView Alert',
-            action: 'EXIT_LONG',
-            instrument: 'ETHUSDT',
-            amount: '3000',
-            status: 'Processed',
-            signalToken: 'token456',
-            maxLag: '5s',
-            investmentType: 'crypto'
-          },
-          {
-            id: 'SIG003', // This matches originalSignalId in Coinstrat signals
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-            source: 'TradingView Alert',
-            status: 'Failed',
-            errorMessage: 'Could not parse signal format',
-            action: 'ENTER_LONG',
-            instrument: 'SOLUSDT',
-            signalToken: 'token789',
-            maxLag: '5s',
-            investmentType: 'crypto',
-            amount: '3700', // Add consistent amount value
-          },
-        ];
-
-        setLogs(mockLogs);
+        console.log(`Fetching TradingView logs for bot ${botId} and user ${userId}`);
+        
+        // Here you would normally make an API call
+        // For now, just use mock data
+        setLogs(mockTradingViewLogs);
+        
         if (!skipLoadingState) {
           stopLoading();
         }
       } catch (err) {
         console.error('Error fetching TradingView logs:', err);
-        setError(err instanceof Error ? err : new Error('Failed to fetch TradingView logs'));
+        setError(err instanceof Error ? err : new Error('Failed to fetch logs'));
         if (!skipLoadingState) {
           stopLoading();
         }
@@ -96,20 +117,19 @@ export const useTradingViewLogs = ({
     }, 600);
   }, [botId, userId, startLoading, stopLoading, skipLoadingState]);
 
+  // Initial fetch
   useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+    if (!initialData || initialData.length === 0) {
+      fetchLogs();
+    }
+  }, [fetchLogs, initialData]);
 
+  // Handle refresh trigger
   useEffect(() => {
     if (refreshTrigger) {
       fetchLogs();
     }
   }, [refreshTrigger, fetchLogs]);
 
-  return {
-    logs,
-    loading,
-    error,
-    fetchLogs
-  };
+  return { logs, loading, error, fetchLogs };
 };
