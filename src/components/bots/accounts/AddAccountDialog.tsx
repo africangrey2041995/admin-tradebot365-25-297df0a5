@@ -100,6 +100,7 @@ interface AddAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   botId: string;
+  botName?: string;
   onAddAccount: (accountData: FormValues) => void;
 }
 
@@ -107,6 +108,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   open,
   onOpenChange,
   botId,
+  botName,
   onAddAccount,
 }) => {
   const form = useForm<FormValues>({
@@ -171,7 +173,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Thêm Tài Khoản vào Bot {botId}</DialogTitle>
+          <DialogTitle>Thêm Tài Khoản vào {botName || botId}</DialogTitle>
         </DialogHeader>
         
         <Form {...form}>

@@ -4,7 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { RefreshCw, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BotCardProps } from '@/components/bots/BotCard';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
+import AddAccountDialog from '@/components/bots/accounts/AddAccountDialog';
 import BotProfileHeader from '@/components/bots/BotProfileHeader';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';
@@ -21,7 +21,6 @@ const BotProfile = () => {
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   
-  // Dữ liệu mẫu cho tài khoản
   const mockAccounts: Account[] = [
     {
       cspAccountId: 'ACC001',
@@ -59,7 +58,6 @@ const BotProfile = () => {
     }
   ];
 
-  // Dữ liệu mẫu cho logs
   const mockLogs: CoinstratSignal[] = [
     {
       id: 'CSP-78952364',
@@ -107,11 +105,9 @@ const BotProfile = () => {
     }
   ];
   
-  // Using the new webhook URL format
   const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
   const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
   
-  // Current user ID - chuẩn hóa đúng định dạng USR-XXX
   const userId = normalizeUserId('USR-001');
   
   useEffect(() => {
@@ -236,6 +232,7 @@ const BotProfile = () => {
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
         botId={bot.botId}
+        botName={bot.title}
         onAddAccount={handleAddAccount}
       />
     </MainLayout>
