@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -13,6 +12,7 @@ import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotD
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
+import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -232,7 +232,6 @@ const PropTradingBotDetail = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Use our new PropTradingBotTabs component */}
                 <PropTradingBotTabs
                   activeTab={activeTab}
                   setActiveTab={setActiveTab}

@@ -41,23 +41,11 @@ const PropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-6">
         {/* Progress in Current Challenge */}
-        <ChallengeProgressCard 
-          phase={challengeData.phase}
-          progress={challengeData.progress}
-          accountBalance={challengeData.accountBalance}
-          profitTarget={challengeData.profitTarget}
-          maxDrawdown={challengeData.maxDrawdown}
-          daysRemaining={challengeData.daysRemaining}
-          description={challengeData.description}
-        />
+        <ChallengeProgressCard challengeData={challengeData} />
 
         {/* Bot Statistics */}
         <BotStatsCard 
-          totalTrades={botStats.totalTrades}
-          winRate={botStats.winRate}
-          profitFactor={botStats.profitFactor}
-          sharpeRatio={botStats.sharpeRatio}
-          currentDrawdown={botStats.currentDrawdown}
+          stats={botStats}
           createdDate={botInfo.createdDate}
           lastUpdated={botInfo.lastUpdated}
           botId={botInfo.botId}

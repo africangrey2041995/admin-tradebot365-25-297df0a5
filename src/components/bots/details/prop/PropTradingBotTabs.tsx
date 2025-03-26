@@ -63,6 +63,23 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
     handleRefresh();
   };
 
+  // Create properly typed handler functions
+  const handleAddAccount = (account: Account) => {
+    addAccount(account);
+  };
+
+  const handleUpdateAccount = (account: Account) => {
+    updateAccount(account);
+  };
+
+  const handleDeleteAccount = (accountId: string) => {
+    deleteAccount(accountId);
+  };
+
+  const handleToggleAccountStatus = (accountId: string) => {
+    toggleAccountStatus(accountId);
+  };
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800 p-0 h-auto rounded-none">
@@ -96,10 +113,10 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
                 isLoading={loading || refreshLoading}
                 error={error}
                 onRefresh={handleRefreshData}
-                onAddAccount={addAccount}
-                onEditAccount={updateAccount}
-                onDeleteAccount={deleteAccount}
-                onToggleStatus={toggleAccountStatus}
+                onAddAccount={handleAddAccount}
+                onEditAccount={handleUpdateAccount}
+                onDeleteAccount={handleDeleteAccount}
+                onToggleStatus={handleToggleAccountStatus}
                 botType="prop"
               />
             )}
