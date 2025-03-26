@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
 import AdvancedSignalFilter from '@/components/bots/trading-view-logs/AdvancedSignalFilter';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
+import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 
 interface SignalTrackingTabProps {
   botId: string;
@@ -18,6 +19,10 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   userId,
   isAdminView = true
 }) => {
+  // State for filtered logs
+  const [filteredTradingViewLogs, setFilteredTradingViewLogs] = useState<TradingViewSignal[]>([]);
+  const [filteredCoinstratLogs, setFilteredCoinstratLogs] = useState<CoinstratSignal[]>([]);
+
   // Use the combined logs hook to fetch both types of logs
   const {
     tradingViewLogs,
@@ -31,13 +36,153 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
     userId
   });
 
+  // Initialize filtered logs when raw logs are loaded
+  useEffect(() => {
+    setFilteredTradingViewLogs(tradingViewLogs);
+    setFilteredCoinstratLogs(coinstratLogs);
+  }, [tradingViewLogs, coinstratLogs]);
+
   const handleRefresh = () => {
     refreshLogs();
   };
 
+  // Handle filter changes
+  const handleFilterChange = (filters: any) => {
+    console.log('Applying filters:', filters);
+    
+    // Filter TradingView logs
+    let filteredTvLogs = [...tradingViewLogs];
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredTvLogs = filteredTvLogs.filter(log => 
+        log.id.toLowerCase().includes(searchLower) ||
+        log.instrument.toLowerCase().includes(searchLower) ||
+        (log.accountName && log.accountName.toLowerCase().includes(searchLower)) ||
+        log.action.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply source filter
+    if (filters.signalSource === 'coinstrat') {
+      filteredTvLogs = [];
+    }
+    
+    // Apply status filter
+    if (filters.status !== 'all') {
+      const statusMap: Record<string, string> = {
+        'success': 'Processed',
+        'failed': 'Failed',
+        'pending': 'Pending'
+      };
+      
+      filteredTvLogs = filteredTvLogs.filter(log => 
+        log.status.toString().toLowerCase() === statusMap[filters.status]?.toLowerCase()
+      );
+    }
+    
+    // Apply date filter
+    if (filters.dateRange.from || filters.dateRange.to) {
+      filteredTvLogs = filteredTvLogs.filter(log => {
+        const logDate = new Date(log.timestamp);
+        let isInRange = true;
+        
+        if (filters.dateRange.from) {
+          isInRange = isInRange && logDate >= filters.dateRange.from;
+        }
+        
+        if (filters.dateRange.to) {
+          // Add one day to include the end date
+          const endDate = new Date(filters.dateRange.to);
+          endDate.setDate(endDate.getDate() + 1);
+          isInRange = isInRange && logDate <= endDate;
+        }
+        
+        return isInRange;
+      });
+    }
+    
+    setFilteredTradingViewLogs(filteredTvLogs);
+    
+    // Filter Coinstrat logs
+    let filteredCsLogs = [...coinstratLogs];
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredCsLogs = filteredCsLogs.filter(log => 
+        log.id.toLowerCase().includes(searchLower) ||
+        log.originalSignalId.toLowerCase().includes(searchLower) ||
+        log.instrument.toLowerCase().includes(searchLower) ||
+        log.action.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply source filter
+    if (filters.signalSource === 'tradingview') {
+      filteredCsLogs = [];
+    }
+    
+    // Apply status filter
+    if (filters.status !== 'all') {
+      const statusFilter = filters.status;
+      
+      filteredCsLogs = filteredCsLogs.filter(log => {
+        if (statusFilter === 'success') {
+          return log.processedAccounts.length > 0;
+        } else if (statusFilter === 'failed') {
+          return log.failedAccounts.length > 0;
+        } else if (statusFilter === 'pending') {
+          return log.status.toString().toLowerCase().includes('pending');
+        }
+        return true;
+      });
+    }
+    
+    // Apply date filter
+    if (filters.dateRange.from || filters.dateRange.to) {
+      filteredCsLogs = filteredCsLogs.filter(log => {
+        const logDate = new Date(log.timestamp);
+        let isInRange = true;
+        
+        if (filters.dateRange.from) {
+          isInRange = isInRange && logDate >= filters.dateRange.from;
+        }
+        
+        if (filters.dateRange.to) {
+          // Add one day to include the end date
+          const endDate = new Date(filters.dateRange.to);
+          endDate.setDate(endDate.getDate() + 1);
+          isInRange = isInRange && logDate <= endDate;
+        }
+        
+        return isInRange;
+      });
+    }
+    
+    // Apply user filter
+    if (filters.userId) {
+      filteredCsLogs = filteredCsLogs.filter(log => {
+        // Check if any processed or failed account belongs to the selected user
+        const hasUserInProcessed = log.processedAccounts.some(
+          account => account.userId === filters.userId
+        );
+        
+        const hasUserInFailed = log.failedAccounts.some(
+          account => account.userId === filters.userId
+        );
+        
+        return hasUserInProcessed || hasUserInFailed;
+      });
+    }
+    
+    setFilteredCoinstratLogs(filteredCsLogs);
+  };
+
   // Prepare export data for signals
   const signalExportData = React.useMemo(() => {
-    return coinstratLogs.map(log => [
+    return filteredCoinstratLogs.map(log => [
       log.id,
       log.originalSignalId || '',
       log.instrument || '',
@@ -48,7 +193,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
       log.failedAccounts.length,
       log.errorMessage || ''
     ]);
-  }, [coinstratLogs]);
+  }, [filteredCoinstratLogs]);
 
   const signalExportHeaders = [
     'ID',
@@ -84,7 +229,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
         {/* Advanced filtering for signals */}
         <div className="mb-6">
           <AdvancedSignalFilter 
-            onFilterChange={() => {/* Handle filter changes */}} 
+            onFilterChange={handleFilterChange} 
             availableUsers={availableUsers}
             showExport={true}
             exportComponent={
@@ -99,8 +244,8 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
         
         {/* Unified hierarchical signal view */}
         <UnifiedSignalView 
-          tradingViewLogs={tradingViewLogs} 
-          coinstratLogs={coinstratLogs} 
+          tradingViewLogs={filteredTradingViewLogs} 
+          coinstratLogs={filteredCoinstratLogs} 
           onRefresh={refreshLogs} 
           isLoading={loading} 
         />
