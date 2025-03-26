@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
@@ -25,6 +26,11 @@ The Alpha Edge bot has consistently delivered excellent performance over various
   performanceLastMonth: '+18.7%',
   performanceAllTime: '+145.3%',
   pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT'],
+  price: {
+    monthly: 49.99,
+    quarterly: 129.99,
+    yearly: 459.99
+  },
   features: ['Advanced algorithm', 'Real-time market analysis', 'Smart risk management', 'Multi-exchange support', '24/7 operation', 'Performance reports', 'Priority support'],
   createdDate: '2023-05-15T10:30:00Z',
   lastUpdated: '2023-11-10T15:45:00Z'
@@ -47,6 +53,11 @@ The Momentum Master bot is particularly effective in trending markets, with risk
   performanceLastMonth: '+24.2%',
   performanceAllTime: '+188.5%',
   pairs: ['BTC/USDT', 'ETH/USDT', 'MATIC/USDT', 'DOGE/USDT', 'ADA/USDT'],
+  price: {
+    monthly: 59.99,
+    quarterly: 149.99,
+    yearly: 539.99
+  },
   features: ['Momentum detection', 'Trend strength analysis', 'Dynamic take profit levels', 'Adaptive stop-loss', 'Market condition filter', 'Performance tracking', 'VIP support channel'],
   createdDate: '2023-06-20T09:15:00Z',
   lastUpdated: '2023-10-28T12:30:00Z'
@@ -151,7 +162,7 @@ const mockAccounts: Account[] = [{
   userAccount: 'Robert Johnson'
 }];
 
-export const usePremiumBotDetail = (botId: string | undefined, userId: string) => {
+export const usePremiumBotDetail = (botId: string | undefined) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -170,7 +181,7 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
     availableUsers: userList 
   } = useCombinedSignalLogs({
     botId: botId || '',
-    userId: userId
+    userId: 'admin'
   });
 
   // Transform availableUsers from array of strings to array of objects with id and name
