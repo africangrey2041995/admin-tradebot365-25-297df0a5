@@ -29,12 +29,3 @@ export const getTypeLabel = (type: string) => {
     default: return type;
   }
 };
-
-export const getBotTypeLabel = (botType: 'premium' | 'prop' | 'user') => {
-  switch (botType) {
-    case 'premium': return 'Premium Bot';
-    case 'prop': return 'Prop Trading Bot';
-    case 'user': return 'User Bot';
-    default: return 'Bot';
-  }
-};

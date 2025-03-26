@@ -6,7 +6,6 @@ import AccountsTabContent from '../tabs/AccountsTabContent';
 import { getTabsListClassName, getTabTriggerClassName, getTabIcon } from '../tabs/TabStyles';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
-import HierarchicalAccountsTable from '@/components/admin/prop-bots/detail/components/HierarchicalAccountsTable';
 
 interface PremiumBotTabsProps {
   activeTab: string;
@@ -53,25 +52,14 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="connected-accounts">
-        <div className="card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Tài khoản kết nối</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Quản lý các tài khoản được kết nối với Premium Bot
-            </p>
-            
-            {accountsData && accountsData.length > 0 ? (
-              <HierarchicalAccountsTable 
-                accounts={accountsData}
-                onRefresh={onRefresh}
-              />
-            ) : (
-              <div className="text-center py-10 text-gray-500">
-                Không có tài khoản nào được kết nối với bot này
-              </div>
-            )}
-          </div>
-        </div>
+        <AccountsTabContent
+          botId={botId}
+          userId={userId}
+          botType="premium"
+          title="Tài khoản kết nối"
+          description="Quản lý các tài khoản được kết nối với Premium Bot"
+          accountsData={accountsData}
+        />
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">

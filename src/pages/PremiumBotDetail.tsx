@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -243,8 +242,6 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
-  const [activeTab, setActiveTab] = useState("overview");
-  const [refreshLoading, setRefreshLoading] = useState(false);
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -307,70 +304,6 @@ const PremiumBotDetail = () => {
       ];
     }
   };
-  
-  const handleRefresh = () => {
-    setRefreshLoading(true);
-    // Simulate API call with a timer
-    setTimeout(() => {
-      setRefreshLoading(false);
-      toast.success(`Đã làm mới dữ liệu tab ${
-        activeTab === "overview" ? "Tổng quan" : 
-        activeTab === "connected-accounts" ? "Tài khoản kết nối" : 
-        "Premium Bot Logs"
-      }`);
-    }, 1000);
-  };
-
-  const botOverviewContent = (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <BotDescription 
-          description={bot.longDescription} 
-          pairs={bot.pairs} 
-        />
-
-        <PerformanceChart
-          selectedPeriod={selectedChartPeriod}
-          onPeriodChange={setSelectedChartPeriod}
-          chartData={generateChartData()}
-        />
-
-        <TradeDetailsChart
-          tradePerformanceData={tradePerformanceData}
-          statisticsData={statisticsData}
-        />
-
-        <FeaturesList features={bot.features} />
-      </div>
-
-      <div className="space-y-6">
-        <BotInfoCard
-          type={bot.type}
-          exchange={bot.exchange}
-          minCapital={bot.minCapital}
-          createdDate={bot.createdDate}
-          subscribers={bot.subscribers}
-        />
-
-        <PerformanceCard
-          performanceLastMonth={bot.performanceLastMonth}
-          performanceAllTime={bot.performanceAllTime}
-        />
-
-        <div className="card border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden">
-          <div className="p-4 bg-white dark:bg-zinc-900">
-            <h3 className="font-semibold mb-2">Đăng ký sử dụng</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Đăng ký sử dụng {bot.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
-            </p>
-            <Button onClick={handleSubscribe} className="w-full">
-              Đăng Ký Ngay
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <MainLayout title={bot?.name || "Premium Bot Detail"}>
@@ -388,17 +321,54 @@ const PremiumBotDetail = () => {
           </Button>
         </div>
 
-        <PremiumBotDetailTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          userId={'user-001'}
-          botId={bot.id}
-          onRefresh={handleRefresh}
-          isLoading={refreshLoading}
-          overviewContent={botOverviewContent}
-          accountsData={bot.accounts}
-          signalSourceLabel="TB365 ID"
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <BotDescription 
+              description={bot.longDescription} 
+              pairs={bot.pairs} 
+            />
+
+            <PerformanceChart
+              selectedPeriod={selectedChartPeriod}
+              onPeriodChange={setSelectedChartPeriod}
+              chartData={generateChartData()}
+            />
+
+            <TradeDetailsChart
+              tradePerformanceData={tradePerformanceData}
+              statisticsData={statisticsData}
+            />
+
+            <FeaturesList features={bot.features} />
+          </div>
+
+          <div className="space-y-6">
+            <BotInfoCard
+              type={bot.type}
+              exchange={bot.exchange}
+              minCapital={bot.minCapital}
+              createdDate={bot.createdDate}
+              subscribers={bot.subscribers}
+            />
+
+            <PerformanceCard
+              performanceLastMonth={bot.performanceLastMonth}
+              performanceAllTime={bot.performanceAllTime}
+            />
+
+            <div className="card border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden">
+              <div className="p-4 bg-white dark:bg-zinc-900">
+                <h3 className="font-semibold mb-2">Đăng ký sử dụng</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                  Đăng ký sử dụng {bot.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
+                </p>
+                <Button onClick={handleSubscribe} className="w-full">
+                  Đăng Ký Ngay
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <SubscribePremiumBotDialog

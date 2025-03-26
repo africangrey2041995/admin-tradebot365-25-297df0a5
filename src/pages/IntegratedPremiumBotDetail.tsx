@@ -10,7 +10,6 @@ import PremiumBotTabs from '@/components/bots/details/premium/PremiumBotTabs';
 import PremiumBotOverviewTab from '@/components/bots/details/premium/PremiumBotOverviewTab';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 import { BotType } from '@/constants/botTypes';
-import { Account } from '@/types';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -70,9 +69,6 @@ const IntegratedPremiumBotDetail = () => {
     performanceAllTime: bot.performanceAllTime,
   };
 
-  // Convert accounts to proper format if needed
-  const botAccounts = Array.isArray(bot.accounts) ? bot.accounts : [];
-
   return (
     <MainLayout title={`Bot tích hợp: ${bot.name}`}>
       <div className="space-y-6">
@@ -103,7 +99,6 @@ const IntegratedPremiumBotDetail = () => {
             />
           }
           signalSourceLabel="TB365 ID"
-          accountsData={botAccounts}
         />
       </div>
     </MainLayout>
