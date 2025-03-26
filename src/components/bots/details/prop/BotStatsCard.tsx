@@ -1,7 +1,5 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 interface BotStatsCardProps {
   stats: {
     totalTrades: number;
@@ -11,12 +9,12 @@ interface BotStatsCardProps {
     currentDrawdown: string;
   };
 }
-
-const BotStatsCard: React.FC<BotStatsCardProps> = ({ stats }) => {
-  return (
-    <Card className="border-gray-200 dark:border-gray-800">
+const BotStatsCard: React.FC<BotStatsCardProps> = ({
+  stats
+}) => {
+  return <Card className="border-gray-200 dark:border-gray-800">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
-        <CardTitle className="text-lg font-medium">Thống Kê Bot</CardTitle>
+        <CardTitle className="text-lg font-medium">Mục Tiêu Bot</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -42,8 +40,6 @@ const BotStatsCard: React.FC<BotStatsCardProps> = ({ stats }) => {
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default BotStatsCard;
