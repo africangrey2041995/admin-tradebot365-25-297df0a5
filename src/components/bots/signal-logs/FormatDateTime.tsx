@@ -4,11 +4,13 @@ import React from 'react';
 interface FormatDateTimeProps {
   timestamp: string;
   showSeconds?: boolean;
+  options?: Intl.DateTimeFormatOptions;
 }
 
 const FormatDateTime: React.FC<FormatDateTimeProps> = ({ 
   timestamp, 
-  showSeconds = false 
+  showSeconds = false,
+  options: customOptions
 }) => {
   // Safely parse the date
   const date = new Date(timestamp);
@@ -19,16 +21,24 @@ const FormatDateTime: React.FC<FormatDateTimeProps> = ({
   }
   
   // Format the date
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
+  let options: Intl.DateTimeFormatOptions;
   
-  if (showSeconds) {
-    options.second = '2-digit';
+  if (customOptions) {
+    // Use the custom options if provided
+    options = customOptions;
+  } else {
+    // Use default options
+    options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+    
+    if (showSeconds) {
+      options.second = '2-digit';
+    }
   }
   
   try {
