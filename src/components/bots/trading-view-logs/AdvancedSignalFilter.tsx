@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, X, Calendar, Users, BarChart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -22,7 +21,7 @@ export interface SignalFilters {
 
 interface AdvancedSignalFilterProps {
   onFilterChange: (filters: SignalFilters) => void;
-  availableUsers?: {id: string, name: string}[];
+  availableUsers?: { id: string, name: string }[];
   showExport?: boolean;
   exportComponent?: React.ReactNode;
 }
@@ -47,7 +46,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [dateOpen, setDateOpen] = useState(false);
 
-  // Update active filters visibility
   useEffect(() => {
     const active: string[] = [];
     
@@ -59,7 +57,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     setActiveFilters(active);
   }, [filters]);
 
-  // Apply filters when they change
   useEffect(() => {
     onFilterChange(filters);
   }, [filters, onFilterChange]);
@@ -242,7 +239,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
         </div>
       </div>
       
-      {/* Active filter tags */}
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {activeFilters.includes('source') && (

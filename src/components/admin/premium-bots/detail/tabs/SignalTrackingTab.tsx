@@ -24,10 +24,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   availableUsers,
   onRefresh
 }) => {
-  // Transform available users to just the names array for the filter component
-  // Extract only the names for the filter component which expects string[]
-  const usersList = availableUsers.map(user => user.name);
-  
+  // No need to transform, just pass the original availableUsers which is already in the correct format
   return (
     <Card>
       <CardContent className="p-6">
@@ -51,7 +48,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
         <div className="mb-6">
           <AdvancedSignalFilter 
             onFilterChange={() => {/* Handle filter changes */}} 
-            availableUsers={usersList}
+            availableUsers={availableUsers}
             showExport={true}
             exportComponent={
               <ExportDataDropdown 

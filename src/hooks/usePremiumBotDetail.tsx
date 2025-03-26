@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
-import { Account } from '@/types';
+import { Account, PremiumBot } from '@/types';
 
 // Mock Premium Bot data
 const mockPremiumBots = [{
@@ -169,7 +170,7 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
   const { statisticsData } = useBotStatistics();
 
   // Get bot data
-  const bot = mockPremiumBots.find(b => b.id === botId);
+  const bot = mockPremiumBots.find(b => b.id === botId || b.botId === botId);
 
   // Get signal logs data for signal count and Signal Tracking tab
   const { 
@@ -184,9 +185,9 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
   });
 
   // Transform availableUsers from array of strings to array of objects with id and name
-  const availableUsers = userList.map(username => ({
-    id: `user-${username.toLowerCase().replace(/\s+/g, '-')}`,
-    name: username
+  const availableUsers = userList.map(user => ({
+    id: `user-${user.id || user.name.toLowerCase().replace(/\s+/g, '-')}`,
+    name: user.name
   }));
 
   // Set up accounts data for the selected bot using the same hook as prop bots
@@ -295,14 +296,39 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
     logsLoading,
     availableUsers,
     refreshAccounts,
-    handleEditAccount,
-    handleDeleteAccount,
-    handleToggleConnection,
-    handleUpdateDescription,
-    handleUpdateTradingPairs,
-    handleUpdateFeatures,
-    handleUpdateStatistics,
-    handleUpdateBotInfo,
+    handleEditAccount: (account: Account) => {
+      console.log("Edit account:", account);
+      toast.info(`Editing account: ${account.cspAccountName}`);
+    },
+    handleDeleteAccount: (accountId: string) => {
+      console.log("Delete account:", accountId);
+      toast.info(`Deleting account: ${accountId}`);
+    },
+    handleToggleConnection: toggleAccountStatus,
+    handleUpdateDescription: (description: string) => {
+      toast.success("Bot description updated");
+      console.log("Updated description:", description);
+    },
+    handleUpdateTradingPairs: (pairs: string[]) => {
+      toast.success("Trading pairs updated");
+      console.log("Updated pairs:", pairs);
+    },
+    handleUpdateFeatures: (features: string[]) => {
+      toast.success("Bot features updated");
+      console.log("Updated features:", features);
+    },
+    handleUpdateStatistics: (updatedStats: { name: string; value: string; icon: React.ReactNode }[]) => {
+      toast.success("Bot statistics updated");
+      console.log("Updated statistics:", updatedStats);
+    },
+    handleUpdateBotInfo: (info: {
+      type: string;
+      exchange: string;
+      minCapital: string;
+    }) => {
+      toast.success("Bot information updated");
+      console.log("Updated bot information:", info);
+    },
     refreshSignalLogs: refreshLogs,
     refreshLoading: logsLoading || accountsLoading,
     refreshTabData

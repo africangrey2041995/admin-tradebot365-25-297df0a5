@@ -92,10 +92,10 @@ const PremiumBotDetail = () => {
         <TabsContent value="overview" className="space-y-4">
           <PremiumBotOverviewTab
             bot={{
-              id: bot.botId, // Using botId as id
+              id: bot.botId || bot.id || '', // Use either botId or id
               longDescription: bot.description || '',
-              pairs: Array.isArray(bot.pairs) ? bot.pairs : [], // Ensure pairs is an array (default to empty if doesn't exist)
-              features: Array.isArray(bot.features) ? bot.features : [],  // Ensure features is an array
+              pairs: bot.pairs || [], // Use pairs property if it exists, otherwise empty array
+              features: bot.features || [],  // Use features property if it exists, otherwise empty array
               type: bot.type,
               exchange: bot.exchange || '',
               minCapital: bot.minCapital || '',
