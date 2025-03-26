@@ -202,7 +202,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                   <TableCell><ActionBadge action={tvSignal.action} /></TableCell>
                   <TableCell><StatusBadge status={tvSignal.status.toString()} /></TableCell>
                   <TableCell>
-                    {renderStatusSummary(successfulAccounts, failedCount, totalAccounts)}
+                    {renderStatusSummary(successfulAccounts, failedAccounts, totalAccounts)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button 
