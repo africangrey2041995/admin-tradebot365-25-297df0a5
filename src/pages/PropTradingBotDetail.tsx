@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -11,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle, BriefcaseIcon } from 'lucide-react';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 import { mockPropBots } from '@/mocks/propBotsMock';
-import { BotStatus } from '@/constants/botTypes';
+import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
 
 const propTradingBots = mockPropBots.map(bot => ({
   ...bot,
