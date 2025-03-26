@@ -1,48 +1,92 @@
 
-import React, { useState } from 'react';
-import { useAccountFiltering } from './hooks/useAccountFiltering';
-import { organizeAccounts } from './utils/accountTransformUtils';
+import React, { useState, useMemo } from 'react';
+import { Accordion } from '@/components/ui/accordion';
 import { Account } from '@/types';
-import AccountsHeader from './components/AccountsHeader';
-import AccountsFilter from './AccountsFilter';
+import { toast } from 'sonner';
+import AddAccountDialog from './AddAccountDialog';
+import EmptyAccountsState from './EmptyAccountsState';
 import LoadingAccounts from './LoadingAccounts';
 import ErrorState from './ErrorState';
-import EmptyAccountsState from './EmptyAccountsState';
-import AddAccountDialog from './components/AddAccountDialog';
-import { toast } from 'sonner';
+import AccountsFilter from './AccountsFilter';
+import { organizeAccounts } from './utils/accountTransformUtils';
+import { useAccountFiltering } from './hooks/useAccountFiltering';
 import CSPAccountCard from './components/CSPAccountCard';
+import AccountsHeader from './components/AccountsHeader';
 
 interface UserHierarchicalAccountsTableProps {
   accounts: Account[];
-  isLoading?: boolean;
-  error?: Error | null;
+  isLoading: boolean;
+  error: Error | null;
   onRefresh: () => void;
-  onAddAccount: (account: Account) => void;
-  onEditAccount: (account: Account) => void;
-  onDeleteAccount: (accountId: string) => void;
-  onToggleStatus: (accountId: string) => void;
+  onAddAccount?: (account: Account) => void;
+  onEditAccount?: (account: Account) => void;
+  onDeleteAccount?: (accountId: string) => void;
+  onToggleStatus?: (accountId: string) => void;
   botType?: 'premium' | 'prop' | 'user';
 }
 
-const UserHierarchicalAccountsTable = ({
+const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps> = ({
   accounts,
-  isLoading = false,
-  error = null,
+  isLoading,
+  error,
   onRefresh,
   onAddAccount,
   onEditAccount,
   onDeleteAccount,
   onToggleStatus,
   botType = 'user'
-}: UserHierarchicalAccountsTableProps) => {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+}) => {
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
+
+  // Transform flat accounts list into hierarchical structure
+  const organizedAccounts = useMemo(() => organizeAccounts(accounts), [accounts]);
   
-  // Transform flat accounts into hierarchical structure
-  const cspAccounts = organizeAccounts(accounts);
+  // Filter accounts based on user input
+  const { filteredAccounts, handleFilterChange } = useAccountFiltering(organizedAccounts);
   
-  // Use our filtering hook
-  const { filters, filteredAccounts, handleFilterChange } = useAccountFiltering(cspAccounts);
-  
+  // Calculate total number of trading accounts
+  const totalTradingAccounts = useMemo(() => accounts.length, [accounts]);
+
+  // Handle edit, delete, and toggle status actions
+  const handleEdit = (account: Account) => {
+    if (onEditAccount) {
+      onEditAccount(account);
+    } else {
+      toast.info("Edit functionality will be implemented");
+    }
+  };
+
+  const handleDelete = (accountId: string) => {
+    if (onDeleteAccount) {
+      onDeleteAccount(accountId);
+    } else {
+      toast.info(`Delete account ${accountId} functionality will be implemented`);
+    }
+  };
+
+  const handleToggleStatus = (accountId: string) => {
+    if (onToggleStatus) {
+      onToggleStatus(accountId);
+    } else {
+      toast.info(`Toggle connection for ${accountId} functionality will be implemented`);
+    }
+  };
+
+  // Handle adding a new account
+  const handleAddAccount = (accountData: any) => {
+    console.log('Adding account:', accountData);
+    
+    if (onAddAccount) {
+      onAddAccount(accountData);
+    } else {
+      toast.success('Tài khoản đã được thêm thành công!');
+    }
+    
+    onRefresh();
+    setIsAddAccountDialogOpen(false);
+  };
+
+  // Render appropriate UI based on loading/error state
   if (isLoading) {
     return <LoadingAccounts message="Đang tải tài khoản..." />;
   }
@@ -53,51 +97,44 @@ const UserHierarchicalAccountsTable = ({
 
   if (!accounts || accounts.length === 0) {
     return (
-      <>
-        <EmptyAccountsState 
-          onRefresh={onRefresh} 
-          botType={botType} 
-          onAddAccount={() => setIsAddDialogOpen(true)} 
-        />
-        
-        <AddAccountDialog
-          open={isAddDialogOpen}
-          onOpenChange={setIsAddDialogOpen}
-          onAddAccount={onAddAccount}
-        />
-      </>
+      <EmptyAccountsState 
+        onRefresh={onRefresh} 
+        botType={botType} 
+        onAddAccount={() => setIsAddAccountDialogOpen(true)} 
+      />
     );
   }
 
   return (
     <div className="space-y-4">
       <AccountsHeader 
-        onAddAccount={() => setIsAddDialogOpen(true)} 
-        onRefresh={onRefresh} 
+        onAddAccount={() => setIsAddAccountDialogOpen(true)}
+        onRefresh={onRefresh}
       />
-      
+
       <AccountsFilter 
-        totalAccounts={filteredAccounts.length}
         onFilterChange={handleFilterChange}
+        totalAccounts={totalTradingAccounts}
       />
-      
-      <div className="space-y-4">
-        {filteredAccounts.map(cspAccount => (
+
+      <Accordion type="multiple" className="w-full space-y-2">
+        {filteredAccounts.map((cspAccount) => (
           <CSPAccountCard
             key={cspAccount.cspAccountId}
             cspAccount={cspAccount}
             accounts={accounts}
-            onEdit={(account: Account) => onEditAccount(account)}
-            onDelete={(accountId: string) => onDeleteAccount(accountId)}
-            onToggleStatus={(accountId: string) => onToggleStatus(accountId)}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
           />
         ))}
-      </div>
-      
+      </Accordion>
+
       <AddAccountDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onAddAccount={onAddAccount}
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={botType === 'user' ? 'User Bot' : botType === 'premium' ? 'Premium Bot' : 'Prop Bot'}
+        onAddAccount={handleAddAccount}
       />
     </div>
   );
