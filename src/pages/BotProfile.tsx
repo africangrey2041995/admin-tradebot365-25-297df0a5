@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { RefreshCw, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BotCardProps } from '@/components/bots/BotCard';
-import AddAccountDialog from '@/components/bots/accounts/AddAccountDialog';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import BotProfileHeader from '@/components/bots/BotProfileHeader';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';

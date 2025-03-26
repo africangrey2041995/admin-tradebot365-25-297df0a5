@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Trash, Power, UserPlus } from 'lucide-react';
@@ -6,7 +5,6 @@ import { toast } from 'sonner';
 import EditBotDialog from './EditBotDialog';
 import { BotCardProps } from './BotCard';
 import { useNavigation } from '@/hooks/useNavigation';
-import AccountManagementDialog from './accounts/AccountManagementDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import AddAccountDialog from './AddAccountDialog';
 
 interface BotProfileHeaderProps {
   botId: string;
@@ -30,7 +29,6 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
   const { goBack } = useNavigation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // Add state for account management dialog
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
   const handleBack = () => {
@@ -39,19 +37,13 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
     } catch (error) {
       console.error('Error navigating back:', error);
       toast.error('Không thể quay lại trang trước. Đang chuyển về trang Bot.');
-      // Fallback navigation logic would be handled in the useNavigation hook
     }
   };
 
   const handleDeleteBot = () => {
     try {
-      // Here you would implement the actual deletion logic
       console.log(`Deleting bot: ${botId}`);
-      
-      // Show success toast
       toast.success(`Bot ${botId} đã được xóa`);
-      
-      // Navigate back to bots page
       goBack();
     } catch (error) {
       console.error(`Error deleting bot ${botId}:`, error);
@@ -145,13 +137,11 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
         onSave={handleSaveBot}
       />
 
-      {/* Add Account Dialog */}
-      <AccountManagementDialog
+      <AddAccountDialog
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
-        onSubmit={handleAddAccount}
-        mode="add"
-        isSubmitting={false}
+        botId={botId}
+        onAddAccount={handleAddAccount}
       />
     </div>
   );

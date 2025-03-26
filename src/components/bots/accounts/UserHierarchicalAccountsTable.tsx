@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { Accordion } from '@/components/ui/accordion';
 import { Account } from '@/types';
 import { toast } from 'sonner';
-import AddAccountDialog from './AddAccountDialog';
 import EmptyAccountsState from './EmptyAccountsState';
 import LoadingAccounts from './LoadingAccounts';
 import ErrorState from './ErrorState';
@@ -35,8 +34,6 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
   onToggleStatus,
   botType = 'user'
 }) => {
-  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
-
   // Transform flat accounts list into hierarchical structure
   const organizedAccounts = useMemo(() => organizeAccounts(accounts), [accounts]);
   
@@ -71,20 +68,6 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
     }
   };
 
-  // Handle adding a new account
-  const handleAddAccount = (accountData: any) => {
-    console.log('Adding account:', accountData);
-    
-    if (onAddAccount) {
-      onAddAccount(accountData);
-    } else {
-      toast.success('Tài khoản đã được thêm thành công!');
-    }
-    
-    onRefresh();
-    setIsAddAccountDialogOpen(false);
-  };
-
   // Render appropriate UI based on loading/error state
   if (isLoading) {
     return <LoadingAccounts message="Đang tải tài khoản..." />;
@@ -99,7 +82,7 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
       <EmptyAccountsState 
         onRefresh={onRefresh} 
         botType={botType} 
-        onAddAccount={() => setIsAddAccountDialogOpen(true)} 
+        onAddAccount={onAddAccount} 
       />
     );
   }
@@ -123,13 +106,6 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
           />
         ))}
       </Accordion>
-
-      <AddAccountDialog
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={botType === 'user' ? 'User Bot' : botType === 'premium' ? 'Premium Bot' : 'Prop Bot'}
-        onAddAccount={handleAddAccount}
-      />
     </div>
   );
 };

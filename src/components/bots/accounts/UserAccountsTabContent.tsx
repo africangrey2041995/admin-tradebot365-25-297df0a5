@@ -6,8 +6,6 @@ import { getCardClassName, getCardHeaderClassName } from '../details/tabs/TabSty
 import { Account } from '@/types';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import UserHierarchicalAccountsTable from './UserHierarchicalAccountsTable';
-import AccountManagementDialog from './AccountManagementDialog';
-import { useState } from 'react';
 
 interface UserAccountsTabContentProps {
   botId: string;
@@ -28,11 +26,6 @@ const UserAccountsTabContent: React.FC<UserAccountsTabContentProps> = ({
   accountsData,
   isLoading = false
 }) => {
-  // Dialogs state
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-
   // Use the bot accounts hook to get data
   const {
     accounts,
@@ -42,33 +35,8 @@ const UserAccountsTabContent: React.FC<UserAccountsTabContentProps> = ({
     addAccount,
     updateAccount,
     deleteAccount,
-    toggleAccountStatus,
-    isAddingAccount,
-    isUpdatingAccount
+    toggleAccountStatus
   } = useBotAccounts(botId, userId, accountsData || [], botType);
-
-  // Handle adding a new account
-  const handleAddAccount = () => {
-    setSelectedAccount(null);
-    setIsAddDialogOpen(true);
-  };
-
-  // Handle editing an account
-  const handleEditAccount = (account: Account) => {
-    setSelectedAccount(account);
-    setIsEditDialogOpen(true);
-  };
-
-  // Handle form submissions
-  const handleAddSubmit = (formData: any) => {
-    addAccount(formData);
-    setIsAddDialogOpen(false);
-  };
-
-  const handleEditSubmit = (formData: any) => {
-    updateAccount(formData);
-    setIsEditDialogOpen(false);
-  };
 
   return (
     <Card className={getCardClassName(botType)}>
@@ -81,30 +49,10 @@ const UserAccountsTabContent: React.FC<UserAccountsTabContentProps> = ({
           isLoading={loading || isLoading}
           error={error}
           onRefresh={handleRefresh}
-          onAddAccount={handleAddAccount}
-          onEditAccount={handleEditAccount}
+          onEditAccount={updateAccount}
           onDeleteAccount={deleteAccount}
           onToggleStatus={toggleAccountStatus}
           botType={botType}
-        />
-        
-        {/* Add Account Dialog */}
-        <AccountManagementDialog
-          open={isAddDialogOpen}
-          onOpenChange={setIsAddDialogOpen}
-          onSubmit={handleAddSubmit}
-          mode="add"
-          isSubmitting={isAddingAccount}
-        />
-        
-        {/* Edit Account Dialog */}
-        <AccountManagementDialog
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          account={selectedAccount}
-          onSubmit={handleEditSubmit}
-          mode="edit"
-          isSubmitting={isUpdatingAccount}
         />
       </CardContent>
     </Card>
