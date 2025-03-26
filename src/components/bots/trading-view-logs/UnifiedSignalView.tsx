@@ -271,7 +271,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
             ))}
             
             {orphanedCoinstratSignals.length > 0 && (
-              <>
+              <React.Fragment>
                 <TableRow className="bg-gray-100 dark:bg-gray-800/50">
                   <TableCell colSpan={8} className="py-2">
                     <div className="font-medium text-gray-700 dark:text-gray-300">
@@ -312,7 +312,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                     </TableCell>
                   </TableRow>
                 ))}
-              </>
+              </React.Fragment>
             )}
             
             {combinedSignals.length === 0 && orphanedCoinstratSignals.length === 0 && (
