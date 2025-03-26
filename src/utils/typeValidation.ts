@@ -1,11 +1,10 @@
-
 /**
  * Type validation utilities for runtime type checking
  * These utilities help ensure data objects conform to expected types
  */
 
 import { User, Bot, Account, ExtendedSignal } from '@/types';
-import { validateUserId, validateBotId } from './normalizeUserId';
+import { normalizeUserId, validateUserId, validateBotId } from './normalizeUserId';
 
 /**
  * Validates if an object is a valid User
