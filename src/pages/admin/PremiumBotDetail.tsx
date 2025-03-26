@@ -42,7 +42,7 @@ const PremiumBotDetail = () => {
     handleUpdateStatistics,
     handleUpdateBotInfo,
     refreshSignalLogs
-  } = usePremiumBotDetail(botId);
+  } = usePremiumBotDetail(botId, 'admin');
 
   // Go back to premium bots list
   const goBackToList = () => {
@@ -70,7 +70,7 @@ const PremiumBotDetail = () => {
         name={bot.name}
         status={bot.status}
         risk={bot.risk}
-        id={bot.id}
+        id={bot.botId} // Using botId instead of id
       />
 
       {/* Stats Cards */}
@@ -91,7 +91,18 @@ const PremiumBotDetail = () => {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <PremiumBotOverviewTab
-            bot={bot}
+            bot={{
+              id: bot.botId, // Using botId for id
+              longDescription: bot.description || '',
+              pairs: bot.exchange ? [bot.exchange] : [],
+              features: [],
+              type: bot.type,
+              exchange: bot.exchange || '',
+              minCapital: bot.minCapital || '',
+              subscribers: bot.subscribers || 0,
+              createdAt: bot.createdDate,
+              updatedAt: bot.lastUpdated
+            }}
             statisticsData={statisticsData}
             onUpdateDescription={handleUpdateDescription}
             onUpdateTradingPairs={handleUpdateTradingPairs}

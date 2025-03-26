@@ -12,7 +12,7 @@ interface SignalTrackingTabProps {
   tradingViewLogs: TradingViewSignal[];
   coinstratLogs: CoinstratSignal[];
   isLoading: boolean;
-  availableUsers: string[];
+  availableUsers: { id: string; name: string }[];  // Updated type
   onRefresh: () => void;
 }
 
@@ -24,6 +24,9 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   availableUsers,
   onRefresh
 }) => {
+  // Transform available users to the format required by AdvancedSignalFilter if needed
+  const usersList = availableUsers.map(user => user.name);
+  
   return (
     <Card>
       <CardContent className="p-6">
@@ -47,7 +50,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
         <div className="mb-6">
           <AdvancedSignalFilter 
             onFilterChange={() => {/* Handle filter changes */}} 
-            availableUsers={availableUsers}
+            availableUsers={usersList}
             showExport={true}
             exportComponent={
               <ExportDataDropdown 

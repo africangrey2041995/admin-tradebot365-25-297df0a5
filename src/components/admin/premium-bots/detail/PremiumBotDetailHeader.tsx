@@ -11,7 +11,7 @@ interface PremiumBotDetailHeaderProps {
   name: string;
   status: string;
   risk: string;
-  id: string;
+  id: string;  // This is the botId
 }
 
 // Utility function to get bot status badge UI
