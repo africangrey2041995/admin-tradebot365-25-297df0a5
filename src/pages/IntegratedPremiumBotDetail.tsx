@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { USER_ROUTES } from '@/constants/routes';
@@ -12,10 +12,6 @@ import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 import { BotType } from '@/constants/botTypes';
 import BotDescription from '@/components/bots/details/BotDescription';
 import FeaturesList from '@/components/bots/details/FeaturesList';
-import AddAccountDialog from '@/components/bots/accounts/AddAccountDialog';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -23,7 +19,6 @@ const CURRENT_USER_ID = 'USR-001';
 const IntegratedPremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
   // Use our custom hook to manage the premium bot data and states
   const {
@@ -46,11 +41,6 @@ const IntegratedPremiumBotDetail = () => {
 
   const goBack = () => {
     navigate(USER_ROUTES.INTEGRATED_PREMIUM_BOTS);
-  };
-
-  const handleAddAccount = (accountData: any) => {
-    console.log('Adding account:', accountData, 'to bot:', botId);
-    toast.success('Tài khoản đã được thêm thành công!');
   };
 
   if (isLoading) {
@@ -128,25 +118,8 @@ const IntegratedPremiumBotDetail = () => {
           logsData={coinstratLogs}
           logsLoading={logsLoading}
           signalSourceLabel="TB365 ID"
-          accountsActions={
-            <Button 
-              size="sm" 
-              onClick={() => setIsAddAccountDialogOpen(true)} 
-              className="flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" /> Thêm tài khoản
-            </Button>
-          }
         />
       </div>
-
-      <AddAccountDialog 
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={botId || ""}
-        botName={bot.name}
-        onAddAccount={handleAddAccount}
-      />
     </MainLayout>
   );
 };
