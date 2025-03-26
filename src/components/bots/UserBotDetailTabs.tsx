@@ -11,6 +11,7 @@ import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
 import AccountsTabContent from './details/tabs/AccountsTabContent';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
+import UserAccountsTabContent from './accounts/UserAccountsTabContent';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -125,11 +126,14 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               isAdminView={true}
             />
           ) : (
-            <BotAccountsTable 
-              botId={botId} 
-              userId={userId} 
-              initialData={accountsData} 
-              refreshTrigger={refreshTrigger > 0}
+            <UserAccountsTabContent
+              botId={botId}
+              userId={userId}
+              botType={botType}
+              title="Tài khoản kết nối"
+              description="Danh sách tài khoản được kết nối với bot này"
+              accountsData={accountsData}
+              isLoading={refreshLoading}
             />
           )}
         </TabsContent>
