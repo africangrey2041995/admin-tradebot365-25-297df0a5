@@ -8,6 +8,7 @@ import { useBotAccounts } from '@/hooks/useBotAccounts';
 import UserHierarchicalAccountsTable from './UserHierarchicalAccountsTable';
 import AccountManagementDialog from './AccountManagementDialog';
 import { useState } from 'react';
+import AccountsHeader from './components/AccountsHeader';
 
 interface UserAccountsTabContentProps {
   botId: string;
@@ -76,6 +77,11 @@ const UserAccountsTabContent: React.FC<UserAccountsTabContentProps> = ({
         <TabHeader title={title} description={description} botType={botType} />
       </CardHeader>
       <CardContent>
+        <AccountsHeader 
+          onAddAccount={handleAddAccount}
+          onRefresh={handleRefresh}
+        />
+        
         <UserHierarchicalAccountsTable 
           accounts={accounts}
           isLoading={loading || isLoading}

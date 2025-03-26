@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings, Trash, Power } from 'lucide-react';
+import { ArrowLeft, Settings, Trash, Power, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import EditBotDialog from './EditBotDialog';
 import { BotCardProps } from './BotCard';
 import { useNavigation } from '@/hooks/useNavigation';
+import AccountManagementDialog from './accounts/AccountManagementDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,8 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
   const { goBack } = useNavigation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // Add state for account management dialog
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
   const handleBack = () => {
     try {
@@ -63,6 +66,17 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
     } catch (error) {
       console.error('Error updating bot settings:', error);
       toast.error('Đã xảy ra lỗi khi cập nhật cài đặt bot');
+    }
+  };
+
+  const handleAddAccount = (formData: any) => {
+    try {
+      console.log('Adding account:', formData);
+      toast.success('Đã thêm tài khoản mới thành công');
+      setIsAddAccountDialogOpen(false);
+    } catch (error) {
+      console.error('Error adding account:', error);
+      toast.error('Đã xảy ra lỗi khi thêm tài khoản');
     }
   };
 
@@ -103,6 +117,15 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
 
         <Button 
           variant="outline" 
+          className="flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+          onClick={() => setIsAddAccountDialogOpen(true)}
+        >
+          <UserPlus className="h-4 w-4" />
+          <span>Thêm Tài Khoản</span>
+        </Button>
+
+        <Button 
+          variant="outline" 
           className="flex items-center gap-2"
           onClick={() => setIsEditDialogOpen(true)}
         >
@@ -120,6 +143,15 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
         onClose={() => setIsEditDialogOpen(false)}
         bot={botDetails}
         onSave={handleSaveBot}
+      />
+
+      {/* Add Account Dialog */}
+      <AccountManagementDialog
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        onSubmit={handleAddAccount}
+        mode="add"
+        isSubmitting={false}
       />
     </div>
   );
