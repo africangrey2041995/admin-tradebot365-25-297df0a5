@@ -3,9 +3,70 @@ import { useState } from 'react';
 import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
+import { BotType, BotRiskLevel } from '@/constants/botTypes';
+
+// Create a basic PremiumBot type for the hook
+interface PremiumBot {
+  id: string;
+  botId: string;
+  name: string;
+  description: string;
+  longDescription?: string;
+  type: string;
+  exchange: string;
+  minCapital: string;
+  risk: BotRiskLevel;
+  performanceLastMonth: string;
+  performanceAllTime: string;
+  subscribers: number;
+  features: string[];
+  pairs: string[];
+  createdDate: string;
+  lastUpdated: string;
+  status: 'active' | 'inactive';
+}
 
 export const usePremiumBotDetail = (botId: string | undefined, userId: string) => {
+  // Basic states
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedPeriod, setSelectedPeriod] = useState("1m");
+  
+  // Find bot by ID - mocked for now
+  const mockBot: PremiumBot = {
+    id: botId || '',
+    botId: `PRE${Math.floor(Math.random() * 10000)}`,
+    name: "Alpha Momentum",
+    description: "Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.",
+    longDescription: "Alpha Momentum Bot là một bot giao dịch tiên tiến sử dụng chiến lược momentum để giao dịch các cặp tiền điện tử.",
+    type: BotType.PREMIUM_BOT,
+    exchange: "Coinstart Pro",
+    minCapital: "$500",
+    risk: BotRiskLevel.MEDIUM,
+    performanceLastMonth: "+18.5%",
+    performanceAllTime: "+125.4%",
+    subscribers: 86,
+    features: [
+      'Phân tích động lượng',
+      'Bộ lọc tin hiệu',
+      'Quản lý rủi ro'
+    ],
+    pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'],
+    createdDate: "2023-04-15",
+    lastUpdated: "2023-10-01",
+    status: 'active'
+  };
+
+  // Mock data
+  const chartData = [
+    { date: '2023-01-01', value: 12.5 },
+    { date: '2023-02-01', value: 8.3 },
+    { date: '2023-03-01', value: -2.1 },
+    { date: '2023-04-01', value: 5.7 },
+    { date: '2023-05-01', value: 15.2 },
+  ];
 
   // Simple mock statistics data
   const statisticsData = [
@@ -44,6 +105,16 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
     { name: 'Sep', profit: 9.8, trades: 21 },
     { name: 'Oct', profit: 18.5, trades: 28 },
   ];
+  
+  // Mock accounts data for admin section
+  const accounts = [];
+  const uniqueUsers = 24;
+  const tradingAccountsCount = 38;
+  const processedSignalsCount = 458;
+  const tradingViewLogs = [];
+  const coinstratLogs = [];
+  const logsLoading = false;
+  const availableUsers = [];
 
   const refreshTabData = () => {
     setRefreshLoading(true);
@@ -54,10 +125,57 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
     }, 1000);
   };
 
+  // Admin-specific handlers
+  const refreshAccounts = () => toast.success('Refreshed accounts');
+  const handleEditAccount = () => toast.success('Edit account');
+  const handleDeleteAccount = () => toast.success('Delete account');
+  const handleToggleConnection = () => toast.success('Toggle connection');
+  const handleUpdateDescription = () => toast.success('Update description');
+  const handleUpdateTradingPairs = () => toast.success('Update trading pairs');
+  const handleUpdateFeatures = () => toast.success('Update features');
+  const handleUpdateStatistics = () => toast.success('Update statistics');
+  const handleUpdateBotInfo = () => toast.success('Update bot info');
+  const refreshSignalLogs = () => toast.success('Refresh signal logs');
+
   return {
+    // Basic data
     tradePerformanceData,
     statisticsData,
     refreshLoading,
-    refreshTabData
+    refreshTabData,
+    
+    // Page states
+    isLoading,
+    isAuthorized,
+    activeTab,
+    setActiveTab,
+    selectedPeriod,
+    setSelectedPeriod,
+    chartData,
+    
+    // Bot data
+    bot: mockBot,
+    
+    // Admin-specific data
+    accounts,
+    uniqueUsers,
+    tradingAccountsCount,
+    processedSignalsCount,
+    tradingViewLogs,
+    coinstratLogs,
+    logsLoading,
+    availableUsers,
+    
+    // Admin-specific handlers
+    refreshAccounts,
+    handleEditAccount,
+    handleDeleteAccount,
+    handleToggleConnection,
+    handleUpdateDescription,
+    handleUpdateTradingPairs,
+    handleUpdateFeatures,
+    handleUpdateStatistics,
+    handleUpdateBotInfo,
+    refreshSignalLogs
   };
 };
