@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LogsTabContent from '../tabs/LogsTabContent';
@@ -5,6 +6,7 @@ import AccountsTabContent from '../tabs/AccountsTabContent';
 import { getTabsListClassName, getTabTriggerClassName, getTabIcon } from '../tabs/TabStyles';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
+
 interface PremiumBotTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
@@ -15,8 +17,10 @@ interface PremiumBotTabsProps {
   overviewContent: React.ReactNode;
   accountsData?: Account[];
   logsData?: CoinstratSignal[];
+  logsLoading?: boolean;
   signalSourceLabel?: string;
 }
+
 const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
   activeTab,
   onTabChange,
@@ -27,6 +31,7 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
   overviewContent,
   accountsData,
   logsData,
+  logsLoading = false,
   signalSourceLabel = "TB365 ID"
 }) => {
   return <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
@@ -50,8 +55,18 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">
-        <LogsTabContent botId={botId} userId={userId} botType="premium" logsData={logsData} signalSourceLabel={signalSourceLabel} title="Premium Trading Logs" description="Xem lịch sử các tín hiệu đã được xử lý bởi Premium Bot" />
+        <LogsTabContent 
+          botId={botId} 
+          userId={userId} 
+          botType="premium" 
+          logsData={logsData} 
+          isLoading={logsLoading}
+          signalSourceLabel={signalSourceLabel} 
+          title="Premium Trading Logs" 
+          description="Xem lịch sử các tín hiệu đã được xử lý bởi Premium Bot" 
+        />
       </TabsContent>
     </Tabs>;
 };
+
 export default PremiumBotTabs;

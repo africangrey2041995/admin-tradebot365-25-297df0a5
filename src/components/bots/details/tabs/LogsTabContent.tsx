@@ -11,6 +11,7 @@ interface LogsTabContentProps {
   userId: string;
   botType: 'premium' | 'prop' | 'user';
   logsData?: CoinstratSignal[];
+  isLoading?: boolean;
   signalSourceLabel: string;
   title: string;
   description: string;
@@ -21,6 +22,7 @@ const LogsTabContent: React.FC<LogsTabContentProps> = ({
   userId,
   botType,
   logsData,
+  isLoading,
   signalSourceLabel,
   title,
   description
@@ -35,6 +37,7 @@ const LogsTabContent: React.FC<LogsTabContentProps> = ({
           botId={botId} 
           userId={userId}
           initialData={logsData}
+          isLoading={isLoading}
           signalSourceLabel={signalSourceLabel}
           botType={botType}
         />

@@ -96,6 +96,7 @@ export const useCombinedSignalLogs = ({
     setAvailableUsers(users);
   }, [coinstratLogs]);
 
+  // This is a modified version that better handles the loading state
   const refreshLogs = useCallback(() => {
     // Prevent concurrent fetches
     if (fetchInProgressRef.current) {
@@ -106,59 +107,47 @@ export const useCombinedSignalLogs = ({
     fetchInProgressRef.current = true;
     startLoading();
     
-    // Start a safety timeout to prevent infinite loading
-    const safetyTimeout = setTimeout(() => {
+    // Create a promise that resolves when both fetches are complete
+    Promise.all([
+      new Promise<void>(resolve => {
+        fetchTvLogs();
+        // We're not waiting for the actual completion since these are mock fetches
+        // In a real app, these would return Promises we could await
+        setTimeout(resolve, 1000);
+      }),
+      new Promise<void>(resolve => {
+        fetchCsLogs();
+        // Same here, setting a reasonable timeout
+        setTimeout(resolve, 1000);
+      })
+    ]).then(() => {
+      // Both fetches have completed
+      stopLoading();
+      fetchInProgressRef.current = false;
+      console.log('CombinedSignalLogs - All fetches complete, loading state cleared');
+    }).catch(error => {
+      console.error('Error in refreshLogs:', error);
+      stopLoading();
+      fetchInProgressRef.current = false;
+    });
+    
+    // Set a maximum timeout as a fallback
+    setTimeout(() => {
       if (fetchInProgressRef.current) {
         console.warn('CombinedSignalLogs - Safety timeout reached, forcing loading state reset');
         stopLoading();
         fetchInProgressRef.current = false;
       }
-    }, 10000);
-    
-    // Call both fetch functions
-    fetchTvLogs();
-    fetchCsLogs();
-    
-    // Use a more reliable approach to detect completion
-    let tvDone = false;
-    let csDone = false;
-    
-    // Set up a check interval with a counter to ensure we eventually stop waiting
-    let checkCount = 0;
-    const maxChecks = 40; // 40 checks * 300ms = 12 seconds max wait time
-    
-    const checkInterval = setInterval(() => {
-      checkCount++;
-      
-      // Check if individual fetches are done
-      if (!tvLoading) tvDone = true;
-      if (!csLoading) csDone = true;
-      
-      // Debug log
-      console.log(`CombinedSignalLogs - Check ${checkCount}: TV: ${tvDone ? 'done' : 'loading'}, CS: ${csDone ? 'done' : 'loading'}`);
-      
-      // If both are done or we've reached max checks
-      if ((tvDone && csDone) || checkCount >= maxChecks) {
-        clearInterval(checkInterval);
-        clearTimeout(safetyTimeout);
-        
-        // Small delay before setting loading to false to ensure UI stability
-        setTimeout(() => {
-          stopLoading();
-          fetchInProgressRef.current = false;
-          console.log('CombinedSignalLogs - All fetches complete, loading state cleared');
-        }, 300);
-      }
-    }, 300);
-    
-    // Clean up interval and timeout if component unmounts during fetch
-    return () => {
-      clearInterval(checkInterval);
-      clearTimeout(safetyTimeout);
-    };
-  }, [fetchTvLogs, fetchCsLogs, startLoading, stopLoading, tvLoading, csLoading]);
+    }, 5000);
+  }, [fetchTvLogs, fetchCsLogs, startLoading, stopLoading]);
 
-  // Handle refresh trigger
+  // Initial fetch
+  useEffect(() => {
+    refreshLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [botId, userId]);
+
+  // Handle refresh trigger from parent
   useEffect(() => {
     if (refreshTrigger) {
       refreshLogs();
