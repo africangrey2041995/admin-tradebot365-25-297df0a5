@@ -12,6 +12,7 @@ import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 import { BotType } from '@/constants/botTypes';
 import BotDescription from '@/components/bots/details/BotDescription';
 import FeaturesList from '@/components/bots/details/FeaturesList';
+import BotInfoCard from '@/components/bots/details/BotInfoCard';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -85,7 +86,7 @@ const IntegratedPremiumBotDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2 space-y-6">
             <BotDescription 
-              description={bot.longDescription || ''} 
+              description={bot.description || ''} 
               pairs={bot.pairs || []} 
             />
 
