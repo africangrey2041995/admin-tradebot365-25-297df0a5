@@ -63,7 +63,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
     handleRefresh();
   };
 
-  // Create properly typed handler functions
+  // Fix the type mismatch by creating wrapper functions with correct signatures
   const handleAddAccount = (account: Account) => {
     addAccount(account);
   };
