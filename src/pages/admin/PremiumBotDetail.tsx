@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -10,8 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
-import TradingViewLogs from '@/components/bots/TradingViewLogs';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
 import PremiumBotStatsCards from '@/components/admin/premium-bots/detail/PremiumBotStatsCards';
 
@@ -391,11 +388,9 @@ const PremiumBotDetail = () => {
 
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
-          <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
-          <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab - Enhanced with charts and visualizations */}
@@ -471,36 +466,6 @@ const PremiumBotDetail = () => {
               </CardDescription>
               
               <HierarchicalAccountsTable accounts={accounts} onRefresh={refreshAccounts} onEdit={handleEditAccount} onDelete={handleDeleteAccount} onToggleConnection={handleToggleConnection} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Trading Logs Tab */}
-        <TabsContent value="trading-logs">
-          <Card>
-            <CardHeader>
-              <CardTitle>TB365 Signal Logs</CardTitle>
-              <CardDescription>
-                Tracking of all signals from TB365 platform
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TradingViewLogs botId={botId || ''} userId="admin" signalSourceLabel="TB365 ID" />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Coinstrat Logs Tab */}
-        <TabsContent value="coinstrat-logs">
-          <Card>
-            <CardHeader>
-              <CardTitle>Coinstrat Logs</CardTitle>
-              <CardDescription>
-                Logs of all processed signals in the Coinstrat platform
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CoinstratLogs botId={botId || ''} userId="admin" />
             </CardContent>
           </Card>
         </TabsContent>
