@@ -11,6 +11,7 @@ import EmptyAccountsState from './EmptyAccountsState';
 import LoadingAccounts from './LoadingAccounts';
 import ErrorState from './ErrorState';
 import AccountsFilter from './AccountsFilter';
+import AddAccountDialog from './AddAccountDialog';
 
 interface AccountsFilterParams {
   searchQuery: string;
@@ -143,6 +144,7 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
     filterStatus: 'all',
     filterLiveDemo: 'all'
   });
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
 
   const toggleCSPExpansion = (cspId: string) => {
     setExpandedCSPs(prev => 
@@ -186,6 +188,13 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
     setFilters(newFilters);
   };
 
+  const handleAddAccount = (accountData: any) => {
+    console.log('Adding account:', accountData);
+    toast.success('Tài khoản đã được thêm thành công!');
+    onRefresh();
+    setIsAddAccountDialogOpen(false);
+  };
+
   const organizedAccounts = useMemo(() => organizeAccounts(accounts), [accounts]);
   const filteredAccounts = useMemo(() => 
     filterAccounts(organizedAccounts, filters), 
@@ -208,7 +217,7 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
       <EmptyAccountsState 
         onRefresh={onRefresh} 
         botType={botType} 
-        onAddAccount={onAddAccount} 
+        onAddAccount={() => setIsAddAccountDialogOpen(true)} 
       />
     );
   }
@@ -223,6 +232,14 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
           </p>
         </div>
         <div className="space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsAddAccountDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm Tài Khoản
+          </Button>
           <Button variant="outline" size="sm" onClick={onRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Làm mới
@@ -328,6 +345,13 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
           </AccordionItem>
         ))}
       </Accordion>
+
+      <AddAccountDialog
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={botType === 'user' ? 'User Bot' : botType === 'premium' ? 'Premium Bot' : 'Prop Bot'}
+        onAddAccount={handleAddAccount}
+      />
     </div>
   );
 };

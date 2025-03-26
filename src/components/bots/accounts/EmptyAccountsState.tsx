@@ -1,6 +1,8 @@
 
 import React from 'react';
 import BotEmptyState from '../common/BotEmptyState';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 interface EmptyAccountsStateProps {
   onRefresh?: () => void;
