@@ -23,7 +23,6 @@ import EditableDescriptionCard from '@/components/admin/premium-bots/detail/Edit
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
 import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
-import EditableBotInfoCard from '@/components/admin/premium-bots/detail/EditableBotInfoCard';
 
 // Import components from user view to enhance admin view
 import { useBotStatistics } from '@/hooks/useBotStatistics';
@@ -405,17 +404,41 @@ const PremiumBotDetail = () => {
               {bot.features && <EditableFeaturesCard features={bot.features} onUpdate={handleUpdateFeatures} />}
             </div>
             <div className="space-y-4">
-              {/* Replace the static bot info card with the editable version */}
-              <EditableBotInfoCard 
-                type={bot.type}
-                exchange={bot.exchange}
-                minCapital={bot.minCapital}
-                subscribers={bot.subscribers}
-                createdAt={bot.createdAt}
-                updatedAt={bot.updatedAt}
-                onUpdate={handleUpdateBotInfo}
-              />
-              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Thông tin Bot</CardTitle>
+                  <Button variant="ghost" size="sm">
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Chỉnh sửa
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Loại Bot</h3>
+                    <p>{bot.type}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Sàn giao dịch</h3>
+                    <p>{bot.exchange}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Vốn tối thiểu</h3>
+                    <p>{bot.minCapital}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Số người đăng ký</h3>
+                    <p>{bot.subscribers}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</h3>
+                    <p>{new Date(bot.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Cập nhật lần cuối</h3>
+                    <p>{new Date(bot.updatedAt).toLocaleDateString()}</p>
+                  </div>
+                </CardContent>
+              </Card>
               <BotPerformanceCard performance={{
               lastMonth: bot.performanceLastMonth,
               allTime: bot.performanceAllTime
