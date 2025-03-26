@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -18,10 +19,7 @@ import {
   CircleDollarSign,
   LineChart,
   Zap,
-  Shield,
-  ChartCandlestick,
-  ChartLine,
-  ChartPie
+  Shield
 } from 'lucide-react';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { isValidEmail } from '@/utils/validationUtils';
@@ -36,6 +34,7 @@ const SignIn = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Kiểm tra Clerk có hoạt động không
   const clerkEnabled = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 
   if (!isLoaded && clerkEnabled) {
@@ -174,12 +173,14 @@ const SignIn = () => {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center relative overflow-hidden bg-[#0e0f12]">
+      {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-zinc-900/80 via-zinc-800/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/e0abed95-bdb0-4253-b385-4f893d26796a.png')] bg-cover opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png')] bg-cover opacity-5"></div>
         
+        {/* Animated background glows */}
         <motion.div 
-          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-cyan-500/5 blur-[100px]"
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-tradebot/5 blur-[100px]"
           animate={{ 
             scale: [1, 1.2, 1], 
             opacity: [0.15, 0.2, 0.15] 
@@ -206,17 +207,18 @@ const SignIn = () => {
         />
       </div>
       
-      <div className="absolute top-24 left-20 text-cyan-500/10">
-        <ChartCandlestick className="h-16 w-16" />
+      {/* Tech elements */}
+      <div className="absolute top-24 left-20 text-white/10">
+        <LineChart className="h-16 w-16" />
       </div>
-      <div className="absolute bottom-24 left-32 text-cyan-500/10">
+      <div className="absolute bottom-24 left-32 text-white/10">
         <CircleDollarSign className="h-10 w-10" />
       </div>
-      <div className="absolute top-32 right-20 text-cyan-500/10">
-        <ChartLine className="h-12 w-12" />
+      <div className="absolute top-32 right-20 text-white/10">
+        <TrendingUp className="h-12 w-12" />
       </div>
-      <div className="absolute bottom-40 right-36 text-cyan-500/10">
-        <ChartPie className="h-14 w-14" />
+      <div className="absolute bottom-40 right-36 text-white/10">
+        <Shield className="h-14 w-14" />
       </div>
       
       <div className="absolute top-8 left-8 z-10">
@@ -248,10 +250,10 @@ const SignIn = () => {
         className="w-full max-w-md z-10"
       >
         <div className="relative">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/50 to-blue-600/50 rounded-2xl blur-lg opacity-20"></div>
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-tradebot/50 to-blue-600/50 rounded-2xl blur-lg opacity-20"></div>
           <Card className="border-zinc-700/50 bg-zinc-900/60 backdrop-blur-xl shadow-2xl relative">
             <motion.div 
-              className="absolute right-5 top-5 text-cyan-400"
+              className="absolute right-5 top-5 text-tradebot"
               animate={{ 
                 rotateZ: [0, 10, -10, 0],
                 scale: [1, 1.05, 0.95, 1]
@@ -267,7 +269,7 @@ const SignIn = () => {
             </motion.div>
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold text-white flex items-center">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-tradebot to-blue-500">
                   Đăng Nhập
                 </span>
               </CardTitle>
@@ -350,7 +352,7 @@ const SignIn = () => {
                       placeholder="your@email.com"
                       value={emailAddress}
                       onChange={(e) => setEmailAddress(e.target.value)}
-                      className={`pl-10 border-zinc-700/50 bg-zinc-800/40 text-white focus-visible:ring-cyan-500 focus-visible:border-cyan-500/70 transition-all duration-300 backdrop-blur-sm ${errors.email ? 'border-red-600/70' : ''}`}
+                      className={`pl-10 border-zinc-700/50 bg-zinc-800/40 text-white focus-visible:ring-tradebot focus-visible:border-tradebot/70 transition-all duration-300 backdrop-blur-sm ${errors.email ? 'border-red-600/70' : ''}`}
                     />
                   </div>
                   {errors.email && (
@@ -369,7 +371,7 @@ const SignIn = () => {
                     <Label htmlFor="password" className="text-zinc-400">Mật khẩu</Label>
                     <Link 
                       to="#" 
-                      className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                      className="text-xs text-tradebot hover:text-tradebot/80 transition-colors"
                       onClick={(e) => {
                         e.preventDefault();
                         toast({
@@ -389,7 +391,7 @@ const SignIn = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`pl-10 border-zinc-700/50 bg-zinc-800/40 text-white focus-visible:ring-cyan-500 focus-visible:border-cyan-500/70 transition-all duration-300 backdrop-blur-sm ${errors.password ? 'border-red-600/70' : ''}`}
+                      className={`pl-10 border-zinc-700/50 bg-zinc-800/40 text-white focus-visible:ring-tradebot focus-visible:border-tradebot/70 transition-all duration-300 backdrop-blur-sm ${errors.password ? 'border-red-600/70' : ''}`}
                     />
                   </div>
                   {errors.password && (
@@ -405,7 +407,8 @@ const SignIn = () => {
                 
                 <Button
                   type="submit"
-                  className="w-full shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium"
+                  variant="tradebot"
+                  className="w-full shadow-lg hover:shadow-tradebot/30 transition-all duration-300 relative overflow-hidden group"
                   disabled={isLoading}
                 >
                   <motion.div 
@@ -425,7 +428,7 @@ const SignIn = () => {
             <CardFooter className="flex flex-col space-y-4 border-t border-zinc-800/50 pt-4">
               <p className="text-center text-sm text-zinc-500">
                 Chưa có tài khoản?{" "}
-                <Link to="/sign-up" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                <Link to="/sign-up" className="text-tradebot hover:text-tradebot/80 transition-colors">
                   Đăng ký ngay
                 </Link>
               </p>
@@ -442,4 +445,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-
