@@ -4,12 +4,15 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 import { toast } from 'sonner';
+import PremiumBotDetailTabs from '@/components/bots/details/PremiumBotDetailTabs';
 import BotHeader from '@/components/bots/details/BotHeader';
 import BotDescription from '@/components/bots/details/BotDescription';
 import FeaturesList from '@/components/bots/details/FeaturesList';
 import BotInfoCard from '@/components/bots/details/BotInfoCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import PerformanceCard from '@/components/bots/details/PerformanceCard';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 
 const premiumBots = [
   {
@@ -82,7 +85,7 @@ Các tính năng chính:
 - Hoạt động 24/7
 - Báo cáo chi tiết
 
-Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhn rủi ro cao.`,
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhận rủi ro cao.`,
     exchange: 'Binance',
     type: 'scalping',
     performanceLastMonth: '+22.1%',
@@ -183,7 +186,7 @@ Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ c�
     description: 'Bot giao dịch lưới, tối ưu hóa lợi nhuận trong thị trường đi ngang.',
     longDescription: `Grid Master Bot là một bot giao dịch lưới được thiết kế để tạo ra lợi nhuận trong thị trường đi ngang hoặc ít biến động.
 
-Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lới, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra li nhuận nhỏ từ mỗi giao dịch.
+Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lưới, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra lợi nhuận nhỏ từ mỗi giao dịch.
 
 Các tính năng chính:
 - Tạo lợi nhuận trong thị trường đi ngang
@@ -241,7 +244,10 @@ const PremiumBotDetail = () => {
 
   const bot = premiumBots.find(b => b.id === botId);
 
-  const { statisticsData } = usePremiumBotDetail(botId, 'user-001');
+  const { 
+    tradePerformanceData, 
+    statisticsData 
+  } = usePremiumBotDetail(botId, 'user-001');
 
   if (!bot) {
     return (
@@ -335,6 +341,11 @@ const PremiumBotDetail = () => {
               minCapital={bot.minCapital}
               createdDate={bot.createdDate}
               subscribers={bot.subscribers}
+            />
+
+            <PerformanceCard
+              performanceLastMonth={bot.performanceLastMonth}
+              performanceAllTime={bot.performanceAllTime}
             />
 
             <div className="card border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden">

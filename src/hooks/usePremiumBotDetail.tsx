@@ -1,181 +1,336 @@
 
-import { useState } from 'react';
-import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { BotType, BotRiskLevel } from '@/constants/botTypes';
+import { useBotAccounts } from '@/hooks/useBotAccounts';
+import { useBotStatistics } from '@/hooks/useBotStatistics';
+import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
+import { Account, PremiumBot } from '@/types';
 
-// Create a basic PremiumBot type for the hook
-interface PremiumBot {
-  id: string;
-  botId: string;
-  name: string;
-  description: string;
-  longDescription?: string;
-  type: string;
-  exchange: string;
-  minCapital: string;
-  risk: BotRiskLevel;
-  performanceLastMonth: string;
-  performanceAllTime: string;
-  subscribers: number;
-  features: string[];
-  pairs: string[];
-  createdDate: string;
-  lastUpdated: string;
-  status: 'active' | 'inactive';
-}
+// Mock Premium Bot data
+const mockPremiumBots = [{
+  id: 'PRE-001',
+  botId: 'PRE-001',
+  name: 'Alpha Edge',
+  description: 'High performance bot for experienced traders with advanced risk management.',
+  longDescription: `Alpha Edge is our flagship premium bot designed for experienced traders who want to maximize their trading potential.
 
-export const usePremiumBotDetail = (botId: string | undefined, userId: string) => {
-  // Basic states
-  const [refreshLoading, setRefreshLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [selectedPeriod, setSelectedPeriod] = useState("1m");
+This bot utilizes advanced algorithms to identify and capitalize on market inefficiencies, with sophisticated risk management systems to protect your capital.
+
+The Alpha Edge bot has consistently delivered excellent performance over various market conditions, with robust backtesting results and real-world performance.`,
+  type: 'premium',
+  status: 'active',
+  risk: 'medium',
+  subscribers: 128,
+  minCapital: '$1000',
+  exchange: 'Binance',
+  performanceLastMonth: '+18.7%',
+  performanceAllTime: '+145.3%',
+  pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT'],
+  price: {
+    monthly: 49.99,
+    quarterly: 129.99,
+    yearly: 459.99
+  },
+  features: ['Advanced algorithm', 'Real-time market analysis', 'Smart risk management', 'Multi-exchange support', '24/7 operation', 'Performance reports', 'Priority support'],
+  createdDate: '2023-05-15T10:30:00Z',
+  lastUpdated: '2023-11-10T15:45:00Z'
+}, {
+  id: 'PRE-002',
+  botId: 'PRE-002',
+  name: 'Momentum Master',
+  description: 'Capitalizing on market momentum with trend identification and precise entries.',
+  longDescription: `Momentum Master is a premium bot that specializes in identifying and capitalizing on market momentum.
+
+Using a combination of technical indicators and price action analysis, this bot excels at identifying trends early and executing precise entries and exits to maximize profit.
+
+The Momentum Master bot is particularly effective in trending markets, with risk management features to mitigate drawdowns during consolidation periods.`,
+  type: 'premium',
+  status: 'active',
+  risk: 'high',
+  subscribers: 87,
+  minCapital: '$500',
+  exchange: 'KuCoin',
+  performanceLastMonth: '+24.2%',
+  performanceAllTime: '+188.5%',
+  pairs: ['BTC/USDT', 'ETH/USDT', 'MATIC/USDT', 'DOGE/USDT', 'ADA/USDT'],
+  price: {
+    monthly: 59.99,
+    quarterly: 149.99,
+    yearly: 539.99
+  },
+  features: ['Momentum detection', 'Trend strength analysis', 'Dynamic take profit levels', 'Adaptive stop-loss', 'Market condition filter', 'Performance tracking', 'VIP support channel'],
+  createdDate: '2023-06-20T09:15:00Z',
+  lastUpdated: '2023-10-28T12:30:00Z'
+}];
+
+// Mock accounts data for the bot
+const mockAccounts: Account[] = [{
+  cspAccountId: 'csp-001',
+  cspAccountName: 'Binance Account 1',
+  status: 'Connected',
+  createdDate: '2023-01-15',
+  lastUpdated: '2023-11-01',
+  cspUserId: 'user-001',
+  apiName: 'Binance',
+  apiId: 'api-001',
+  tradingAccountNumber: '12345678',
+  tradingAccountId: 'trading-001',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$5,420.50',
+  isLive: true,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-002',
+  cspAccountName: 'KuCoin Account',
+  status: 'Connected',
+  createdDate: '2023-02-10',
+  lastUpdated: '2023-10-15',
+  cspUserId: 'user-001',
+  apiName: 'KuCoin',
+  apiId: 'api-002',
+  tradingAccountNumber: '87654321',
+  tradingAccountId: 'trading-002',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$1,250.30',
+  isLive: true,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-003',
+  cspAccountName: 'Binance Demo',
+  status: 'Connected',
+  createdDate: '2023-03-05',
+  lastUpdated: '2023-09-20',
+  cspUserId: 'user-001',
+  apiName: 'Binance',
+  apiId: 'api-003',
+  tradingAccountNumber: '11223344',
+  tradingAccountId: 'trading-003',
+  tradingAccountType: 'NETTED',
+  tradingAccountBalance: '$10,000.00',
+  isLive: false,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-004',
+  cspAccountName: 'Bybit Main',
+  status: 'Disconnected',
+  createdDate: '2023-01-20',
+  lastUpdated: '2023-08-15',
+  cspUserId: 'user-002',
+  apiName: 'Bybit',
+  apiId: 'api-004',
+  tradingAccountNumber: '98765432',
+  tradingAccountId: 'trading-004',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$3,750.60',
+  isLive: true,
+  cspUserEmail: 'user2@example.com',
+  userAccount: 'Jane Smith'
+}, {
+  cspAccountId: 'csp-005',
+  cspAccountName: 'OKX Account',
+  status: 'Connected',
+  createdDate: '2023-04-25',
+  lastUpdated: '2023-10-30',
+  cspUserId: 'user-002',
+  apiName: 'OKX',
+  apiId: 'api-005',
+  tradingAccountNumber: '55667788',
+  tradingAccountId: 'trading-005',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$8,210.25',
+  isLive: true,
+  cspUserEmail: 'user2@example.com',
+  userAccount: 'Jane Smith'
+}, {
+  cspAccountId: 'csp-006',
+  cspAccountName: 'Binance Pro',
+  status: 'Connected',
+  createdDate: '2023-05-18',
+  lastUpdated: '2023-11-02',
+  cspUserId: 'user-003',
+  apiName: 'Binance',
+  apiId: 'api-006',
+  tradingAccountNumber: '13579246',
+  tradingAccountId: 'trading-006',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$15,420.80',
+  isLive: true,
+  cspUserEmail: 'user3@example.com',
+  userAccount: 'Robert Johnson'
+}];
+
+export const usePremiumBotDetail = (botId: string | undefined) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+
+  // Get statistics data from the hook
+  const { statisticsData } = useBotStatistics();
+
+  // Get bot data
+  const bot = mockPremiumBots.find(b => b.id === botId || b.botId === botId);
+
+  // Get signal logs data for signal count and Signal Tracking tab
+  const { 
+    coinstratLogs,
+    tradingViewLogs,
+    refreshLogs,
+    loading: logsLoading,
+    availableUsers: userList 
+  } = useCombinedSignalLogs({
+    botId: botId || '',
+    userId: 'admin'
+  });
+
+  // Transform availableUsers from array of strings to array of objects with id and name
+  const availableUsers = userList.map(user => ({
+    id: `user-${user.id || user.name.toLowerCase().replace(/\s+/g, '-')}`,
+    name: user.name
+  }));
+
+  // Set up accounts data for the selected bot using the same hook as prop bots
+  const {
+    accounts,
+    loading: accountsLoading,
+    handleRefresh: refreshAccounts,
+    toggleAccountStatus
+  } = useBotAccounts(botId || '', 'admin', mockAccounts);
+
+  // Calculate statistics
+  const uniqueUsers = React.useMemo(() => {
+    const userIds = new Set(accounts.map(account => account.cspUserId));
+    return userIds.size;
+  }, [accounts]);
+
+  const tradingAccountsCount = accounts.length;
   
-  // Find bot by ID - mocked for now
-  const mockBot: PremiumBot = {
-    id: botId || '',
-    botId: `PRE${Math.floor(Math.random() * 10000)}`,
-    name: "Alpha Momentum",
-    description: "Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.",
-    longDescription: "Alpha Momentum Bot là một bot giao dịch tiên tiến sử dụng chiến lược momentum để giao dịch các cặp tiền điện tử.",
-    type: BotType.PREMIUM_BOT,
-    exchange: "Coinstart Pro",
-    minCapital: "$500",
-    risk: BotRiskLevel.MEDIUM,
-    performanceLastMonth: "+18.5%",
-    performanceAllTime: "+125.4%",
-    subscribers: 86,
-    features: [
-      'Phân tích động lượng',
-      'Bộ lọc tin hiệu',
-      'Quản lý rủi ro'
-    ],
-    pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'],
-    createdDate: "2023-04-15",
-    lastUpdated: "2023-10-01",
-    status: 'active'
-  };
+  const processedSignalsCount = React.useMemo(() => {
+    return coinstratLogs.length;
+  }, [coinstratLogs]);
 
-  // Mock data
-  const chartData = [
-    { date: '2023-01-01', value: 12.5 },
-    { date: '2023-02-01', value: 8.3 },
-    { date: '2023-03-01', value: -2.1 },
-    { date: '2023-04-01', value: 5.7 },
-    { date: '2023-05-01', value: 15.2 },
-  ];
-
-  // Simple mock statistics data
-  const statisticsData = [
-    { 
-      name: 'Win Rate', 
-      value: '65%', 
-      icon: <Activity className="h-4 w-4 text-green-500" /> 
-    },
-    { 
-      name: 'Avg Profit', 
-      value: '2.7%', 
-      icon: <TrendingUp className="h-4 w-4 text-green-500" /> 
-    },
-    { 
-      name: 'Max Drawdown', 
-      value: '8.5%', 
-      icon: <LineChart className="h-4 w-4 text-red-500" /> 
-    },
-    { 
-      name: 'Sharp Ratio', 
-      value: '1.8', 
-      icon: <PieChart className="h-4 w-4 text-blue-500" /> 
-    },
-  ];
-
-  // Simple mock trade performance data
-  const tradePerformanceData = [
-    { name: 'Jan', profit: 12.5, trades: 24 },
-    { name: 'Feb', profit: 8.3, trades: 18 },
-    { name: 'Mar', profit: -2.1, trades: 15 },
-    { name: 'Apr', profit: 5.7, trades: 17 },
-    { name: 'May', profit: 15.2, trades: 29 },
-    { name: 'Jun', profit: 10.1, trades: 22 },
-    { name: 'Jul', profit: 5.5, trades: 20 },
-    { name: 'Aug', profit: -3.2, trades: 16 },
-    { name: 'Sep', profit: 9.8, trades: 21 },
-    { name: 'Oct', profit: 18.5, trades: 28 },
-  ];
-  
-  // Mock accounts data for admin section
-  const accounts = [];
-  const uniqueUsers = 24;
-  const tradingAccountsCount = 38;
-  const processedSignalsCount = 458;
-  const tradingViewLogs = [];
-  const coinstratLogs = [];
-  const logsLoading = false;
-  const availableUsers = [];
-
-  const refreshTabData = () => {
-    setRefreshLoading(true);
-    // Simulate API call with a timer
-    setTimeout(() => {
-      setRefreshLoading(false);
-      toast.success('Đã làm mới dữ liệu');
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
     }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle account operations
+  const handleEditAccount = (account: Account) => {
+    console.log("Edit account:", account);
+    toast.info(`Editing account: ${account.cspAccountName}`);
+    // In production, this would open an edit dialog and then call updateAccount()
+  };
+  
+  const handleDeleteAccount = (accountId: string) => {
+    console.log("Delete account:", accountId);
+    toast.info(`Deleting account: ${accountId}`);
+    // In production, this would show a confirmation dialog and then call deleteAccount()
+  };
+  
+  const handleToggleConnection = (accountId: string) => {
+    console.log("Toggle connection:", accountId);
+    toggleAccountStatus(accountId);
   };
 
-  // Admin-specific handlers
-  const refreshAccounts = () => toast.success('Refreshed accounts');
-  const handleEditAccount = () => toast.success('Edit account');
-  const handleDeleteAccount = () => toast.success('Delete account');
-  const handleToggleConnection = () => toast.success('Toggle connection');
-  const handleUpdateDescription = () => toast.success('Update description');
-  const handleUpdateTradingPairs = () => toast.success('Update trading pairs');
-  const handleUpdateFeatures = () => toast.success('Update features');
-  const handleUpdateStatistics = () => toast.success('Update statistics');
-  const handleUpdateBotInfo = () => toast.success('Update bot info');
-  const refreshSignalLogs = () => toast.success('Refresh signal logs');
+  // Handle update bot description
+  const handleUpdateDescription = (description: string) => {
+    toast.success("Bot description updated");
+    console.log("Updated description:", description);
+  };
+
+  // Handle update trading pairs
+  const handleUpdateTradingPairs = (pairs: string[]) => {
+    toast.success("Trading pairs updated");
+    console.log("Updated pairs:", pairs);
+  };
+
+  // Handle update features
+  const handleUpdateFeatures = (features: string[]) => {
+    toast.success("Bot features updated");
+    console.log("Updated features:", features);
+  };
+
+  // Handle update statistics
+  const handleUpdateStatistics = (updatedStats: { name: string; value: string; icon: React.ReactNode }[]) => {
+    toast.success("Bot statistics updated");
+    console.log("Updated statistics:", updatedStats);
+  };
+
+  // Handle update bot information
+  const handleUpdateBotInfo = (info: {
+    type: string;
+    exchange: string;
+    minCapital: string;
+  }) => {
+    toast.success("Bot information updated");
+    console.log("Updated bot information:", info);
+  };
+
+  // Centralized function for refreshing tab data
+  const refreshTabData = () => {
+    if (activeTab === 'overview') {
+      // Refresh overview data if needed
+    } else if (activeTab === 'accounts') {
+      refreshAccounts();
+    } else if (activeTab === 'signal-tracking') {
+      refreshLogs();
+    }
+  };
 
   return {
-    // Basic data
-    tradePerformanceData,
-    statisticsData,
-    refreshLoading,
-    refreshTabData,
-    
-    // Page states
     isLoading,
-    isAuthorized,
     activeTab,
     setActiveTab,
-    selectedPeriod,
-    setSelectedPeriod,
-    chartData,
-    
-    // Bot data
-    bot: mockBot,
-    
-    // Admin-specific data
+    bot,
     accounts,
     uniqueUsers,
     tradingAccountsCount,
     processedSignalsCount,
+    statisticsData,
     tradingViewLogs,
     coinstratLogs,
     logsLoading,
     availableUsers,
-    
-    // Admin-specific handlers
     refreshAccounts,
-    handleEditAccount,
-    handleDeleteAccount,
-    handleToggleConnection,
-    handleUpdateDescription,
-    handleUpdateTradingPairs,
-    handleUpdateFeatures,
-    handleUpdateStatistics,
-    handleUpdateBotInfo,
-    refreshSignalLogs
+    handleEditAccount: (account: Account) => {
+      console.log("Edit account:", account);
+      toast.info(`Editing account: ${account.cspAccountName}`);
+    },
+    handleDeleteAccount: (accountId: string) => {
+      console.log("Delete account:", accountId);
+      toast.info(`Deleting account: ${accountId}`);
+    },
+    handleToggleConnection: toggleAccountStatus,
+    handleUpdateDescription: (description: string) => {
+      toast.success("Bot description updated");
+      console.log("Updated description:", description);
+    },
+    handleUpdateTradingPairs: (pairs: string[]) => {
+      toast.success("Trading pairs updated");
+      console.log("Updated pairs:", pairs);
+    },
+    handleUpdateFeatures: (features: string[]) => {
+      toast.success("Bot features updated");
+      console.log("Updated features:", features);
+    },
+    handleUpdateStatistics: (updatedStats: { name: string; value: string; icon: React.ReactNode }[]) => {
+      toast.success("Bot statistics updated");
+      console.log("Updated statistics:", updatedStats);
+    },
+    handleUpdateBotInfo: (info: {
+      type: string;
+      exchange: string;
+      minCapital: string;
+    }) => {
+      toast.success("Bot information updated");
+      console.log("Updated bot information:", info);
+    },
+    refreshSignalLogs: refreshLogs,
+    refreshLoading: logsLoading || accountsLoading,
+    refreshTabData
   };
 };

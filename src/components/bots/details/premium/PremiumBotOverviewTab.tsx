@@ -2,6 +2,7 @@
 import React from 'react';
 import TradeDetails from '@/components/bots/details/TradeDetails';
 import BotInformation from '@/components/bots/details/BotInformation';
+import PerformanceStats from '@/components/bots/details/PerformanceStats';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PremiumBotOverviewTabProps {
@@ -70,8 +71,11 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
           minCapital={bot.minCapital}
           integrationDate={bot.createdDate}
         />
-        
-        {/* PerformanceStats component removed */}
+
+        <PerformanceStats 
+          lastMonthPerformance={bot.performanceLastMonth}
+          allTimePerformance={bot.performanceAllTime}
+        />
       </div>
     </div>
   );
