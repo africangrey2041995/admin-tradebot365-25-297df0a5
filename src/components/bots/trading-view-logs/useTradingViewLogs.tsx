@@ -16,8 +16,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     amount: '0.01',
     status: 'Processed',
     source: 'TradingView',
-    accountName: 'Primary Trading Account',
-    userId: 'USR-001' // Added userId for filtering
+    accountName: 'Primary Trading Account'
   },
   {
     id: 'SIG002', // Changed to match the originalSignalId in coinstratLogs
@@ -30,8 +29,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     amount: '0.01',
     status: 'Processed',
     source: 'TradingView',
-    accountName: 'Primary Trading Account',
-    userId: 'USR-001' // Added userId for filtering
+    accountName: 'Primary Trading Account'
   },
   {
     id: 'SIG003', // Changed to match the originalSignalId in coinstratLogs
@@ -44,8 +42,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     amount: '0.15',
     status: 'Pending',
     source: 'TradingView',
-    accountName: 'Secondary Trading Account',
-    userId: 'USR-002' // Added userId for filtering
+    accountName: 'Secondary Trading Account'
   },
   {
     id: 'SIG004', // Updated to be consistent
@@ -59,7 +56,6 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     status: 'Failed',
     source: 'TradingView',
     accountName: 'Secondary Trading Account',
-    userId: 'USR-002', // Added userId for filtering
     errorMessage: 'Network timeout'
   }
 ];

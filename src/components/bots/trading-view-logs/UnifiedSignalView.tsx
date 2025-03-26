@@ -1,275 +1,405 @@
-
 import React, { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ChevronDown, ChevronRight, AlertTriangle, CheckCircle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { 
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { 
+  ChevronRight, ChevronDown, ExternalLink, Info, AlertCircle, CheckCircle2, ArrowUpDown
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
-import StatusBadge from './StatusBadge';
 import ActionBadge from './ActionBadge';
-import LoadingState from './LoadingState';
-import ErrorState from './ErrorState';
+import StatusBadge from './StatusBadge';
+import HierarchicalSignalView from './HierarchicalSignalView';
+import { cn } from '@/lib/utils';
 
-interface UnifiedSignalViewProps {
+export interface UnifiedSignalViewProps {
   tradingViewLogs: TradingViewSignal[];
   coinstratLogs: CoinstratSignal[];
   onRefresh: () => void;
-  isLoading?: boolean;
-  error?: Error | null;
+  isLoading: boolean;
 }
 
 const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
-  tradingViewLogs = [],
-  coinstratLogs = [],
+  tradingViewLogs,
+  coinstratLogs,
   onRefresh,
-  isLoading = false,
-  error = null
+  isLoading
 }) => {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  const [selectedSignal, setSelectedSignal] = useState<string | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  const toggleRow = (id: string) => {
+  // Create mapping from TradingView signal IDs to their Coinstrat signals
+  const signalMapping = new Map<string, CoinstratSignal[]>();
+  
+  coinstratLogs.forEach(coinstratSignal => {
+    const originalId = coinstratSignal.originalSignalId;
+    console.log(`Mapping Coinstrat signal with originalId: ${originalId}`);
+    if (!signalMapping.has(originalId)) {
+      signalMapping.set(originalId, []);
+    }
+    signalMapping.get(originalId)!.push(coinstratSignal);
+  });
+
+  // Log all Trading View signal IDs for debugging
+  console.log("TradingView signal IDs:", tradingViewLogs.map(tv => tv.id));
+  console.log("Signal mapping keys:", Array.from(signalMapping.keys()));
+
+  // Map TradingView signals to include their Coinstrat signals
+  const combinedSignals = tradingViewLogs.map(tvSignal => {
+    const relatedCoinstratSignals = signalMapping.get(tvSignal.id) || [];
+    console.log(`TV Signal ${tvSignal.id} has ${relatedCoinstratSignals.length} related Coinstrat signals`);
+    
+    // Calculate statistics about related executions
+    const totalAccounts = relatedCoinstratSignals.reduce((sum, signal) => 
+      sum + signal.processedAccounts.length + signal.failedAccounts.length, 0);
+    
+    const successfulAccounts = relatedCoinstratSignals.reduce((sum, signal) => 
+      sum + signal.processedAccounts.length, 0);
+    
+    const failedAccounts = relatedCoinstratSignals.reduce((sum, signal) => 
+      sum + signal.failedAccounts.length, 0);
+    
+    return {
+      tvSignal,
+      coinstratSignals: relatedCoinstratSignals,
+      totalAccounts,
+      successfulAccounts,
+      failedAccounts
+    };
+  });
+
+  // Identify orphaned Coinstrat signals (no matching TradingView signal)
+  const orphanedCoinstratSignals = coinstratLogs.filter(csSignal => {
+    return !tradingViewLogs.some(tvSignal => tvSignal.id === csSignal.originalSignalId);
+  });
+
+  if (orphanedCoinstratSignals.length > 0) {
+    console.log(`Found ${orphanedCoinstratSignals.length} orphaned Coinstrat signals`);
+  }
+
+  const toggleExpandRow = (id: string, e?: React.MouseEvent) => {
+    // If event is provided, stop propagation to prevent row click handling
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    console.log("Toggling row expansion for ID:", id);
+    
     setExpandedRows(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
   };
 
-  // Helper to format date
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('vi-VN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    } catch (e) {
-      console.error("Date formatting error:", e);
-      return dateString;
+  const openDetailDialog = (signalId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row expansion when clicking detail button
+    console.log("Opening detail dialog for ID:", signalId);
+    setSelectedSignal(signalId);
+    setDetailDialogOpen(true);
+  };
+
+  const getSelectedSignalDetails = () => {
+    if (!selectedSignal) return null;
+    
+    // Find the TradingView signal
+    const tvSignal = tradingViewLogs.find(signal => signal.id === selectedSignal);
+    
+    // Find all related Coinstrat signals
+    const relatedCoinstratSignals = coinstratLogs.filter(
+      signal => signal.originalSignalId === selectedSignal
+    );
+    
+    return {
+      tvSignal,
+      coinstratSignals: relatedCoinstratSignals
+    };
+  };
+
+  const formatDateTime = (isoString: string) => {
+    return new Date(isoString).toLocaleString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
+  const renderStatusSummary = (successCount: number, failedCount: number, totalCount: number) => {
+    if (totalCount === 0) {
+      return <Badge variant="outline" className="bg-gray-100 text-gray-600">No Executions</Badge>;
     }
-  };
-
-  // Get Coinstrat signals related to a TradingView signal
-  const getRelatedCoinstratSignals = (tvSignalId: string) => {
-    return coinstratLogs.filter(signal => signal.originalSignalId === tvSignalId);
-  };
-
-  // Check if we have any signals to display
-  const hasSignals = tradingViewLogs.length > 0 || coinstratLogs.length > 0;
-
-  if (isLoading) {
-    return <LoadingState message="Đang tải tín hiệu..." />;
-  }
-
-  if (error) {
-    return <ErrorState error={error} onRetry={onRefresh} />;
-  }
-
-  if (!hasSignals) {
+    
     return (
-      <div className="text-center py-10 border rounded-lg">
-        <div className="flex flex-col items-center gap-2">
-          <AlertTriangle className="h-12 w-12 text-yellow-500" />
-          <h3 className="text-xl font-medium mt-2">Không tìm thấy tín hiệu</h3>
-          <p className="text-muted-foreground mb-4">
-            Không có tín hiệu nào phù hợp với bộ lọc hiện tại hoặc bot chưa nhận được tín hiệu nào.
-          </p>
-          <Button onClick={onRefresh}>Làm mới</Button>
-        </div>
+      <div className="flex items-center space-x-1">
+        {successCount > 0 && (
+          <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            {successCount}
+          </Badge>
+        )}
+        {failedCount > 0 && (
+          <Badge variant="outline" className="bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            {failedCount}
+          </Badge>
+        )}
+        {successCount + failedCount < totalCount && (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300">
+            {totalCount - successCount - failedCount} Pending
+          </Badge>
+        )}
       </div>
     );
-  }
+  };
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-10"></TableHead>
-            <TableHead className="w-52">ID</TableHead>
-            <TableHead className="w-32">Hành động</TableHead>
-            <TableHead className="w-36">Symbol</TableHead>
-            <TableHead className="w-40">Thời gian</TableHead>
-            <TableHead className="w-32">Trạng thái</TableHead>
-            <TableHead className="w-48">Tài khoản</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {/* Trading View Signals */}
-          {tradingViewLogs.map((signal) => {
-            const isExpanded = expandedRows[signal.id] || false;
-            const relatedSignals = getRelatedCoinstratSignals(signal.id);
-            
-            return (
-              <React.Fragment key={signal.id}>
-                {/* TradingView Signal Row */}
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-10"></TableHead>
+              <TableHead>Source ID</TableHead>
+              <TableHead>Symbol</TableHead>
+              <TableHead>
+                <div className="flex items-center">
+                  Timestamp
+                  <ArrowUpDown className="ml-1 h-3 w-3" />
+                </div>
+              </TableHead>
+              <TableHead>Action</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Account Executions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {combinedSignals.map(({ tvSignal, coinstratSignals, totalAccounts, successfulAccounts, failedAccounts }) => (
+              <React.Fragment key={tvSignal.id}>
                 <TableRow 
-                  className={`cursor-pointer ${relatedSignals.length > 0 ? 'hover:bg-muted/50' : ''}`}
-                  onClick={() => relatedSignals.length > 0 && toggleRow(signal.id)}
+                  className={cn(
+                    "hover:bg-gray-50 dark:hover:bg-gray-900/50",
+                    expandedRows[tvSignal.id] && "bg-gray-50 dark:bg-gray-900/30"
+                  )}
                 >
-                  <TableCell>
-                    {relatedSignals.length > 0 ? (
-                      isExpanded ? (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      )
-                    ) : (
-                      <div className="w-4" />
-                    )}
+                  <TableCell className="px-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0"
+                      onClick={(e) => toggleExpandRow(tvSignal.id, e)}
+                    >
+                      {expandedRows[tvSignal.id] ? 
+                        <ChevronDown className="h-4 w-4" /> : 
+                        <ChevronRight className="h-4 w-4" />
+                      }
+                    </Button>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">
-                    {signal.id}
+                  <TableCell className="font-medium">
+                    <div className="flex items-center">
+                      <Badge variant="outline" className="mr-2 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300">TV</Badge>
+                      {tvSignal.id}
+                    </div>
                   </TableCell>
+                  <TableCell>{tvSignal.instrument}</TableCell>
+                  <TableCell>{formatDateTime(tvSignal.timestamp)}</TableCell>
+                  <TableCell><ActionBadge action={tvSignal.action} /></TableCell>
+                  <TableCell><StatusBadge status={tvSignal.status.toString()} /></TableCell>
                   <TableCell>
-                    <ActionBadge action={signal.action} />
+                    {renderStatusSummary(successfulAccounts, failedAccounts, totalAccounts)}
                   </TableCell>
-                  <TableCell>{signal.instrument}</TableCell>
-                  <TableCell>{formatDate(signal.timestamp)}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={signal.status} />
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="h-8"
+                      onClick={(e) => openDetailDialog(tvSignal.id, e)}
+                    >
+                      <Info className="h-4 w-4 mr-1" />
+                      Details
+                    </Button>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900/30 dark:text-blue-300">
-                        TradingView/TB365
-                      </span>
+                </TableRow>
+                {expandedRows[tvSignal.id] && coinstratSignals.length > 0 && (
+                  <TableRow className="bg-gray-50 dark:bg-gray-900/10">
+                    <TableCell colSpan={8} className="p-0">
+                      <div className="p-4">
+                        <div className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                          Coinstrat Signal Executions
+                        </div>
+                        <div className="border rounded-md bg-white dark:bg-gray-950">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Coinstrat ID</TableHead>
+                                <TableHead>Symbol</TableHead>
+                                <TableHead>Timestamp</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Accounts</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {coinstratSignals.map(csSignal => (
+                                <TableRow key={csSignal.id} className="hover:bg-gray-100 dark:hover:bg-gray-900/50">
+                                  <TableCell className="font-medium">
+                                    <div className="flex items-center">
+                                      <Badge variant="outline" className="mr-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">CS</Badge>
+                                      {csSignal.id}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>{csSignal.instrument}</TableCell>
+                                  <TableCell>{formatDateTime(csSignal.timestamp)}</TableCell>
+                                  <TableCell><StatusBadge status={csSignal.status.toString()} /></TableCell>
+                                  <TableCell>
+                                    {renderStatusSummary(
+                                      csSignal.processedAccounts.length, 
+                                      csSignal.failedAccounts.length,
+                                      csSignal.processedAccounts.length + csSignal.failedAccounts.length
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      className="h-8"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openDetailDialog(csSignal.originalSignalId, e);
+                                      }}
+                                    >
+                                      <ExternalLink className="h-4 w-4 mr-1" />
+                                      View
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
+            ))}
+            
+            {orphanedCoinstratSignals.length > 0 && (
+              <React.Fragment>
+                <TableRow className="bg-gray-100 dark:bg-gray-800/50">
+                  <TableCell colSpan={8} className="py-2">
+                    <div className="font-medium text-gray-700 dark:text-gray-300">
+                      Coinstrat Signals Without Matching TradingView Signal
                     </div>
                   </TableCell>
                 </TableRow>
-
-                {/* Expanded Coinstrat Signals related to this TradingView signal */}
-                {isExpanded && relatedSignals.map((csSignal) => (
-                  <TableRow key={csSignal.id} className="bg-muted/30">
-                    <TableCell></TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {csSignal.id}
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium">Original:</span> {csSignal.originalSignalId}
+                {orphanedCoinstratSignals.map(csSignal => (
+                  <TableRow key={csSignal.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                    <TableCell className="px-2"></TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center">
+                        <Badge variant="outline" className="mr-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">CS</Badge>
+                        {csSignal.id}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <ActionBadge action={csSignal.action} />
                     </TableCell>
                     <TableCell>{csSignal.instrument}</TableCell>
-                    <TableCell>{formatDate(csSignal.timestamp)}</TableCell>
+                    <TableCell>{formatDateTime(csSignal.timestamp)}</TableCell>
+                    <TableCell><ActionBadge action={csSignal.action} /></TableCell>
+                    <TableCell><StatusBadge status={csSignal.status.toString()} /></TableCell>
                     <TableCell>
-                      <StatusBadge status={csSignal.status} />
+                      {renderStatusSummary(
+                        csSignal.processedAccounts.length, 
+                        csSignal.failedAccounts.length,
+                        csSignal.processedAccounts.length + csSignal.failedAccounts.length
+                      )}
                     </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {/* Account Status Summary */}
-                        <div className="flex items-center space-x-2">
-                          {csSignal.processedAccounts.length > 0 && (
-                            <div className="flex items-center text-xs">
-                              <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
-                              <span className="text-green-700">{csSignal.processedAccounts.length}</span>
-                            </div>
-                          )}
-                          
-                          {csSignal.failedAccounts.length > 0 && (
-                            <div className="flex items-center text-xs ml-2">
-                              <AlertTriangle className="h-3 w-3 text-red-500 mr-1" />
-                              <span className="text-red-700">{csSignal.failedAccounts.length}</span>
-                            </div>
-                          )}
-                          
-                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-green-900/30 dark:text-green-300">
-                            Coinstrat Pro
-                          </span>
-                        </div>
-                        
-                        {/* Account List - Alternatively you could add a "View Details" button here */}
-                        {csSignal.processedAccounts.length > 0 && (
-                          <div className="text-xs text-muted-foreground flex flex-wrap gap-1">
-                            {csSignal.processedAccounts.slice(0, 2).map((acc, i) => (
-                              <span key={i} className="bg-gray-100 px-1 rounded">{acc.name}</span>
-                            ))}
-                            {csSignal.processedAccounts.length > 2 && (
-                              <span className="text-muted-foreground">+{csSignal.processedAccounts.length - 2} more</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-8"
+                        onClick={(e) => openDetailDialog(csSignal.originalSignalId, e)}
+                      >
+                        <Info className="h-4 w-4 mr-1" />
+                        Details
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </React.Fragment>
-            );
-          })}
-
-          {/* Standalone Coinstrat Signals (not linked to any TradingView signal) */}
-          {coinstratLogs
-            .filter(signal => !tradingViewLogs.some(tv => tv.id === signal.originalSignalId))
-            .map((signal) => (
-              <TableRow key={signal.id}>
-                <TableCell></TableCell>
-                <TableCell className="font-mono text-xs">
-                  {signal.id}
-                  {signal.originalSignalId && (
-                    <div className="text-xs text-muted-foreground">
-                      <span className="font-medium">Original:</span> {signal.originalSignalId}
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <ActionBadge action={signal.action} />
-                </TableCell>
-                <TableCell>{signal.instrument}</TableCell>
-                <TableCell>{formatDate(signal.timestamp)}</TableCell>
-                <TableCell>
-                  <StatusBadge status={signal.status} />
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    {/* Account Status Summary */}
-                    <div className="flex items-center space-x-2">
-                      {signal.processedAccounts.length > 0 && (
-                        <div className="flex items-center text-xs">
-                          <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-green-700">{signal.processedAccounts.length}</span>
-                        </div>
-                      )}
-                      
-                      {signal.failedAccounts.length > 0 && (
-                        <div className="flex items-center text-xs ml-2">
-                          <AlertTriangle className="h-3 w-3 text-red-500 mr-1" />
-                          <span className="text-red-700">{signal.failedAccounts.length}</span>
-                        </div>
-                      )}
-                      
-                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-green-900/30 dark:text-green-300">
-                        Coinstrat Pro
-                      </span>
-                    </div>
-                    
-                    {/* Account List */}
-                    {signal.processedAccounts.length > 0 && (
-                      <div className="text-xs text-muted-foreground flex flex-wrap gap-1">
-                        {signal.processedAccounts.slice(0, 2).map((acc, i) => (
-                          <span key={i} className="bg-gray-100 px-1 rounded">{acc.name}</span>
-                        ))}
-                        {signal.processedAccounts.length > 2 && (
-                          <span className="text-muted-foreground">+{signal.processedAccounts.length - 2} more</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+            )}
+            
+            {combinedSignals.length === 0 && orphanedCoinstratSignals.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} className="h-24 text-center">
+                  No signals found matching the current filters.
                 </TableCell>
               </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-    </div>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Signal Detail & Distribution</DialogTitle>
+          </DialogHeader>
+          
+          {selectedSignal && (
+            <div className="space-y-6">
+              {/* Signal details section */}
+              {getSelectedSignalDetails()?.tvSignal && (
+                <div className="grid grid-cols-2 gap-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-900/30">
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Signal ID</div>
+                    <div className="font-medium">{getSelectedSignalDetails()?.tvSignal?.id}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Instrument</div>
+                    <div className="font-medium">{getSelectedSignalDetails()?.tvSignal?.instrument}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Action</div>
+                    <div>
+                      <ActionBadge action={getSelectedSignalDetails()?.tvSignal?.action || 'ENTER_LONG'} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Amount</div>
+                    <div className="font-medium">{getSelectedSignalDetails()?.tvSignal?.amount}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Timestamp</div>
+                    <div className="font-medium">
+                      {formatDateTime(getSelectedSignalDetails()?.tvSignal?.timestamp || '')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                    <div>
+                      <StatusBadge status={getSelectedSignalDetails()?.tvSignal?.status.toString() || ''} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Hierarchical account distribution view */}
+              <HierarchicalSignalView 
+                tradingViewSignal={getSelectedSignalDetails()?.tvSignal} 
+                coinstratSignals={getSelectedSignalDetails()?.coinstratSignals || []} 
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
