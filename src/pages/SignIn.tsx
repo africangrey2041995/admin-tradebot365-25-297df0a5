@@ -19,7 +19,10 @@ import {
   CircleDollarSign,
   LineChart,
   Zap,
-  Shield
+  Shield,
+  ChartCandlestick,
+  ChartLine,
+  ChartPie
 } from 'lucide-react';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { isValidEmail } from '@/utils/validationUtils';
@@ -176,7 +179,7 @@ const SignIn = () => {
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-zinc-900/80 via-zinc-800/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png')] bg-cover opacity-5"></div>
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/68a402c1-5eae-4c56-a88f-7135d455c4f9.png')] bg-cover opacity-5"></div>
         
         {/* Animated background glows */}
         <motion.div 
@@ -209,18 +212,19 @@ const SignIn = () => {
       
       {/* Tech elements */}
       <div className="absolute top-24 left-20 text-white/10">
-        <LineChart className="h-16 w-16" />
+        <ChartCandlestick className="h-16 w-16" />
       </div>
       <div className="absolute bottom-24 left-32 text-white/10">
         <CircleDollarSign className="h-10 w-10" />
       </div>
       <div className="absolute top-32 right-20 text-white/10">
-        <TrendingUp className="h-12 w-12" />
+        <ChartLine className="h-12 w-12" />
       </div>
       <div className="absolute bottom-40 right-36 text-white/10">
-        <Shield className="h-14 w-14" />
+        <ChartPie className="h-14 w-14" />
       </div>
       
+      {/* Logo and navigation links */}
       <div className="absolute top-8 left-8 z-10">
         <Link to="/">
           <div className="relative group">
@@ -243,6 +247,7 @@ const SignIn = () => {
         </Link>
       </div>
       
+      {/* Main content - Sign in form */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
