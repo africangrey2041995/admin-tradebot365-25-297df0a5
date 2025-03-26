@@ -23,12 +23,11 @@ export const PlanFilterSelect: React.FC<PlanFilterSelectProps> = ({
   planFilter,
   onPlanFilterChange,
   options = [
-    { value: 'all', label: 'Tất cả gói' },
-    { value: 'premium', label: 'Premium' },
-    { value: 'basic', label: 'Basic' },
-    { value: 'trial', label: 'Trial' }
+    { value: 'all', label: 'Tất cả loại' },
+    { value: 'live', label: 'Tài khoản Live' },
+    { value: 'demo', label: 'Tài khoản Demo' }
   ],
-  placeholder = "Gói dịch vụ",
+  placeholder = "Loại tài khoản",
   className = "w-full sm:max-w-[300px]"
 }) => {
   return (

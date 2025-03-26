@@ -11,7 +11,7 @@ import {
   TableRow, 
   TableCell 
 } from "@/components/ui/table";
-import { Eye, ExternalLink, Search, RefreshCw, UserPlus } from "lucide-react";
+import { Eye, ExternalLink, RefreshCw, UserPlus } from "lucide-react";
 import { UsersFilter } from '../UsersFilter';
 import { useUserManagement } from '@/hooks/premium-bot/useUserManagement';
 import { Account } from '@/types';
@@ -72,9 +72,13 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const totalAccounts = accounts.length;
-  const connectedAccounts = accounts.filter(acc => acc.status === 'Connected').length;
-  const liveAccounts = accounts.filter(acc => acc.isLive).length;
+  // Calculate stats
+  const totalCSPAccounts = (() => {
+    const uniqueCspIds = new Set(accounts.map(acc => acc.cspAccountId));
+    return uniqueCspIds.size;
+  })();
+
+  const totalTradingAccounts = accounts.length;
 
   return (
     <div className="space-y-6">
@@ -101,12 +105,12 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="border-zinc-800 bg-zinc-900 text-white">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">{totalAccounts}</div>
-              <div className="text-sm text-zinc-400">Tổng số tài khoản</div>
+              <div className="text-3xl font-bold text-white">{totalCSPAccounts}</div>
+              <div className="text-sm text-zinc-400">Tổng Tài Khoản CSP</div>
             </div>
           </CardContent>
         </Card>
@@ -114,17 +118,8 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
         <Card className="border-zinc-800 bg-zinc-900 text-white">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-500">{connectedAccounts}</div>
-              <div className="text-sm text-zinc-400">Đang kết nối</div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-zinc-800 bg-zinc-900 text-white">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-amber-500">{liveAccounts}</div>
-              <div className="text-sm text-zinc-400">Tài khoản Live</div>
+              <div className="text-3xl font-bold text-amber-500">{totalTradingAccounts}</div>
+              <div className="text-sm text-zinc-400">Tổng Tài Khoản Giao Dịch</div>
             </div>
           </CardContent>
         </Card>
@@ -152,7 +147,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-zinc-800">
-                    <TableHead className="text-zinc-400">Tên tài khoản</TableHead>
+                    <TableHead className="text-zinc-400">Tài khoản CSP</TableHead>
                     <TableHead className="text-zinc-400">API</TableHead>
                     <TableHead className="text-zinc-400">Tài khoản giao dịch</TableHead>
                     <TableHead className="text-zinc-400">Loại</TableHead>

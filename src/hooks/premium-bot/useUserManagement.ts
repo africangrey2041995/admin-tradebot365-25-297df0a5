@@ -18,6 +18,11 @@ export const useUserManagement = (botId: string, userId: string) => {
     const userIds = new Set(accounts.map(account => account.cspUserId));
     return userIds.size;
   })();
+  
+  const uniqueCSPAccounts = (() => {
+    const cspIds = new Set(accounts.map(account => account.cspAccountId));
+    return cspIds.size;
+  })();
 
   const tradingAccountsCount = accounts.length;
   
@@ -42,6 +47,7 @@ export const useUserManagement = (botId: string, userId: string) => {
   return {
     accounts,
     uniqueUsers,
+    uniqueCSPAccounts,
     tradingAccountsCount,
     refreshAccounts,
     handleEditAccount,

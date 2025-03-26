@@ -13,7 +13,7 @@ interface SearchInputProps {
 export const SearchInput: React.FC<SearchInputProps> = ({
   searchTerm,
   onSearchChange,
-  placeholder = "Tìm kiếm người dùng...",
+  placeholder = "Tìm kiếm...",
   className = "relative w-full sm:max-w-[400px]"
 }) => {
   return (

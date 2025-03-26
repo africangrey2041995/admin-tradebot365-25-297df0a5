@@ -16,8 +16,8 @@ export const StatusFilterButtons: React.FC<StatusFilterButtonsProps> = ({
   onFilterClick,
   options = [
     { value: null, label: 'Tất cả' },
-    { value: 'active', label: 'Hoạt động' },
-    { value: 'inactive', label: 'Không hoạt động' }
+    { value: 'connected', label: 'Đã kết nối' },
+    { value: 'disconnected', label: 'Chưa kết nối' }
   ]
 }) => {
   return (
