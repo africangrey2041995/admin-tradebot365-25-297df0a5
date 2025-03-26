@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LogsTabContent from '../tabs/LogsTabContent';
-import AccountsTabContent from '../tabs/AccountsTabContent';
-import { getTabsListClassName, getTabTriggerClassName, getTabIcon } from '../tabs/TabStyles';
+import AccountsTabContent from "../tabs/AccountsTabContent";
+import LogsTabContent from "../tabs/LogsTabContent";
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
+import TabHeader from '../tabs/TabHeader';
 
 interface PremiumBotTabsProps {
   activeTab: string;
@@ -15,10 +15,11 @@ interface PremiumBotTabsProps {
   onRefresh: () => void;
   isLoading: boolean;
   overviewContent: React.ReactNode;
-  accountsData?: Account[];
-  logsData?: CoinstratSignal[];
+  accountsData: Account[];
+  logsData: CoinstratSignal[];
   logsLoading?: boolean;
   signalSourceLabel?: string;
+  accountsActions?: React.ReactNode;
 }
 
 const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
@@ -32,41 +33,47 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
   accountsData,
   logsData,
   logsLoading = false,
-  signalSourceLabel = "TB365 ID"
+  signalSourceLabel = "TradingView ID",
+  accountsActions
 }) => {
-  return <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className={`grid w-full grid-cols-3 ${getTabsListClassName('premium')}`}>
-        <TabsTrigger value="overview" className={getTabTriggerClassName('premium')}>
-          {getTabIcon('overview', 'premium')}
-          Tổng quan
-        </TabsTrigger>
-        <TabsTrigger value="connected-accounts" className={getTabTriggerClassName('premium')}>
-          Tài khoản kết nối
-        </TabsTrigger>
-        <TabsTrigger value="coinstrat-logs" className={getTabTriggerClassName('premium')}>Coinstrat Pro Logs</TabsTrigger>
+  return (
+    <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+        <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
+        <TabsTrigger value="signals">Signal Tracking</TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="overview" className="space-y-4">
+
+      <TabsContent value="overview">
         {overviewContent}
       </TabsContent>
-      
-      <TabsContent value="connected-accounts">
-        <AccountsTabContent botId={botId} userId={userId} botType="premium" title="Tài khoản kết nối" description="Quản lý các tài khoản được kết nối với Premium Bot" accountsData={accountsData} />
-      </TabsContent>
-      
-      <TabsContent value="coinstrat-logs">
-        <LogsTabContent 
-          botId={botId} 
-          userId={userId} 
-          botType="premium" 
-          logsData={logsData} 
-          isLoading={logsLoading}
-          signalSourceLabel={signalSourceLabel} 
-          title="Premium Trading Logs" 
-          description="Xem lịch sử các tín hiệu đã được xử lý bởi Premium Bot" 
+
+      <TabsContent value="accounts">
+        <TabHeader 
+          title="Tài khoản kết nối"
+          onRefresh={onRefresh}
+          isLoading={isLoading}
+          actions={accountsActions}
+        />
+        <AccountsTabContent 
+          accounts={accountsData}
+          botId={botId}
+          userId={userId}
+          botType="premium"
         />
       </TabsContent>
-    </Tabs>;
+
+      <TabsContent value="signals">
+        <LogsTabContent 
+          logs={logsData}
+          isLoading={logsLoading}
+          onRefresh={onRefresh}
+          title="Signal Tracking"
+          signalSourceLabel={signalSourceLabel}
+        />
+      </TabsContent>
+    </Tabs>
+  );
 };
 
 export default PremiumBotTabs;

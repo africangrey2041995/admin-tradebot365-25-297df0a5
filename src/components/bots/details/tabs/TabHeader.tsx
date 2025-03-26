@@ -1,36 +1,39 @@
 
 import React from 'react';
-import { CardTitle, CardDescription } from '@/components/ui/card';
-import { BotType } from '@/constants/botTypes';
-import { Star, Target, User, Crown, BarChart, Settings } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TabHeaderProps {
   title: string;
-  description: string;
-  botType: 'premium' | 'prop' | 'user';
+  onRefresh?: () => void;
+  isLoading?: boolean;
+  actions?: React.ReactNode;
 }
 
-const TabHeader: React.FC<TabHeaderProps> = ({ title, description, botType }) => {
-  const getBotIcon = () => {
-    switch (botType) {
-      case 'premium':
-        return <Crown className="h-4 w-4 mr-2 text-yellow-500" />;
-      case 'prop':
-        return <BarChart className="h-4 w-4 mr-2 text-blue-500" />;
-      case 'user':
-      default:
-        return <User className="h-4 w-4 mr-2 text-gray-500" />;
-    }
-  };
-
+const TabHeader: React.FC<TabHeaderProps> = ({
+  title,
+  onRefresh,
+  isLoading = false,
+  actions
+}) => {
   return (
-    <>
-      <CardTitle className="flex items-center">
-        {getBotIcon()}
-        {title}
-      </CardTitle>
-      <CardDescription>{description}</CardDescription>
-    </>
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="flex items-center gap-2">
+        {actions}
+        {onRefresh && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Làm mới
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 
