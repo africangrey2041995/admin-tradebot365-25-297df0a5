@@ -10,6 +10,7 @@ import { UserBot } from '@/types/bot';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { useNavigation } from '@/hooks/useNavigation';
+import { UserBotStatsCards } from '@/components/admin/user-bots/UserBotStatsCards';
 
 interface UserBotColumn {
   accessorKey: string;
@@ -226,6 +227,8 @@ const AdminUserBots = () => {
             Thêm User Bot mới
           </Button>
         </div>
+
+        <UserBotStatsCards bots={userBots} />
 
         <Card className="border-zinc-800 bg-zinc-900 text-white">
           <CardHeader>
