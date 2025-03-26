@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
+import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 
 interface PropBotDetailTabsProps {
   activeTab: string;
@@ -58,11 +59,25 @@ const PropBotDetailTabs: React.FC<PropBotDetailTabsProps> = ({
       </TabsList>
       
       <TabsContent value="overview" className="space-y-4">
-        <PropBotOverviewTab 
-          challengeData={challengeData}
+        <AdminPropBotOverviewTab 
+          propBot={{
+            botId: botId,
+            type: 'prop',
+            name: '',
+            description: '',
+            status: 'active',
+            createdDate: botInfo.createdDate,
+            lastUpdated: botInfo.lastUpdated,
+            performanceLastMonth: '',
+            performanceAllTime: '',
+            minCapital: '',
+            users: 0,
+            profit: '',
+            propFirm: 'Coinstrat Pro'
+          }}
           botStats={botStats}
           botInfo={botInfo}
-          challengeRules={challengeRules}
+          challengeRules={{ "Coinstrat Pro": challengeRules }}
         />
       </TabsContent>
       
