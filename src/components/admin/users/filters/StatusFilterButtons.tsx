@@ -29,10 +29,10 @@ export const StatusFilterButtons: React.FC<StatusFilterButtonsProps> = ({
           variant={filterStatus === option.value ? "default" : "outline"}
           size="sm"
           className={`
-            h-8 px-3 relative overflow-hidden
+            h-8 px-3 relative overflow-hidden backdrop-blur-sm
             ${filterStatus === option.value ? 
-              'bg-primary text-white border-transparent' : 
-              'border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800'
+              'bg-gradient-to-r from-tradebot to-tradebot/80 text-zinc-900 border-transparent font-medium shadow-lg shadow-tradebot/20' : 
+              'border-zinc-700/50 text-zinc-300 hover:text-white hover:border-tradebot/50 hover:bg-zinc-800/50'
             }
           `}
           onClick={() => onFilterClick(option.value)}
@@ -41,11 +41,11 @@ export const StatusFilterButtons: React.FC<StatusFilterButtonsProps> = ({
           {filterStatus === option.value && (
             <motion.span
               layoutId="buttonHighlight"
-              className="absolute inset-0 bg-primary z-0"
+              className="absolute inset-0 bg-gradient-to-r from-tradebot to-tradebot/80 z-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             />
           )}
           <span className="relative z-10">{option.label}</span>
