@@ -1,9 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw, UsersIcon } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { UsersStatsCards } from '@/components/admin/users/UsersStatsCards';
 import { useUsers } from '@/hooks/admin/useUsers';
 import { UsersSearchAndFilters } from '@/components/admin/users/UsersSearchAndFilters';
 import { UsersTable } from '@/components/admin/users/UsersTable';
@@ -13,6 +11,8 @@ import { UsersFilter } from '@/components/admin/users/UsersFilter';
 import { BulkActionDialog } from '@/components/admin/users/BulkActionDialog';
 import { toast } from "sonner";
 import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
+import AccountsStatsCards from '@/components/admin/accounts/AccountsStatsCards';
+import { useBotAccounts } from '@/hooks/useBotAccounts';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,16 +23,128 @@ const Users = () => {
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   
   const navigate = useNavigate();
-  const { totalUsers } = useUsers();
+  const { users, totalUsers } = useUsers();
 
-  const statsData = {
-    totalUsers: 5,
-    activeUsers: 3,
-    inactiveUsers: 2,
-    suspendedUsers: 0,
-    newUsersThisMonth: 2,
-    newUsersThisWeek: 1,
-    newUsersToday: 0
+  const { 
+    accounts, 
+    hierarchicalData,
+    loading: accountsLoading,
+    handleRefresh
+  } = useBotAccounts('all', 'all');
+  
+  const connectedAccounts = accounts.filter(acc => acc.status === 'connected').length;
+  const disconnectedAccounts = accounts.length - connectedAccounts;
+  const liveAccounts = accounts.filter(acc => acc.isLive).length;
+  const demoAccounts = accounts.length - liveAccounts;
+
+  const handleRefreshStats = () => {
+    handleRefresh();
+    toast.success("Đã làm mới dữ liệu thống kê");
+  };
+
+  const filteredUsers = mockUsers.filter(user => {
+    const searchRegex = new RegExp(searchTerm, 'i');
+    const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
+
+    const matchesStatus = !filterStatus || user.status === filterStatus;
+    const matchesPlan = !planFilter || planFilter === 'all' || user.plan === planFilter;
+
+    return matchesSearch && matchesStatus && matchesPlan;
+  });
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const handleFilterClick = (status: string | null) => {
+    setFilterStatus(status === filterStatus ? null : status);
+  };
+  
+  const handlePlanFilterChange = (value: string | null) => {
+    setPlanFilter(value);
+  };
+  
+  const viewUserDetail = (userId: string) => {
+    navigate(`/admin/users/${userId}`);
+  };
+
+  const handleAddUser = () => {
+    console.log("Add user clicked");
+  };
+
+  const handleSelectUser = (userId: string, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedUsers([...selectedUsers, userId]);
+    } else {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+    }
+  };
+
+  const handleSelectAllUsers = (isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedUsers(filteredUsers.map(user => user.id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action ${action} for users:`, selectedUsers);
+    
+    switch (action) {
+      case 'activate':
+        setBulkAction('activate');
+        break;
+      case 'suspend':
+        setBulkAction('deactivate');
+        break;
+      case 'delete':
+        setBulkAction('delete');
+        break;
+      default:
+        toast.info(`Đã thực hiện hành động "${action}" cho ${selectedUsers.length} người dùng`);
+        return;
+    }
+    
+    setBulkActionDialogOpen(true);
+  };
+
+  const handleConfirmBulkAction = () => {
+    console.log(`Confirmed bulk action ${bulkAction} for users:`, selectedUsers);
+    
+    setSelectedUsers([]);
+    setBulkAction(null);
+    toast.success("Thao tác hàng loạt thành công!");
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
+    const data = filteredUsers.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.status,
+      user.plan,
+      user.joinDate
+    ]);
+    
+    exportToCSV(headers, data, 'danh-sach-nguoi-dung');
+    toast.success("Đã xuất dữ liệu ra file CSV");
+  };
+
+  const handleExportExcel = () => {
+    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
+    const data = filteredUsers.map(user => [
+      user.id,
+      user.name,
+      user.email,
+      user.status,
+      user.plan,
+      user.joinDate
+    ]);
+    
+    exportToExcel(headers, data, 'danh-sach-nguoi-dung', 'Người dùng');
+    toast.success("Đã xuất dữ liệu ra file Excel");
   };
 
   const mockUsers = [
@@ -103,128 +215,26 @@ const Users = () => {
     }
   ];
 
-  const filteredUsers = mockUsers.filter(user => {
-    const searchRegex = new RegExp(searchTerm, 'i');
-    const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
-
-    const matchesStatus = !filterStatus || user.status === filterStatus;
-    const matchesPlan = !planFilter || planFilter === 'all' || user.plan === planFilter;
-
-    return matchesSearch && matchesStatus && matchesPlan;
-  });
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-  
-  const handleFilterClick = (status: string | null) => {
-    setFilterStatus(status === filterStatus ? null : status);
-  };
-  
-  const handlePlanFilterChange = (value: string | null) => {
-    setPlanFilter(value);
-  };
-  
-  const viewUserDetail = (userId: string) => {
-    navigate(`/admin/users/${userId}`);
-  };
-
-  const handleAddUser = () => {
-    // Logic to add a new user
-    console.log("Add user clicked");
-  };
-
-  // Chọn người dùng
-  const handleSelectUser = (userId: string, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedUsers([...selectedUsers, userId]);
-    } else {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId));
-    }
-  };
-
-  const handleSelectAllUsers = (isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedUsers(filteredUsers.map(user => user.id));
-    } else {
-      setSelectedUsers([]);
-    }
-  };
-
-  // Thao tác hàng loạt
-  const handleBulkAction = (action: string) => {
-    console.log(`Bulk action ${action} for users:`, selectedUsers);
-    
-    switch (action) {
-      case 'activate':
-        setBulkAction('activate');
-        break;
-      case 'suspend':
-        setBulkAction('deactivate');
-        break;
-      case 'delete':
-        setBulkAction('delete');
-        break;
-      default:
-        // Xử lý các hành động khác (nâng cấp premium, v.v.)
-        toast.info(`Đã thực hiện hành động "${action}" cho ${selectedUsers.length} người dùng`);
-        return;
-    }
-    
-    setBulkActionDialogOpen(true);
-  };
-
-  const handleConfirmBulkAction = () => {
-    console.log(`Confirmed bulk action ${bulkAction} for users:`, selectedUsers);
-    
-    // Sau khi xác nhận, làm mới danh sách và bỏ chọn người dùng
-    setSelectedUsers([]);
-    setBulkAction(null);
-    toast.success("Thao tác hàng loạt thành công!");
-  };
-
-  // Xuất dữ liệu
-  const handleExportCSV = () => {
-    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
-    const data = filteredUsers.map(user => [
-      user.id,
-      user.name,
-      user.email,
-      user.status,
-      user.plan,
-      user.joinDate
-    ]);
-    
-    exportToCSV(headers, data, 'danh-sach-nguoi-dung');
-    toast.success("Đã xuất dữ liệu ra file CSV");
-  };
-
-  const handleExportExcel = () => {
-    const headers = ['ID', 'Tên', 'Email', 'Trạng thái', 'Gói', 'Ngày tham gia'];
-    const data = filteredUsers.map(user => [
-      user.id,
-      user.name,
-      user.email,
-      user.status,
-      user.plan,
-      user.joinDate
-    ]);
-    
-    exportToExcel(headers, data, 'danh-sach-nguoi-dung', 'Người dùng');
-    toast.success("Đã xuất dữ liệu ra file Excel");
-  };
-
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
-        <UsersStatsCards 
-          totalUsers={statsData.totalUsers}
-          activeUsers={statsData.activeUsers}
-          inactiveUsers={statsData.inactiveUsers}
-          suspendedUsers={statsData.suspendedUsers}
-          newUsersThisMonth={statsData.newUsersThisMonth}
-          newUsersThisWeek={statsData.newUsersThisWeek}
-          newUsersToday={statsData.newUsersToday}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-white">Thống kê tài khoản</h2>
+          <button 
+            className="flex items-center text-sm text-indigo-400 hover:text-indigo-300"
+            onClick={handleRefreshStats}
+          >
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Làm mới thống kê
+          </button>
+        </div>
+        
+        <AccountsStatsCards 
+          data={hierarchicalData}
+          connectedAccounts={connectedAccounts}
+          disconnectedAccounts={disconnectedAccounts}
+          liveAccounts={liveAccounts}
+          demoAccounts={demoAccounts}
         />
       </div>
       
@@ -236,7 +246,6 @@ const Users = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Bộ lọc nâng cao */}
           <UsersFilter 
             searchTerm={searchTerm}
             filterStatus={filterStatus}
