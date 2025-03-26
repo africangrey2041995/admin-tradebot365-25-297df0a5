@@ -19,6 +19,7 @@ interface AddAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   botId: string;
+  botName?: string; // Added botName as optional prop
   onAddAccount: (accountData: any) => void;
 }
 
@@ -26,6 +27,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   open,
   onOpenChange,
   botId,
+  botName, // Added botName in destructuring
   onAddAccount
 }) => {
   const [formData, setFormData] = useState({
@@ -87,7 +89,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Thêm Tài Khoản Mới</DialogTitle>
+          <DialogTitle>Thêm Tài Khoản Mới{botName ? ` vào ${botName}` : ''}</DialogTitle>
           <DialogDescription>
             Thêm tài khoản mới để kết nối với Bot
           </DialogDescription>
