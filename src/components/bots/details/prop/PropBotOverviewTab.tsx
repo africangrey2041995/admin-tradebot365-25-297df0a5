@@ -5,6 +5,7 @@ import BotStatsCard from './BotStatsCard';
 import WarningCard from './WarningCard';
 import BotInfoCard from './BotInfoCard';
 import ChallengeRulesCard from './ChallengeRulesCard';
+import { BarChart } from 'lucide-react';
 
 interface PropBotOverviewTabProps {
   challengeData: {
@@ -37,9 +38,40 @@ const PropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
   botInfo,
   challengeRules
 }) => {
+  // Default values to prevent "undefined" errors
+  const defaultChallengeData = {
+    phase: "Challenge Phase",
+    progress: 0,
+    accountBalance: "$0",
+    profitTarget: "0%",
+    maxDrawdown: "0%",
+    daysRemaining: "0 days",
+    description: "No description available"
+  };
+
+  const defaultBotStats = {
+    totalTrades: 0,
+    winRate: "0%",
+    profitFactor: 0,
+    sharpeRatio: 0,
+    currentDrawdown: "0%"
+  };
+
+  const defaultBotInfo = {
+    createdDate: new Date().toISOString().split('T')[0],
+    lastUpdated: new Date().toISOString().split('T')[0],
+    botId: "PROP-000"
+  };
+
+  // Use provided data or defaults
+  const safeChallenge = challengeData || defaultChallengeData;
+  const safeStats = botStats || defaultBotStats;
+  const safeInfo = botInfo || defaultBotInfo;
+  const safeRules = challengeRules || [];
+
   return (
     <div className="space-y-6">
-      <ChallengeProgressCard challengeData={challengeData} />
+      <ChallengeProgressCard challengeData={safeChallenge} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left column */}
@@ -54,18 +86,15 @@ const PropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
         
         {/* Right column */}
         <div className="space-y-6">
-          <BotStatsCard stats={botStats} />
+          <BotStatsCard stats={safeStats} />
           <WarningCard />
-          <BotInfoCard botInfo={botInfo} />
+          <BotInfoCard botInfo={safeInfo} />
         </div>
       </div>
       
-      <ChallengeRulesCard rules={challengeRules} />
+      <ChallengeRulesCard rules={safeRules} />
     </div>
   );
 };
 
 export default PropBotOverviewTab;
-
-// Import the BarChart icon
-import { BarChart } from 'lucide-react';

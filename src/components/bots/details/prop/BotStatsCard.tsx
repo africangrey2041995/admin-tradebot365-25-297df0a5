@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Briefcase } from 'lucide-react';
 
 interface BotStatsCardProps {
   stats: {
@@ -16,6 +15,15 @@ interface BotStatsCardProps {
 const BotStatsCard: React.FC<BotStatsCardProps> = ({
   stats
 }) => {
+  // Ensure stats exist to prevent errors
+  const safeStats = stats || {
+    totalTrades: 0,
+    winRate: "0%",
+    profitFactor: 0,
+    sharpeRatio: 0,
+    currentDrawdown: "0%"
+  };
+
   return <Card className="border-gray-200 dark:border-gray-800">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
         <CardTitle className="text-lg font-medium">Mục Tiêu Bot</CardTitle>
@@ -24,23 +32,23 @@ const BotStatsCard: React.FC<BotStatsCardProps> = ({
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Số Giao Dịch</span>
-            <span className="font-semibold text-gray-900 dark:text-white">{stats.totalTrades}</span>
+            <span className="font-semibold text-gray-900 dark:text-white">{safeStats.totalTrades}</span>
           </div>
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Tỷ Lệ Thắng</span>
-            <span className="font-semibold text-green-600 dark:text-green-400">{stats.winRate}</span>
+            <span className="font-semibold text-green-600 dark:text-green-400">{safeStats.winRate}</span>
           </div>
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Hệ Số Lợi Nhuận</span>
-            <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.profitFactor}</span>
+            <span className="font-semibold text-blue-600 dark:text-blue-400">{safeStats.profitFactor}</span>
           </div>
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Tỷ Lệ Sharpe</span>
-            <span className="font-semibold text-blue-600 dark:text-blue-400">{stats.sharpeRatio}</span>
+            <span className="font-semibold text-blue-600 dark:text-blue-400">{safeStats.sharpeRatio}</span>
           </div>
           <div className="flex justify-between items-center p-4">
             <span className="text-gray-600 dark:text-gray-300">Drawdown Hiện Tại</span>
-            <span className="font-semibold text-red-600 dark:text-red-400">{stats.currentDrawdown}</span>
+            <span className="font-semibold text-red-600 dark:text-red-400">{safeStats.currentDrawdown}</span>
           </div>
         </div>
       </CardContent>

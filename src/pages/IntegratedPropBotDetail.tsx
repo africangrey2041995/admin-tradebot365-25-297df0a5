@@ -14,6 +14,7 @@ import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useIntegratedBot } from '@/hooks/useIntegratedBot';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
 import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
+import { filterAccountsByUserId } from '@/utils/accountSecurityUtils';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001'; 
@@ -40,6 +41,9 @@ const IntegratedPropBotDetail = () => {
     mockLogs, 
     refreshTabData 
   } = useIntegratedBot("overview");
+
+  // Filter accounts to only show those belonging to the current user
+  const userAccounts = filterAccountsByUserId(mockAccounts || [], CURRENT_USER_ID);
 
   const goBack = () => {
     navigate(USER_ROUTES.INTEGRATED_PREMIUM_BOTS);
@@ -82,7 +86,7 @@ const IntegratedPropBotDetail = () => {
   const botInfo = {
     createdDate: "2023-09-15",
     lastUpdated: "2023-11-22",
-    botId: "PROP001"
+    botId: botId || "PROP001"
   };
 
   // Challenge rules
@@ -144,7 +148,7 @@ const IntegratedPropBotDetail = () => {
           userId={CURRENT_USER_ID}
           botId={botId || ""}
           refreshLoading={refreshLoading}
-          accounts={mockAccounts}
+          accounts={userAccounts}
           logs={mockLogs}
           overviewContent={overviewContent}
           refreshTabData={refreshTabData}

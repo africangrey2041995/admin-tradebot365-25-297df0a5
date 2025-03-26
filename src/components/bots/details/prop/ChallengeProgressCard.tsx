@@ -17,6 +17,9 @@ interface ChallengeProgressCardProps {
 }
 
 const ChallengeProgressCard: React.FC<ChallengeProgressCardProps> = ({ challengeData }) => {
+  // Provide a default description if undefined to prevent errors
+  const safeDescription = challengeData?.description || "Challenge progress information";
+  
   return (
     <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/30">
       <CardHeader className="pb-2">
@@ -27,7 +30,7 @@ const ChallengeProgressCard: React.FC<ChallengeProgressCardProps> = ({ challenge
           </CardTitle>
         </div>
         <CardDescription className="text-blue-700 dark:text-blue-300">
-          {challengeData.description}
+          {safeDescription}
         </CardDescription>
       </CardHeader>
       <CardContent>
