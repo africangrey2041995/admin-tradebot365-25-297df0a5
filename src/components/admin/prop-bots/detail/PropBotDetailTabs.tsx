@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
-import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 
 interface PropBotDetailTabsProps {
   activeTab: string;
@@ -52,11 +51,10 @@ const PropBotDetailTabs: React.FC<PropBotDetailTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="overview">Tổng quan</TabsTrigger>
         <TabsTrigger value="connected-accounts">Tài khoản kết nối</TabsTrigger>
         <TabsTrigger value="coinstrat-logs">Prop Trading Logs</TabsTrigger>
-        <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
       </TabsList>
       
       <TabsContent value="overview" className="space-y-4">
@@ -96,21 +94,6 @@ const PropBotDetailTabs: React.FC<PropBotDetailTabsProps> = ({
               userId={userId}
               signalSourceLabel="TB365 ID"
               botType="prop"
-            />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="signal-tracking">
-        <Card>
-          <CardHeader>
-            <CardTitle>Signal Tracking</CardTitle>
-            <CardDescription>Theo dõi tín hiệu giao dịch và cách chúng được xử lý trên các tài khoản của bạn</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SignalTrackingTab 
-              botId={botId} 
-              userId={userId}
             />
           </CardContent>
         </Card>

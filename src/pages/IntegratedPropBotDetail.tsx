@@ -13,9 +13,8 @@ import { useChartData } from '@/hooks/useChartData';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useIntegratedBot } from '@/hooks/useIntegratedBot';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
+import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
 import { filterAccountsByUserId } from '@/utils/accountSecurityUtils';
-import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
-import PropBotDetailTabs from '@/components/admin/prop-bots/detail/PropBotDetailTabs';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001'; 
@@ -42,18 +41,6 @@ const IntegratedPropBotDetail = () => {
     mockLogs, 
     refreshTabData 
   } = useIntegratedBot("overview");
-
-  // Add support for signal tracking with the combined logs hook
-  const {
-    tradingViewLogs,
-    coinstratLogs,
-    loading: signalLogsLoading,
-    refreshLogs
-  } = useCombinedSignalLogs({
-    botId: botId || "",
-    userId: CURRENT_USER_ID,
-    refreshTrigger: refreshLoading
-  });
 
   // Filter accounts to only show those belonging to the current user
   const userAccounts = filterAccountsByUserId(mockAccounts || [], CURRENT_USER_ID);
@@ -113,11 +100,15 @@ const IntegratedPropBotDetail = () => {
     "Maximum position size: 2% of account"
   ];
 
-  // Handle refreshing all data
-  const handleRefreshAll = () => {
-    refreshTabData();
-    refreshLogs();
-  };
+  // Prepare the overview content
+  const overviewContent = (
+    <PropBotOverviewTab 
+      challengeData={challengeData}
+      botStats={botStats}
+      botInfo={botInfo}
+      challengeRules={challengeRules}
+    />
+  );
 
   return (
     <MainLayout title={`Chi Tiết Prop Trading Bot: ${bot.name}`}>
@@ -150,17 +141,17 @@ const IntegratedPropBotDetail = () => {
           </div>
         </div>
         
-        <PropBotDetailTabs 
+        {/* Main Tabs Component */}
+        <PropTradingBotTabs
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          setActiveTab={setActiveTab}
           userId={CURRENT_USER_ID}
           botId={botId || ""}
-          onRefresh={handleRefreshAll}
-          isLoading={refreshLoading || signalLogsLoading}
-          challengeData={challengeData}
-          botStats={botStats}
-          botInfo={botInfo}
-          challengeRules={challengeRules}
+          refreshLoading={refreshLoading}
+          accounts={userAccounts}
+          logs={mockLogs}
+          overviewContent={overviewContent}
+          refreshTabData={refreshTabData}
         />
       </motion.div>
     </MainLayout>
