@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { BotProfileTabsProps } from '@/types/admin-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
-import { UserBotAccountDialog } from './accounts/dialogs';
+import { AddAccountDialog } from './accounts/dialogs';
 
 const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) => {
   const [accountsData, setAccountsData] = useState([]);
@@ -93,11 +93,12 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
         )}
       </CardContent>
 
-      <UserBotAccountDialog 
+      <AddAccountDialog 
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
         botId={botId}
         onAddAccount={handleAddAccountSubmit}
+        botType="user"
       />
     </Card>
   );
