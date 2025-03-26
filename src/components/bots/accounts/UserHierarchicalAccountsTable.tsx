@@ -11,7 +11,6 @@ import AccountsFilter from './AccountsFilter';
 import { organizeAccounts } from './utils/accountTransformUtils';
 import { useAccountFiltering } from './hooks/useAccountFiltering';
 import CSPAccountCard from './components/CSPAccountCard';
-import AccountsHeader from './components/AccountsHeader';
 
 interface UserHierarchicalAccountsTableProps {
   accounts: Account[];
@@ -107,11 +106,6 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
 
   return (
     <div className="space-y-4">
-      <AccountsHeader 
-        onAddAccount={() => setIsAddAccountDialogOpen(true)}
-        onRefresh={onRefresh}
-      />
-
       <AccountsFilter 
         onFilterChange={handleFilterChange}
         totalAccounts={totalTradingAccounts}
