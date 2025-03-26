@@ -332,187 +332,181 @@ const PremiumBotDetail = () => {
 
   if (isLoading) {
     return (
-      <AdminLayout>
-        <LoadingState />
-      </AdminLayout>
+      <LoadingState />
     );
   }
 
   if (!bot) {
     return (
-      <AdminLayout>
-        <div className="flex flex-col items-center justify-center h-[60vh]">
-          <h1 className="text-2xl font-bold">Bot Not Found</h1>
-          <p className="text-gray-500 mt-2">The premium bot you're looking for doesn't exist.</p>
-          <Button onClick={goBackToList} className="mt-4">Back to Premium Bots</Button>
-        </div>
-      </AdminLayout>
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <h1 className="text-2xl font-bold">Bot Not Found</h1>
+        <p className="text-gray-500 mt-2">The premium bot you're looking for doesn't exist.</p>
+        <Button onClick={goBackToList} className="mt-4">Back to Premium Bots</Button>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Bot Detail Header */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" onClick={goBackToList}>
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
-            </Button>
-            <h1 className="text-2xl font-bold">{bot.name}</h1>
-            {getBotStatusBadge(bot.status)}
-            {getRiskBadge(bot.risk)}
-            <Badge variant="outline" className="ml-2">ID: {bot.id}</Badge>
-          </div>
-          <div className="flex space-x-2">
-            <Button>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Bot
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Bot Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Preview Bot</DropdownMenuItem>
-                <DropdownMenuItem>Change Status</DropdownMenuItem>
-                <DropdownMenuItem>Clone Bot</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-500">Delete Bot</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+    <div className="space-y-6">
+      {/* Bot Detail Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="sm" onClick={goBackToList}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold">{bot.name}</h1>
+          {getBotStatusBadge(bot.status)}
+          {getRiskBadge(bot.risk)}
+          <Badge variant="outline" className="ml-2">ID: {bot.id}</Badge>
         </div>
-
-        {/* Bot Detail Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-            <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
-            <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
-            <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2 space-y-4">
-                <EditableDescriptionCard 
-                  description={bot.longDescription} 
-                  onUpdate={handleUpdateDescription}
-                />
-                <EditableTradingPairsCard 
-                  tradingPairs={bot.pairs}
-                  onUpdate={handleUpdateTradingPairs}
-                />
-              </div>
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bot Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Type</h3>
-                      <p>{bot.type}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Exchange</h3>
-                      <p>{bot.exchange}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Min Capital</h3>
-                      <p>{bot.minCapital}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Subscribers</h3>
-                      <p>{bot.subscribers}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h3>
-                      <p>{new Date(bot.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</h3>
-                      <p>{new Date(bot.updatedAt).toLocaleDateString()}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <BotPerformanceCard
-                  performance={{
-                    lastMonth: bot.performanceLastMonth,
-                    allTime: bot.performanceAllTime
-                  }}
-                  onUpdate={handleUpdatePerformance}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Accounts Tab - Now using the hierarchical accounts table */}
-          <TabsContent value="accounts">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <CardTitle>Tài Khoản Kết Nối</CardTitle>
-                  <ExportDataDropdown 
-                    data={accountsExportData}
-                    headers={accountsExportHeaders}
-                    fileName={`premium-bot-${botId}-accounts`}
-                  />
-                </div>
-                <CardDescription className="mb-6">
-                  Quản lý tài khoản người dùng được kết nối với Premium Bot
-                </CardDescription>
-                
-                <HierarchicalAccountsTable 
-                  accounts={accounts}
-                  onRefresh={refreshAccounts}
-                  onEdit={handleEditAccount}
-                  onDelete={handleDeleteAccount}
-                  onToggleConnection={handleToggleConnection}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Trading Logs Tab */}
-          <TabsContent value="trading-logs">
-            <Card>
-              <CardHeader>
-                <CardTitle>TB365 Signal Logs</CardTitle>
-                <CardDescription>
-                  Tracking of all signals from TB365 platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <TradingViewLogs botId={botId || ''} userId="admin" />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Coinstrat Logs Tab */}
-          <TabsContent value="coinstrat-logs">
-            <Card>
-              <CardHeader>
-                <CardTitle>Coinstrat Logs</CardTitle>
-                <CardDescription>
-                  Logs of all processed signals in the Coinstrat platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CoinstratLogs botId={botId || ''} userId="admin" />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <div className="flex space-x-2">
+          <Button>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Bot
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Bot Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Preview Bot</DropdownMenuItem>
+              <DropdownMenuItem>Change Status</DropdownMenuItem>
+              <DropdownMenuItem>Clone Bot</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-500">Delete Bot</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </AdminLayout>
+
+      {/* Bot Detail Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+          <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
+          <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
+          <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2 space-y-4">
+              <EditableDescriptionCard 
+                description={bot.longDescription} 
+                onUpdate={handleUpdateDescription}
+              />
+              <EditableTradingPairsCard 
+                tradingPairs={bot.pairs}
+                onUpdate={handleUpdateTradingPairs}
+              />
+            </div>
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bot Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Type</h3>
+                    <p>{bot.type}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Exchange</h3>
+                    <p>{bot.exchange}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Min Capital</h3>
+                    <p>{bot.minCapital}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Subscribers</h3>
+                    <p>{bot.subscribers}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h3>
+                    <p>{new Date(bot.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</h3>
+                    <p>{new Date(bot.updatedAt).toLocaleDateString()}</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <BotPerformanceCard
+                performance={{
+                  lastMonth: bot.performanceLastMonth,
+                  allTime: bot.performanceAllTime
+                }}
+                onUpdate={handleUpdatePerformance}
+              />
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Accounts Tab - Now using the hierarchical accounts table */}
+        <TabsContent value="accounts">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <CardTitle>Tài Khoản Kết Nối</CardTitle>
+                <ExportDataDropdown 
+                  data={accountsExportData}
+                  headers={accountsExportHeaders}
+                  fileName={`premium-bot-${botId}-accounts`}
+                />
+              </div>
+              <CardDescription className="mb-6">
+                Quản lý tài khoản người dùng được kết nối với Premium Bot
+              </CardDescription>
+              
+              <HierarchicalAccountsTable 
+                accounts={accounts}
+                onRefresh={refreshAccounts}
+                onEdit={handleEditAccount}
+                onDelete={handleDeleteAccount}
+                onToggleConnection={handleToggleConnection}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Trading Logs Tab */}
+        <TabsContent value="trading-logs">
+          <Card>
+            <CardHeader>
+              <CardTitle>TB365 Signal Logs</CardTitle>
+              <CardDescription>
+                Tracking of all signals from TB365 platform
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TradingViewLogs botId={botId || ''} userId="admin" signalSourceLabel="TB365 ID" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Coinstrat Logs Tab */}
+        <TabsContent value="coinstrat-logs">
+          <Card>
+            <CardHeader>
+              <CardTitle>Coinstrat Logs</CardTitle>
+              <CardDescription>
+                Logs of all processed signals in the Coinstrat platform
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CoinstratLogs botId={botId || ''} userId="admin" />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
