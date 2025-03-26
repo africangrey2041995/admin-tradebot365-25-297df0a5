@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -176,7 +175,6 @@ const SignIn = () => {
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-zinc-900/80 via-zinc-800/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/baec666a-ccac-4ef0-bb3e-8468d891488b.png')] bg-cover opacity-5"></div>
         
         {/* Animated background glows */}
         <motion.div 
@@ -277,6 +275,7 @@ const SignIn = () => {
                 Đăng nhập để truy cập hệ thống quản lý bot giao dịch AI
               </CardDescription>
             </CardHeader>
+            
             <CardContent className="space-y-4">
               {errors.general && (
                 <Alert variant="destructive" className="border-red-800/50 bg-red-950/50 backdrop-blur-sm">
