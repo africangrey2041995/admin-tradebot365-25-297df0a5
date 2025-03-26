@@ -68,6 +68,15 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
     }
   };
 
+  // Create a wrapper function that doesn't need an argument
+  const handleAddAccount = () => {
+    if (onAddAccount) {
+      // Since we're in EmptyAccountsState, we don't have an account to pass
+      // We'll let the Dialog handle creating the account
+      toast.info("Opening add account dialog");
+    }
+  };
+
   // Render appropriate UI based on loading/error state
   if (isLoading) {
     return <LoadingAccounts message="Đang tải tài khoản..." />;
@@ -82,7 +91,7 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
       <EmptyAccountsState 
         onRefresh={onRefresh} 
         botType={botType} 
-        onAddAccount={onAddAccount} 
+        onAddAccount={handleAddAccount} 
       />
     );
   }
