@@ -50,6 +50,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
         <UserHierarchicalAccountsTable 
           accounts={accountsData}
           isLoading={isLoading}
+          error={null}
           onRefresh={onRefresh}
           onAddAccount={onAddAccount}
           onEditAccount={(account: Account) => console.log('Edit account', account)}
