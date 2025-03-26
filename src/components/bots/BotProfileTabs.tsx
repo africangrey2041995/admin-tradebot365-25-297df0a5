@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { toast } from "sonner";
 import { BotProfileTabsProps } from '@/types/admin-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
-import { AddAccountDialog } from './accounts/dialogs';
+import AddAccountDialog from '../bots/AddAccountDialog';
 
 const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) => {
   const [accountsData, setAccountsData] = useState([]);
