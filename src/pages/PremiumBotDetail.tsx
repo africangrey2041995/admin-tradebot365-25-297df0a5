@@ -11,6 +11,7 @@ import FeaturesList from '@/components/bots/details/FeaturesList';
 import BotInfoCard from '@/components/bots/details/BotInfoCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
+import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 
 const premiumBots = [
   {
@@ -83,7 +84,7 @@ Các tính năng chính:
 - Hoạt động 24/7
 - Báo cáo chi tiết
 
-Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhận rủi ro cao.`,
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nh��n rủi ro cao.`,
     exchange: 'Binance',
     type: 'scalping',
     performanceLastMonth: '+22.1%',
