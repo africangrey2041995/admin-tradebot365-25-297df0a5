@@ -328,7 +328,7 @@ const AdminPremiumBotDetail = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
           <TabsTrigger value="trading-logs">TB365 Logs</TabsTrigger>
           <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
         </TabsList>
