@@ -1,31 +1,58 @@
-
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UseFormReturn } from 'react-hook-form';
 
-export const AccountFormApiField = ({ form, filteredApis }: any) => {
+interface ApiOption {
+  id: string;
+  name: string;
+  userId: string;
+}
+
+interface TradingAccountOption {
+  id: string;
+  number: string;
+  type: string;
+  balance: string;
+  isLive: boolean;
+  apiId: string;
+}
+
+interface VolumeOption {
+  value: string;
+  label: string;
+}
+
+// API Field Component
+export const AccountFormApiField = ({ 
+  form, 
+  filteredApis 
+}: { 
+  form: UseFormReturn<any>, 
+  filteredApis: ApiOption[] 
+}) => {
   return (
     <FormField
       control={form.control}
       name="apiKey"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>API Key</FormLabel>
+          <FormLabel>API</FormLabel>
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
               form.setValue("tradingAccountId", "");
             }}
             value={field.value}
-            disabled={filteredApis.length === 0}
+            disabled={!form.watch("userAccount")}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Chọn API key" />
+                <SelectValue placeholder="Select API" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {filteredApis.map((api: any) => (
+              {filteredApis.map(api => (
                 <SelectItem key={api.id} value={api.id}>
                   {api.name}
                 </SelectItem>
@@ -39,42 +66,45 @@ export const AccountFormApiField = ({ form, filteredApis }: any) => {
   );
 };
 
-export const AccountFormTradingField = ({ form, filteredTradingAccounts }: any) => {
+// Trading Account Field Component
+export const AccountFormTradingField = ({ 
+  form, 
+  filteredTradingAccounts 
+}: { 
+  form: UseFormReturn<any>, 
+  filteredTradingAccounts: TradingAccountOption[] 
+}) => {
   return (
     <FormField
       control={form.control}
       name="tradingAccountId"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Tài khoản giao dịch</FormLabel>
+          <FormLabel>Account Trading</FormLabel>
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
               
-              // Automatically populate additional fields if we have the data
-              const selectedAccount = filteredTradingAccounts.find(
-                (acc: any) => acc.id === value
-              );
-              
+              const selectedAccount = filteredTradingAccounts.find(acc => acc.id === value);
               if (selectedAccount) {
-                form.setValue("tradingAccountNumber", selectedAccount.accountNumber || "");
-                form.setValue("tradingAccountType", selectedAccount.accountType || "");
-                form.setValue("tradingAccountBalance", selectedAccount.balance || "");
-                form.setValue("isLive", selectedAccount.isLive || false);
+                form.setValue("tradingAccountNumber", selectedAccount.number);
+                form.setValue("tradingAccountType", selectedAccount.type);
+                form.setValue("tradingAccountBalance", selectedAccount.balance);
+                form.setValue("isLive", selectedAccount.isLive);
               }
             }}
             value={field.value}
-            disabled={filteredTradingAccounts.length === 0 || !form.watch("apiKey")}
+            disabled={!form.watch("apiKey")}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Chọn tài khoản giao dịch" />
+                <SelectValue placeholder="Select trading account" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {filteredTradingAccounts.map((account: any) => (
+              {filteredTradingAccounts.map(account => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.name} - {account.accountNumber}
+                  {account.number} | {account.isLive ? 'Live' : 'Demo'} | {account.balance}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -86,22 +116,32 @@ export const AccountFormTradingField = ({ form, filteredTradingAccounts }: any) 
   );
 };
 
-export const AccountFormVolumeField = ({ form, volumeOptions }: any) => {
+// Volume Multiplier Field Component
+export const AccountFormVolumeField = ({ 
+  form, 
+  volumeOptions 
+}: { 
+  form: UseFormReturn<any>, 
+  volumeOptions: VolumeOption[] 
+}) => {
   return (
     <FormField
       control={form.control}
       name="volumeMultiplier"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Hệ số khối lượng giao dịch</FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
+          <FormLabel>Volume Multiplier</FormLabel>
+          <Select 
+            onValueChange={field.onChange}
+            value={field.value}
+          >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Chọn hệ số" />
+                <SelectValue placeholder="Select volume multiplier" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {volumeOptions.map((option: any) => (
+              {volumeOptions.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -109,6 +149,9 @@ export const AccountFormVolumeField = ({ form, volumeOptions }: any) => {
             </SelectContent>
           </Select>
           <FormMessage />
+          <p className="text-xs text-muted-foreground mt-1">
+            Multiplier for trade volume relative to original signal
+          </p>
         </FormItem>
       )}
     />
