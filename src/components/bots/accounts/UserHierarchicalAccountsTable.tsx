@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAccountFiltering } from '../hooks/useAccountFiltering';
+import { useAccountFiltering } from './hooks/useAccountFiltering';
 import { organizeAccounts } from './utils/accountTransformUtils';
 import { Account } from '@/types';
 import AccountsHeader from './components/AccountsHeader';
@@ -77,7 +77,7 @@ const UserHierarchicalAccountsTable = ({
       />
       
       <AccountsFilter 
-        filters={filters}
+        totalAccounts={filteredAccounts.length}
         onFilterChange={handleFilterChange}
       />
       
@@ -86,6 +86,7 @@ const UserHierarchicalAccountsTable = ({
           <CSPAccountCard
             key={cspAccount.cspAccountId}
             cspAccount={cspAccount}
+            accounts={accounts}
             onEdit={(account: Account) => onEditAccount(account)}
             onDelete={(accountId: string) => onDeleteAccount(accountId)}
             onToggleStatus={(accountId: string) => onToggleStatus(accountId)}
