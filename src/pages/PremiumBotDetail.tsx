@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
+import { PremiumBotAccountDialog } from '@/components/bots/accounts/dialogs';
 import { toast } from 'sonner';
 import PremiumBotDetailTabs from '@/components/bots/details/PremiumBotDetailTabs';
 import BotHeader from '@/components/bots/details/BotHeader';
@@ -85,7 +84,7 @@ Các tính năng chính:
 - Hoạt động 24/7
 - Báo cáo chi tiết
 
-Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhận rủi ro cao.`,
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến ��ộng giá nhỏ và có khả năng chấp nhận rủi ro cao.`,
     exchange: 'Binance',
     type: 'scalping',
     performanceLastMonth: '+22.1%',
@@ -186,7 +185,7 @@ Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ c�
     description: 'Bot giao dịch lưới, tối ưu hóa lợi nhuận trong thị trường đi ngang.',
     longDescription: `Grid Master Bot là một bot giao dịch lưới được thiết kế để tạo ra lợi nhuận trong thị trường đi ngang hoặc ít biến động.
 
-Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lư���i, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra lợi nhuận nhỏ từ mỗi giao dịch.
+Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lư���i, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra lợi nhuận nhỏ t��� mỗi giao dịch.
 
 Các tính năng chính:
 - Tạo lợi nhuận trong thị trường đi ngang
@@ -359,7 +358,7 @@ const PremiumBotDetail = () => {
         </div>
       </div>
       
-      <AddAccountDialog
+      <PremiumBotAccountDialog
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
         botId={bot?.id || ''}

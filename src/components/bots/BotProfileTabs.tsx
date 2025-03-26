@@ -7,10 +7,12 @@ import { toast } from "sonner";
 import { BotProfileTabsProps } from '@/types/admin-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
+import { UserBotAccountDialog } from './accounts/dialogs';
 
 const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) => {
   const [accountsData, setAccountsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
@@ -23,6 +25,19 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
       setIsLoading(false);
       toast.success("Đã làm mới dữ liệu tài khoản");
     }, 1000);
+  };
+
+  const handleAddAccountClick = () => {
+    setIsAddAccountDialogOpen(true);
+  };
+
+  const handleAddAccountSubmit = (formData: any) => {
+    console.log('Adding account:', formData);
+    if (onAddAccount) {
+      onAddAccount(formData);
+    }
+    toast.success('Tài khoản đã được thêm thành công');
+    setIsAddAccountDialogOpen(false);
   };
 
   return (
@@ -38,7 +53,7 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
           <Button 
             variant="outline" 
             size="sm"
-            onClick={onAddAccount}
+            onClick={handleAddAccountClick}
           >
             <Plus className="h-4 w-4 mr-2" />
             Thêm tài khoản
@@ -65,7 +80,7 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
             <Button 
               variant="outline" 
               size="sm"
-              onClick={onAddAccount}
+              onClick={handleAddAccountClick}
             >
               <Plus className="h-4 w-4 mr-2" />
               Thêm tài khoản
@@ -77,6 +92,13 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
           </div>
         )}
       </CardContent>
+
+      <UserBotAccountDialog 
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        botId={botId}
+        onAddAccount={handleAddAccountSubmit}
+      />
     </Card>
   );
 };

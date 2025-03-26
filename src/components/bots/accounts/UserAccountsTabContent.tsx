@@ -6,7 +6,7 @@ import { getCardClassName, getCardHeaderClassName } from '../details/tabs/TabSty
 import { Account } from '@/types';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import UserHierarchicalAccountsTable from './UserHierarchicalAccountsTable';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
+import { UserBotAccountDialog } from './dialogs';
 import { Button } from '@/components/ui/button';
 import { UserPlus } from 'lucide-react';
 
@@ -79,7 +79,7 @@ const UserAccountsTabContent: React.FC<UserAccountsTabContentProps> = ({
           botType={botType}
         />
 
-        <AddAccountDialog
+        <UserBotAccountDialog
           open={isAddAccountDialogOpen}
           onOpenChange={setIsAddAccountDialogOpen}
           botId={botId}

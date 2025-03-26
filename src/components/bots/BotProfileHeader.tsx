@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Trash, Power, UserPlus } from 'lucide-react';
@@ -17,7 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import AddAccountDialog from './AddAccountDialog';
+import { UserBotAccountDialog } from './accounts/dialogs';
 
 interface BotProfileHeaderProps {
   botId: string;
@@ -138,7 +137,7 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
         onSave={handleSaveBot}
       />
 
-      <AddAccountDialog
+      <UserBotAccountDialog
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
         botId={botId}

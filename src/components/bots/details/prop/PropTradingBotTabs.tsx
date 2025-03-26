@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,7 @@ import { toast } from 'sonner';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 import { Button } from '@/components/ui/button';
 import { UserPlus } from 'lucide-react';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
+import { PropBotAccountDialog } from '@/components/bots/accounts/dialogs';
 
 interface PropTradingBotTabsProps {
   activeTab: string;
@@ -40,7 +39,6 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  // Use the accounts hook to manage connected accounts
   const { 
     accounts: botAccounts,
     loading: accountsLoading,
@@ -52,21 +50,16 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
     toggleAccountStatus
   } = useBotAccounts(botId, userId, accounts, 'prop');
 
-  // Function to handle data refresh with React Query
   const handleRefresh = () => {
-    // Invalidate React Query cache for this bot's accounts
     queryClient.invalidateQueries({
       queryKey: accountsQueryKeys.byBot(botId)
     });
 
-    // Refresh accounts using the hook
     refreshAccounts();
 
-    // Also call the provided refresh function
     refreshTabData();
   };
 
-  // Wrapper functions to handle account management operations
   const handleAddAccount = (account: Account) => {
     addAccount(account);
     toast.success('Tài khoản đã được thêm thành công');
@@ -90,7 +83,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
   const handleAddAccountSubmit = (formData: any) => {
     console.log('Adding account:', formData);
     addAccount({
-      cspAccountId: `acc-${Date.now()}`, // Generate a temporary ID
+      cspAccountId: `acc-${Date.now()}`,
       ...formData
     } as Account);
     setIsAddAccountDialogOpen(false);
@@ -146,7 +139,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
           </CardContent>
         </Card>
 
-        <AddAccountDialog
+        <PropBotAccountDialog
           open={isAddAccountDialogOpen}
           onOpenChange={setIsAddAccountDialogOpen}
           botId={botId}
