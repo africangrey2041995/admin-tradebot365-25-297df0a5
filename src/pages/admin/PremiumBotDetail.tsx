@@ -6,14 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pencil, MoreVertical, ChevronLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
@@ -36,78 +29,59 @@ import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 
 // Mock Premium Bot data
-const mockPremiumBots = [
-  {
-    id: 'PRE-001',
-    name: 'Alpha Edge',
-    description: 'High performance bot for experienced traders with advanced risk management.',
-    longDescription: `Alpha Edge is our flagship premium bot designed for experienced traders who want to maximize their trading potential.
+const mockPremiumBots = [{
+  id: 'PRE-001',
+  name: 'Alpha Edge',
+  description: 'High performance bot for experienced traders with advanced risk management.',
+  longDescription: `Alpha Edge is our flagship premium bot designed for experienced traders who want to maximize their trading potential.
 
 This bot utilizes advanced algorithms to identify and capitalize on market inefficiencies, with sophisticated risk management systems to protect your capital.
 
 The Alpha Edge bot has consistently delivered excellent performance over various market conditions, with robust backtesting results and real-world performance.`,
-    type: 'premium',
-    status: 'active',
-    risk: 'medium',
-    subscribers: 128,
-    minCapital: '$1000',
-    exchange: 'Binance',
-    performanceLastMonth: '+18.7%',
-    performanceAllTime: '+145.3%',
-    pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT'],
-    price: {
-      monthly: 49.99,
-      quarterly: 129.99,
-      yearly: 459.99
-    },
-    features: [
-      'Advanced algorithm',
-      'Real-time market analysis',
-      'Smart risk management',
-      'Multi-exchange support',
-      '24/7 operation',
-      'Performance reports',
-      'Priority support'
-    ],
-    createdAt: '2023-05-15T10:30:00Z',
-    updatedAt: '2023-11-10T15:45:00Z'
+  type: 'premium',
+  status: 'active',
+  risk: 'medium',
+  subscribers: 128,
+  minCapital: '$1000',
+  exchange: 'Binance',
+  performanceLastMonth: '+18.7%',
+  performanceAllTime: '+145.3%',
+  pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'XRP/USDT'],
+  price: {
+    monthly: 49.99,
+    quarterly: 129.99,
+    yearly: 459.99
   },
-  {
-    id: 'PRE-002',
-    name: 'Momentum Master',
-    description: 'Capitalizing on market momentum with trend identification and precise entries.',
-    longDescription: `Momentum Master is a premium bot that specializes in identifying and capitalizing on market momentum.
+  features: ['Advanced algorithm', 'Real-time market analysis', 'Smart risk management', 'Multi-exchange support', '24/7 operation', 'Performance reports', 'Priority support'],
+  createdAt: '2023-05-15T10:30:00Z',
+  updatedAt: '2023-11-10T15:45:00Z'
+}, {
+  id: 'PRE-002',
+  name: 'Momentum Master',
+  description: 'Capitalizing on market momentum with trend identification and precise entries.',
+  longDescription: `Momentum Master is a premium bot that specializes in identifying and capitalizing on market momentum.
 
 Using a combination of technical indicators and price action analysis, this bot excels at identifying trends early and executing precise entries and exits to maximize profit.
 
 The Momentum Master bot is particularly effective in trending markets, with risk management features to mitigate drawdowns during consolidation periods.`,
-    type: 'premium',
-    status: 'active',
-    risk: 'high',
-    subscribers: 87,
-    minCapital: '$500',
-    exchange: 'KuCoin',
-    performanceLastMonth: '+24.2%',
-    performanceAllTime: '+188.5%',
-    pairs: ['BTC/USDT', 'ETH/USDT', 'MATIC/USDT', 'DOGE/USDT', 'ADA/USDT'],
-    price: {
-      monthly: 59.99,
-      quarterly: 149.99,
-      yearly: 539.99
-    },
-    features: [
-      'Momentum detection',
-      'Trend strength analysis',
-      'Dynamic take profit levels',
-      'Adaptive stop-loss',
-      'Market condition filter',
-      'Performance tracking',
-      'VIP support channel'
-    ],
-    createdAt: '2023-06-20T09:15:00Z',
-    updatedAt: '2023-10-28T12:30:00Z'
-  }
-];
+  type: 'premium',
+  status: 'active',
+  risk: 'high',
+  subscribers: 87,
+  minCapital: '$500',
+  exchange: 'KuCoin',
+  performanceLastMonth: '+24.2%',
+  performanceAllTime: '+188.5%',
+  pairs: ['BTC/USDT', 'ETH/USDT', 'MATIC/USDT', 'DOGE/USDT', 'ADA/USDT'],
+  price: {
+    monthly: 59.99,
+    quarterly: 149.99,
+    yearly: 539.99
+  },
+  features: ['Momentum detection', 'Trend strength analysis', 'Dynamic take profit levels', 'Adaptive stop-loss', 'Market condition filter', 'Performance tracking', 'VIP support channel'],
+  createdAt: '2023-06-20T09:15:00Z',
+  updatedAt: '2023-10-28T12:30:00Z'
+}];
 
 // Utility function to get bot status badge UI
 const getBotStatusBadge = (status: string) => {
@@ -140,125 +114,123 @@ const getRiskBadge = (risk: string) => {
 };
 
 // Mock accounts data for the bot
-const mockAccounts: Account[] = [
-  {
-    cspAccountId: 'csp-001',
-    cspAccountName: 'Binance Account 1',
-    status: 'Connected',
-    createdDate: '2023-01-15',
-    lastUpdated: '2023-11-01',
-    cspUserId: 'user-001',
-    apiName: 'Binance',
-    apiId: 'api-001',
-    tradingAccountNumber: '12345678',
-    tradingAccountId: 'trading-001',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$5,420.50',
-    isLive: true,
-    cspUserEmail: 'user1@example.com',
-    userAccount: 'John Doe'
-  },
-  {
-    cspAccountId: 'csp-002',
-    cspAccountName: 'KuCoin Account',
-    status: 'Connected',
-    createdDate: '2023-02-10',
-    lastUpdated: '2023-10-15',
-    cspUserId: 'user-001',
-    apiName: 'KuCoin',
-    apiId: 'api-002',
-    tradingAccountNumber: '87654321',
-    tradingAccountId: 'trading-002',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$1,250.30',
-    isLive: true,
-    cspUserEmail: 'user1@example.com',
-    userAccount: 'John Doe'
-  },
-  {
-    cspAccountId: 'csp-003',
-    cspAccountName: 'Binance Demo',
-    status: 'Connected',
-    createdDate: '2023-03-05',
-    lastUpdated: '2023-09-20',
-    cspUserId: 'user-001',
-    apiName: 'Binance',
-    apiId: 'api-003',
-    tradingAccountNumber: '11223344',
-    tradingAccountId: 'trading-003',
-    tradingAccountType: 'NETTED',
-    tradingAccountBalance: '$10,000.00',
-    isLive: false,
-    cspUserEmail: 'user1@example.com',
-    userAccount: 'John Doe'
-  },
-  {
-    cspAccountId: 'csp-004',
-    cspAccountName: 'Bybit Main',
-    status: 'Disconnected',
-    createdDate: '2023-01-20',
-    lastUpdated: '2023-08-15',
-    cspUserId: 'user-002',
-    apiName: 'Bybit',
-    apiId: 'api-004',
-    tradingAccountNumber: '98765432',
-    tradingAccountId: 'trading-004',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$3,750.60',
-    isLive: true,
-    cspUserEmail: 'user2@example.com',
-    userAccount: 'Jane Smith'
-  },
-  {
-    cspAccountId: 'csp-005',
-    cspAccountName: 'OKX Account',
-    status: 'Connected',
-    createdDate: '2023-04-25',
-    lastUpdated: '2023-10-30',
-    cspUserId: 'user-002',
-    apiName: 'OKX',
-    apiId: 'api-005',
-    tradingAccountNumber: '55667788',
-    tradingAccountId: 'trading-005',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$8,210.25',
-    isLive: true,
-    cspUserEmail: 'user2@example.com',
-    userAccount: 'Jane Smith'
-  },
-  {
-    cspAccountId: 'csp-006',
-    cspAccountName: 'Binance Pro',
-    status: 'Connected',
-    createdDate: '2023-05-18',
-    lastUpdated: '2023-11-02',
-    cspUserId: 'user-003',
-    apiName: 'Binance',
-    apiId: 'api-006',
-    tradingAccountNumber: '13579246',
-    tradingAccountId: 'trading-006',
-    tradingAccountType: 'HEDGED',
-    tradingAccountBalance: '$15,420.80',
-    isLive: true,
-    cspUserEmail: 'user3@example.com',
-    userAccount: 'Robert Johnson'
-  }
-];
-
+const mockAccounts: Account[] = [{
+  cspAccountId: 'csp-001',
+  cspAccountName: 'Binance Account 1',
+  status: 'Connected',
+  createdDate: '2023-01-15',
+  lastUpdated: '2023-11-01',
+  cspUserId: 'user-001',
+  apiName: 'Binance',
+  apiId: 'api-001',
+  tradingAccountNumber: '12345678',
+  tradingAccountId: 'trading-001',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$5,420.50',
+  isLive: true,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-002',
+  cspAccountName: 'KuCoin Account',
+  status: 'Connected',
+  createdDate: '2023-02-10',
+  lastUpdated: '2023-10-15',
+  cspUserId: 'user-001',
+  apiName: 'KuCoin',
+  apiId: 'api-002',
+  tradingAccountNumber: '87654321',
+  tradingAccountId: 'trading-002',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$1,250.30',
+  isLive: true,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-003',
+  cspAccountName: 'Binance Demo',
+  status: 'Connected',
+  createdDate: '2023-03-05',
+  lastUpdated: '2023-09-20',
+  cspUserId: 'user-001',
+  apiName: 'Binance',
+  apiId: 'api-003',
+  tradingAccountNumber: '11223344',
+  tradingAccountId: 'trading-003',
+  tradingAccountType: 'NETTED',
+  tradingAccountBalance: '$10,000.00',
+  isLive: false,
+  cspUserEmail: 'user1@example.com',
+  userAccount: 'John Doe'
+}, {
+  cspAccountId: 'csp-004',
+  cspAccountName: 'Bybit Main',
+  status: 'Disconnected',
+  createdDate: '2023-01-20',
+  lastUpdated: '2023-08-15',
+  cspUserId: 'user-002',
+  apiName: 'Bybit',
+  apiId: 'api-004',
+  tradingAccountNumber: '98765432',
+  tradingAccountId: 'trading-004',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$3,750.60',
+  isLive: true,
+  cspUserEmail: 'user2@example.com',
+  userAccount: 'Jane Smith'
+}, {
+  cspAccountId: 'csp-005',
+  cspAccountName: 'OKX Account',
+  status: 'Connected',
+  createdDate: '2023-04-25',
+  lastUpdated: '2023-10-30',
+  cspUserId: 'user-002',
+  apiName: 'OKX',
+  apiId: 'api-005',
+  tradingAccountNumber: '55667788',
+  tradingAccountId: 'trading-005',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$8,210.25',
+  isLive: true,
+  cspUserEmail: 'user2@example.com',
+  userAccount: 'Jane Smith'
+}, {
+  cspAccountId: 'csp-006',
+  cspAccountName: 'Binance Pro',
+  status: 'Connected',
+  createdDate: '2023-05-18',
+  lastUpdated: '2023-11-02',
+  cspUserId: 'user-003',
+  apiName: 'Binance',
+  apiId: 'api-006',
+  tradingAccountNumber: '13579246',
+  tradingAccountId: 'trading-006',
+  tradingAccountType: 'HEDGED',
+  tradingAccountBalance: '$15,420.80',
+  isLive: true,
+  cspUserEmail: 'user3@example.com',
+  userAccount: 'Robert Johnson'
+}];
 const PremiumBotDetail = () => {
-  const { botId } = useParams<{ botId: string }>();
+  const {
+    botId
+  } = useParams<{
+    botId: string;
+  }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Get statistics data from the hook
-  const { statisticsData } = useBotStatistics();
-  
+  const {
+    statisticsData
+  } = useBotStatistics();
+
   // Get bot data
   const bot = mockPremiumBots.find(b => b.id === botId);
-  
+
   // Set up accounts data for the selected bot using the same hook as prop bots
-  const { 
+  const {
     accounts,
     loading: accountsLoading,
     handleRefresh: refreshAccounts,
@@ -269,25 +241,11 @@ const PremiumBotDetail = () => {
   } = useBotAccounts(botId || '', 'admin', mockAccounts);
 
   // Export data headers
-  const accountsExportHeaders = [
-    'Tên tài khoản',
-    'Email',
-    'API',
-    'Loại tài khoản',
-    'Trạng thái',
-    'Số dư'
-  ];
+  const accountsExportHeaders = ['Tên tài khoản', 'Email', 'API', 'Loại tài khoản', 'Trạng thái', 'Số dư'];
 
   // Memoized accounts export data
   const accountsExportData = React.useMemo(() => {
-    return accounts.map(account => [
-      account.cspAccountName || '',
-      account.cspUserEmail || '',
-      account.apiName || '',
-      account.tradingAccountType || '',
-      account.status || '',
-      account.tradingAccountBalance || ''
-    ]);
+    return accounts.map(account => [account.cspAccountName || '', account.cspUserEmail || '', account.apiName || '', account.tradingAccountType || '', account.status || '', account.tradingAccountBalance || '']);
   }, [accounts]);
 
   // Simulate loading
@@ -304,13 +262,11 @@ const PremiumBotDetail = () => {
     toast.info(`Editing account: ${account.cspAccountName}`);
     // In production, this would open an edit dialog and then call updateAccount()
   };
-
   const handleDeleteAccount = (accountId: string) => {
     console.log("Delete account:", accountId);
     toast.info(`Deleting account: ${accountId}`);
     // In production, this would show a confirmation dialog and then call deleteAccount()
   };
-
   const handleToggleConnection = (accountId: string) => {
     console.log("Toggle connection:", accountId);
     toggleAccountStatus(accountId);
@@ -340,33 +296,34 @@ const PremiumBotDetail = () => {
   };
 
   // Handle update performance data
-  const handleUpdatePerformance = (performance: { lastMonth: string; allTime: string }) => {
+  const handleUpdatePerformance = (performance: {
+    lastMonth: string;
+    allTime: string;
+  }) => {
     toast.success("Bot performance data updated");
     console.log("Updated performance:", performance);
   };
 
   // Handle update bot information
-  const handleUpdateBotInfo = (info: { type: string; exchange: string; minCapital: string }) => {
+  const handleUpdateBotInfo = (info: {
+    type: string;
+    exchange: string;
+    minCapital: string;
+  }) => {
     toast.success("Bot information updated");
     console.log("Updated bot information:", info);
   };
-
   if (isLoading) {
     return <LoadingState />;
   }
-
   if (!bot) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh]">
+    return <div className="flex flex-col items-center justify-center h-[60vh]">
         <h1 className="text-2xl font-bold">Bot Not Found</h1>
         <p className="text-gray-500 mt-2">The premium bot you're looking for doesn't exist.</p>
         <Button onClick={goBackToList} className="mt-4">Back to Premium Bots</Button>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Bot Detail Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
@@ -416,20 +373,16 @@ const PremiumBotDetail = () => {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2 space-y-4">
-              <EditableDescriptionCard 
-                description={bot.longDescription} 
-                onUpdate={handleUpdateDescription}
-              />
+              <EditableDescriptionCard description={bot.longDescription} onUpdate={handleUpdateDescription} />
               
               {/* Trade Statistics - Keeping only the statistics data without the chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Chi tiết giao dịch</CardTitle>
+                  <CardTitle>Hiệu Suất Giao Dịch</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-4 gap-4 mb-2">
-                    {statisticsData.map((stat, index) => (
-                      <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+                    {statisticsData.map((stat, index) => <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
                         <div className="flex items-center gap-2 mb-1">
                           {stat.icon}
                           <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -439,24 +392,15 @@ const PremiumBotDetail = () => {
                         <div className="text-2xl font-bold text-slate-900 dark:text-white">
                           {stat.value}
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
               </Card>
               
-              <EditableTradingPairsCard 
-                tradingPairs={bot.pairs}
-                onUpdate={handleUpdateTradingPairs}
-              />
+              <EditableTradingPairsCard tradingPairs={bot.pairs} onUpdate={handleUpdateTradingPairs} />
               
               {/* Features List - Now using the editable component */}
-              {bot.features && (
-                <EditableFeaturesCard 
-                  features={bot.features}
-                  onUpdate={handleUpdateFeatures}
-                />
-              )}
+              {bot.features && <EditableFeaturesCard features={bot.features} onUpdate={handleUpdateFeatures} />}
             </div>
             <div className="space-y-4">
               <Card>
@@ -494,13 +438,10 @@ const PremiumBotDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-              <BotPerformanceCard
-                performance={{
-                  lastMonth: bot.performanceLastMonth,
-                  allTime: bot.performanceAllTime
-                }}
-                onUpdate={handleUpdatePerformance}
-              />
+              <BotPerformanceCard performance={{
+              lastMonth: bot.performanceLastMonth,
+              allTime: bot.performanceAllTime
+            }} onUpdate={handleUpdatePerformance} />
               
               {/* Bot Integration Info - Kept below performance card */}
               <BotIntegrationInfo botId={bot.id} />
@@ -514,23 +455,13 @@ const PremiumBotDetail = () => {
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <CardTitle>Tài Khoản Kết Nối</CardTitle>
-                <ExportDataDropdown 
-                  data={accountsExportData}
-                  headers={accountsExportHeaders}
-                  fileName={`premium-bot-${botId}-accounts`}
-                />
+                <ExportDataDropdown data={accountsExportData} headers={accountsExportHeaders} fileName={`premium-bot-${botId}-accounts`} />
               </div>
               <CardDescription className="mb-6">
                 Quản lý tài khoản người dùng được kết nối với Premium Bot
               </CardDescription>
               
-              <HierarchicalAccountsTable 
-                accounts={accounts}
-                onRefresh={refreshAccounts}
-                onEdit={handleEditAccount}
-                onDelete={handleDeleteAccount}
-                onToggleConnection={handleToggleConnection}
-              />
+              <HierarchicalAccountsTable accounts={accounts} onRefresh={refreshAccounts} onEdit={handleEditAccount} onDelete={handleDeleteAccount} onToggleConnection={handleToggleConnection} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -565,9 +496,6 @@ const PremiumBotDetail = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default PremiumBotDetail;
-
