@@ -22,6 +22,7 @@ import { ADMIN_ROUTES } from '@/constants/routes';
 import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
+import EditableStatisticsCard from '@/components/admin/premium-bots/detail/EditableStatisticsCard';
 
 // Import components from user view to enhance admin view
 import { useBotStatistics } from '@/hooks/useBotStatistics';
@@ -295,6 +296,12 @@ const PremiumBotDetail = () => {
     console.log("Updated features:", features);
   };
 
+  // Handle update statistics
+  const handleUpdateStatistics = (updatedStats: { name: string; value: string; icon: React.ReactNode }[]) => {
+    toast.success("Bot statistics updated");
+    console.log("Updated statistics:", updatedStats);
+  };
+
   // Handle update bot information
   const handleUpdateBotInfo = (info: {
     type: string;
@@ -304,6 +311,7 @@ const PremiumBotDetail = () => {
     toast.success("Bot information updated");
     console.log("Updated bot information:", info);
   };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -366,27 +374,11 @@ const PremiumBotDetail = () => {
             <div className="md:col-span-2 space-y-4">
               <EditableDescriptionCard description={bot.longDescription} onUpdate={handleUpdateDescription} />
               
-              {/* Trade Statistics - Keeping only the statistics data without the chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hiệu Suất Giao Dịch</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-4 mb-2">
-                    {statisticsData.map((stat, index) => <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
-                        <div className="flex items-center gap-2 mb-1">
-                          {stat.icon}
-                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                            {stat.name}
-                          </span>
-                        </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                          {stat.value}
-                        </div>
-                      </div>)}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Trade Statistics - Now using the editable component */}
+              <EditableStatisticsCard 
+                statistics={statisticsData} 
+                onUpdate={handleUpdateStatistics} 
+              />
               
               <EditableTradingPairsCard tradingPairs={bot.pairs} onUpdate={handleUpdateTradingPairs} />
               
