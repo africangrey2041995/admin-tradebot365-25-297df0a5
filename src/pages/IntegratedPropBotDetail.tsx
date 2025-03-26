@@ -15,6 +15,7 @@ import { useIntegratedBot } from '@/hooks/useIntegratedBot';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
 import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
 import { filterAccountsByUserId } from '@/utils/accountSecurityUtils';
+import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001'; 
@@ -41,6 +42,18 @@ const IntegratedPropBotDetail = () => {
     mockLogs, 
     refreshTabData 
   } = useIntegratedBot("overview");
+  
+  // Use the combined signal logs hook for the Signal Tracking tab
+  const {
+    tradingViewLogs,
+    coinstratLogs,
+    loading: signalLogsLoading,
+    refreshLogs: refreshSignalLogs
+  } = useCombinedSignalLogs({
+    botId: botId || '',
+    userId: CURRENT_USER_ID,
+    refreshTrigger: refreshLoading
+  });
 
   // Filter accounts to only show those belonging to the current user
   const userAccounts = filterAccountsByUserId(mockAccounts || [], CURRENT_USER_ID);
@@ -109,6 +122,12 @@ const IntegratedPropBotDetail = () => {
       challengeRules={challengeRules}
     />
   );
+  
+  // Handle refresh for all tabs
+  const handleRefresh = () => {
+    refreshTabData();
+    refreshSignalLogs();
+  };
 
   return (
     <MainLayout title={`Chi Tiết Prop Trading Bot: ${bot.name}`}>
@@ -147,11 +166,11 @@ const IntegratedPropBotDetail = () => {
           setActiveTab={setActiveTab}
           userId={CURRENT_USER_ID}
           botId={botId || ""}
-          refreshLoading={refreshLoading}
+          refreshLoading={refreshLoading || signalLogsLoading}
           accounts={userAccounts}
           logs={mockLogs}
           overviewContent={overviewContent}
-          refreshTabData={refreshTabData}
+          refreshTabData={handleRefresh}
         />
       </motion.div>
     </MainLayout>

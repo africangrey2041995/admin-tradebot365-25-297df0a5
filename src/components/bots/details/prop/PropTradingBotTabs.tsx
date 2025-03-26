@@ -10,6 +10,7 @@ import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 import UserHierarchicalAccountsTable from '@/components/bots/accounts/UserHierarchicalAccountsTable';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import { toast } from 'sonner';
+import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 
 interface PropTradingBotTabsProps {
   activeTab: string;
@@ -89,6 +90,9 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
           Tổng Quan
         </TabsTrigger>
         <TabsTrigger value="accounts" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">Tài Khoản Kết Nối</TabsTrigger>
+        <TabsTrigger value="signal-tracking" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
+          Signal Tracking
+        </TabsTrigger>
         <TabsTrigger value="logs" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
           Coinstrat Pro Logs
         </TabsTrigger>
@@ -117,6 +121,23 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
               onDeleteAccount={handleDeleteAccount}
               onToggleStatus={handleToggleStatus}
               botType="prop"
+            />
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="signal-tracking">
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
+            <CardTitle className="text-lg font-medium">Signal Tracking</CardTitle>
+            <CardDescription>
+              Theo dõi các tín hiệu giao dịch và trạng thái xử lý
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <SignalTrackingTab
+              botId={botId}
+              userId={userId}
             />
           </CardContent>
         </Card>
