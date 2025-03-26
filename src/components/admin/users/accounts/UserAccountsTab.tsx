@@ -59,7 +59,8 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     const matchesSearch = searchTerm === '' || 
       account.cspAccountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       account.cspUserEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.apiName.toLowerCase().includes(searchTerm.toLowerCase());
+      account.apiName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.cspAccountId.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === null || 
       (statusFilter === 'connected' && account.status === 'Connected') ||
@@ -148,6 +149,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                 <TableHeader>
                   <TableRow className="border-zinc-800">
                     <TableHead className="text-zinc-400">Tài khoản CSP</TableHead>
+                    <TableHead className="text-zinc-400">ID CSP</TableHead>
                     <TableHead className="text-zinc-400">API</TableHead>
                     <TableHead className="text-zinc-400">Tài khoản giao dịch</TableHead>
                     <TableHead className="text-zinc-400">Loại</TableHead>
@@ -163,6 +165,9 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                           <div className="font-medium">{account.cspAccountName}</div>
                           <div className="text-xs text-zinc-400">{account.cspUserEmail}</div>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium text-xs text-zinc-300">{account.cspAccountId}</div>
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">{account.apiName}</div>
