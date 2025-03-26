@@ -95,6 +95,7 @@ const UserBotDetailContent: React.FC<UserBotDetailContentProps> = ({
           logsData={logs}
           onRefresh={handleRefresh}
           isLoading={refreshLoading}
+          isAdminView={true} // Set isAdminView to true for admin user bot detail page
         />
       </div>
     </ErrorBoundary>

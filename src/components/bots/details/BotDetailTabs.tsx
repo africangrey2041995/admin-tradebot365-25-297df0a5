@@ -25,6 +25,7 @@ interface BotDetailTabsProps {
   logsData?: CoinstratSignal[];
   signalSourceLabel?: string;
   botType: 'premium' | 'prop' | 'user';
+  isAdminView?: boolean; // New prop for admin view
 }
 
 const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
@@ -39,6 +40,7 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
   logsData,
   signalSourceLabel = "TradingView ID",
   botType = 'user',
+  isAdminView = false // Default to false
 }) => {
   const tabLabels = getTabLabels(botType);
   
@@ -70,6 +72,7 @@ const BotDetailTabs: React.FC<BotDetailTabsProps> = ({
           isLoading={isLoading}
           title={tabLabels.accounts}
           description={tabLabels.accountsDescription}
+          isAdminView={isAdminView}
         />
       </TabsContent>
       

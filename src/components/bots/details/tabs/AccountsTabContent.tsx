@@ -6,6 +6,8 @@ import TabHeader from './TabHeader';
 import { getCardClassName, getCardHeaderClassName } from './TabStyles';
 import { Account } from '@/types';
 import HierarchicalAccountsTable from '@/components/admin/prop-bots/detail/components/HierarchicalAccountsTable';
+import { useBotAccounts } from '@/hooks/useBotAccounts';
+import { toast } from 'sonner';
 
 interface AccountsTabContentProps {
   botId: string;
@@ -28,25 +30,34 @@ const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
   isLoading = false,
   isAdminView = false
 }) => {
+  // Use the bot accounts hook to get data for both admin and user views
+  const {
+    accounts,
+    handleRefresh,
+    updateAccount,
+    deleteAccount,
+    toggleAccountStatus,
+    hierarchicalAccounts, // Use the transformed hierarchical data
+    hierarchicalData
+  } = useBotAccounts(botId, userId, accountsData || [], botType);
+
   // Handle account operations for admin hierarchical view
   const handleEditAccount = (account: Account) => {
     console.log("Edit account:", account);
-    // Implementation would go here
+    toast.info(`Editing account: ${account.cspAccountName}`);
+    updateAccount(account);
   };
 
   const handleDeleteAccount = (accountId: string) => {
     console.log("Delete account:", accountId);
-    // Implementation would go here
+    toast.info(`Deleting account: ${accountId}`);
+    deleteAccount(accountId);
   };
 
   const handleToggleConnection = (accountId: string) => {
     console.log("Toggle connection:", accountId);
-    // Implementation would go here
-  };
-
-  const handleRefresh = () => {
-    console.log("Refreshing accounts data");
-    // Implementation would go here
+    toast.info(`Toggling connection for account: ${accountId}`);
+    toggleAccountStatus(accountId);
   };
 
   return (
@@ -58,7 +69,7 @@ const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
         {isAdminView ? (
           // Use hierarchical view for admin
           <HierarchicalAccountsTable 
-            accounts={accountsData || []}
+            accounts={accounts}
             onRefresh={handleRefresh}
             onEdit={handleEditAccount}
             onDelete={handleDeleteAccount}

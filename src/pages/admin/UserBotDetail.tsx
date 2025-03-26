@@ -7,6 +7,7 @@ import UserBotDetailContent from './components/user-bot-detail/UserBotDetailCont
 import { useAdminBotDetail } from './hooks/useAdminBotDetail';
 import { mockAccounts, mockLogs } from './components/user-bot-detail/mock-data';
 import { toast } from 'sonner';
+import { useBotAccounts } from '@/hooks/useBotAccounts';
 
 const AdminUserBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -19,6 +20,14 @@ const AdminUserBotDetail = () => {
     userInfo, 
     handleRefresh 
   } = useAdminBotDetail(botId);
+
+  // Fetch accounts with the useBotAccounts hook for real accounts data
+  const { accounts } = useBotAccounts(
+    botId || '',
+    userInfo?.id || '',
+    mockAccounts, // Use mockAccounts as initial data
+    'user' // Bot type
+  );
 
   const handleBackClick = () => {
     goBack();
@@ -52,7 +61,7 @@ const AdminUserBotDetail = () => {
         refreshLoading={refreshLoading}
         bot={bot}
         userInfo={userInfo}
-        accounts={mockAccounts}
+        accounts={accounts.length > 0 ? accounts : mockAccounts} // Use real accounts if available
         logs={mockLogs}
         handleRefresh={handleRefresh}
         handleBackClick={handleBackClick}

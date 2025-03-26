@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
+import AccountsTabContent from './details/tabs/AccountsTabContent';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -21,6 +22,7 @@ interface UserBotDetailTabsProps {
   isLoading?: boolean;
   signalSourceLabel?: string;
   botType?: 'premium' | 'prop' | 'user';
+  isAdminView?: boolean; // New prop to determine if this is admin view
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
@@ -31,7 +33,8 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
   onRefresh,
   isLoading = false,
   signalSourceLabel = "TradingView ID",
-  botType = 'user'
+  botType = 'user',
+  isAdminView = false // Default to false
 }) => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -67,7 +70,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
     skipLoadingState: true
   });
 
-  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}`);
+  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}, isAdminView: ${isAdminView}`);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -112,12 +115,25 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
         </TabsList>
         
         <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
-          <BotAccountsTable 
-            botId={botId} 
-            userId={userId} 
-            initialData={accountsData} 
-            refreshTrigger={refreshTrigger > 0}
-          />
+          {isAdminView ? (
+            <AccountsTabContent 
+              botId={botId}
+              userId={userId}
+              botType={botType}
+              title="Tài khoản kết nối"
+              description="Danh sách tài khoản được kết nối với bot này"
+              accountsData={accountsData}
+              isLoading={refreshLoading}
+              isAdminView={true}
+            />
+          ) : (
+            <BotAccountsTable 
+              botId={botId} 
+              userId={userId} 
+              initialData={accountsData} 
+              refreshTrigger={refreshTrigger > 0}
+            />
+          )}
         </TabsContent>
         
         <TabsContent value="tradingview-logs" className="animate-in fade-in-50 duration-200">
