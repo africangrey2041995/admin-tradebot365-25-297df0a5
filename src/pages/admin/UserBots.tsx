@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,40 +18,6 @@ interface UserBotColumn {
   header: string;
   cell?: (value: any, row: any) => React.ReactNode;
 }
-
-const columns: UserBotColumn[] = [
-  {
-    accessorKey: 'botId',
-    header: 'ID',
-  },
-  {
-    accessorKey: 'name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: (value) => (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value === BotStatus.ACTIVE ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-      }`}>
-        {value}
-      </span>
-    )
-  },
-  {
-    accessorKey: 'createdDate',
-    header: 'Created Date',
-  },
-  {
-    accessorKey: 'owner',
-    header: 'Owner',
-  },
-  {
-    accessorKey: 'accounts',
-    header: 'Accounts',
-  },
-];
 
 const mockUserBots: UserBot[] = [
   {
@@ -130,7 +97,53 @@ const AdminUserBots = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [userBots, setUserBots] = useState<UserBot[]>([]);
-  const { navigateToBotDetail } = useNavigation();
+  const { navigateToBotDetail, navigateTo } = useNavigation();
+  
+  // Updated columns to display User ID and make it clickable
+  const columns: UserBotColumn[] = [
+    {
+      accessorKey: 'botId',
+      header: 'ID',
+    },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value === BotStatus.ACTIVE ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value}
+        </span>
+      )
+    },
+    {
+      accessorKey: 'createdDate',
+      header: 'Created Date',
+    },
+    {
+      accessorKey: 'ownerId',
+      header: 'User ID',
+      cell: (value, row) => (
+        <button 
+          className="text-blue-400 hover:text-blue-500 hover:underline"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering row click
+            handleUserClick(value);
+          }}
+        >
+          {value}
+        </button>
+      )
+    },
+    {
+      accessorKey: 'accounts',
+      header: 'Accounts',
+    },
+  ];
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -170,9 +183,11 @@ const AdminUserBots = () => {
     fetchUserBots();
   }, [fetchUserBots]);
 
+  // Updated filter to include User ID
   const filteredBots = userBots.filter(bot =>
     bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bot.botId.toLowerCase().includes(searchTerm.toLowerCase())
+    bot.botId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    bot.ownerId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addUserBot = () => {
@@ -192,6 +207,16 @@ const AdminUserBots = () => {
       toast.error('Không thể chuyển đến trang chi tiết bot');
     }
   }, [navigateToBotDetail]);
+  
+  // Handle click on User ID to navigate to user details
+  const handleUserClick = useCallback((userId: string) => {
+    try {
+      navigateTo(`/admin/users/${userId}`);
+    } catch (error) {
+      console.error('Error navigating to user detail:', error);
+      toast.error('Không thể chuyển đến trang chi tiết người dùng');
+    }
+  }, [navigateTo]);
   
   const handleRefreshData = useCallback(() => {
     toast.info('Đang làm mới dữ liệu User Bots...');
@@ -243,7 +268,7 @@ const AdminUserBots = () => {
                 <UserCircle className="h-5 w-5 text-amber-500" />
                 <Input
                   type="text"
-                  placeholder="Tìm kiếm User Bots..."
+                  placeholder="Tìm kiếm User Bots theo tên, ID, hoặc User ID..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   className="max-w-md"
