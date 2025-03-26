@@ -345,10 +345,12 @@ const PremiumBotDetail = () => {
 
   // Generate chart data based on selected period
   const getChartData = () => {
-    if (bot?.monthlyPerformance) {
-      return selectedChartPeriod === "month" ? bot.monthlyPerformance : generateChartData();
+    // Using chart data from the hook instead of relying on bot.monthlyPerformance
+    if (selectedChartPeriod === "month") {
+      return chartData; // Use the data from useChartData hook
+    } else {
+      return generateChartData(); // Generate data based on period
     }
-    return chartData;
   };
 
   if (isLoading) {
