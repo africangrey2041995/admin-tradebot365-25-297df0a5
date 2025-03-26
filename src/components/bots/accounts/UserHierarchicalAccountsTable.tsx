@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ interface UserHierarchicalAccountsTableProps {
   isLoading: boolean;
   error: Error | null;
   onRefresh: () => void;
-  onAddAccount?: () => void;
+  onAddAccount?: (account: Account) => void; // Đã thay đổi để chấp nhận tham số Account
   onEditAccount?: (account: Account) => void;
   onDeleteAccount?: (accountId: string) => void;
   onToggleStatus?: (accountId: string) => void;
@@ -190,7 +191,13 @@ const UserHierarchicalAccountsTable: React.FC<UserHierarchicalAccountsTableProps
 
   const handleAddAccount = (accountData: any) => {
     console.log('Adding account:', accountData);
-    toast.success('Tài khoản đã được thêm thành công!');
+    
+    if (onAddAccount) {
+      onAddAccount(accountData); // Truyền dữ liệu tài khoản vào callback
+    } else {
+      toast.success('Tài khoản đã được thêm thành công!');
+    }
+    
     onRefresh();
     setIsAddAccountDialogOpen(false);
   };
