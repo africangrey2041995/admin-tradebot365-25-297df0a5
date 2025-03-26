@@ -1,5 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, Briefcase } from 'lucide-react';
+
 interface BotStatsCardProps {
   stats: {
     totalTrades: number;
@@ -9,6 +12,7 @@ interface BotStatsCardProps {
     currentDrawdown: string;
   };
 }
+
 const BotStatsCard: React.FC<BotStatsCardProps> = ({
   stats
 }) => {
@@ -42,4 +46,5 @@ const BotStatsCard: React.FC<BotStatsCardProps> = ({
       </CardContent>
     </Card>;
 };
+
 export default BotStatsCard;

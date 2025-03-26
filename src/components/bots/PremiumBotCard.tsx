@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf } from 'lucide-react';
+import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -137,6 +137,8 @@ export const PremiumBotCard = ({
     }
   };
 
+  const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
+
   return (
     <Card className={`overflow-hidden border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
       <CardHeader className="p-3 pb-0">
@@ -188,21 +190,21 @@ export const PremiumBotCard = ({
         <div className="grid grid-cols-2 gap-2 mb-2">
           <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
             <div className="flex items-center gap-1 mb-0.5">
-              <ChartLine className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tháng</span>
+              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Người dùng đăng ký</span>
             </div>
-            <div className={`text-sm font-semibold ${getPerformanceColor(performanceLastMonth)}`}>
-              {performanceLastMonth}
+            <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+              {subscribers}
             </div>
           </div>
           
           <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
             <div className="flex items-center gap-1 mb-0.5">
-              <TrendingUp className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Hiệu suất Tổng</span>
+              <Briefcase className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tài khoản kết nối</span>
             </div>
-            <div className={`text-sm font-semibold ${getPerformanceColor(performanceAllTime)}`}>
-              {performanceAllTime}
+            <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+              {connectedAccounts}
             </div>
           </div>
         </div>
@@ -213,16 +215,9 @@ export const PremiumBotCard = ({
             <span className="text-[10px]">Vốn tối thiểu:</span>
             <span className="text-xs font-semibold">{minCapital}</span>
           </div>
-          {isIntegrated && accountCount ? (
+          {isIntegrated && (
             <div className="flex items-center gap-1">
-              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-[10px]">Tài khoản:</span>
-              <span className="text-xs font-semibold">{accountCount}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1">
-              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-xs font-semibold">{subscribers}</span>
+              <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400">Đã tích hợp</Badge>
             </div>
           )}
         </div>
