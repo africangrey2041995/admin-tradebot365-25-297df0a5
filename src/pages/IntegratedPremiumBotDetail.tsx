@@ -117,7 +117,6 @@ const IntegratedPremiumBotDetail = () => {
           accountsData={accounts}
           logsData={coinstratLogs}
           logsLoading={logsLoading}
-          signalSourceLabel="TB365 ID"
         />
       </div>
     </MainLayout>

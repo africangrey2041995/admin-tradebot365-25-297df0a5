@@ -7,6 +7,7 @@ import UserAccountsTabContent from '../../accounts/UserAccountsTabContent';
 import { getTabsListClassName, getTabTriggerClassName, getTabIcon } from '../tabs/TabStyles';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
+import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 
 interface PremiumBotTabsProps {
   activeTab: string;
@@ -44,7 +45,7 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
         <TabsTrigger value="connected-accounts" className={getTabTriggerClassName('premium')}>
           Tài khoản kết nối
         </TabsTrigger>
-        <TabsTrigger value="coinstrat-logs" className={getTabTriggerClassName('premium')}>Coinstrat Pro Logs</TabsTrigger>
+        <TabsTrigger value="signal-tracking" className={getTabTriggerClassName('premium')}>Signal Tracking</TabsTrigger>
       </TabsList>
       
       <TabsContent value="overview" className="space-y-4">
@@ -63,16 +64,10 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent value="coinstrat-logs">
-        <LogsTabContent 
+      <TabsContent value="signal-tracking">
+        <SignalTrackingTab 
           botId={botId} 
           userId={userId} 
-          botType="premium" 
-          logsData={logsData} 
-          isLoading={logsLoading}
-          signalSourceLabel={signalSourceLabel} 
-          title="Premium Trading Logs" 
-          description="Xem lịch sử các tín hiệu đã được xử lý bởi Premium Bot" 
         />
       </TabsContent>
     </Tabs>;
