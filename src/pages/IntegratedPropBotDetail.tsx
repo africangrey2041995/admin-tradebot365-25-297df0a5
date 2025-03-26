@@ -39,14 +39,11 @@ const IntegratedPropBotDetail = () => {
     setActiveTab, 
     refreshLoading, 
     mockAccounts, 
-    mockLogs, 
     refreshTabData 
   } = useIntegratedBot("overview");
   
   // Use the combined signal logs hook for the Signal Tracking tab
   const {
-    tradingViewLogs,
-    coinstratLogs,
     loading: signalLogsLoading,
     refreshLogs: refreshSignalLogs
   } = useCombinedSignalLogs({
@@ -168,7 +165,6 @@ const IntegratedPropBotDetail = () => {
           botId={botId || ""}
           refreshLoading={refreshLoading || signalLogsLoading}
           accounts={userAccounts}
-          logs={mockLogs}
           overviewContent={overviewContent}
           refreshTabData={handleRefresh}
         />

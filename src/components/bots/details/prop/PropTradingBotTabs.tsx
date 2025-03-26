@@ -2,7 +2,6 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import { CoinstratSignal } from '@/types/signal';
 import { Account } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -93,9 +92,6 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
         <TabsTrigger value="signal-tracking" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
           Signal Tracking
         </TabsTrigger>
-        <TabsTrigger value="logs" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
-          Coinstrat Pro Logs
-        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="overview" className="mt-6">
@@ -139,20 +135,6 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
               botId={botId}
               userId={userId}
             />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="logs">
-        <Card className="border-gray-200 dark:border-gray-800">
-          <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
-            <CardTitle className="text-lg font-medium">Coinstrat Pro Logs</CardTitle>
-            <CardDescription>
-              Xem lịch sử các tín hiệu đã được xử lý bởi Prop Trading Bot
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <CoinstratLogs botId={botId} userId={userId} initialData={logs} signalSourceLabel="TB365 ID" refreshTrigger={refreshLoading} botType="prop" isLoading={refreshLoading} />
           </CardContent>
         </Card>
       </TabsContent>
