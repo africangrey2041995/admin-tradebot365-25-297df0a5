@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { CardTitle } from '@/components/ui/card';
-import { Crown, BarChart, User } from 'lucide-react';
+import { CardTitle, CardDescription } from '@/components/ui/card';
+import { BotType } from '@/constants/botTypes';
+import { Star, Target, User, Crown, BarChart, Settings } from 'lucide-react';
 
 interface TabHeaderProps {
   title: string;
+  description: string;
   botType: 'premium' | 'prop' | 'user';
 }
 
-const TabHeader: React.FC<TabHeaderProps> = ({ title, botType }) => {
+const TabHeader: React.FC<TabHeaderProps> = ({ title, description, botType }) => {
   const getBotIcon = () => {
     switch (botType) {
       case 'premium':
@@ -22,10 +24,13 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title, botType }) => {
   };
 
   return (
-    <CardTitle className="flex items-center">
-      {getBotIcon()}
-      {title}
-    </CardTitle>
+    <>
+      <CardTitle className="flex items-center">
+        {getBotIcon()}
+        {title}
+      </CardTitle>
+      <CardDescription>{description}</CardDescription>
+    </>
   );
 };
 

@@ -1,42 +1,45 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import { CoinstratSignal } from '@/types/signal';
 import TabHeader from './TabHeader';
 import { getCardClassName, getCardHeaderClassName } from './TabStyles';
-import { CoinstratSignal } from '@/types/signal';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
 
 interface LogsTabContentProps {
   botId: string;
   userId: string;
   botType: 'premium' | 'prop' | 'user';
-  title: string;
   logsData?: CoinstratSignal[];
   isLoading?: boolean;
-  signalSourceLabel?: string;
+  signalSourceLabel: string;
+  title: string;
+  description: string;
 }
 
 const LogsTabContent: React.FC<LogsTabContentProps> = ({
   botId,
   userId,
   botType,
-  title,
   logsData,
   isLoading,
-  signalSourceLabel = 'TB365 ID'
+  signalSourceLabel,
+  title,
+  description
 }) => {
   return (
     <Card className={getCardClassName(botType)}>
       <CardHeader className={getCardHeaderClassName(botType)}>
-        <TabHeader title={title} botType={botType} />
+        <TabHeader title={title} description={description} botType={botType} />
       </CardHeader>
       <CardContent>
         <CoinstratLogs 
           botId={botId} 
           userId={userId}
           initialData={logsData}
-          signalSourceLabel={signalSourceLabel}
           isLoading={isLoading}
+          signalSourceLabel={signalSourceLabel}
+          botType={botType}
         />
       </CardContent>
     </Card>

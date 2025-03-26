@@ -51,12 +51,7 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="connected-accounts">
-        <AccountsTabContent 
-          botId={botId} 
-          userId={userId} 
-          botType="premium" 
-          title="Tài khoản kết nối" 
-        />
+        <AccountsTabContent botId={botId} userId={userId} botType="premium" title="Tài khoản kết nối" description="Quản lý các tài khoản được kết nối với Premium Bot" accountsData={accountsData} />
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">
@@ -68,6 +63,7 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
           isLoading={logsLoading}
           signalSourceLabel={signalSourceLabel} 
           title="Premium Trading Logs" 
+          description="Xem lịch sử các tín hiệu đã được xử lý bởi Premium Bot" 
         />
       </TabsContent>
     </Tabs>;
