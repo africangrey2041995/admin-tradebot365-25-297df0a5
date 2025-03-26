@@ -348,6 +348,12 @@ const PremiumBotDetail = () => {
     console.log("Updated performance:", performance);
   };
 
+  // Handle update bot information
+  const handleUpdateBotInfo = (info: { type: string; exchange: string; minCapital: string }) => {
+    toast.success("Bot information updated");
+    console.log("Updated bot information:", info);
+  };
+
   // Generate chart data based on selected period
   const getChartData = () => {
     // Using chart data from the hook instead of relying on bot.monthlyPerformance
@@ -456,32 +462,36 @@ const PremiumBotDetail = () => {
             </div>
             <div className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle>Bot Information</CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Thông tin Bot</CardTitle>
+                  <Button variant="ghost" size="sm">
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Chỉnh sửa
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Type</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Loại Bot</h3>
                     <p>{bot.type}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Exchange</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Sàn giao dịch</h3>
                     <p>{bot.exchange}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Min Capital</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Vốn tối thiểu</h3>
                     <p>{bot.minCapital}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Subscribers</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Số người đăng ký</h3>
                     <p>{bot.subscribers}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</h3>
                     <p>{new Date(bot.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Cập nhật lần cuối</h3>
                     <p>{new Date(bot.updatedAt).toLocaleDateString()}</p>
                   </div>
                 </CardContent>
