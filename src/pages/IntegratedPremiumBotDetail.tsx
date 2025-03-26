@@ -99,6 +99,7 @@ const IntegratedPremiumBotDetail = () => {
             />
           }
           signalSourceLabel="TB365 ID"
+          accountsData={bot.accounts || []}
         />
       </div>
     </MainLayout>
