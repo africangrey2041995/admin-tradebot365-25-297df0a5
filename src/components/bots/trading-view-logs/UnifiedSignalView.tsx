@@ -71,14 +71,23 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
     return !tradingViewLogs.some(tvSignal => tvSignal.id === csSignal.originalSignalId);
   });
 
-  const toggleExpandRow = (id: string) => {
+  const toggleExpandRow = (id: string, e?: React.MouseEvent) => {
+    // If event is provided, stop propagation to prevent row click handling
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    console.log("Toggling row expansion for ID:", id);
+    
     setExpandedRows(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
   };
 
-  const openDetailDialog = (signalId: string) => {
+  const openDetailDialog = (signalId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row expansion when clicking detail button
+    console.log("Opening detail dialog for ID:", signalId);
     setSelectedSignal(signalId);
     setDetailDialogOpen(true);
   };
@@ -165,13 +174,17 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
               <React.Fragment key={tvSignal.id}>
                 <TableRow 
                   className={cn(
-                    "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/50",
+                    "hover:bg-gray-50 dark:hover:bg-gray-900/50",
                     expandedRows[tvSignal.id] && "bg-gray-50 dark:bg-gray-900/30"
                   )}
-                  onClick={() => toggleExpandRow(tvSignal.id)}
                 >
                   <TableCell className="px-2">
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0"
+                      onClick={(e) => toggleExpandRow(tvSignal.id, e)}
+                    >
                       {expandedRows[tvSignal.id] ? 
                         <ChevronDown className="h-4 w-4" /> : 
                         <ChevronRight className="h-4 w-4" />
@@ -189,17 +202,14 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                   <TableCell><ActionBadge action={tvSignal.action} /></TableCell>
                   <TableCell><StatusBadge status={tvSignal.status.toString()} /></TableCell>
                   <TableCell>
-                    {renderStatusSummary(successfulAccounts, failedAccounts, totalAccounts)}
+                    {renderStatusSummary(successfulAccounts, failedCount, totalAccounts)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button 
                       variant="ghost" 
                       size="sm"
                       className="h-8"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openDetailDialog(tvSignal.id);
-                      }}
+                      onClick={(e) => openDetailDialog(tvSignal.id, e)}
                     >
                       <Info className="h-4 w-4 mr-1" />
                       Details
@@ -251,7 +261,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                                       className="h-8"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        openDetailDialog(csSignal.originalSignalId);
+                                        openDetailDialog(csSignal.originalSignalId, e);
                                       }}
                                     >
                                       <ExternalLink className="h-4 w-4 mr-1" />
@@ -304,7 +314,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                         variant="ghost" 
                         size="sm"
                         className="h-8"
-                        onClick={() => openDetailDialog(csSignal.originalSignalId)}
+                        onClick={(e) => openDetailDialog(csSignal.originalSignalId, e)}
                       >
                         <Info className="h-4 w-4 mr-1" />
                         Details
