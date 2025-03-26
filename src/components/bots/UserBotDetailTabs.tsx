@@ -12,6 +12,7 @@ import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
 import AccountsTabContent from './details/tabs/AccountsTabContent';
+import SignalTrackingTab from '@/pages/admin/components/user-bot-detail/SignalTrackingTab';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -112,6 +113,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
           <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
           <TabsTrigger value="tradingview-logs">TradingView Logs</TabsTrigger>
           <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
+          {isAdminView && <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>}
         </TabsList>
         
         <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
@@ -157,6 +159,16 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             isLoading={refreshLoading} // Pass the consolidated loading state
           />
         </TabsContent>
+        
+        {isAdminView && (
+          <TabsContent value="signal-tracking" className="animate-in fade-in-50 duration-200">
+            <SignalTrackingTab 
+              botId={botId} 
+              userId={userId} 
+              isAdminView={true}
+            />
+          </TabsContent>
+        )}
       </Tabs>
     </TabContentWrapper>
   );
