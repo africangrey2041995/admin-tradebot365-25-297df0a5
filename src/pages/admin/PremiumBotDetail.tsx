@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -28,12 +27,12 @@ import { Account } from '@/types';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
+import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
 import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
 
 // Import components from user view to enhance admin view
 import PerformanceChart from '@/components/bots/details/PerformanceChart';
 import TradeDetailsChart from '@/components/bots/details/TradeDetailsChart';
-import FeaturesList from '@/components/bots/details/FeaturesList';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useChartData } from '@/hooks/useChartData';
 
@@ -337,6 +336,12 @@ const PremiumBotDetail = () => {
     console.log("Updated pairs:", pairs);
   };
 
+  // Handle update features
+  const handleUpdateFeatures = (features: string[]) => {
+    toast.success("Bot features updated");
+    console.log("Updated features:", features);
+  };
+
   // Handle update performance data
   const handleUpdatePerformance = (performance: { lastMonth: string; allTime: string }) => {
     toast.success("Bot performance data updated");
@@ -441,9 +446,12 @@ const PremiumBotDetail = () => {
                 onUpdate={handleUpdateTradingPairs}
               />
               
-              {/* Features List - Added from user view */}
+              {/* Features List - Now using the editable component */}
               {bot.features && (
-                <FeaturesList features={bot.features} />
+                <EditableFeaturesCard 
+                  features={bot.features}
+                  onUpdate={handleUpdateFeatures}
+                />
               )}
             </div>
             <div className="space-y-4">
