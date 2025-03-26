@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import TradingViewLogs from '@/components/bots/TradingViewLogs';
 import CoinstratLogs from '@/components/bots/CoinstratLogs';
+import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
 
 // Import the hierarchical accounts table component and its utilities
 import HierarchicalAccountsTable from '@/components/admin/prop-bots/detail/components/HierarchicalAccountsTable';
@@ -416,6 +417,9 @@ const PremiumBotDetail = () => {
         </div>
       </div>
 
+      {/* Add Integration Info Card */}
+      <BotIntegrationInfo botId={bot.id} />
+
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
@@ -569,3 +573,4 @@ const PremiumBotDetail = () => {
 };
 
 export default PremiumBotDetail;
+
