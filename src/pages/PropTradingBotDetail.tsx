@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -71,9 +72,9 @@ const PropTradingBotDetail = () => {
     [BotRiskLevel.LOW]: 'Thấp',
     [BotRiskLevel.MEDIUM]: 'Trung bình',
     [BotRiskLevel.HIGH]: 'Cao'
-  }[bot.risk];
+  }[bot.risk as BotRiskLevel];
   
-  const riskColor = getColorByRisk(bot.risk);
+  const riskColor = getColorByRisk(bot.risk as BotRiskLevel);
   
   const colorSchemeClasses = {
     blue: {
