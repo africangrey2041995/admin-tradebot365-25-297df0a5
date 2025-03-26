@@ -1,152 +1,105 @@
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TabContentWrapper from './tabs/TabContentWrapper';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, RefreshCw } from 'lucide-react';
+import UserHierarchicalAccountsTable from './accounts/UserHierarchicalAccountsTable';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
-import { useQueryClient } from '@tanstack/react-query';
-import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
-import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
-import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
-import AccountsTabContent from './details/tabs/AccountsTabContent';
-import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
-import UserAccountsTabContent from './accounts/UserAccountsTabContent';
 
 interface UserBotDetailTabsProps {
-  userId: string;
   botId: string;
-  accountsData?: Account[];
-  logsData?: CoinstratSignal[];
-  onRefresh?: () => void;
-  isLoading?: boolean;
+  userId: string;
+  onRefresh: () => void;
+  isLoading: boolean;
+  accountsData: Account[];
+  logsData: CoinstratSignal[];
   signalSourceLabel?: string;
   botType?: 'premium' | 'prop' | 'user';
-  isAdminView?: boolean;
+  onAddAccount?: () => void;  // Add this prop
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
-  userId,
   botId,
+  userId,
+  onRefresh,
+  isLoading,
   accountsData,
   logsData,
-  onRefresh,
-  isLoading = false,
-  signalSourceLabel = "TradingView ID",
+  signalSourceLabel = 'Signal Source',
   botType = 'user',
-  isAdminView = false
+  onAddAccount  // Add this prop
 }) => {
-  const [activeTab, setActiveTab] = useState("accounts");
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const queryClient = useQueryClient();
-
-  // Centralized loading state
-  const [refreshLoading, setRefreshLoading] = useState(isLoading);
-
-  // Update loading state based on parent isLoading
-  useEffect(() => {
-    setRefreshLoading(isLoading);
-  }, [isLoading]);
-
-  // Centralized logs state using hooks with skipLoadingState=true
-  const { 
-    logs: tradingViewLogs, 
-    fetchLogs: fetchTvLogs 
-  } = useTradingViewLogs({
-    botId,
-    userId,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  const {
-    logs: coinstratLogs,
-    fetchLogs: fetchCsLogs
-  } = useCoinstratLogs({
-    botId,
-    userId,
-    initialData: logsData,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}, isAdminView: ${isAdminView}`);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    
-    // When there's an onRefresh handler provided, call it when changing tabs
-    if (onRefresh) {
-      onRefresh();
-    }
-  };
+  const [activeTab, setActiveTab] = useState('accounts');
 
   const handleRefresh = () => {
-    console.log("UserBotDetailTabs - handleRefresh called");
-    // Set loading state to true
-    setRefreshLoading(true);
-    setRefreshTrigger(prev => prev + 1);
-    
-    // Invalidate React Query cache for this bot's accounts
-    queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
-    
-    if (onRefresh) {
-      onRefresh();
-    }
-
-    // Set a timeout to reset loading state after a consistent delay
-    setTimeout(() => {
-      setRefreshLoading(false);
-    }, 800);
+    onRefresh();
   };
 
   return (
-    <TabContentWrapper 
-      title="Quản lý Bot"
-      description="Thông tin về tài khoản, tín hiệu và lịch sử xử lý"
-      onRefresh={handleRefresh}
-      refreshLoading={refreshLoading}
-    >
-      <Tabs defaultValue="accounts" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
-          <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
+    <Tabs defaultValue="accounts" className="w-full" onValueChange={setActiveTab}>
+      <div className="flex items-center justify-between mb-4">
+        <TabsList>
+          <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
+          <TabsTrigger value="settings">Cài đặt</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
-          {isAdminView ? (
-            <AccountsTabContent 
-              botId={botId}
-              userId={userId}
-              botType={botType}
-              title="Tài khoản kết nối"
-              description="Danh sách tài khoản được kết nối với bot này"
-              accountsData={accountsData}
-              isLoading={refreshLoading}
-              isAdminView={true}
-            />
-          ) : (
-            <UserAccountsTabContent
-              botId={botId}
-              userId={userId}
-              botType={botType}
-              title="Tài khoản kết nối"
-              description="Danh sách tài khoản được kết nối với bot này"
-              accountsData={accountsData}
-              isLoading={refreshLoading}
-            />
+
+        <div className="flex space-x-2">
+          {activeTab === 'accounts' && onAddAccount && (
+            <Button variant="outline" size="sm" onClick={onAddAccount}>
+              <Plus className="mr-2 h-4 w-4" />
+              Thêm tài khoản
+            </Button>
           )}
-        </TabsContent>
-        
-        <TabsContent value="signal-tracking" className="animate-in fade-in-50 duration-200">
-          <SignalTrackingTab 
-            botId={botId} 
-            userId={userId} 
-            isAdminView={isAdminView}
-          />
-        </TabsContent>
-      </Tabs>
-    </TabContentWrapper>
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
+            {isLoading ? (
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Làm mới
+          </Button>
+        </div>
+      </div>
+
+      <TabsContent value="accounts" className="mt-0">
+        <Card>
+          <CardContent className="p-6">
+            <UserHierarchicalAccountsTable 
+              accounts={accountsData}
+              isLoading={isLoading}
+              error={null}
+              onRefresh={handleRefresh}
+              onAddAccount={onAddAccount}
+              botType={botType}
+            />
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="logs" className="mt-0">
+        <Card>
+          <CardContent className="p-6">
+            {/* Logs content goes here */}
+            <div className="text-center text-gray-500 p-8">
+              Logs tab content will be implemented here
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="settings" className="mt-0">
+        <Card>
+          <CardContent className="p-6">
+            {/* Settings content goes here */}
+            <div className="text-center text-gray-500 p-8">
+              Settings tab content will be implemented here
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 };
 
