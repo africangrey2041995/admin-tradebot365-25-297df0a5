@@ -9,6 +9,7 @@ import { Account } from '@/types';
 // Mock Premium Bot data
 const mockPremiumBots = [{
   id: 'PRE-001',
+  botId: 'PRE-001',
   name: 'Alpha Edge',
   description: 'High performance bot for experienced traders with advanced risk management.',
   longDescription: `Alpha Edge is our flagship premium bot designed for experienced traders who want to maximize their trading potential.
@@ -31,10 +32,11 @@ The Alpha Edge bot has consistently delivered excellent performance over various
     yearly: 459.99
   },
   features: ['Advanced algorithm', 'Real-time market analysis', 'Smart risk management', 'Multi-exchange support', '24/7 operation', 'Performance reports', 'Priority support'],
-  createdAt: '2023-05-15T10:30:00Z',
-  updatedAt: '2023-11-10T15:45:00Z'
+  createdDate: '2023-05-15T10:30:00Z',
+  lastUpdated: '2023-11-10T15:45:00Z'
 }, {
   id: 'PRE-002',
+  botId: 'PRE-002',
   name: 'Momentum Master',
   description: 'Capitalizing on market momentum with trend identification and precise entries.',
   longDescription: `Momentum Master is a premium bot that specializes in identifying and capitalizing on market momentum.
@@ -57,8 +59,8 @@ The Momentum Master bot is particularly effective in trending markets, with risk
     yearly: 539.99
   },
   features: ['Momentum detection', 'Trend strength analysis', 'Dynamic take profit levels', 'Adaptive stop-loss', 'Market condition filter', 'Performance tracking', 'VIP support channel'],
-  createdAt: '2023-06-20T09:15:00Z',
-  updatedAt: '2023-10-28T12:30:00Z'
+  createdDate: '2023-06-20T09:15:00Z',
+  lastUpdated: '2023-10-28T12:30:00Z'
 }];
 
 // Mock accounts data for the bot
@@ -160,34 +162,7 @@ const mockAccounts: Account[] = [{
   userAccount: 'Robert Johnson'
 }];
 
-export interface UsePremiumBotDetailResult {
-  isLoading: boolean;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  bot: typeof mockPremiumBots[0] | undefined;
-  accounts: Account[];
-  accountsLoading: boolean;
-  uniqueUsers: number;
-  tradingAccountsCount: number;
-  processedSignalsCount: number;
-  statisticsData: ReturnType<typeof useBotStatistics>['statisticsData'];
-  tradingViewLogs: ReturnType<typeof useCombinedSignalLogs>['tradingViewLogs'];
-  coinstratLogs: ReturnType<typeof useCombinedSignalLogs>['coinstratLogs'];
-  logsLoading: boolean;
-  availableUsers: string[];
-  refreshAccounts: () => void;
-  handleEditAccount: (account: Account) => void;
-  handleDeleteAccount: (accountId: string) => void;
-  handleToggleConnection: (accountId: string) => void;
-  handleUpdateDescription: (description: string) => void;
-  handleUpdateTradingPairs: (pairs: string[]) => void;
-  handleUpdateFeatures: (features: string[]) => void;
-  handleUpdateStatistics: (stats: { name: string; value: string; icon: React.ReactNode }[]) => void;
-  handleUpdateBotInfo: (info: { type: string; exchange: string; minCapital: string }) => void;
-  refreshSignalLogs: () => void;
-}
-
-export const usePremiumBotDetail = (botId: string | undefined): UsePremiumBotDetailResult => {
+export const usePremiumBotDetail = (botId: string | undefined) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -203,11 +178,17 @@ export const usePremiumBotDetail = (botId: string | undefined): UsePremiumBotDet
     tradingViewLogs,
     refreshLogs,
     loading: logsLoading,
-    availableUsers 
+    availableUsers: userList 
   } = useCombinedSignalLogs({
     botId: botId || '',
     userId: 'admin'
   });
+
+  // Transform availableUsers from array of strings to array of objects with id and name
+  const availableUsers = userList.map(username => ({
+    id: `user-${username.toLowerCase().replace(/\s+/g, '-')}`,
+    name: username
+  }));
 
   // Set up accounts data for the selected bot using the same hook as prop bots
   const {
@@ -289,6 +270,17 @@ export const usePremiumBotDetail = (botId: string | undefined): UsePremiumBotDet
     console.log("Updated bot information:", info);
   };
 
+  // Centralized function for refreshing tab data
+  const refreshTabData = () => {
+    if (activeTab === 'overview') {
+      // Refresh overview data if needed
+    } else if (activeTab === 'accounts') {
+      refreshAccounts();
+    } else if (activeTab === 'signal-tracking') {
+      refreshLogs();
+    }
+  };
+
   return {
     isLoading,
     activeTab,
@@ -313,6 +305,8 @@ export const usePremiumBotDetail = (botId: string | undefined): UsePremiumBotDet
     handleUpdateFeatures,
     handleUpdateStatistics,
     handleUpdateBotInfo,
-    refreshSignalLogs: refreshLogs
+    refreshSignalLogs: refreshLogs,
+    refreshLoading: logsLoading || accountsLoading,
+    refreshTabData
   };
 };

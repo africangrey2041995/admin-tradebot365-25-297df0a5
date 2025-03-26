@@ -13,15 +13,15 @@ interface EditableTradingPairsCardProps {
 }
 
 const EditableTradingPairsCard: React.FC<EditableTradingPairsCardProps> = ({ 
-  tradingPairs, 
+  tradingPairs = [], // Set default empty array to avoid "not iterable" error
   onUpdate 
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPairs, setEditedPairs] = useState<string[]>([...tradingPairs]);
+  const [editedPairs, setEditedPairs] = useState<string[]>([...(Array.isArray(tradingPairs) ? tradingPairs : [])]);
   const [newPair, setNewPair] = useState('');
 
   const handleStartEditing = () => {
-    setEditedPairs([...tradingPairs]);
+    setEditedPairs([...(Array.isArray(tradingPairs) ? tradingPairs : [])]);
     setIsEditing(true);
   };
 
@@ -56,6 +56,9 @@ const EditableTradingPairsCard: React.FC<EditableTradingPairsCardProps> = ({
     updatedPairs.splice(index, 1);
     setEditedPairs(updatedPairs);
   };
+
+  // Ensure we're working with an array of trading pairs
+  const safeTradingPairs = Array.isArray(tradingPairs) ? tradingPairs : [];
 
   return (
     <Card className="border border-neutral-200 dark:border-neutral-800">
@@ -100,8 +103,8 @@ const EditableTradingPairsCard: React.FC<EditableTradingPairsCardProps> = ({
       <CardContent>
         {!isEditing ? (
           <div className="flex flex-wrap gap-2">
-            {tradingPairs.length > 0 ? (
-              tradingPairs.map((pair, index) => (
+            {safeTradingPairs.length > 0 ? (
+              safeTradingPairs.map((pair, index) => (
                 <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
                   {pair}
                 </Badge>

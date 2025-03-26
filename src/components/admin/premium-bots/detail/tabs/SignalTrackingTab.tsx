@@ -24,7 +24,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   availableUsers,
   onRefresh
 }) => {
-  // Transform available users to the format required by AdvancedSignalFilter if needed
+  // Transform available users to just the names array for the filter component
   const usersList = availableUsers.map(user => user.name);
   
   return (
