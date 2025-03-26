@@ -1,45 +1,18 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { 
-  ChartLine, 
-  Users, 
-  Gauge, 
-  Wallet, 
-  Bot, 
-  TrendingUp, 
-  Clock, 
-  CircuitBoard, 
-  BarChart4, 
-  LineChart, 
-  Sparkles,
-  CheckCircle,
-  Calendar,
-  ArrowRight,
-  ChevronLeft,
-  Activity,
-  PieChart,
-  Plus,
-  RefreshCw
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Bar,
-  ComposedChart,
-  Legend
-} from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
+import { toast } from 'sonner';
+import PremiumBotDetailTabs from '@/components/bots/details/PremiumBotDetailTabs';
+import BotHeader from '@/components/bots/details/BotHeader';
+import BotDescription from '@/components/bots/details/BotDescription';
+import PerformanceChart from '@/components/bots/details/PerformanceChart';
+import TradeDetailsChart from '@/components/bots/details/TradeDetailsChart';
+import FeaturesList from '@/components/bots/details/FeaturesList';
+import BotInfoCard from '@/components/bots/details/BotInfoCard';
+import PerformanceCard from '@/components/bots/details/PerformanceCard';
+import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 
 const premiumBots = [
   {
@@ -272,6 +245,11 @@ const PremiumBotDetail = () => {
 
   const bot = premiumBots.find(b => b.id === botId);
 
+  const { 
+    tradePerformanceData, 
+    statisticsData 
+  } = usePremiumBotDetail(botId, 'user-001');
+
   if (!bot) {
     return (
       <MainLayout title="Không tìm thấy Bot">
@@ -283,7 +261,7 @@ const PremiumBotDetail = () => {
             Bot bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
           </p>
           <Button onClick={() => navigate('/premium-bots')}>
-            <ChevronLeft className="mr-2 h-4 w-4" /> Quay lại danh sách Bot
+            Quay lại danh sách Bot
           </Button>
         </div>
       </MainLayout>
@@ -302,35 +280,6 @@ const PremiumBotDetail = () => {
     setTimeout(() => {
       navigate('/premium-bots');
     }, 500);
-  };
-
-  const getRiskLabel = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'Thấp';
-      case 'medium': return 'Trung bình';
-      case 'high': return 'Cao';
-      default: return risk;
-    }
-  };
-  
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default: return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
-    }
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'momentum': return 'Momentum';
-      case 'scalping': return 'Scalping';
-      case 'swing': return 'Swing';
-      case 'grid': return 'Grid';
-      case 'trend': return 'Trend';
-      default: return type;
-    }
   };
 
   const generateChartData = () => {
@@ -356,346 +305,68 @@ const PremiumBotDetail = () => {
     }
   };
 
-  const tradePerformanceData = [
-    { name: 'Jan', profit: 12.5, trades: 24 },
-    { name: 'Feb', profit: 8.3, trades: 18 },
-    { name: 'Mar', profit: -2.1, trades: 15 },
-    { name: 'Apr', profit: 5.7, trades: 17 },
-    { name: 'May', profit: 15.2, trades: 29 },
-    { name: 'Jun', profit: 10.1, trades: 22 },
-    { name: 'Jul', profit: 5.5, trades: 20 },
-    { name: 'Aug', profit: -3.2, trades: 16 },
-    { name: 'Sep', profit: 9.8, trades: 21 },
-    { name: 'Oct', profit: 18.5, trades: 28 },
-  ];
-
-  const statisticsData = [
-    { name: 'Win Rate', value: '65%', icon: <Activity className="h-4 w-4 text-green-500" /> },
-    { name: 'Avg Profit', value: '2.7%', icon: <TrendingUp className="h-4 w-4 text-green-500" /> },
-    { name: 'Max Drawdown', value: '8.5%', icon: <ChartLine className="h-4 w-4 text-red-500" /> },
-    { name: 'Sharp Ratio', value: '1.8', icon: <PieChart className="h-4 w-4 text-blue-500" /> },
-  ];
-
   return (
     <MainLayout title={bot?.name || "Premium Bot Detail"}>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/premium-bots')}
-              className="mr-2"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Quay lại
-            </Button>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
-              {bot?.name}
-              <Sparkles className="h-5 w-5 text-yellow-500 ml-2" />
-            </h1>
-            <Badge className={getRiskColor(bot?.risk)}>
-              Rủi ro: {getRiskLabel(bot?.risk)}
-            </Badge>
-            {/* Add Bot ID badge */}
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
-              {bot.botId}
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleSubscribe}>
-              Đăng Ký Sử Dụng
-            </Button>
-          </div>
+        <BotHeader
+          name={bot.name}
+          risk={bot.risk}
+          botId={bot.botId}
+          onBack={() => navigate('/premium-bots')}
+        />
+
+        <div className="flex justify-end">
+          <Button onClick={handleSubscribe}>
+            Đăng Ký Sử Dụng
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Giới thiệu</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none dark:prose-invert">
-                  <p className="text-slate-600 dark:text-slate-300 whitespace-pre-line">
-                    {bot?.longDescription}
-                  </p>
-                </div>
-                <div className="mt-6">
-                  <h4 className="font-medium text-slate-800 dark:text-white mb-2">Các cặp tiền giao dịch</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {bot?.pairs.map((pair, index) => (
-                      <Badge key={index} variant="outline">{pair}</Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <BotDescription 
+              description={bot.longDescription} 
+              pairs={bot.pairs} 
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle>Biểu đồ hiệu suất</CardTitle>
-                <div className="flex gap-2">
-                  <Button 
-                    variant={selectedChartPeriod === "week" ? "secondary" : "outline"} 
-                    size="sm"
-                    onClick={() => setSelectedChartPeriod("week")}
-                  >
-                    Tuần
-                  </Button>
-                  <Button 
-                    variant={selectedChartPeriod === "month" ? "secondary" : "outline"} 
-                    size="sm"
-                    onClick={() => setSelectedChartPeriod("month")}
-                  >
-                    Tháng
-                  </Button>
-                  <Button 
-                    variant={selectedChartPeriod === "year" ? "secondary" : "outline"} 
-                    size="sm"
-                    onClick={() => setSelectedChartPeriod("year")}
-                  >
-                    Năm
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px] w-full">
-                  <ChartContainer
-                    config={{
-                      profit: {
-                        label: "Profit",
-                        theme: {
-                          light: "#10b981",
-                          dark: "#34d399"
-                        }
-                      },
-                      loss: {
-                        label: "Loss",
-                        theme: {
-                          light: "#ef4444",
-                          dark: "#f87171"
-                        }
-                      },
-                      line: {
-                        label: "Performance Line",
-                        theme: {
-                          light: "#60a5fa",
-                          dark: "#3b82f6"
-                        }
-                      }
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart
-                        data={generateChartData()}
-                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                      >
-                        <defs>
-                          <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                          </linearGradient>
-                          <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                        <XAxis 
-                          dataKey={selectedChartPeriod === "year" ? "year" : (selectedChartPeriod === "week" ? "day" : "month")} 
-                          className="text-xs font-medium" 
-                        />
-                        <YAxis className="text-xs font-medium" />
-                        <ChartTooltip 
-                          content={
-                            <ChartTooltipContent 
-                              formatter={(value: number) => [`${value.toFixed(2)}%`, 'Hiệu suất']}
-                            />
-                          } 
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="value" 
-                          stroke="#10b981" 
-                          fillOpacity={1} 
-                          fill="url(#colorPositive)" 
-                          activeDot={{ r: 6 }} 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
+            <PerformanceChart
+              selectedPeriod={selectedChartPeriod}
+              onPeriodChange={setSelectedChartPeriod}
+              chartData={generateChartData()}
+            />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Chi tiết giao dịch</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px]">
-                  <ChartContainer
-                    config={{
-                      profit: {
-                        label: "Profit",
-                        theme: {
-                          light: "#10b981",
-                          dark: "#34d399"
-                        }
-                      },
-                      trades: {
-                        label: "Trades",
-                        theme: {
-                          light: "#60a5fa",
-                          dark: "#3b82f6"
-                        }
-                      }
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart
-                        data={tradePerformanceData}
-                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                      >
-                        <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                        <XAxis dataKey="name" scale="band" />
-                        <YAxis yAxisId="left" label={{ value: 'Profit (%)', angle: -90, position: 'insideLeft' }} />
-                        <YAxis yAxisId="right" orientation="right" label={{ value: 'Trades', angle: 90, position: 'insideRight' }} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar yAxisId="right" dataKey="trades" fill="#3b82f6" barSize={20} />
-                        <Area yAxisId="left" type="monotone" dataKey="profit" fill="#34d399" stroke="#10b981" />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </div>
+            <TradeDetailsChart
+              tradePerformanceData={tradePerformanceData}
+              statisticsData={statisticsData}
+            />
 
-                <div className="grid grid-cols-4 gap-4 mt-6 mb-2">
-                  {statisticsData.map((stat, index) => (
-                    <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        {stat.icon}
-                        <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                          {stat.name}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {stat.value}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tính năng</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {bot?.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <span className="text-slate-700 dark:text-slate-300">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <FeaturesList features={bot.features} />
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Thông tin chung</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-300">Loại Bot</span>
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{getTypeLabel(bot?.type)}</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <CircuitBoard className="h-4 w-4 text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-300">Sàn giao dịch</span>
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot?.exchange}</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Wallet className="h-4 w-4 text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-300">Vốn tối thiểu</span>
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot?.minCapital}</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-300">Người dùng</span>
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot?.subscribers}</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-300">Ngày tạo</span>
-                  </div>
-                  <span className="font-medium text-slate-800 dark:text-white">{bot?.createdDate}</span>
-                </div>
-              </CardContent>
-            </Card>
+            <BotInfoCard
+              type={bot.type}
+              exchange={bot.exchange}
+              minCapital={bot.minCapital}
+              createdDate={bot.createdDate}
+              subscribers={bot.subscribers}
+            />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Hiệu suất</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <TrendingUp className="h-4 w-4 text-slate-500" />
-                    <span className="text-sm font-medium text-slate-500">Hiệu suất tháng này</span>
-                  </div>
-                  <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                    {bot?.performanceLastMonth}
-                  </div>
-                </div>
-                
-                <div className="bg-white dark:bg-zinc-800/50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <BarChart4 className="h-4 w-4 text-slate-500" />
-                    <span className="text-sm font-medium text-slate-500">Hiệu suất tổng thời gian</span>
-                  </div>
-                  <div className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                    {bot?.performanceAllTime}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <PerformanceCard
+              performanceLastMonth={bot.performanceLastMonth}
+              performanceAllTime={bot.performanceAllTime}
+            />
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle>
-                  Đăng ký sử dụng
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="card border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden">
+              <div className="p-4 bg-white dark:bg-zinc-900">
+                <h3 className="font-semibold mb-2">Đăng ký sử dụng</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                  Đăng ký sử dụng {bot?.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
+                  Đăng ký sử dụng {bot.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
                 </p>
                 <Button onClick={handleSubscribe} className="w-full">
                   Đăng Ký Ngay
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
