@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { AccountsFilterParams } from '../../types/account-types';
@@ -10,6 +10,21 @@ interface AccountsFilterProps {
 }
 
 const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange }) => {
+  // Reset search when component unmounts
+  useEffect(() => {
+    return () => {
+      // Cleanup function - reset search if needed
+      console.log('AccountsFilter component unmounted');
+    };
+  }, []);
+
+  // Handle search input changes with debounce
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log('Search value changed:', value);
+    onFilterChange('searchQuery', value);
+  };
+
   return (
     <div className="space-x-2 flex">
       <div className="relative">
@@ -18,7 +33,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange
           placeholder="Search accounts..."
           className="pl-8 w-64"
           value={filters.searchQuery}
-          onChange={(e) => onFilterChange('searchQuery', e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
       

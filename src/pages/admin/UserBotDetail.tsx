@@ -22,7 +22,10 @@ const AdminUserBotDetail = () => {
   } = useAdminBotDetail(botId);
 
   // Fetch accounts with the useBotAccounts hook for real accounts data
-  const { accounts } = useBotAccounts(
+  const { 
+    accounts,
+    handleRefresh: refreshAccounts
+  } = useBotAccounts(
     botId || '',
     userInfo?.id || '',
     mockAccounts, // Use mockAccounts as initial data
@@ -52,6 +55,12 @@ const AdminUserBotDetail = () => {
       }
     }
   };
+  
+  // Combined refresh function to update both bot and account data
+  const handleFullRefresh = () => {
+    handleRefresh();
+    refreshAccounts();
+  };
 
   return (
     <ErrorBoundary>
@@ -63,7 +72,7 @@ const AdminUserBotDetail = () => {
         userInfo={userInfo}
         accounts={accounts.length > 0 ? accounts : mockAccounts} // Use real accounts if available
         logs={mockLogs}
-        handleRefresh={handleRefresh}
+        handleRefresh={handleFullRefresh}
         handleBackClick={handleBackClick}
         viewPublicBotProfile={viewPublicBotProfile}
         viewUserDetails={viewUserDetails}

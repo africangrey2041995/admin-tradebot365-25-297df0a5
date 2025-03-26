@@ -78,6 +78,8 @@ export const filterAccountData = (
   data: UserAccount[], 
   filters: AccountsFilterParams
 ): UserAccount[] => {
+  console.log('Filtering accounts with:', filters);
+  
   // If no filters are applied, return the original data
   if (!filters.searchQuery && filters.filterStatus === 'all' && filters.filterLiveDemo === 'all') {
     return data;
@@ -87,6 +89,7 @@ export const filterAccountData = (
     // Apply search filtering
     if (filters.searchQuery) {
       const searchLower = filters.searchQuery.toLowerCase();
+      console.log(`Searching for: "${searchLower}" in user: ${user.name}`);
       
       // Check if user data matches search
       const matchesUser = 
@@ -109,8 +112,11 @@ export const filterAccountData = (
       
       // If nothing matches the search, exclude this user
       if (!(matchesUser || matchesCSP || matchesTrading)) {
+        console.log(`No match found for user: ${user.name}`);
         return false;
       }
+      
+      console.log(`Match found for user: ${user.name}`);
     }
     
     // Filter by status if not 'all'

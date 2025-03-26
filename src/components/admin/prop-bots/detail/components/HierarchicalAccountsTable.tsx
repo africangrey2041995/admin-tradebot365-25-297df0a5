@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+
+import React, { useState, useCallback, useEffect } from 'react';
 import { Accordion } from '@/components/ui/accordion';
 import { Account } from '@/types';
 import { toast } from 'sonner';
@@ -39,7 +40,7 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   // Get admin status
   const { isAdmin } = useAdmin();
   
-  // State for filters
+  // State for filters with default values
   const [filters, setFilters] = useState<AccountsFilterParams>({
     searchQuery: '',
     filterStatus: 'all',
@@ -56,9 +57,10 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   [accounts]);
 
   // Apply filtering (memoized)
-  const filteredData = React.useMemo(() => 
-    filterAccountData(hierarchicalData, filters), 
-  [hierarchicalData, filters]);
+  const filteredData = React.useMemo(() => {
+    console.log("Applying filters to hierarchical data:", filters);
+    return filterAccountData(hierarchicalData, filters);
+  }, [hierarchicalData, filters]);
 
   // Calculate total accounts (memoized)
   const counts: AccountsCount = React.useMemo(() => 
@@ -70,7 +72,8 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize));
   
   // Reset to first page when filters change
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log("Filters changed, resetting to page 1");
     setCurrentPage(1);
   }, [filters]);
 
@@ -78,16 +81,20 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   const paginatedData = React.useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return filteredData.slice(startIndex, endIndex);
+    const result = filteredData.slice(startIndex, endIndex);
+    console.log(`Pagination: showing items ${startIndex}-${endIndex} of ${filteredData.length}`);
+    return result;
   }, [filteredData, currentPage, pageSize]);
 
   // Handler for filter changes
   const handleFilterChange = useCallback((key: keyof AccountsFilterParams, value: string) => {
+    console.log(`Filter changed: ${key} = ${value}`);
     setFilters(prev => ({ ...prev, [key]: value }));
   }, []);
 
   // Handler for page changes
   const handlePageChange = useCallback((page: number) => {
+    console.log(`Page changed to: ${page}`);
     setCurrentPage(page);
   }, []);
 
@@ -123,6 +130,12 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
     
     return pageNumbers;
   };
+
+  // Log filter and pagination state changes for debugging
+  useEffect(() => {
+    console.log("Current filter state:", filters);
+    console.log(`Current pagination: Page ${currentPage} of ${totalPages}, showing ${paginatedData.length} items`);
+  }, [filters, currentPage, totalPages, paginatedData.length]);
 
   return (
     <div className="space-y-4">
