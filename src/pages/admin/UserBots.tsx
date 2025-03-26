@@ -12,6 +12,9 @@ import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { useNavigation } from '@/hooks/useNavigation';
 import { UserBotStatsCards } from '@/components/admin/user-bots/UserBotStatsCards';
+import { UserBotsActions } from '@/components/admin/user-bots/UserBotsActions';
+import { BulkActionDialog } from '@/components/admin/user-bots/BulkActionDialog';
+import { exportToCSV, exportToExcel, exportToJSON } from '@/utils/exportUtils';
 
 interface UserBotColumn {
   accessorKey: string;
@@ -99,6 +102,12 @@ const AdminUserBots = () => {
   const [userBots, setUserBots] = useState<UserBot[]>([]);
   const { navigateToBotDetail, navigateTo } = useNavigation();
   
+  // New state variables for filtering, selection, and bulk actions
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [selectedBotIds, setSelectedBotIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  
   // Updated columns to display User ID and make it clickable with white text headers
   const columns: UserBotColumn[] = [
     {
@@ -183,12 +192,24 @@ const AdminUserBots = () => {
     fetchUserBots();
   }, [fetchUserBots]);
 
-  // Updated filter to include User ID
-  const filteredBots = userBots.filter(bot =>
-    bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bot.botId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bot.ownerId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter bots based on search term and filter status
+  const filteredBots = userBots.filter(bot => {
+    // Search filter
+    const matchesSearch = 
+      bot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bot.botId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bot.ownerId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Status filter
+    let matchesStatus = true;
+    if (filterStatus === 'active') {
+      matchesStatus = bot.status === BotStatus.ACTIVE;
+    } else if (filterStatus === 'inactive') {
+      matchesStatus = bot.status === BotStatus.INACTIVE;
+    }
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const addUserBot = () => {
     try {
@@ -222,6 +243,140 @@ const AdminUserBots = () => {
     toast.info('Đang làm mới dữ liệu User Bots...');
     fetchUserBots();
   }, [fetchUserBots]);
+
+  // Handle filter toggle
+  const handleFilterClick = () => {
+    if (filterStatus === null) {
+      setFilterStatus('active');
+    } else if (filterStatus === 'active') {
+      setFilterStatus('inactive');
+    } else {
+      setFilterStatus(null);
+    }
+  };
+
+  // Handle selection clearing
+  const handleClearSelections = () => {
+    setSelectedBotIds([]);
+  };
+
+  // Handle bulk action click
+  const handleBulkActionClick = (action: 'activate' | 'deactivate' | 'delete') => {
+    setBulkAction(action);
+    setIsBulkDialogOpen(true);
+  };
+
+  // Handle bulk action confirmation
+  const handleConfirmBulkAction = () => {
+    if (!bulkAction) return;
+
+    try {
+      // In a real implementation, this would make API calls to perform the actions
+      const actionMessages = {
+        activate: 'kích hoạt',
+        deactivate: 'tạm dừng',
+        delete: 'xóa'
+      };
+
+      // Simulate action
+      setTimeout(() => {
+        // For demo purposes, we'll just update the local state for activate/deactivate
+        if (bulkAction === 'activate' || bulkAction === 'deactivate') {
+          const newStatus = bulkAction === 'activate' ? BotStatus.ACTIVE : BotStatus.INACTIVE;
+          
+          setUserBots(prevBots => 
+            prevBots.map(bot => 
+              selectedBotIds.includes(bot.botId) 
+                ? { ...bot, status: newStatus } 
+                : bot
+            )
+          );
+        } else if (bulkAction === 'delete') {
+          // For delete, we'll remove the bots from the list
+          setUserBots(prevBots => 
+            prevBots.filter(bot => !selectedBotIds.includes(bot.botId))
+          );
+        }
+
+        // Clear selections after action
+        setSelectedBotIds([]);
+        
+        // Show success message
+        toast.success(`Đã ${actionMessages[bulkAction]} ${selectedBotIds.length} User Bot thành công`);
+      }, 1000);
+
+    } catch (error) {
+      console.error(`Error performing bulk ${bulkAction}:`, error);
+      toast.error(`Có lỗi xảy ra khi thực hiện ${bulkAction} hàng loạt`);
+    }
+
+    // Close dialog
+    setIsBulkDialogOpen(false);
+    setBulkAction(null);
+  };
+
+  // Export functions
+  const handleExportToCSV = () => {
+    try {
+      const selectedBots = selectedBotIds.length > 0 
+        ? userBots.filter(bot => selectedBotIds.includes(bot.botId))
+        : filteredBots;
+        
+      const headers = ['Bot ID', 'Name', 'Status', 'Created Date', 'Owner ID', 'Accounts'];
+      const data = selectedBots.map(bot => [
+        bot.botId,
+        bot.name,
+        bot.status,
+        bot.createdDate,
+        bot.ownerId,
+        bot.accounts.toString()
+      ]);
+      
+      exportToCSV(headers, data, 'user-bots-export');
+      toast.success('Đã xuất dữ liệu CSV thành công');
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      toast.error('Có lỗi xảy ra khi xuất dữ liệu CSV');
+    }
+  };
+  
+  const handleExportToExcel = () => {
+    try {
+      const selectedBots = selectedBotIds.length > 0 
+        ? userBots.filter(bot => selectedBotIds.includes(bot.botId))
+        : filteredBots;
+        
+      const headers = ['Bot ID', 'Name', 'Status', 'Created Date', 'Owner ID', 'Accounts'];
+      const data = selectedBots.map(bot => [
+        bot.botId,
+        bot.name,
+        bot.status,
+        bot.createdDate,
+        bot.ownerId,
+        bot.accounts.toString()
+      ]);
+      
+      exportToExcel(headers, data, 'user-bots-export', 'User Bots');
+      toast.success('Đã xuất dữ liệu Excel thành công');
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      toast.error('Có lỗi xảy ra khi xuất dữ liệu Excel');
+    }
+  };
+  
+  const handleExportToJSON = () => {
+    try {
+      const selectedBots = selectedBotIds.length > 0 
+        ? userBots.filter(bot => selectedBotIds.includes(bot.botId))
+        : filteredBots;
+      
+      exportToJSON(selectedBots, 'user-bots-export');
+      toast.success('Đã xuất dữ liệu JSON thành công');
+    } catch (error) {
+      console.error('Error exporting to JSON:', error);
+      toast.error('Có lỗi xảy ra khi xuất dữ liệu JSON');
+    }
+  };
 
   return (
     <ErrorBoundary>
@@ -263,27 +418,18 @@ const AdminUserBots = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between py-2 mb-4">
-              <div className="flex items-center gap-2 flex-1">
-                <UserCircle className="h-5 w-5 text-amber-500" />
-                <Input
-                  type="text"
-                  placeholder="Tìm kiếm User Bots theo tên, ID, hoặc User ID..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="max-w-md"
-                />
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleRefreshData}
-                disabled={isLoading}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Làm mới
-              </Button>
-            </div>
+            <UserBotsActions 
+              searchTerm={searchTerm}
+              filterStatus={filterStatus}
+              selectedBots={selectedBotIds}
+              onSearchChange={handleSearchChange}
+              onFilterClick={handleFilterClick}
+              clearSelections={handleClearSelections}
+              exportToCSV={handleExportToCSV}
+              exportToExcel={handleExportToExcel}
+              exportToJSON={handleExportToJSON}
+              openBulkActionDialog={handleBulkActionClick}
+            />
             
             <DataTable 
               columns={columns} 
@@ -293,9 +439,21 @@ const AdminUserBots = () => {
               onRetry={handleRefreshData}
               onRowClick={handleRowClick}
               emptyMessage="Không tìm thấy User Bot nào phù hợp với tiêu chí tìm kiếm."
+              selectable={true}
+              selectedRows={selectedBotIds}
+              onSelectedRowsChange={setSelectedBotIds}
+              rowIdentifier="botId"
             />
           </CardContent>
         </Card>
+        
+        <BulkActionDialog 
+          open={isBulkDialogOpen}
+          onOpenChange={setIsBulkDialogOpen}
+          selectedCount={selectedBotIds.length}
+          action={bulkAction}
+          onConfirm={handleConfirmBulkAction}
+        />
       </div>
     </ErrorBoundary>
   );
