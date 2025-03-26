@@ -7,11 +7,13 @@ import { RefreshCw } from "lucide-react";
 export interface LoadingStateProps {
   isSimple?: boolean;
   message?: string;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
 const LoadingState: React.FC<LoadingStateProps> = ({ 
   isSimple = false,
-  message = "Loading trading view logs..."
+  message = "Loading trading view logs...",
+  botType = 'user'
 }) => {
   if (isSimple) {
     return (

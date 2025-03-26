@@ -29,6 +29,11 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   titleClassName = '',
   userId
 }) => {
+  if (!accounts) {
+    console.warn('AccountSection - accounts array is undefined');
+    return null;
+  }
+  
   // Validate userId trước khi xử lý
   if (!validateUserId(userId)) {
     console.warn(`AccountSection - Invalid userId format: ${userId}, should be in format USR-XXX`);

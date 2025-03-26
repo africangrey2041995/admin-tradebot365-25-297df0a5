@@ -99,7 +99,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                   <TableCell className="font-medium">
                     <div className="flex items-center">
                       {hasCoinstratLogs && (
-                        <Info className="h-4 w-4 text-blue-500 mr-2" title="Has Coinstrat logs" />
+                        <Info className="h-4 w-4 text-blue-500 mr-2" aria-label="Has Coinstrat logs" />
                       )}
                       {signal.id}
                     </div>
@@ -157,8 +157,10 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                             {/* Show account details if there are any */}
                             {(csLog.processedAccounts.length > 0 || csLog.failedAccounts.length > 0) && (
                               <AccountSection
-                                processedAccounts={csLog.processedAccounts}
-                                failedAccounts={csLog.failedAccounts}
+                                accounts={csLog.processedAccounts}
+                                title="Processed Accounts"
+                                type="success"
+                                userId={signal.userId || 'USR-001'}
                               />
                             )}
                             
@@ -189,7 +191,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
               <TableRow key={orphanedLog.id} className="border-l-2 border-l-yellow-500">
                 <TableCell className="font-medium">
                   <div className="flex items-center">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" title="Orphaned log" />
+                    <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" aria-label="Orphaned log" />
                     {orphanedLog.id}
                   </div>
                 </TableCell>
