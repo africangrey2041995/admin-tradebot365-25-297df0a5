@@ -22,7 +22,6 @@ import { ADMIN_ROUTES } from '@/constants/routes';
 import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
-import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
 
 // Import components from user view to enhance admin view
 import { useBotStatistics } from '@/hooks/useBotStatistics';
@@ -296,15 +295,6 @@ const PremiumBotDetail = () => {
     console.log("Updated features:", features);
   };
 
-  // Handle update performance data
-  const handleUpdatePerformance = (performance: {
-    lastMonth: string;
-    allTime: string;
-  }) => {
-    toast.success("Bot performance data updated");
-    console.log("Updated performance:", performance);
-  };
-
   // Handle update bot information
   const handleUpdateBotInfo = (info: {
     type: string;
@@ -439,12 +429,8 @@ const PremiumBotDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-              <BotPerformanceCard performance={{
-              lastMonth: bot.performanceLastMonth,
-              allTime: bot.performanceAllTime
-            }} onUpdate={handleUpdatePerformance} />
               
-              {/* Bot Integration Info - Kept below performance card */}
+              {/* Bot Integration Info - Moved up to replace the performance card */}
               <BotIntegrationInfo botId={bot.id} />
             </div>
           </div>
