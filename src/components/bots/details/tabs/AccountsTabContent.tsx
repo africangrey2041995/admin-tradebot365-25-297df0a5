@@ -16,6 +16,7 @@ interface AccountsTabContentProps {
   description: string;
   accountsData?: Account[];
   isAdmin?: boolean;
+  isLoading?: boolean; // Add this property to fix the error
 }
 
 const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
@@ -25,7 +26,8 @@ const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
   title,
   description,
   accountsData,
-  isAdmin = false
+  isAdmin = false,
+  isLoading = false // Add default value
 }) => {
   const { 
     accounts, 
@@ -35,6 +37,9 @@ const AccountsTabContent: React.FC<AccountsTabContentProps> = ({
     deleteAccount,
     toggleAccountStatus
   } = useBotAccounts(botId, userId, accountsData);
+
+  // Use the loading state from either the prop or the hook
+  const isDataLoading = isLoading || loading;
 
   // Prepare export data for the accounts
   const accountsExportData = accounts.map(account => [
