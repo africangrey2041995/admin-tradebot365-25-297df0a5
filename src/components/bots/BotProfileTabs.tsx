@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ const BotProfileTabs: React.FC<BotProfileTabsProps> = ({ botId, onAddAccount }) 
   const handleAddAccountSubmit = (formData: any) => {
     console.log('Adding account:', formData);
     if (onAddAccount) {
-      onAddAccount(formData);
+      // Call onAddAccount without arguments if it doesn't expect any
+      onAddAccount();
     }
     toast.success('Tài khoản đã được thêm thành công');
     setIsAddAccountDialogOpen(false);
