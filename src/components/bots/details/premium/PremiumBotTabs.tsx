@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LogsTabContent from '../tabs/LogsTabContent';
 import AccountsTabContent from '../tabs/AccountsTabContent';
+import UserAccountsTabContent from '../../accounts/UserAccountsTabContent';
 import { getTabsListClassName, getTabTriggerClassName, getTabIcon } from '../tabs/TabStyles';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
@@ -51,7 +52,15 @@ const PremiumBotTabs: React.FC<PremiumBotTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="connected-accounts">
-        <AccountsTabContent botId={botId} userId={userId} botType="premium" title="Tài khoản kết nối" description="Quản lý các tài khoản được kết nối với Premium Bot" accountsData={accountsData} />
+        <UserAccountsTabContent 
+          botId={botId} 
+          userId={userId} 
+          botType="premium" 
+          title="Tài khoản kết nối" 
+          description="Quản lý các tài khoản được kết nối với Premium Bot" 
+          accountsData={accountsData} 
+          isLoading={isLoading}
+        />
       </TabsContent>
       
       <TabsContent value="coinstrat-logs">

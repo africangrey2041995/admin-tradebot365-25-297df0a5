@@ -1,100 +1,106 @@
 
-import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Search, Filter } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-
-interface AccountsFilterParams {
-  searchQuery: string;
-  filterStatus: string;
-  filterLiveDemo: string;
-}
+import React from 'react';
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
 
 interface AccountsFilterProps {
-  onFilterChange: (filters: AccountsFilterParams) => void;
+  onFilterChange: (newFilters: {
+    searchQuery: string;
+    filterStatus: string;
+    filterLiveDemo: string;
+  }) => void;
   totalAccounts: number;
 }
 
-const AccountsFilter: React.FC<AccountsFilterProps> = ({ 
+const AccountsFilter: React.FC<AccountsFilterProps> = ({
   onFilterChange,
   totalAccounts
 }) => {
-  const [filters, setFilters] = useState<AccountsFilterParams>({
-    searchQuery: '',
-    filterStatus: 'all',
-    filterLiveDemo: 'all'
-  });
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [filterStatus, setFilterStatus] = React.useState('all');
+  const [filterLiveDemo, setFilterLiveDemo] = React.useState('all');
 
-  // Apply filters when they change
-  useEffect(() => {
-    onFilterChange(filters);
-  }, [filters, onFilterChange]);
-
-  // Handle input changes
+  // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters(prev => ({
-      ...prev,
-      searchQuery: e.target.value
-    }));
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    onFilterChange({
+      searchQuery: value,
+      filterStatus,
+      filterLiveDemo
+    });
   };
 
-  // Handle status filter change
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilters(prev => ({
-      ...prev,
-      filterStatus: e.target.value
-    }));
+  // Handle status filter changes
+  const handleStatusChange = (value: string) => {
+    setFilterStatus(value);
+    
+    onFilterChange({
+      searchQuery,
+      filterStatus: value,
+      filterLiveDemo
+    });
   };
 
-  // Handle live/demo filter change
-  const handleLiveDemoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilters(prev => ({
-      ...prev,
-      filterLiveDemo: e.target.value
-    }));
+  // Handle live/demo filter changes
+  const handleLiveDemoChange = (value: string) => {
+    setFilterLiveDemo(value);
+    
+    onFilterChange({
+      searchQuery,
+      filterStatus,
+      filterLiveDemo: value
+    });
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-      <div className="relative w-full md:w-auto md:flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="Tìm kiếm tài khoản..."
-          className="pl-10"
-          value={filters.searchQuery}
-          onChange={handleSearchChange}
-        />
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-medium">
+          Tài khoản
+          <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
+            {totalAccounts} Tài khoản
+          </Badge>
+        </div>
       </div>
       
-      <div className="flex items-center gap-2 w-full md:w-auto">
-        <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">Lọc:</span>
+      <div className="flex flex-col md:flex-row gap-2">
+        <div className="relative md:w-1/2">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Tìm kiếm tài khoản..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="pl-8"
+          />
         </div>
         
-        <select 
-          className="px-3 py-2 border rounded-md text-sm bg-background"
-          value={filters.filterStatus}
-          onChange={handleStatusChange}
-        >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="connected">Đã kết nối</option>
-          <option value="disconnected">Đã ngắt kết nối</option>
-        </select>
-        
-        <select 
-          className="px-3 py-2 border rounded-md text-sm bg-background"
-          value={filters.filterLiveDemo}
-          onChange={handleLiveDemoChange}
-        >
-          <option value="all">Tất cả loại</option>
-          <option value="live">Live</option>
-          <option value="demo">Demo</option>
-        </select>
-        
-        <Badge variant="outline" className="ml-2">
-          {totalAccounts} Tài khoản
-        </Badge>
+        <div className="flex gap-2">
+          <Select value={filterStatus} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="connected">Đã kết nối</SelectItem>
+              <SelectItem value="disconnected">Chưa kết nối</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={filterLiveDemo} onValueChange={handleLiveDemoChange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Tài khoản" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="live">Live</SelectItem>
+              <SelectItem value="demo">Demo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

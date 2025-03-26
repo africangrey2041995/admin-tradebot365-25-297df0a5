@@ -11,6 +11,7 @@ import { PremiumBot } from '@/types/bot';
 
 export const usePremiumBotDetail = (botId: string | undefined, userId: string) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedPeriod, setSelectedPeriod] = useState("1m");
   const [refreshLoading, setRefreshLoading] = useState(false);
   
   // Use the existing hooks for bot authorization, chart data, and statistics
@@ -19,7 +20,7 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
     userId
   });
   
-  const { selectedPeriod, setSelectedPeriod, chartData } = useChartData();
+  const { chartData } = useChartData();
   const { tradePerformanceData, statisticsData } = useBotStatistics();
 
   // Use the combined signal logs hook
@@ -60,7 +61,7 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
       setRefreshLoading(false);
       toast.success(`Đã làm mới dữ liệu tab ${
         activeTab === "overview" ? "Tổng quan" : 
-        activeTab === "accounts" ? "Tài khoản kết nối" : "Signal Tracking"
+        activeTab === "connected-accounts" ? "Tài khoản kết nối" : "Signal Tracking"
       }`);
     }, 1000);
   };
