@@ -2,13 +2,19 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, UserPlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
+} from "@/components/ui/table";
+import { Eye, ExternalLink, RefreshCw, UserPlus } from "lucide-react";
 import { UsersFilter } from '../UsersFilter';
 import { useUserManagement } from '@/hooks/premium-bot/useUserManagement';
-import { useAccountsTransform } from '@/hooks/accounts/useAccountsTransform';
-import HierarchicalAccountsTable from '@/components/admin/prop-bots/detail/components/HierarchicalAccountsTable';
 import { Account } from '@/types';
-import { toast } from 'sonner';
 
 interface UserAccountsTabProps {
   userId: string;
@@ -26,14 +32,8 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     refreshAccounts,
     handleEditAccount,
     handleDeleteAccount,
-    handleToggleConnection,
-    uniqueUsers,
-    uniqueCSPAccounts,
-    tradingAccountsCount
+    handleToggleConnection
   } = useUserManagement('all', userId);
-
-  // Get hierarchical account structure 
-  const { users: hierarchicalUsers } = useAccountsTransform(accounts);
 
   const handleRefresh = () => {
     setIsLoading(true);
@@ -54,6 +54,31 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   const handleTypeFilterChange = (value: string | null) => {
     setTypeFilter(value);
   };
+
+  const filteredAccounts = accounts.filter(account => {
+    const matchesSearch = searchTerm === '' || 
+      account.cspAccountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.cspUserEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.apiName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === null || 
+      (statusFilter === 'connected' && account.status === 'Connected') ||
+      (statusFilter === 'disconnected' && account.status === 'Disconnected');
+    
+    const matchesType = typeFilter === null || typeFilter === 'all' ||
+      (typeFilter === 'live' && account.isLive) ||
+      (typeFilter === 'demo' && !account.isLive);
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  // Calculate stats
+  const totalCSPAccounts = (() => {
+    const uniqueCspIds = new Set(accounts.map(acc => acc.cspAccountId));
+    return uniqueCspIds.size;
+  })();
+
+  const totalTradingAccounts = accounts.length;
 
   return (
     <div className="space-y-6">
@@ -84,7 +109,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
         <Card className="border-zinc-800 bg-zinc-900 text-white">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">{uniqueCSPAccounts}</div>
+              <div className="text-3xl font-bold text-white">{totalCSPAccounts}</div>
               <div className="text-sm text-zinc-400">Tổng Tài Khoản CSP</div>
             </div>
           </CardContent>
@@ -93,7 +118,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
         <Card className="border-zinc-800 bg-zinc-900 text-white">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-500">{tradingAccountsCount}</div>
+              <div className="text-3xl font-bold text-amber-500">{totalTradingAccounts}</div>
               <div className="text-sm text-zinc-400">Tổng Tài Khoản Giao Dịch</div>
             </div>
           </CardContent>
@@ -111,19 +136,90 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
 
       <Card className="border-zinc-800 bg-zinc-900 text-white">
         <CardHeader>
-          <CardTitle>Tài khoản người dùng</CardTitle>
+          <CardTitle>Danh sách tài khoản</CardTitle>
           <CardDescription className="text-zinc-400">
-            Quản lý tất cả các tài khoản và kết nối cho người dùng này
+            Quản lý tất cả các tài khoản giao dịch của người dùng
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <HierarchicalAccountsTable
-            accounts={accounts}
-            onRefresh={refreshAccounts}
-            onEdit={handleEditAccount}
-            onDelete={handleDeleteAccount}
-            onToggleConnection={handleToggleConnection}
-          />
+          {filteredAccounts.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-zinc-800">
+                    <TableHead className="text-zinc-400">Tài khoản CSP</TableHead>
+                    <TableHead className="text-zinc-400">API</TableHead>
+                    <TableHead className="text-zinc-400">Tài khoản giao dịch</TableHead>
+                    <TableHead className="text-zinc-400">Loại</TableHead>
+                    <TableHead className="text-zinc-400">Trạng thái</TableHead>
+                    <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAccounts.map((account: Account) => (
+                    <TableRow key={account.cspAccountId} className="border-zinc-800">
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{account.cspAccountName}</div>
+                          <div className="text-xs text-zinc-400">{account.cspUserEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{account.apiName}</div>
+                        <div className="text-xs text-zinc-400">{account.apiId}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{account.tradingAccountNumber}</div>
+                        <div className="text-xs text-zinc-400">{account.brokerName || 'Unknown Broker'}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          className={`${account.isLive ? 'bg-amber-500/20 text-amber-500' : 'bg-blue-500/20 text-blue-500'} hover:${account.isLive ? 'bg-amber-500/30' : 'bg-blue-500/30'}`}
+                        >
+                          {account.isLive ? 'Live' : 'Demo'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <div className={`h-2 w-2 rounded-full ${account.status === 'Connected' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></div>
+                          <span className={account.status === 'Connected' ? 'text-green-500' : 'text-red-500'}>
+                            {account.status}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            title="Xem chi tiết"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            title="Xem trong Bot"
+                            onClick={() => console.log("View in bot")}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-zinc-400">
+              {searchTerm || statusFilter || typeFilter ? 
+                "Không tìm thấy tài khoản nào phù hợp với bộ lọc" : 
+                "Người dùng chưa có tài khoản nào."}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
