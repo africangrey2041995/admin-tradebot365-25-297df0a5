@@ -11,10 +11,28 @@ import {
   TableRow, 
   TableCell 
 } from "@/components/ui/table";
-import { Eye, ExternalLink, RefreshCw, UserPlus } from "lucide-react";
+import { RefreshCw, UserPlus, MoreVertical, Edit3, Link2, Link2Off, Trash2 } from "lucide-react";
 import { UsersFilter } from '../UsersFilter';
 import { useUserManagement } from '@/hooks/premium-bot/useUserManagement';
 import { Account } from '@/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserAccountsTabProps {
   userId: string;
@@ -25,6 +43,10 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   // Use the existing hook to manage accounts for this user
   const { 
@@ -53,6 +75,33 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
 
   const handleTypeFilterChange = (value: string | null) => {
     setTypeFilter(value);
+  };
+
+  const handleDeleteClick = (account: Account) => {
+    setAccountToDelete(account);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (accountToDelete) {
+      setIsDeletingAccount(true);
+      try {
+        await handleDeleteAccount(accountToDelete.cspAccountId);
+      } finally {
+        setIsDeletingAccount(false);
+        setAccountToDelete(null);
+        setIsDeleteDialogOpen(false);
+      }
+    }
+  };
+
+  const handleToggleStatusClick = async (account: Account) => {
+    setIsTogglingStatus(true);
+    try {
+      await handleToggleConnection(account.cspAccountId);
+    } finally {
+      setIsTogglingStatus(false);
+    }
   };
 
   const filteredAccounts = accounts.filter(account => {
@@ -193,24 +242,62 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                            title="Xem chi tiết"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                            title="Xem trong Bot"
-                            onClick={() => console.log("View in bot")}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                disabled={isTogglingStatus || isDeletingAccount}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white">
+                              <DropdownMenuLabel>Tùy chọn tài khoản</DropdownMenuLabel>
+                              <DropdownMenuSeparator className="bg-zinc-700" />
+                              <DropdownMenuItem 
+                                onClick={() => handleEditAccount(account)} 
+                                disabled={isTogglingStatus || isDeletingAccount}
+                                className="hover:bg-zinc-700 focus:bg-zinc-700"
+                              >
+                                <Edit3 className="h-4 w-4 mr-2" />
+                                Chỉnh sửa
+                              </DropdownMenuItem>
+                              
+                              {account.status === 'Connected' ? (
+                                <DropdownMenuItem 
+                                  onClick={() => handleToggleStatusClick(account)} 
+                                  disabled={isTogglingStatus}
+                                  className="hover:bg-zinc-700 focus:bg-zinc-700"
+                                >
+                                  <Link2Off className="h-4 w-4 mr-2" />
+                                  {isTogglingStatus ? 'Đang xử lý...' : 'Ngắt kết nối'}
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem 
+                                  onClick={() => handleToggleStatusClick(account)} 
+                                  disabled={isTogglingStatus}
+                                  className="hover:bg-zinc-700 focus:bg-zinc-700"
+                                >
+                                  <Link2 className="h-4 w-4 mr-2" />
+                                  {isTogglingStatus ? 'Đang xử lý...' : 'Kết nối lại'}
+                                </DropdownMenuItem>
+                              )}
+                              
+                              <DropdownMenuSeparator className="bg-zinc-700" />
+                              <DropdownMenuItem 
+                                className="text-red-500 hover:bg-zinc-700 focus:bg-zinc-700" 
+                                onClick={() => handleDeleteClick(account)}
+                                disabled={isDeletingAccount}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {isDeletingAccount ? 'Đang xóa...' : 'Xóa tài khoản'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -227,6 +314,39 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa tài khoản</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác và sẽ ngắt kết nối tài khoản khỏi bot.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="bg-zinc-800 text-white border-zinc-700 hover:bg-zinc-700" 
+              disabled={isDeletingAccount}
+            >
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeletingAccount}
+            >
+              {isDeletingAccount ? (
+                <>
+                  <span className="animate-spin inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xác nhận xóa'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
