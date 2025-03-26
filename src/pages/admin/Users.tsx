@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw, UsersIcon } from "lucide-react";
@@ -15,6 +16,34 @@ import AccountsStatsCards from '@/components/admin/accounts/AccountsStatsCards';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 
 const Users = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [planFilter, setPlanFilter] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
+  const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
+  
+  const navigate = useNavigate();
+  const { users, totalUsers } = useUsers();
+
+  const { 
+    accounts, 
+    hierarchicalData,
+    loading: accountsLoading,
+    handleRefresh
+  } = useBotAccounts('all', 'all');
+  
+  const connectedAccounts = accounts.filter(acc => acc.status === 'connected').length;
+  const disconnectedAccounts = accounts.length - connectedAccounts;
+  const liveAccounts = accounts.filter(acc => acc.isLive).length;
+  const demoAccounts = accounts.length - liveAccounts;
+
+  const handleRefreshStats = () => {
+    handleRefresh();
+    toast.success("Đã làm mới dữ liệu thống kê");
+  };
+
+  // Define mock users data
   const mockUsers = [
     {
       id: "user-001",
@@ -83,33 +112,7 @@ const Users = () => {
     }
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [planFilter, setPlanFilter] = useState<string | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
-  const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
-  
-  const navigate = useNavigate();
-  const { users, totalUsers } = useUsers();
-
-  const { 
-    accounts, 
-    hierarchicalData,
-    loading: accountsLoading,
-    handleRefresh
-  } = useBotAccounts('all', 'all');
-  
-  const connectedAccounts = accounts.filter(acc => acc.status === 'connected').length;
-  const disconnectedAccounts = accounts.length - connectedAccounts;
-  const liveAccounts = accounts.filter(acc => acc.isLive).length;
-  const demoAccounts = accounts.length - liveAccounts;
-
-  const handleRefreshStats = () => {
-    handleRefresh();
-    toast.success("Đã làm mới dữ liệu thống kê");
-  };
-
+  // Now define filteredUsers AFTER mockUsers has been initialized
   const filteredUsers = mockUsers.filter(user => {
     const searchRegex = new RegExp(searchTerm, 'i');
     const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
