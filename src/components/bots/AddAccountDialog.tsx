@@ -14,6 +14,7 @@ import {
   AccountFormTradingField, 
   AccountFormVolumeField 
 } from './accounts/AccountFormFields';
+import { CircleDollarSign } from 'lucide-react';
 
 const formSchema = z.object({
   userAccount: z.string({ required_error: "Please select a user account" }),
@@ -31,13 +32,21 @@ interface AddAccountDialogProps {
   onOpenChange: (open: boolean) => void;
   botId: string;
   onAddAccount: (accountData: z.infer<typeof formSchema>) => void;
+  title?: string;
+  description?: string;
+  submitButtonText?: string;
+  showCostInformation?: boolean;
 }
 
 const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ 
   open, 
   onOpenChange, 
   botId,
-  onAddAccount 
+  onAddAccount,
+  title = "Thêm Tài Khoản",
+  description,
+  submitButtonText = "Thêm Tài Khoản",
+  showCostInformation = false
 }) => {
   const { users, apis, tradingAccounts, volumeOptions } = useAccountOptions();
   
@@ -70,7 +79,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     onAddAccount(values);
-    toast.success("Account added successfully");
+    toast.success("Tài khoản đã được thêm thành công");
     onOpenChange(false);
     resetFormState();
   };
@@ -92,7 +101,12 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add Account to Bot {botId}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
+          {description && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              {description}
+            </p>
+          )}
         </DialogHeader>
         
         <Form {...form}>
@@ -102,7 +116,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               name="userAccount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account Profile</FormLabel>
+                  <FormLabel>Tài khoản người dùng</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -113,7 +127,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select account profile" />
+                        <SelectValue placeholder="Chọn tài khoản người dùng" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -144,15 +158,41 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
               volumeOptions={volumeOptions} 
             />
 
+            {showCostInformation && (
+              <div className="bg-slate-50 dark:bg-zinc-800 p-4 rounded-lg border border-slate-200 dark:border-zinc-700">
+                <h4 className="font-medium text-slate-800 dark:text-white flex items-center mb-2">
+                  <CircleDollarSign className="h-4 w-4 mr-1" /> Chi phí sử dụng
+                </h4>
+                <div className="flex justify-between items-center mb-2 text-sm">
+                  <span className="text-slate-600 dark:text-slate-300">Phí đăng ký:</span>
+                  <span className="font-medium text-slate-800 dark:text-white">Free</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Hiện tại bot này được cung cấp miễn phí trong giai đoạn thử nghiệm.
+                </p>
+              </div>
+            )}
+
+            {!form.watch("tradingAccountId") && (
+              <div className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                <span>Bạn cần chọn đầy đủ thông tin tài khoản để tiếp tục</span>
+              </div>
+            )}
+
             <DialogFooter className="pt-4">
               <Button 
                 variant="outline" 
                 type="button" 
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
-              <Button type="submit">Add Account</Button>
+              <Button 
+                type="submit" 
+                disabled={!form.watch("tradingAccountId")}
+              >
+                {submitButtonText}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

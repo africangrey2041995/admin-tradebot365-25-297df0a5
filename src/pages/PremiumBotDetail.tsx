@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import { toast } from 'sonner';
 import PremiumBotDetailTabs from '@/components/bots/details/PremiumBotDetailTabs';
 import BotHeader from '@/components/bots/details/BotHeader';
@@ -239,7 +240,7 @@ Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ th
 const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -266,13 +267,14 @@ const PremiumBotDetail = () => {
     );
   }
 
-  const handleSubscribe = () => {
-    setSubscribeDialogOpen(true);
+  const handleAddAccount = () => {
+    setIsAddAccountDialogOpen(true);
   };
 
-  const confirmSubscription = (subscriptionData: any) => {
+  const handleAddAccountSubmit = (formData: any) => {
+    console.log('Adding account:', formData);
     toast.success(`Đăng ký thành công!`, {
-      description: `Bạn đã đăng ký sử dụng ${bot.name} cho tài khoản đã chọn với hệ số khối lượng x${subscriptionData.volumeMultiplier}.`,
+      description: `Bạn đã đăng ký sử dụng ${bot.name} cho tài khoản đã chọn với hệ số khối lượng x${formData.volumeMultiplier || '1'}.`,
     });
     
     setTimeout(() => {
@@ -316,7 +318,7 @@ const PremiumBotDetail = () => {
         />
 
         <div className="flex justify-end">
-          <Button onClick={handleSubscribe}>
+          <Button onClick={handleAddAccount}>
             Đăng Ký Sử Dụng
           </Button>
         </div>
@@ -348,7 +350,7 @@ const PremiumBotDetail = () => {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                   Đăng ký sử dụng {bot.name} cho tài khoản của bạn để bắt đầu giao dịch tự động
                 </p>
-                <Button onClick={handleSubscribe} className="w-full">
+                <Button onClick={handleAddAccount} className="w-full">
                   Đăng Ký Ngay
                 </Button>
               </div>
@@ -357,12 +359,11 @@ const PremiumBotDetail = () => {
         </div>
       </div>
       
-      <SubscribePremiumBotDialog
-        open={subscribeDialogOpen}
-        onOpenChange={setSubscribeDialogOpen}
+      <AddAccountDialog
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
         botId={bot?.id || ''}
-        botName={bot?.name || ''}
-        onSubscribe={confirmSubscription}
+        onAddAccount={handleAddAccountSubmit}
       />
     </MainLayout>
   );

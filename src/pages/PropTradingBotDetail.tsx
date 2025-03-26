@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -9,9 +8,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2, TrendingUp, AlertTriangle, BriefcaseIcon } from 'lucide-react';
-import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
+import { toast } from 'sonner';
 
 const propTradingBots = mockPropBots.map(bot => ({
   ...bot,
@@ -37,7 +37,7 @@ const propTradingBots = mockPropBots.map(bot => ({
 const PropTradingBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
-  const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   
   const bot = propTradingBots.find(b => b.botId === botId || b.id === botId);
   
@@ -110,6 +110,18 @@ const PropTradingBotDetail = () => {
   };
   
   const colors = colorSchemeClasses[bot.colorScheme as keyof typeof colorSchemeClasses] || colorSchemeClasses.default;
+  
+  const handleAddAccount = () => {
+    setIsAddAccountDialogOpen(true);
+  };
+
+  const handleAddAccountSubmit = (formData: any) => {
+    console.log('Adding account:', formData);
+    toast.success(`Tích hợp thành công!`, {
+      description: `Bạn đã tích hợp ${bot.name} với tài khoản đã chọn.`,
+    });
+    navigate('/premium-bots');
+  };
   
   return (
     <MainLayout title={bot.name}>
@@ -250,7 +262,7 @@ const PropTradingBotDetail = () => {
                 <Button 
                   className="w-full mb-4" 
                   size="lg"
-                  onClick={() => setIsSubscribeDialogOpen(true)}
+                  onClick={handleAddAccount}
                 >
                   Tích hợp với tài khoản
                 </Button>
@@ -310,12 +322,11 @@ const PropTradingBotDetail = () => {
         </div>
       </motion.div>
       
-      <SubscribePremiumBotDialog 
+      <AddAccountDialog 
         botId={botId || ''}
-        botName={bot.name}
-        open={isSubscribeDialogOpen}
-        onOpenChange={setIsSubscribeDialogOpen}
-        onSubscribe={(data) => console.log('Subscribe data:', data)}
+        open={isAddAccountDialogOpen}
+        onOpenChange={setIsAddAccountDialogOpen}
+        onAddAccount={handleAddAccountSubmit}
       />
     </MainLayout>
   );
