@@ -2,8 +2,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TradingViewLogs from '@/components/bots/TradingViewLogs';
-import CoinstratLogs from '@/components/bots/CoinstratLogs';
 import TabContentWrapper from './tabs/TabContentWrapper';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
@@ -111,8 +109,6 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
       <Tabs defaultValue="accounts" value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="mb-6">
           <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
-          <TabsTrigger value="tradingview-logs">TradingView Logs</TabsTrigger>
-          <TabsTrigger value="coinstrat-logs">Coinstrat Pro Logs</TabsTrigger>
           {isAdminView && <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>}
         </TabsList>
         
@@ -136,28 +132,6 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               refreshTrigger={refreshTrigger > 0}
             />
           )}
-        </TabsContent>
-        
-        <TabsContent value="tradingview-logs" className="animate-in fade-in-50 duration-200">
-          <TradingViewLogs 
-            botId={botId} 
-            userId={userId}
-            refreshTrigger={refreshTrigger > 0}
-            botType={botType}
-            isLoading={refreshLoading} // Pass the consolidated loading state
-          />
-        </TabsContent>
-        
-        <TabsContent value="coinstrat-logs" className="animate-in fade-in-50 duration-200">
-          <CoinstratLogs 
-            botId={botId} 
-            userId={userId} 
-            initialData={logsData}
-            signalSourceLabel={signalSourceLabel}
-            refreshTrigger={refreshTrigger > 0}
-            botType={botType}
-            isLoading={refreshLoading} // Pass the consolidated loading state
-          />
         </TabsContent>
         
         {isAdminView && (
