@@ -10,6 +10,8 @@ import PremiumBotTabs from '@/components/bots/details/premium/PremiumBotTabs';
 import PremiumBotOverviewTab from '@/components/bots/details/premium/PremiumBotOverviewTab';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 import { BotType } from '@/constants/botTypes';
+import BotDescription from '@/components/bots/details/BotDescription';
+import FeaturesList from '@/components/bots/details/FeaturesList';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001';
@@ -78,6 +80,17 @@ const IntegratedPremiumBotDetail = () => {
           risk={bot.risk}
           backPath={USER_ROUTES.INTEGRATED_PREMIUM_BOTS}
         />
+
+        {/* Add Description and Features cards before tabs */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <BotDescription 
+            description={bot.description} 
+            pairs={bot.pairs || []}
+          />
+          <FeaturesList 
+            features={bot.features || []}
+          />
+        </div>
 
         <PremiumBotTabs 
           activeTab={activeTab}

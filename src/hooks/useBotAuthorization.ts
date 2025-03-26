@@ -32,7 +32,7 @@ export const useBotAuthorization = ({
         const mockBot: PremiumBot = {
           botId: botId || 'pb-001', // Using botId consistently
           name: 'Alpha Momentum',
-          description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.',
+          description: 'Bot giao dịch sử dụng chiến lược momentum cho thị trường tiền điện tử với tỷ lệ thành công cao.\n\nKhi thị trường đang trong xu hướng tăng, bot sẽ tự động vào lệnh khi có tín hiệu xác nhận động lượng đang tăng mạnh. \n\nBot sẽ đặt stop loss và take profit tự động dựa trên tình hình thị trường.',
           exchange: 'Coinstart Pro',
           type: BotType.PREMIUM_BOT,
           performanceLastMonth: '+18.5%',
@@ -48,7 +48,16 @@ export const useBotAuthorization = ({
           lastUpdated: '2023-11-10',
           ownerId: userId,
           users: 86, // Added for admin context
-          profit: '+18.5%' // Added for admin context
+          profit: '+18.5%', // Added for admin context
+          pairs: ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'BNB/USDT', 'ADA/USDT'],
+          features: [
+            'Phân tích thị trường tự động 24/7',
+            'Quản lý rủi ro thông minh',
+            'Tối ưu vị thế theo thời gian thực',
+            'Báo cáo hiệu suất chi tiết',
+            'Hỗ trợ đa sàn giao dịch',
+            'Cập nhật thuật toán thường xuyên'
+          ]
         };
         
         // Check if the current user is the owner of this bot
