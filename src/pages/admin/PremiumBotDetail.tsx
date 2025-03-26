@@ -18,6 +18,7 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   
   // Use our custom hook to manage all the data and logic
+  // Adding 'admin' as the second parameter since usePremiumBotDetail expects two arguments
   const {
     isLoading,
     activeTab,
@@ -42,7 +43,7 @@ const PremiumBotDetail = () => {
     handleUpdateStatistics,
     handleUpdateBotInfo,
     refreshSignalLogs
-  } = usePremiumBotDetail(botId);
+  } = usePremiumBotDetail(botId, 'admin');
 
   // Go back to premium bots list
   const goBackToList = () => {
@@ -92,9 +93,9 @@ const PremiumBotDetail = () => {
         <TabsContent value="overview" className="space-y-4">
           <PremiumBotOverviewTab
             bot={{
-              id: bot.botId || bot.id || '', // Use either botId or id
+              id: bot.botId || '', // Use botId instead of id
               longDescription: bot.description || '',
-              pairs: bot.pairs || [], // Use pairs property if it exists, otherwise empty array
+              pairs: bot.pairs || [], // Make sure to use the pairs property safely with a fallback to empty array
               features: bot.features || [],  // Use features property if it exists, otherwise empty array
               type: bot.type,
               exchange: bot.exchange || '',

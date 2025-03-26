@@ -83,6 +83,7 @@ export interface PremiumBot extends BaseBot {
   tradingStyle?: string;
   timeframe?: string;
   markets?: string[];
+  pairs?: string[]; // Added pairs property to fix TypeScript errors
   accounts?: Account[] | number;
   users?: number; // Number of users for admin context
   profit?: string; // Profit in percentage for admin context
