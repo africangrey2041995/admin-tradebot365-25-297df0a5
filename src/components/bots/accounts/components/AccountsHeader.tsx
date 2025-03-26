@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, PlusCircle } from 'lucide-react';
 
 interface AccountsHeaderProps {
   onAddAccount: () => void;
@@ -20,7 +20,11 @@ const AccountsHeader: React.FC<AccountsHeaderProps> = ({
           Quản lý tài khoản Coinstrat Pro và tài khoản giao dịch của bạn
         </p>
       </div>
-      <div>
+      <div className="flex space-x-2">
+        <Button variant="outline" size="sm" onClick={onAddAccount}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Thêm tài khoản
+        </Button>
         <Button variant="outline" size="sm" onClick={onRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Làm mới

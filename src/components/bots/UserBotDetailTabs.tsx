@@ -1,152 +1,73 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
-import TabContentWrapper from './tabs/TabContentWrapper';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
-import { useQueryClient } from '@tanstack/react-query';
-import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
-import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
-import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
-import AccountsTabContent from './details/tabs/AccountsTabContent';
-import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
-import UserAccountsTabContent from './accounts/UserAccountsTabContent';
+import BotOverviewCard from './BotOverviewCard';
+import UserHierarchicalAccountsTable from './accounts/UserHierarchicalAccountsTable';
+import UserLogsTable from './logs/UserLogsTable';
 
 interface UserBotDetailTabsProps {
-  userId: string;
   botId: string;
+  userId: string;
+  onRefresh: () => void;
+  isLoading: boolean;
   accountsData?: Account[];
   logsData?: CoinstratSignal[];
-  onRefresh?: () => void;
-  isLoading?: boolean;
   signalSourceLabel?: string;
   botType?: 'premium' | 'prop' | 'user';
   isAdminView?: boolean;
+  onAddAccount?: (account: Account) => void;
 }
 
 const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
-  userId,
   botId,
-  accountsData,
-  logsData,
+  userId,
   onRefresh,
-  isLoading = false,
+  isLoading,
+  accountsData = [],
+  logsData = [],
   signalSourceLabel = "TradingView ID",
   botType = 'user',
-  isAdminView = false
+  isAdminView = false,
+  onAddAccount
 }) => {
-  const [activeTab, setActiveTab] = useState("accounts");
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const queryClient = useQueryClient();
-
-  // Centralized loading state
-  const [refreshLoading, setRefreshLoading] = useState(isLoading);
-
-  // Update loading state based on parent isLoading
-  useEffect(() => {
-    setRefreshLoading(isLoading);
-  }, [isLoading]);
-
-  // Centralized logs state using hooks with skipLoadingState=true
-  const { 
-    logs: tradingViewLogs, 
-    fetchLogs: fetchTvLogs 
-  } = useTradingViewLogs({
-    botId,
-    userId,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  const {
-    logs: coinstratLogs,
-    fetchLogs: fetchCsLogs
-  } = useCoinstratLogs({
-    botId,
-    userId,
-    initialData: logsData,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}, isAdminView: ${isAdminView}`);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    
-    // When there's an onRefresh handler provided, call it when changing tabs
-    if (onRefresh) {
-      onRefresh();
-    }
-  };
-
-  const handleRefresh = () => {
-    console.log("UserBotDetailTabs - handleRefresh called");
-    // Set loading state to true
-    setRefreshLoading(true);
-    setRefreshTrigger(prev => prev + 1);
-    
-    // Invalidate React Query cache for this bot's accounts
-    queryClient.invalidateQueries({ queryKey: accountsQueryKeys.byBot(botId) });
-    
-    if (onRefresh) {
-      onRefresh();
-    }
-
-    // Set a timeout to reset loading state after a consistent delay
-    setTimeout(() => {
-      setRefreshLoading(false);
-    }, 800);
-  };
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <TabContentWrapper 
-      title="Quản lý Bot"
-      description="Thông tin về tài khoản, tín hiệu và lịch sử xử lý"
-      onRefresh={handleRefresh}
-      refreshLoading={refreshLoading}
-    >
-      <Tabs defaultValue="accounts" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
-          <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
-          {isAdminView ? (
-            <AccountsTabContent 
-              botId={botId}
-              userId={userId}
-              botType={botType}
-              title="Tài khoản kết nối"
-              description="Danh sách tài khoản được kết nối với bot này"
-              accountsData={accountsData}
-              isLoading={refreshLoading}
-              isAdminView={true}
-            />
-          ) : (
-            <UserAccountsTabContent
-              botId={botId}
-              userId={userId}
-              botType={botType}
-              title="Tài khoản kết nối"
-              description="Danh sách tài khoản được kết nối với bot này"
-              accountsData={accountsData}
-              isLoading={refreshLoading}
-            />
-          )}
-        </TabsContent>
-        
-        <TabsContent value="signal-tracking" className="animate-in fade-in-50 duration-200">
-          <SignalTrackingTab 
-            botId={botId} 
-            userId={userId} 
-            isAdminView={isAdminView}
-          />
-        </TabsContent>
-      </Tabs>
-    </TabContentWrapper>
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+        <TabsTrigger value="accounts">Tài khoản</TabsTrigger>
+        <TabsTrigger value="logs">Lịch sử giao dịch</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview">
+        <BotOverviewCard botId={botId} />
+      </TabsContent>
+
+      <TabsContent value="accounts">
+        <UserHierarchicalAccountsTable 
+          accounts={accountsData}
+          isLoading={isLoading}
+          onRefresh={onRefresh}
+          onAddAccount={onAddAccount}
+          onEditAccount={(account: Account) => console.log('Edit account', account)}
+          onDeleteAccount={(accountId: string) => console.log('Delete account', accountId)}
+          onToggleStatus={(accountId: string) => console.log('Toggle status', accountId)}
+          botType={botType}
+        />
+      </TabsContent>
+
+      <TabsContent value="logs">
+        <UserLogsTable 
+          logs={logsData}
+          isLoading={isLoading}
+          onRefresh={onRefresh}
+          signalSourceLabel={signalSourceLabel}
+        />
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -1,58 +1,31 @@
+
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UseFormReturn } from 'react-hook-form';
 
-interface ApiOption {
-  id: string;
-  name: string;
-  userId: string;
-}
-
-interface TradingAccountOption {
-  id: string;
-  number: string;
-  type: string;
-  balance: string;
-  isLive: boolean;
-  apiId: string;
-}
-
-interface VolumeOption {
-  value: string;
-  label: string;
-}
-
-// API Field Component
-export const AccountFormApiField = ({ 
-  form, 
-  filteredApis 
-}: { 
-  form: UseFormReturn<any>, 
-  filteredApis: ApiOption[] 
-}) => {
+export const AccountFormApiField = ({ form, filteredApis }: any) => {
   return (
     <FormField
       control={form.control}
       name="apiKey"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>API</FormLabel>
+          <FormLabel>API Key</FormLabel>
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
               form.setValue("tradingAccountId", "");
             }}
             value={field.value}
-            disabled={!form.watch("userAccount")}
+            disabled={filteredApis.length === 0}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select API" />
+                <SelectValue placeholder="Chọn API key" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {filteredApis.map(api => (
+              {filteredApis.map((api: any) => (
                 <SelectItem key={api.id} value={api.id}>
                   {api.name}
                 </SelectItem>
@@ -66,45 +39,42 @@ export const AccountFormApiField = ({
   );
 };
 
-// Trading Account Field Component
-export const AccountFormTradingField = ({ 
-  form, 
-  filteredTradingAccounts 
-}: { 
-  form: UseFormReturn<any>, 
-  filteredTradingAccounts: TradingAccountOption[] 
-}) => {
+export const AccountFormTradingField = ({ form, filteredTradingAccounts }: any) => {
   return (
     <FormField
       control={form.control}
       name="tradingAccountId"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Account Trading</FormLabel>
+          <FormLabel>Tài khoản giao dịch</FormLabel>
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
               
-              const selectedAccount = filteredTradingAccounts.find(acc => acc.id === value);
+              // Automatically populate additional fields if we have the data
+              const selectedAccount = filteredTradingAccounts.find(
+                (acc: any) => acc.id === value
+              );
+              
               if (selectedAccount) {
-                form.setValue("tradingAccountNumber", selectedAccount.number);
-                form.setValue("tradingAccountType", selectedAccount.type);
-                form.setValue("tradingAccountBalance", selectedAccount.balance);
-                form.setValue("isLive", selectedAccount.isLive);
+                form.setValue("tradingAccountNumber", selectedAccount.accountNumber || "");
+                form.setValue("tradingAccountType", selectedAccount.accountType || "");
+                form.setValue("tradingAccountBalance", selectedAccount.balance || "");
+                form.setValue("isLive", selectedAccount.isLive || false);
               }
             }}
             value={field.value}
-            disabled={!form.watch("apiKey")}
+            disabled={filteredTradingAccounts.length === 0 || !form.watch("apiKey")}
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select trading account" />
+                <SelectValue placeholder="Chọn tài khoản giao dịch" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {filteredTradingAccounts.map(account => (
+              {filteredTradingAccounts.map((account: any) => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.number} | {account.isLive ? 'Live' : 'Demo'} | {account.balance}
+                  {account.name} - {account.accountNumber}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -116,32 +86,22 @@ export const AccountFormTradingField = ({
   );
 };
 
-// Volume Multiplier Field Component
-export const AccountFormVolumeField = ({ 
-  form, 
-  volumeOptions 
-}: { 
-  form: UseFormReturn<any>, 
-  volumeOptions: VolumeOption[] 
-}) => {
+export const AccountFormVolumeField = ({ form, volumeOptions }: any) => {
   return (
     <FormField
       control={form.control}
       name="volumeMultiplier"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Volume Multiplier</FormLabel>
-          <Select 
-            onValueChange={field.onChange}
-            value={field.value}
-          >
+          <FormLabel>Hệ số khối lượng giao dịch</FormLabel>
+          <Select onValueChange={field.onChange} value={field.value}>
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select volume multiplier" />
+                <SelectValue placeholder="Chọn hệ số" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {volumeOptions.map(option => (
+              {volumeOptions.map((option: any) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -149,9 +109,6 @@ export const AccountFormVolumeField = ({
             </SelectContent>
           </Select>
           <FormMessage />
-          <p className="text-xs text-muted-foreground mt-1">
-            Multiplier for trade volume relative to original signal
-          </p>
         </FormItem>
       )}
     />
