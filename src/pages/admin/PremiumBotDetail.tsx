@@ -493,29 +493,6 @@ const PremiumBotDetail = () => {
                 }}
                 onUpdate={handleUpdatePerformance}
               />
-              
-              {/* Additional pricing information card */}
-              {bot.price && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Pricing</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Monthly</h3>
-                      <p className="font-bold text-green-600">${bot.price.monthly}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Quarterly</h3>
-                      <p className="font-bold text-green-600">${bot.price.quarterly}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Yearly</h3>
-                      <p className="font-bold text-green-600">${bot.price.yearly}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </div>
         </TabsContent>
