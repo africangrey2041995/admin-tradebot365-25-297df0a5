@@ -94,7 +94,7 @@ const PremiumBotDetail = () => {
             bot={{
               id: bot.botId, // Using botId as id
               longDescription: bot.description || '',
-              pairs: Array.isArray(bot.pairs) ? bot.pairs : [],  // Ensure pairs is an array
+              pairs: Array.isArray(bot.pairs) ? bot.pairs : [], // Ensure pairs is an array (default to empty if doesn't exist)
               features: Array.isArray(bot.features) ? bot.features : [],  // Ensure features is an array
               type: bot.type,
               exchange: bot.exchange || '',

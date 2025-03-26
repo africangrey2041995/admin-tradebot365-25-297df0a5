@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
@@ -287,7 +286,6 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
     setActiveTab,
     bot,
     accounts,
-    accountsLoading,
     uniqueUsers,
     tradingAccountsCount,
     processedSignalsCount,

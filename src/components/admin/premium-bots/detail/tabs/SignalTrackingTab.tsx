@@ -12,7 +12,7 @@ interface SignalTrackingTabProps {
   tradingViewLogs: TradingViewSignal[];
   coinstratLogs: CoinstratSignal[];
   isLoading: boolean;
-  availableUsers: { id: string; name: string }[];  // Updated type
+  availableUsers: { id: string; name: string }[];  // This expects objects with id and name
   onRefresh: () => void;
 }
 
@@ -25,6 +25,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   onRefresh
 }) => {
   // Transform available users to just the names array for the filter component
+  // Extract only the names for the filter component which expects string[]
   const usersList = availableUsers.map(user => user.name);
   
   return (

@@ -17,11 +17,15 @@ const EditableTradingPairsCard: React.FC<EditableTradingPairsCardProps> = ({
   onUpdate 
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPairs, setEditedPairs] = useState<string[]>([...(Array.isArray(tradingPairs) ? tradingPairs : [])]);
+  const [editedPairs, setEditedPairs] = useState<string[]>([]);
   const [newPair, setNewPair] = useState('');
 
+  // Ensure tradingPairs is always an array before we work with it
+  const safeTradingPairs = Array.isArray(tradingPairs) ? tradingPairs : [];
+
+  // Initialize editedPairs when starting to edit
   const handleStartEditing = () => {
-    setEditedPairs([...(Array.isArray(tradingPairs) ? tradingPairs : [])]);
+    setEditedPairs([...safeTradingPairs]);
     setIsEditing(true);
   };
 
@@ -56,9 +60,6 @@ const EditableTradingPairsCard: React.FC<EditableTradingPairsCardProps> = ({
     updatedPairs.splice(index, 1);
     setEditedPairs(updatedPairs);
   };
-
-  // Ensure we're working with an array of trading pairs
-  const safeTradingPairs = Array.isArray(tradingPairs) ? tradingPairs : [];
 
   return (
     <Card className="border border-neutral-200 dark:border-neutral-800">
