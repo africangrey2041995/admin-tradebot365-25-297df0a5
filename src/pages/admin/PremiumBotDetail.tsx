@@ -211,6 +211,7 @@ const mockAccounts: Account[] = [{
   cspUserEmail: 'user3@example.com',
   userAccount: 'Robert Johnson'
 }];
+
 const PremiumBotDetail = () => {
   const {
     botId
@@ -327,14 +328,14 @@ const PremiumBotDetail = () => {
       {/* Bot Detail Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm" onClick={goBackToList}>
+          <Button variant="ghost" size="sm" onClick={goBackToList} className="text-white hover:text-white/80 hover:bg-white/10">
             <ChevronLeft className="h-4 w-4 mr-1" />
             Back
           </Button>
-          <h1 className="text-2xl font-bold">{bot.name}</h1>
+          <h1 className="text-2xl font-bold text-white">{bot.name}</h1>
           {getBotStatusBadge(bot.status)}
           {getRiskBadge(bot.risk)}
-          <Badge variant="outline" className="ml-2">ID: {bot.id}</Badge>
+          <Badge variant="outline" className="ml-2 text-white border-white/20">{`ID: ${bot.id}`}</Badge>
         </div>
         <div className="flex space-x-2">
           <Button>
