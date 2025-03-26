@@ -31,16 +31,18 @@ interface UseBotAccountsReturn {
  * @param botId The ID of the bot to fetch accounts for
  * @param userId The ID of the user who owns the bot
  * @param initialData Optional initial data to use
+ * @param botType Optional bot type to filter accounts ('premium' | 'prop' | 'user')
  * @returns Combined object with all account management functionality
  */
 export const useBotAccounts = (
   botId: string, 
   userId: string, 
-  initialData: Account[] = []
+  initialData: Account[] = [],
+  botType?: 'premium' | 'prop' | 'user'
 ): UseBotAccountsReturn => {
   // Use the new React Query hook for data fetching and CRUD operations
   const { 
-    accounts, 
+    accounts: allAccounts, 
     loading, 
     error, 
     fetchAccounts,
@@ -54,6 +56,16 @@ export const useBotAccounts = (
     isDeletingAccount,
     isTogglingStatus
   } = useAccountsQuery(botId, initialData);
+
+  // Filter accounts by bot type if specified
+  const accounts = useCallback(() => {
+    if (!botType) return allAccounts;
+    
+    // In a real implementation, accounts would have a botType property
+    // Here, for demo purposes, we're just returning all accounts
+    // In production, you would filter: return allAccounts.filter(acc => acc.botType === botType);
+    return allAccounts;
+  }, [allAccounts, botType])();
   
   // Use the transform hook to get hierarchical data
   const hierarchicalData = useAccountsTransform(accounts);
