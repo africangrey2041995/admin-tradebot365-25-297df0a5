@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import BotAccountsTable from '@/components/bots/BotAccountsTable';
 import TabContentWrapper from './tabs/TabContentWrapper';
 import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
@@ -9,7 +8,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
-import AccountsTabContent from './details/tabs/AccountsTabContent';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 import UserAccountsTabContent from './accounts/UserAccountsTabContent';
 
@@ -115,7 +113,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
         
         <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
           {isAdminView ? (
-            <AccountsTabContent 
+            <UserAccountsTabContent 
               botId={botId}
               userId={userId}
               botType={botType}
@@ -123,7 +121,6 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
               description="Danh sách tài khoản được kết nối với bot này"
               accountsData={accountsData}
               isLoading={refreshLoading}
-              isAdminView={true}
             />
           ) : (
             <UserAccountsTabContent

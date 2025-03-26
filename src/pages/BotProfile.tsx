@@ -4,7 +4,6 @@ import MainLayout from '@/components/layout/MainLayout';
 import { RefreshCw, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BotCardProps } from '@/components/bots/BotCard';
-import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import BotProfileHeader from '@/components/bots/BotProfileHeader';
 import BotInfoCard from '@/components/bots/BotInfoCard';
 import ConnectionSettingsCard from '@/components/bots/ConnectionSettingsCard';
@@ -18,7 +17,6 @@ const BotProfile = () => {
   const { botId } = useParams<{ botId: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [bot, setBot] = useState<BotCardProps | null>(null);
-  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   
   const mockAccounts: Account[] = [
@@ -227,13 +225,6 @@ const BotProfile = () => {
           botType="user"
         />
       </div>
-      
-      <AddAccountDialog 
-        open={isAddAccountDialogOpen}
-        onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot.botId}
-        onAddAccount={handleAddAccount}
-      />
     </MainLayout>
   );
 };
