@@ -6,7 +6,7 @@ import { useSafeLoading } from '@/hooks/useSafeLoading';
 // Mock data for trading view logs
 const mockTradingViewLogs: TradingViewSignal[] = [
   {
-    id: 'TV-SIG-001',
+    id: 'SIG001', // Changed to match the originalSignalId in coinstratLogs
     action: 'ENTER_LONG',
     instrument: 'BTC/USDT',
     timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
@@ -19,7 +19,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     accountName: 'Primary Trading Account'
   },
   {
-    id: 'TV-SIG-002',
+    id: 'SIG002', // Changed to match the originalSignalId in coinstratLogs
     action: 'EXIT_LONG',
     instrument: 'BTC/USDT',
     timestamp: new Date(Date.now() - 3600000).toISOString(),
@@ -32,7 +32,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     accountName: 'Primary Trading Account'
   },
   {
-    id: 'TV-SIG-003',
+    id: 'SIG003', // Changed to match the originalSignalId in coinstratLogs
     action: 'ENTER_SHORT',
     instrument: 'ETH/USDT',
     timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
@@ -45,7 +45,7 @@ const mockTradingViewLogs: TradingViewSignal[] = [
     accountName: 'Secondary Trading Account'
   },
   {
-    id: 'TV-SIG-004',
+    id: 'SIG004', // Updated to be consistent
     action: 'EXIT_SHORT',
     instrument: 'ETH/USDT',
     timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),

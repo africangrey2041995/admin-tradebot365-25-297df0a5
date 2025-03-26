@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
@@ -37,15 +36,21 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
   
   coinstratLogs.forEach(coinstratSignal => {
     const originalId = coinstratSignal.originalSignalId;
+    console.log(`Mapping Coinstrat signal with originalId: ${originalId}`);
     if (!signalMapping.has(originalId)) {
       signalMapping.set(originalId, []);
     }
     signalMapping.get(originalId)!.push(coinstratSignal);
   });
 
+  // Log all Trading View signal IDs for debugging
+  console.log("TradingView signal IDs:", tradingViewLogs.map(tv => tv.id));
+  console.log("Signal mapping keys:", Array.from(signalMapping.keys()));
+
   // Map TradingView signals to include their Coinstrat signals
   const combinedSignals = tradingViewLogs.map(tvSignal => {
     const relatedCoinstratSignals = signalMapping.get(tvSignal.id) || [];
+    console.log(`TV Signal ${tvSignal.id} has ${relatedCoinstratSignals.length} related Coinstrat signals`);
     
     // Calculate statistics about related executions
     const totalAccounts = relatedCoinstratSignals.reduce((sum, signal) => 
@@ -70,6 +75,10 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
   const orphanedCoinstratSignals = coinstratLogs.filter(csSignal => {
     return !tradingViewLogs.some(tvSignal => tvSignal.id === csSignal.originalSignalId);
   });
+
+  if (orphanedCoinstratSignals.length > 0) {
+    console.log(`Found ${orphanedCoinstratSignals.length} orphaned Coinstrat signals`);
+  }
 
   const toggleExpandRow = (id: string, e?: React.MouseEvent) => {
     // If event is provided, stop propagation to prevent row click handling
