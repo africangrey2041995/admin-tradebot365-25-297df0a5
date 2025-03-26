@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings, Trash, Power, UserPlus } from 'lucide-react';
+import { ArrowLeft, Settings, Trash, Power } from 'lucide-react';
 import { toast } from 'sonner';
 import EditBotDialog from './EditBotDialog';
 import { BotCardProps } from './BotCard';
@@ -23,16 +23,9 @@ interface BotProfileHeaderProps {
   status: string;
   botDetails: BotCardProps;
   onUpdateBot: (updatedBot: Partial<BotCardProps>) => void;
-  onAddAccount: () => void;
 }
 
-const BotProfileHeader = ({ 
-  botId, 
-  status, 
-  botDetails, 
-  onUpdateBot,
-  onAddAccount 
-}: BotProfileHeaderProps) => {
+const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfileHeaderProps) => {
   const { goBack } = useNavigation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -81,15 +74,6 @@ const BotProfileHeader = ({
       </Button>
       
       <div className="flex items-center gap-2">
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
-          onClick={onAddAccount}
-        >
-          <UserPlus className="h-4 w-4" />
-          <span>Thêm Tài Khoản</span>
-        </Button>
-        
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">

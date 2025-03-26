@@ -149,7 +149,6 @@ const BotProfile = () => {
   const handleAddAccount = (accountData: any) => {
     console.log('Adding account:', accountData, 'to bot:', botId);
     toast.success('Thêm tài khoản thành công!');
-    setIsAddAccountDialogOpen(false);
   };
 
   const handleUpdateBot = (updatedBot: Partial<BotCardProps>) => {
@@ -199,16 +198,15 @@ const BotProfile = () => {
     <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
-          botId={bot?.botId || ''}
-          status={bot?.status || 'Inactive'} 
-          botDetails={bot || {} as BotCardProps}
+          botId={bot.botId}
+          status={bot.status} 
+          botDetails={bot}
           onUpdateBot={handleUpdateBot}
-          onAddAccount={() => setIsAddAccountDialogOpen(true)}
         />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
           <div className="lg:col-span-5">
-            <BotInfoCard bot={bot || {} as BotCardProps} />
+            <BotInfoCard bot={bot} />
           </div>
           
           <div className="lg:col-span-7">
@@ -220,7 +218,7 @@ const BotProfile = () => {
         </div>
         
         <UserBotDetailTabs 
-          botId={bot?.botId || ''}
+          botId={bot.botId}
           userId={userId}
           onRefresh={refreshData}
           isLoading={refreshLoading}
@@ -234,7 +232,7 @@ const BotProfile = () => {
       <AddAccountDialog 
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
-        botId={bot?.botId || ''}
+        botId={bot.botId}
         onAddAccount={handleAddAccount}
       />
     </MainLayout>
