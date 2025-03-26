@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -28,6 +29,13 @@ import { ADMIN_ROUTES } from '@/constants/routes';
 import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import BotPerformanceCard from '@/components/admin/prop-bots/detail/BotPerformanceCard';
+
+// Import components from user view to enhance admin view
+import PerformanceChart from '@/components/bots/details/PerformanceChart';
+import TradeDetailsChart from '@/components/bots/details/TradeDetailsChart';
+import FeaturesList from '@/components/bots/details/FeaturesList';
+import { useBotStatistics } from '@/hooks/useBotStatistics';
+import { useChartData } from '@/hooks/useChartData';
 
 // Mock Premium Bot data
 const mockPremiumBots = [
@@ -244,6 +252,11 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedChartPeriod, setSelectedChartPeriod] = useState("month");
+  
+  // Get statistics and chart data from the hooks
+  const { tradePerformanceData, statisticsData } = useBotStatistics();
+  const { chartData, generateChartData } = useChartData();
   
   // Get bot data
   const bot = mockPremiumBots.find(b => b.id === botId);
@@ -330,10 +343,16 @@ const PremiumBotDetail = () => {
     console.log("Updated performance:", performance);
   };
 
+  // Generate chart data based on selected period
+  const getChartData = () => {
+    if (bot?.monthlyPerformance) {
+      return selectedChartPeriod === "month" ? bot.monthlyPerformance : generateChartData();
+    }
+    return chartData;
+  };
+
   if (isLoading) {
-    return (
-      <LoadingState />
-    );
+    return <LoadingState />;
   }
 
   if (!bot) {
@@ -393,7 +412,7 @@ const PremiumBotDetail = () => {
           <TabsTrigger value="coinstrat-logs">Coinstrat Logs</TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
+        {/* Overview Tab - Enhanced with charts and visualizations */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2 space-y-4">
@@ -401,10 +420,29 @@ const PremiumBotDetail = () => {
                 description={bot.longDescription} 
                 onUpdate={handleUpdateDescription}
               />
+              
+              {/* Performance Chart - Added from user view */}
+              <PerformanceChart
+                selectedPeriod={selectedChartPeriod}
+                onPeriodChange={setSelectedChartPeriod}
+                chartData={getChartData()}
+              />
+              
+              {/* Trade Details Chart - Added from user view */}
+              <TradeDetailsChart
+                tradePerformanceData={tradePerformanceData}
+                statisticsData={statisticsData}
+              />
+              
               <EditableTradingPairsCard 
                 tradingPairs={bot.pairs}
                 onUpdate={handleUpdateTradingPairs}
               />
+              
+              {/* Features List - Added from user view */}
+              {bot.features && (
+                <FeaturesList features={bot.features} />
+              )}
             </div>
             <div className="space-y-4">
               <Card>
@@ -445,6 +483,29 @@ const PremiumBotDetail = () => {
                 }}
                 onUpdate={handleUpdatePerformance}
               />
+              
+              {/* Additional pricing information card */}
+              {bot.price && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Pricing</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Monthly</h3>
+                      <p className="font-bold text-green-600">${bot.price.monthly}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Quarterly</h3>
+                      <p className="font-bold text-green-600">${bot.price.quarterly}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Yearly</h3>
+                      <p className="font-bold text-green-600">${bot.price.yearly}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </TabsContent>
