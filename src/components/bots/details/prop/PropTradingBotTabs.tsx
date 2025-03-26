@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CoinstratSignal } from '@/types/signal';
@@ -10,6 +10,9 @@ import UserHierarchicalAccountsTable from '@/components/bots/accounts/UserHierar
 import { useBotAccounts } from '@/hooks/useBotAccounts';
 import { toast } from 'sonner';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
+import { Button } from '@/components/ui/button';
+import { UserPlus } from 'lucide-react';
+import AddAccountDialog from '@/components/bots/AddAccountDialog';
 
 interface PropTradingBotTabsProps {
   activeTab: string;
@@ -34,6 +37,7 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
   overviewContent,
   refreshTabData
 }) => {
+  const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Use the accounts hook to manage connected accounts
@@ -83,6 +87,15 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
     toast.success('Trạng thái tài khoản đã được cập nhật');
   };
 
+  const handleAddAccountSubmit = (formData: any) => {
+    console.log('Adding account:', formData);
+    addAccount({
+      cspAccountId: `acc-${Date.now()}`, // Generate a temporary ID
+      ...formData
+    } as Account);
+    setIsAddAccountDialogOpen(false);
+  };
+
   return <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800 p-0 h-auto rounded-none">
         <TabsTrigger value="overview" className="data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:border-b-2 rounded-none border-b-2 border-transparent py-3 px-6">
@@ -101,10 +114,22 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
       <TabsContent value="accounts">
         <Card className="border-gray-200 dark:border-gray-800">
           <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30 pb-3">
-            <CardTitle className="text-lg font-medium">Tài Khoản Kết Nối</CardTitle>
-            <CardDescription>
-              Quản lý các tài khoản được kết nối với Prop Trading Bot
-            </CardDescription>
+            <div className="flex justify-between items-center w-full">
+              <div>
+                <CardTitle className="text-lg font-medium">Tài Khoản Kết Nối</CardTitle>
+                <CardDescription>
+                  Quản lý các tài khoản được kết nối với Prop Trading Bot
+                </CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                onClick={() => setIsAddAccountDialogOpen(true)}
+              >
+                <UserPlus className="h-4 w-4" />
+                <span>Thêm Tài Khoản</span>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="p-6">
             <UserHierarchicalAccountsTable 
@@ -120,6 +145,13 @@ const PropTradingBotTabs: React.FC<PropTradingBotTabsProps> = ({
             />
           </CardContent>
         </Card>
+
+        <AddAccountDialog
+          open={isAddAccountDialogOpen}
+          onOpenChange={setIsAddAccountDialogOpen}
+          botId={botId}
+          onAddAccount={handleAddAccountSubmit}
+        />
       </TabsContent>
       
       <TabsContent value="signal-tracking">
