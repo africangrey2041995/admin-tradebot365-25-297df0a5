@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,10 @@ import { ArrowLeft, Bot, CheckCircle2, CircleAlert, Users, DollarSign, BarChart2
 import SubscribePremiumBotDialog from '@/components/premium/SubscribePremiumBotDialog';
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
+import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
+
+// Update user ID format to use the standardized 'USR-001' format with dash
+const CURRENT_USER_ID = 'USR-001';
 
 const propTradingBots = mockPropBots.map(bot => ({
   ...bot,
@@ -38,8 +42,67 @@ const PropTradingBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [isSubscribeDialogOpen, setIsSubscribeDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [refreshLoading, setRefreshLoading] = useState(false);
   
   const bot = propTradingBots.find(b => b.botId === botId || b.id === botId);
+  
+  // Mock challenge data
+  const challengeData = {
+    phase: "Challenge Phase 1",
+    progress: 68,
+    accountBalance: "$10,000",
+    profitTarget: "$1,000 (10%)",
+    maxDrawdown: "5%",
+    daysRemaining: "14 days",
+    description: "Tiến độ hoàn thành để chuyển sang giai đoạn tiếp theo"
+  };
+
+  // Mock stats data
+  const botStats = {
+    totalTrades: 56,
+    winRate: "64%",
+    profitFactor: 1.8,
+    sharpeRatio: 1.6,
+    currentDrawdown: "2.3%"
+  };
+
+  // Mock bot info
+  const botInfo = {
+    createdDate: "2023-09-15",
+    lastUpdated: "2023-11-22",
+    botId: bot?.botId || "PROP001"
+  };
+
+  // Challenge rules
+  const challengeRules = [
+    "Minimum 10 trading days required",
+    "Maximum daily drawdown: 4%",
+    "Maximum total drawdown: 8%",
+    "Profit target: 10% to advance to next phase",
+    "No weekend trading allowed",
+    "No holding positions overnight",
+    "Maximum position size: 2% of account"
+  ];
+
+  const handleRefresh = () => {
+    setRefreshLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setRefreshLoading(false);
+    }, 1000);
+  };
+  
+  // Prepare the overview content
+  const overviewContent = (
+    <PropBotOverviewTab 
+      challengeData={challengeData}
+      botStats={botStats}
+      botInfo={botInfo}
+      challengeRules={challengeRules}
+    />
+  );
   
   if (!bot) {
     return (
@@ -133,7 +196,7 @@ const PropTradingBotDetail = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
@@ -150,160 +213,37 @@ const PropTradingBotDetail = () => {
                       </CardDescription>
                     </div>
                   </div>
+                  <div className="flex space-x-2">
+                    <Badge variant="outline" className={riskColor}>
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Rủi ro: {riskLabel}
+                    </Badge>
+                    <Badge variant="outline" className={colors.badge}>
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      Vốn tối thiểu: {bot.minCapital}
+                    </Badge>
+                    <Button 
+                      className="ml-4" 
+                      onClick={() => setIsSubscribeDialogOpen(true)}
+                    >
+                      Tích hợp với tài khoản
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <Badge variant="outline" className={riskColor}>
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    Rủi ro: {riskLabel}
-                  </Badge>
-                  <Badge variant="outline" className={colors.badge}>
-                    <DollarSign className="h-3 w-3 mr-1" />
-                    Vốn tối thiểu: {bot.minCapital}
-                  </Badge>
-                  <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400">
-                    <Users className="h-3 w-3 mr-1" />
-                    {bot.subscribers} người đăng ký
-                  </Badge>
-                </div>
-                
-                <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="overview" className="w-full">Tổng quan</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="overview" className="pt-4 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-base flex items-center">
-                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                            Tính năng
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                            {bot.features.map((feature, index) => (
-                              <li key={index}>{feature}</li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-base flex items-center">
-                            <CircleAlert className="h-4 w-4 mr-2 text-amber-500" />
-                            Yêu cầu
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                            {bot.requirements.map((req, index) => (
-                              <li key={index}>{req}</li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base flex items-center">
-                          <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
-                          Thống kê
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                            <div className="text-sm text-slate-600 dark:text-slate-400">Người dùng đăng ký</div>
-                            <div className="text-2xl font-bold mt-1 flex items-center">
-                              {bot.subscribers}
-                              <Users className="ml-2 h-5 w-5 text-blue-500" />
-                            </div>
-                          </div>
-                          
-                          <div className={`p-4 rounded-md ${colors.bg} ${colors.border} border`}>
-                            <div className="text-sm text-slate-600 dark:text-slate-400">Tài khoản kết nối</div>
-                            <div className="text-2xl font-bold mt-1 flex items-center">
-                              {Math.round(bot.subscribers * 1.5)}
-                              <BriefcaseIcon className="ml-2 h-5 w-5 text-purple-500" />
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="space-y-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Đăng ký Bot</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full mb-4" 
-                  size="lg"
-                  onClick={() => setIsSubscribeDialogOpen(true)}
-                >
-                  Tích hợp với tài khoản
-                </Button>
-                
-                <div className="text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                  <p>Khi tích hợp bot này, bạn sẽ nhận được:</p>
-                  <ul className="list-disc pl-5 space-y-1 text-sm">
-                    <li>Tín hiệu giao dịch tự động 24/7</li>
-                    <li>Quản lý rủi ro theo tiêu chuẩn Prop Trading</li>
-                    <li>Báo cáo hiệu suất chi tiết</li>
-                    <li>Hỗ trợ kỹ thuật ưu tiên</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Thông tin Bot</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Sàn giao dịch
-                  </div>
-                  <div className="mt-1">{bot.exchange}</div>
-                </div>
-                
-                <div>
-                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Loại bot
-                  </div>
-                  <div className="mt-1">Prop Trading</div>
-                </div>
-                
-                <div>
-                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Trạng thái
-                  </div>
-                  <div className="mt-1 flex items-center">
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                    {bot.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    ID Bot
-                  </div>
-                  <code className="mt-1 block bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-xs">
-                    {bot.id}
-                  </code>
-                </div>
+                {/* Use our new PropTradingBotTabs component */}
+                <PropTradingBotTabs
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  userId={CURRENT_USER_ID}
+                  botId={botId || ""}
+                  refreshLoading={refreshLoading}
+                  accounts={[]} // Will be fetched inside the component
+                  logs={[]} // Will be fetched inside the component
+                  overviewContent={overviewContent}
+                  refreshTabData={handleRefresh}
+                />
               </CardContent>
             </Card>
           </div>

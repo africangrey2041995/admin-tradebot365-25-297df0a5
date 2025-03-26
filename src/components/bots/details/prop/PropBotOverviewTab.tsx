@@ -1,10 +1,10 @@
 
 import React from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import ChallengeProgressCard from './ChallengeProgressCard';
 import BotStatsCard from './BotStatsCard';
-import WarningCard from './WarningCard';
-import BotInfoCard from './BotInfoCard';
 import ChallengeRulesCard from './ChallengeRulesCard';
+import WarningCard from './WarningCard';
 
 interface PropBotOverviewTabProps {
   challengeData: {
@@ -38,34 +38,41 @@ const PropBotOverviewTab: React.FC<PropBotOverviewTabProps> = ({
   challengeRules
 }) => {
   return (
-    <div className="space-y-6">
-      <ChallengeProgressCard challengeData={challengeData} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-900/20 rounded border border-dashed border-gray-200 dark:border-gray-700">
-            <div className="text-center text-gray-500 dark:text-gray-400 flex flex-col items-center">
-              <BarChart className="h-8 w-8 mb-2 opacity-50" />
-              <p>Biểu đồ hiệu suất</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Right column */}
-        <div className="space-y-6">
-          <BotStatsCard stats={botStats} />
-          <WarningCard />
-          <BotInfoCard botInfo={botInfo} />
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-6">
+        {/* Progress in Current Challenge */}
+        <ChallengeProgressCard 
+          phase={challengeData.phase}
+          progress={challengeData.progress}
+          accountBalance={challengeData.accountBalance}
+          profitTarget={challengeData.profitTarget}
+          maxDrawdown={challengeData.maxDrawdown}
+          daysRemaining={challengeData.daysRemaining}
+          description={challengeData.description}
+        />
+
+        {/* Bot Statistics */}
+        <BotStatsCard 
+          totalTrades={botStats.totalTrades}
+          winRate={botStats.winRate}
+          profitFactor={botStats.profitFactor}
+          sharpeRatio={botStats.sharpeRatio}
+          currentDrawdown={botStats.currentDrawdown}
+          createdDate={botInfo.createdDate}
+          lastUpdated={botInfo.lastUpdated}
+          botId={botInfo.botId}
+        />
       </div>
-      
-      <ChallengeRulesCard rules={challengeRules} />
+
+      <div className="space-y-6">
+        {/* Challenge Rules */}
+        <ChallengeRulesCard rules={challengeRules} />
+
+        {/* Warning Card */}
+        <WarningCard />
+      </div>
     </div>
   );
 };
 
 export default PropBotOverviewTab;
-
-// Import the BarChart icon
-import { BarChart } from 'lucide-react';

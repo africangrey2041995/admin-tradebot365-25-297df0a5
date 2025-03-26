@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { useBotStatistics } from '@/hooks/useBotStatistics';
 import { useIntegratedBot } from '@/hooks/useIntegratedBot';
 import PropBotOverviewTab from '@/components/bots/details/prop/PropBotOverviewTab';
 import PropTradingBotTabs from '@/components/bots/details/prop/PropTradingBotTabs';
+import { Account } from '@/types';
 
 // Update user ID format to use the standardized 'USR-001' format with dash
 const CURRENT_USER_ID = 'USR-001'; 
@@ -40,6 +41,13 @@ const IntegratedPropBotDetail = () => {
     mockLogs, 
     refreshTabData 
   } = useIntegratedBot("overview");
+
+  // Filter accounts to only show those belonging to the current user
+  const userAccounts = React.useMemo(() => {
+    // In a real implementation, we would filter accounts by user ID
+    // For now, we'll just return the mock accounts
+    return mockAccounts;
+  }, [mockAccounts]);
 
   const goBack = () => {
     navigate(USER_ROUTES.INTEGRATED_PREMIUM_BOTS);
@@ -144,7 +152,7 @@ const IntegratedPropBotDetail = () => {
           userId={CURRENT_USER_ID}
           botId={botId || ""}
           refreshLoading={refreshLoading}
-          accounts={mockAccounts}
+          accounts={userAccounts}
           logs={mockLogs}
           overviewContent={overviewContent}
           refreshTabData={refreshTabData}
