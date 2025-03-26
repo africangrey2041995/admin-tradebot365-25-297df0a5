@@ -7,12 +7,12 @@ import { toast } from 'sonner';
 import PremiumBotDetailTabs from '@/components/bots/details/PremiumBotDetailTabs';
 import BotHeader from '@/components/bots/details/BotHeader';
 import BotDescription from '@/components/bots/details/BotDescription';
-import PerformanceChart from '@/components/bots/details/PerformanceChart';
-import TradeDetailsChart from '@/components/bots/details/TradeDetailsChart';
 import FeaturesList from '@/components/bots/details/FeaturesList';
 import BotInfoCard from '@/components/bots/details/BotInfoCard';
 import PerformanceCard from '@/components/bots/details/PerformanceCard';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, TrendingUp, LineChart, PieChart } from 'lucide-react';
 
 const premiumBots = [
   {
@@ -41,7 +41,7 @@ Bot này phù hợp cho các nhà đầu tư muốn tận dụng các xu hướn
     subscribers: 86,
     imageUrl: null,
     colorScheme: 'green',
-    botId: 'PRE7459', // Updated botId to follow PRE#### format
+    botId: 'PRE7459',
     monthlyPerformance: [
       { month: 'Jan', value: 12.5 },
       { month: 'Feb', value: 8.3 },
@@ -241,7 +241,6 @@ const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
-  const [selectedChartPeriod, setSelectedChartPeriod] = useState<string>("month");
 
   const bot = premiumBots.find(b => b.id === botId);
 
@@ -282,28 +281,30 @@ const PremiumBotDetail = () => {
     }, 500);
   };
 
-  const generateChartData = () => {
-    if (selectedChartPeriod === "month") {
-      return bot?.monthlyPerformance || [];
-    } else if (selectedChartPeriod === "week") {
-      return [
-        { day: 'Mon', value: 5.7 },
-        { day: 'Tue', value: 7.3 },
-        { day: 'Wed', value: -2.1 },
-        { day: 'Thu', value: 4.2 },
-        { day: 'Fri', value: 8.5 },
-        { day: 'Sat', value: 2.1 },
-        { day: 'Sun', value: 3.8 }
-      ];
-    } else {
-      return [
-        { year: '2020', value: 28.5 },
-        { year: '2021', value: 42.3 },
-        { year: '2022', value: 37.8 },
-        { year: '2023', value: 125.4 }
-      ];
-    }
-  };
+  const StatsDisplay = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Chi tiết giao dịch</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+          {statisticsData.map((stat, index) => (
+            <div key={index} className="p-4 bg-white rounded-lg border border-gray-100 dark:bg-zinc-800/50 dark:border-gray-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                {stat.icon}
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {stat.name}
+                </span>
+              </div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                {stat.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <MainLayout title={bot?.name || "Premium Bot Detail"}>
@@ -328,16 +329,7 @@ const PremiumBotDetail = () => {
               pairs={bot.pairs} 
             />
 
-            <PerformanceChart
-              selectedPeriod={selectedChartPeriod}
-              onPeriodChange={setSelectedChartPeriod}
-              chartData={generateChartData()}
-            />
-
-            <TradeDetailsChart
-              tradePerformanceData={tradePerformanceData}
-              statisticsData={statisticsData}
-            />
+            <StatsDisplay />
 
             <FeaturesList features={bot.features} />
           </div>
