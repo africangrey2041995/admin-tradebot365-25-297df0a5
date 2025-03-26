@@ -14,6 +14,7 @@ interface AddAccountDialogProps {
   botId: string;
   onAddAccount: (data: any) => void;
   botType?: 'premium' | 'prop' | 'user';
+  botName?: string; // Make botName optional to maintain compatibility
 }
 
 const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
@@ -21,7 +22,8 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
   onOpenChange,
   botId,
   onAddAccount,
-  botType = 'user'
+  botType = 'user',
+  botName // Optional property
 }) => {
   const [formData, setFormData] = useState({
     cspAccountName: '',
@@ -93,11 +95,15 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({
     });
   };
 
+  const dialogTitle = botName 
+    ? `Thêm tài khoản vào ${botName}`
+    : "Thêm tài khoản mới";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Thêm Tài Khoản Mới</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
             Nhập thông tin chi tiết để kết nối tài khoản mới với bot này.
           </DialogDescription>

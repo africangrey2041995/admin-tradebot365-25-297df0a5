@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -232,7 +233,6 @@ const BotProfile = () => {
         open={isAddAccountDialogOpen}
         onOpenChange={setIsAddAccountDialogOpen}
         botId={bot.botId}
-        botName={bot.title}
         onAddAccount={handleAddAccount}
       />
     </MainLayout>
