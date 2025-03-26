@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSignUp } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,28 +8,43 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   ArrowRight, 
   MailIcon, 
   KeyIcon, 
   UserIcon,
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
+import { isValidEmail, validatePassword } from '@/utils/validationUtils';
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [fullName, setFullName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    code?: string;
+    general?: string;
+  }>({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  if (!isLoaded) {
+  // Kiểm tra Clerk có hoạt động không
+  const clerkEnabled = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+
+  if (!isLoaded && clerkEnabled) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
         <Loader2 className="h-12 w-12 animate-spin text-white/50" />
@@ -36,12 +52,114 @@ const SignUp = () => {
     );
   }
 
+  const validateSignUpForm = () => {
+    const newErrors: {
+      name?: string;
+      email?: string;
+      password?: string;
+      confirmPassword?: string;
+    } = {};
+    let isValid = true;
+
+    if (!fullName || fullName.trim().length < 3) {
+      newErrors.name = 'Họ tên phải có ít nhất 3 ký tự';
+      isValid = false;
+    }
+
+    if (!emailAddress) {
+      newErrors.email = 'Email không được để trống';
+      isValid = false;
+    } else if (!isValidEmail(emailAddress)) {
+      newErrors.email = 'Email không đúng định dạng';
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = 'Mật khẩu không được để trống';
+      isValid = false;
+    } else if (password.length < 8) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+      isValid = false;
+    }
+
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Mật khẩu nhập lại không khớp';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const validateVerificationForm = () => {
+    const newErrors: { code?: string } = {};
+    let isValid = true;
+
+    if (!code || code.length < 6) {
+      newErrors.code = 'Mã xác thực không hợp lệ';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleMockSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateSignUpForm()) return;
+    
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      setPendingVerification(true);
+      toast({
+        title: "Mã xác thực đã được gửi",
+        description: "Vui lòng kiểm tra email của bạn",
+      });
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  const handleMockVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateVerificationForm()) return;
+    
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      toast({
+        title: "Đăng ký thành công",
+        description: "Chào mừng bạn đến với Trade Bot 365",
+      });
+      navigate('/');
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  const handleMockGoogleSignUp = () => {
+    setIsGoogleLoading(true);
+    
+    setTimeout(() => {
+      toast({
+        title: "Đăng ký thành công",
+        description: "Đã đăng ký với Google",
+      });
+      navigate('/');
+      setIsGoogleLoading(false);
+    }, 1500);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
+    if (!isLoaded || !clerkEnabled) return;
+
+    if (!validateSignUpForm()) return;
 
     try {
       setIsLoading(true);
+      setErrors({});
       
       await signUp.create({
         firstName: fullName.split(' ')[0],
@@ -59,6 +177,10 @@ const SignUp = () => {
         description: "Vui lòng kiểm tra email của bạn",
       });
     } catch (err: any) {
+      console.error("Signup error:", err);
+      setErrors({
+        general: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng ký"
+      });
       toast({
         variant: "destructive",
         title: "Lỗi đăng ký",
@@ -71,10 +193,13 @@ const SignUp = () => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
+    if (!isLoaded || !clerkEnabled) return;
+
+    if (!validateVerificationForm()) return;
 
     try {
       setIsLoading(true);
+      setErrors({});
       
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
@@ -95,6 +220,11 @@ const SignUp = () => {
         });
       }
     } catch (err: any) {
+      console.error("Verification error:", err);
+      setErrors({
+        code: err.errors?.[0]?.message || "Mã xác thực không hợp lệ",
+        general: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi xác thực"
+      });
       toast({
         variant: "destructive",
         title: "Lỗi xác thực",
@@ -106,7 +236,7 @@ const SignUp = () => {
   };
 
   const handleSignUpWithGoogle = async () => {
-    if (!isLoaded) return;
+    if (!isLoaded || !clerkEnabled) return;
 
     try {
       setIsGoogleLoading(true);
@@ -116,6 +246,7 @@ const SignUp = () => {
         redirectUrlComplete: "/",
       });
     } catch (err: any) {
+      console.error("Google signup error:", err);
       toast({
         variant: "destructive",
         title: "Lỗi đăng ký với Google",
@@ -123,6 +254,57 @@ const SignUp = () => {
       });
       setIsGoogleLoading(false);
     }
+  };
+
+  const onSubmit = clerkEnabled ? handleSubmit : handleMockSignUp;
+  const onVerify = clerkEnabled ? handleVerify : handleMockVerify;
+  const onGoogleSignUp = clerkEnabled ? handleSignUpWithGoogle : handleMockGoogleSignUp;
+
+  const getPasswordStrength = () => {
+    if (!password) return { strength: 0, text: '' };
+    
+    let strength = 0;
+    let text = 'Rất yếu';
+    
+    // Tăng điểm cho độ dài
+    if (password.length >= 8) strength += 1;
+    if (password.length >= 12) strength += 1;
+    
+    // Kiểm tra có chữ thường
+    if (/[a-z]/.test(password)) strength += 1;
+    
+    // Kiểm tra có chữ hoa
+    if (/[A-Z]/.test(password)) strength += 1;
+    
+    // Kiểm tra có số
+    if (/[0-9]/.test(password)) strength += 1;
+    
+    // Kiểm tra có ký tự đặc biệt
+    if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+    
+    // Xác định mức độ mạnh dựa vào điểm
+    if (strength === 0) {
+      text = 'Rất yếu';
+    } else if (strength <= 2) {
+      text = 'Yếu';
+    } else if (strength <= 4) {
+      text = 'Trung bình';
+    } else if (strength <= 5) {
+      text = 'Mạnh';
+    } else {
+      text = 'Rất mạnh';
+    }
+    
+    return { strength: Math.min(strength, 6), text };
+  };
+
+  const { strength, text } = getPasswordStrength();
+  const strengthPercentage = (strength / 6) * 100;
+  
+  const getStrengthColor = () => {
+    if (strength <= 2) return 'bg-red-500';
+    if (strength <= 4) return 'bg-yellow-500';
+    return 'bg-green-500';
   };
 
   return (
@@ -160,8 +342,24 @@ const SignUp = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {errors.general && (
+              <Alert variant="destructive" className="border-red-800 bg-red-950/50">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errors.general}</AlertDescription>
+              </Alert>
+            )}
+            
+            {!clerkEnabled && (
+              <Alert className="border-amber-800 bg-amber-950/50 text-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-300" />
+                <AlertDescription className="text-amber-200">
+                  Hệ thống đang chạy ở chế độ demo. Bạn có thể đăng ký với bất kỳ thông tin nào.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             {pendingVerification ? (
-              <form onSubmit={handleVerify} className="space-y-4">
+              <form onSubmit={onVerify} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="code" className="text-zinc-400">Mã xác thực</Label>
                   <Input
@@ -170,9 +368,11 @@ const SignUp = () => {
                     placeholder="Nhập mã 6 số"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                    required
+                    className={`border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.code ? 'border-red-600' : ''}`}
                   />
+                  {errors.code && (
+                    <p className="text-xs text-red-500 mt-1">{errors.code}</p>
+                  )}
                 </div>
                 <Button
                   type="submit"
@@ -196,7 +396,7 @@ const SignUp = () => {
                   <Button 
                     variant="outline" 
                     className="relative w-full bg-zinc-800/80 border-zinc-700 hover:bg-zinc-700/90 text-white font-medium"
-                    onClick={handleSignUpWithGoogle}
+                    onClick={onGoogleSignUp}
                     disabled={isGoogleLoading}
                   >
                     {isGoogleLoading ? (
@@ -236,7 +436,7 @@ const SignUp = () => {
                   </div>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={onSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="fullName" className="text-zinc-400">Họ và tên</Label>
                     <div className="relative">
@@ -247,10 +447,12 @@ const SignUp = () => {
                         placeholder="Nguyen Van A"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                        required
+                        className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.name ? 'border-red-600' : ''}`}
                       />
                     </div>
+                    {errors.name && (
+                      <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -263,10 +465,12 @@ const SignUp = () => {
                         placeholder="your@email.com"
                         value={emailAddress}
                         onChange={(e) => setEmailAddress(e.target.value)}
-                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                        required
+                        className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.email ? 'border-red-600' : ''}`}
                       />
                     </div>
+                    {errors.email && (
+                      <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -279,11 +483,46 @@ const SignUp = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                        required
+                        className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.password ? 'border-red-600' : ''}`}
                       />
                     </div>
-                    <p className="text-xs text-zinc-500">Mật khẩu phải có ít nhất 8 ký tự</p>
+                    {password && (
+                      <div className="mt-2">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-zinc-400">Độ mạnh mật khẩu:</span>
+                          <span className="text-xs font-medium" style={{color: getStrengthColor().replace('bg-', 'text-')}}>
+                            {text}
+                          </span>
+                        </div>
+                        <div className="h-1 w-full bg-zinc-700 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full ${getStrengthColor()}`} 
+                            style={{width: `${strengthPercentage}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                    {errors.password && (
+                      <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-zinc-400">Xác nhận mật khẩu</Label>
+                    <div className="relative">
+                      <KeyIcon className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.confirmPassword ? 'border-red-600' : ''}`}
+                      />
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>
+                    )}
                   </div>
                   
                   <Button

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSignIn } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,13 +8,16 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   ArrowRight, 
   MailIcon, 
   KeyIcon, 
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import TradeBotLogo from '@/components/common/TradeBotLogo';
+import { isValidEmail } from '@/utils/validationUtils';
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -21,10 +25,14 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [errors, setErrors] = useState<{email?: string; password?: string; general?: string}>({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  if (!isLoaded) {
+  // Kiểm tra Clerk có hoạt động không
+  const clerkEnabled = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+
+  if (!isLoaded && clerkEnabled) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800">
         <Loader2 className="h-12 w-12 animate-spin text-white/50 mb-4" />
@@ -33,25 +41,43 @@ const SignIn = () => {
     );
   }
 
+  const validateForm = () => {
+    const newErrors: {email?: string; password?: string} = {};
+    let isValid = true;
+
+    if (!emailAddress) {
+      newErrors.email = 'Email không được để trống';
+      isValid = false;
+    } else if (!isValidEmail(emailAddress)) {
+      newErrors.email = 'Email không đúng định dạng';
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = 'Mật khẩu không được để trống';
+      isValid = false;
+    } else if (password.length < 8) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleMockSignIn = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
     
     setIsLoading(true);
     
     setTimeout(() => {
-      if (emailAddress && password) {
-        toast({
-          title: "Đăng nhập thành công",
-          description: "Chào mừng bạn quay trở lại",
-        });
-        navigate('/');
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Đăng nhập thất bại",
-          description: "Vui lòng kiểm tra lại thông tin đăng nhập",
-        });
-      }
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn quay trở lại",
+      });
+      navigate('/');
       setIsLoading(false);
     }, 1500);
   };
@@ -71,10 +97,14 @@ const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
+    if (!isLoaded || !clerkEnabled) return;
+
+    if (!validateForm()) return;
 
     try {
       setIsLoading(true);
+      setErrors({});
+      
       const result = await signIn.create({
         identifier: emailAddress,
         password,
@@ -96,6 +126,9 @@ const SignIn = () => {
       }
     } catch (err: any) {
       console.error("Login error:", err);
+      setErrors({
+        general: err.errors?.[0]?.message || "Đã có lỗi xảy ra khi đăng nhập"
+      });
       toast({
         variant: "destructive",
         title: "Lỗi đăng nhập",
@@ -107,7 +140,7 @@ const SignIn = () => {
   };
 
   const handleSignInWithGoogle = async () => {
-    if (!isLoaded) return;
+    if (!isLoaded || !clerkEnabled) return;
 
     try {
       setIsGoogleLoading(true);
@@ -127,8 +160,8 @@ const SignIn = () => {
     }
   };
 
-  const onSubmit = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSubmit : handleMockSignIn;
-  const onGoogleSignIn = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? handleSignInWithGoogle : handleMockGoogleSignIn;
+  const onSubmit = clerkEnabled ? handleSubmit : handleMockSignIn;
+  const onGoogleSignIn = clerkEnabled ? handleSignInWithGoogle : handleMockGoogleSignIn;
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800 px-4">
@@ -161,6 +194,22 @@ const SignIn = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {errors.general && (
+              <Alert variant="destructive" className="border-red-800 bg-red-950/50">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errors.general}</AlertDescription>
+              </Alert>
+            )}
+            
+            {!clerkEnabled && (
+              <Alert className="border-amber-800 bg-amber-950/50 text-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-300" />
+                <AlertDescription className="text-amber-200">
+                  Hệ thống đang chạy ở chế độ demo. Bạn có thể đăng nhập với bất kỳ thông tin nào.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="flex flex-col space-y-3">
               <Button 
                 variant="outline" 
@@ -216,10 +265,12 @@ const SignIn = () => {
                     placeholder="your@email.com"
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
-                    className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                    required
+                    className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.email ? 'border-red-600' : ''}`}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -247,10 +298,12 @@ const SignIn = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot"
-                    required
+                    className={`pl-10 border-zinc-700 bg-zinc-800/70 text-white focus-visible:ring-tradebot focus-visible:border-tradebot ${errors.password ? 'border-red-600' : ''}`}
                   />
                 </div>
+                {errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                )}
               </div>
               
               <Button
