@@ -99,7 +99,7 @@ const AdminUserBots = () => {
   const [userBots, setUserBots] = useState<UserBot[]>([]);
   const { navigateToBotDetail, navigateTo } = useNavigation();
   
-  // Updated columns to display User ID and make it clickable
+  // Updated columns to display User ID and make it clickable with white text headers
   const columns: UserBotColumn[] = [
     {
       accessorKey: 'botId',

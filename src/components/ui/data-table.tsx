@@ -90,7 +90,9 @@ export const DataTable = ({
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
-              <TableHead key={column.accessorKey}>{column.header}</TableHead>
+              <TableHead key={column.accessorKey} className="text-white">
+                {column.header}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
