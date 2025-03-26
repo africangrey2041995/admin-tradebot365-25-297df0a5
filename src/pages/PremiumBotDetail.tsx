@@ -82,7 +82,7 @@ Các tính năng chính:
 - Hoạt động 24/7
 - Báo cáo chi tiết
 
-Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nh��n rủi ro cao.`,
+Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ các biến động giá nhỏ và có khả năng chấp nhn rủi ro cao.`,
     exchange: 'Binance',
     type: 'scalping',
     performanceLastMonth: '+22.1%',
@@ -183,7 +183,7 @@ Bot này phù hợp cho các nhà đầu tư muốn kiếm lợi nhuận từ c�
     description: 'Bot giao dịch lưới, tối ưu hóa lợi nhuận trong thị trường đi ngang.',
     longDescription: `Grid Master Bot là một bot giao dịch lưới được thiết kế để tạo ra lợi nhuận trong thị trường đi ngang hoặc ít biến động.
 
-Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong l��ới, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra l���i nhuận nhỏ từ mỗi giao dịch.
+Bot hoạt động bằng cách đặt một loạt các lệnh mua và bán ở các mức giá khác nhau, tạo thành một "lưới". Khi giá dao động trong lới, bot sẽ tự động mua ở mức giá thấp và bán ở mức giá cao, tạo ra li nhuận nhỏ từ mỗi giao dịch.
 
 Các tính năng chính:
 - Tạo lợi nhuận trong thị trường đi ngang
@@ -364,4 +364,3 @@ const PremiumBotDetail = () => {
 };
 
 export default PremiumBotDetail;
-
