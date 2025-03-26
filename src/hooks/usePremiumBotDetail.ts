@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { useBotAuthorization } from '@/hooks/useBotAuthorization';
 import { useChartData } from '@/hooks/useChartData';
 import { useBotStatistics } from '@/hooks/useBotStatistics';
+import { useBotAccounts } from '@/hooks/useBotAccounts';
+import { Account } from '@/types';
 
 export const usePremiumBotDetail = (botId: string | undefined, userId: string) => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -17,6 +19,9 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
   
   const { selectedPeriod, setSelectedPeriod, chartData } = useChartData();
   const { tradePerformanceData, statisticsData } = useBotStatistics();
+  
+  // Get accounts data using the useBotAccounts hook
+  const { accounts: accountsData = [] } = useBotAccounts(botId || '', userId);
 
   const refreshTabData = () => {
     setRefreshLoading(true);
@@ -42,6 +47,7 @@ export const usePremiumBotDetail = (botId: string | undefined, userId: string) =
     chartData,
     tradePerformanceData,
     statisticsData,
-    refreshTabData
+    refreshTabData,
+    accountsData
   };
 };
