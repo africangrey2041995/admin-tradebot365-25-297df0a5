@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserPlanBadge } from "../users/UserPlanBadge";
+import { UserStatusBadge } from "../users/UserStatusBadge";
 import { EditUserDialog } from "./EditUserDialog";
 import { DeleteUserDialog } from "./DeleteUserDialog";
 import { LockAccountDialog } from "./LockAccountDialog";
@@ -133,7 +134,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({
               <TableCell className="font-medium">{user.id}</TableCell>
               <TableCell>{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.status}</TableCell>
+              <TableCell>
+                <UserStatusBadge status={user.status} />
+              </TableCell>
               <TableCell>
                 <UserPlanBadge plan={user.plan} />
               </TableCell>

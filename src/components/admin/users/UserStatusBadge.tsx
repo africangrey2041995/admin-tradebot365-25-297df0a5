@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 
 type StatusBadgeProps = {
   status: string;
@@ -9,31 +11,31 @@ export const UserStatusBadge = ({ status }: StatusBadgeProps) => {
   switch(status) {
     case 'active':
       return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-          <span className="text-green-500">Hoạt động</span>
-        </div>
+        <Badge variant="success" className="gap-1 font-normal py-1">
+          <CheckCircle className="h-3.5 w-3.5" />
+          Hoạt động
+        </Badge>
       );
     case 'inactive':
       return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></div>
-          <span className="text-yellow-500">Không hoạt động</span>
-        </div>
+        <Badge variant="warning" className="gap-1 font-normal py-1">
+          <AlertCircle className="h-3.5 w-3.5" />
+          Không hoạt động
+        </Badge>
       );
     case 'suspended':
       return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-red-500 mr-2"></div>
-          <span className="text-red-500">Đã khóa</span>
-        </div>
+        <Badge variant="destructive" className="gap-1 font-normal py-1">
+          <XCircle className="h-3.5 w-3.5" />
+          Tạm khóa
+        </Badge>
       );
     default:
       return (
-        <div className="flex items-center">
-          <div className="h-2 w-2 rounded-full bg-zinc-500 mr-2"></div>
-          <span className="text-zinc-500">Không xác định</span>
-        </div>
+        <Badge variant="outline" className="gap-1 font-normal py-1">
+          <AlertCircle className="h-3.5 w-3.5" />
+          Không xác định
+        </Badge>
       );
   }
 };

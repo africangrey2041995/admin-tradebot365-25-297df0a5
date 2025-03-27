@@ -27,7 +27,6 @@ interface LockAccountDialogProps {
 
 export function LockAccountDialog({ open, onOpenChange, user, onStatusChange }: LockAccountDialogProps) {
   const [isLoading, setIsLoading] = React.useState(false);
-  const isActive = user.status === 'active';
 
   const handleLockAccount = async () => {
     setIsLoading(true);
