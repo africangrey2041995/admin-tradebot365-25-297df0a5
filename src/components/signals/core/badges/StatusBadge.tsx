@@ -3,12 +3,47 @@ import React from 'react';
 import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * StatusBadge Component
+ * 
+ * Displays a badge indicating the status of a signal or process with appropriate
+ * styling and icon based on the status value.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <StatusBadge status="success" />
+ * 
+ * // With custom size
+ * <StatusBadge status="failed" size="lg" />
+ * 
+ * // With custom className
+ * <StatusBadge status="pending" className="my-custom-class" />
+ * ```
+ */
 interface StatusBadgeProps {
+  /** 
+   * Status value to display. Common values include 'success', 'failed', 'pending', 'warning'.
+   * The component will normalize case and handle partial matches.
+   */
   status: string;
+  
+  /**
+   * Size variant of the badge
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  
+  /**
+   * Additional CSS classes to apply to the badge
+   */
   className?: string;
 }
 
+/**
+ * A badge that visually represents the status of an operation or entity.
+ * Automatically selects appropriate colors and icons based on the status text.
+ */
 const StatusBadge: React.FC<StatusBadgeProps> = ({ 
   status, 
   size = 'md',

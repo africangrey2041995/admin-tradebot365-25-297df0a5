@@ -3,12 +3,47 @@ import React from 'react';
 import { CheckCircle, XCircle, Clock, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * UserStatusBadge Component
+ * 
+ * Displays a badge indicating a user or account status with appropriate
+ * styling and icon based on the status value.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <UserStatusBadge status="active" />
+ * 
+ * // With custom size
+ * <UserStatusBadge status="suspended" size="lg" />
+ * 
+ * // With custom className
+ * <UserStatusBadge status="pending" className="my-custom-class" />
+ * ```
+ */
 interface UserStatusBadgeProps {
+  /**
+   * Status value to display. Common values include 'active', 'inactive', 'pending', 'suspended', 'connected', 'disconnected'.
+   * The component handles case insensitivity.
+   */
   status: string;
+  
+  /**
+   * Size variant of the badge
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  
+  /**
+   * Additional CSS classes to apply to the badge
+   */
   className?: string;
 }
 
+/**
+ * A badge that visually represents the status of a user or account.
+ * Automatically selects appropriate colors and icons based on the status text.
+ */
 const UserStatusBadge: React.FC<UserStatusBadgeProps> = ({ 
   status, 
   size = 'md',

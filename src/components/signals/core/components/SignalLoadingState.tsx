@@ -2,14 +2,66 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * SignalLoadingState Component
+ * 
+ * Displays a loading indicator for signal-related data with customizable
+ * styling based on the bot type and display preferences.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <SignalLoadingState />
+ * 
+ * // With custom message and bot type
+ * <SignalLoadingState 
+ *   message="Loading premium signals..." 
+ *   botType="premium" 
+ * />
+ * 
+ * // With progress bar and simple mode
+ * <SignalLoadingState 
+ *   showProgress={true} 
+ *   isSimple={true} 
+ * />
+ * ```
+ */
 export interface SignalLoadingStateProps {
+  /**
+   * Custom message to display during loading
+   * @default "Loading signals..."
+   */
   message?: string;
+  
+  /**
+   * Whether to show a progress bar
+   * @default false
+   */
   showProgress?: boolean;
+  
+  /**
+   * Type of bot, affects the color scheme
+   * @default 'user'
+   */
   botType?: 'premium' | 'prop' | 'user';
+  
+  /**
+   * Whether to use a simplified, more compact view
+   * @default false
+   */
   isSimple?: boolean;
+  
+  /**
+   * Additional CSS classes to apply
+   */
   className?: string;
 }
 
+/**
+ * A component that displays a loading state for signals with customizable appearance.
+ * The appearance changes based on the bot type (premium, prop, or user) and
+ * can show a progress bar if needed.
+ */
 export const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
   message = "Loading signals...",
   showProgress = false,

@@ -3,12 +3,47 @@ import React from 'react';
 import { ArrowUpRight, ArrowDownRight, ArrowRight, Plus, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * ActionBadge Component
+ * 
+ * Displays a badge representing a trading action with an appropriate icon and styling
+ * based on the action type.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <ActionBadge action="buy" />
+ * 
+ * // With custom size
+ * <ActionBadge action="sell" size="lg" />
+ * 
+ * // With custom className
+ * <ActionBadge action="add" className="my-custom-class" />
+ * ```
+ */
 interface ActionBadgeProps {
+  /**
+   * The trading action to display. Common values: 'buy', 'sell', 'long', 'short', 'add', 'reduce'.
+   * The component will handle case insensitivity.
+   */
   action: string;
+  
+  /**
+   * Size variant of the badge
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  
+  /**
+   * Additional CSS classes to apply to the badge
+   */
   className?: string;
 }
 
+/**
+ * A badge that visually represents a trading action with an appropriate icon.
+ * Each action type uses a different color and icon for clear visual differentiation.
+ */
 const ActionBadge: React.FC<ActionBadgeProps> = ({ 
   action, 
   size = 'md',

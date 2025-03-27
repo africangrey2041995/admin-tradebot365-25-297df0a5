@@ -1,107 +1,81 @@
 
-# Signal Components Architecture
+# Signal Components Documentation
 
-This directory contains all components related to trading signals in the application.
+This directory contains components, hooks, and utilities for working with trading signals in the application.
+
+## Overview
+
+The signals module provides:
+
+- Badge components for displaying status, actions, and user states
+- Loading state components for different types of bots
+- Filter utilities for searching and filtering signal data
+- Type definitions for signal-related data structures
 
 ## Directory Structure
 
-- `/core`: Core components and utilities used across all signal types
-  - `/badges`: Signal status and action badges
-  - `/components`: Reusable UI components for signal displays
-- `/tradingview`: Components specific to TradingView signals
-- `/coinstrat`: Components specific to Coinstrat signals
-- `/errors`: Error handling and display components
-- `/tracking`: Signal tracking components
-- `/hooks`: Custom hooks for signal data and management
+- `/core` - Core components and badges used by all signal types
+- `/tradingview` - Components specific to TradingView signals
+- `/coinstrat` - Components specific to Coinstrat signals
+- `/hooks` - Custom hooks for signal data management
+- `/tracking` - Components for signal tracking and monitoring
+- `/errors` - Error handling and display components
+- `/examples` - Example implementations and showcase components
 
-## Core Components
+## Usage
 
-The core components are designed to be reused across the application. They include:
-
-- **Badges**: Visual indicators of signal states and actions
-  - `StatusBadge`: Shows the current status of a signal (processed, failed, etc.)
-  - `ActionBadge`: Displays the action type (buy, sell, etc.)
-  - `UserStatusBadge`: Indicates user/account status
-
-- **Components**: UI building blocks for signals
-  - `SignalLoadingState`: Loading indicators
-  - `SignalEmptyState`: Empty state message
-  - `SignalErrorState`: Error state display
-  - `CopyableField`: Field with copy capability
-  - `FormatDateTime`: Date/time formatter
-  - `TimestampSection`: Standard timestamp display
-
-## Signal-Specific Components
-
-Each signal source has its own components:
-
-- **TradingView**:
-  - `TradingViewLogItem`: Individual TradingView signal item
-  - Signal-specific badges and formatting
-
-- **Coinstrat**:
-  - `CoinstratSignalItem`: Individual Coinstrat signal item
-  - `AccountSection`: Shows accounts that processed a signal
-  - Signal-specific badges and formatting
-
-## Tracking Components
-
-Components for tracking and monitoring signals:
-
-- `AdvancedSignalFilter`: Filter interface for signals with multiple criteria
-- Unified signal views and displays
-
-## Hooks
-
-Custom hooks for signal management:
-
-- `useSignalFilters`: Manages filter state for signal displays
-- `useSafeLoading`: Provides safe loading state with timeouts
-
-## Usage Guidelines
-
-### Core Components
-
-Core components should be used directly from their specific locations:
+### Basic Components
 
 ```tsx
-import { FormatDateTime, TimestampSection } from '@/components/signals/core/components';
-import { ActionBadge, StatusBadge } from '@/components/signals/core/badges';
+import { StatusBadge, ActionBadge, SignalLoadingState } from '@/components/signals';
+
+// Display a status badge
+<StatusBadge status="success" />
+
+// Display an action badge
+<ActionBadge action="buy" />
+
+// Show a loading state
+<SignalLoadingState botType="premium" />
 ```
 
-### Signal Type Specific Components
-
-Each signal type has its own directory with specific components:
+### Using Hooks
 
 ```tsx
-import { TradingViewLogItem } from '@/components/signals/tradingview/components';
-import { CoinstratSignalItem, AccountSection } from '@/components/signals/coinstrat/components';
+import { useSignalFilters } from '@/components/signals';
+
+function MyComponent() {
+  const { filters, updateFilter, resetFilters } = useSignalFilters();
+  
+  // Update a filter
+  const handleSearchChange = (e) => {
+    updateFilter('search', e.target.value);
+  };
+  
+  // Reset all filters
+  const handleReset = () => {
+    resetFilters();
+  };
+  
+  return (
+    // Component JSX
+  );
+}
 ```
 
-### Tracking Components
+## Documentation
 
-For signal tracking and filtering:
+For full documentation and examples, visit the [Signal Components Showcase](/docs/signals) in the application.
 
-```tsx
-import { AdvancedSignalFilter } from '@/components/signals/tracking';
-```
+## Accessibility
 
-### Hooks
+All components are designed with accessibility in mind, including:
 
-Use the signal-specific hooks:
+- Proper ARIA attributes where needed
+- Keyboard navigation support
+- Color contrast compliance
+- Screen reader friendly content
 
-```tsx
-import { useSignalFilters } from '@/components/signals/hooks/useSignalFilters';
-import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
-```
+## Internationalization
 
-## Backward Compatibility
-
-To maintain backward compatibility during the transition, components are also accessible through their original import paths. However, new code should use the new import paths directly.
-
-## Best Practices
-
-- Use the appropriate component for the signal type
-- Leverage the core components for consistency
-- Use the hooks to manage state
-- Follow the established patterns for new components
+Text content in these components is kept minimal and can be easily replaced with translated content when needed.
