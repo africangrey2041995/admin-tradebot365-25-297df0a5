@@ -1,6 +1,11 @@
 
 import { SignalAction, SignalStatus } from '@/types/signal';
 import { ArrowUpRight, ArrowUpLeft, ArrowDownRight, ArrowDownLeft } from 'lucide-react';
+import React from 'react';
+
+type IconProps = {
+  className?: string;
+};
 
 /**
  * Get the appropriate icon for a signal action
@@ -10,16 +15,29 @@ import { ArrowUpRight, ArrowUpLeft, ArrowDownRight, ArrowDownLeft } from 'lucide
 export const getActionIcon = (action: SignalAction) => {
   switch (action) {
     case 'ENTER_LONG':
-      return <ArrowUpRight className="h-4 w-4 text-success" />;
+      return { icon: ArrowUpRight, className: "h-4 w-4 text-success" };
     case 'EXIT_LONG':
-      return <ArrowUpLeft className="h-4 w-4 text-muted-foreground" />;
+      return { icon: ArrowUpLeft, className: "h-4 w-4 text-muted-foreground" };
     case 'ENTER_SHORT':
-      return <ArrowDownRight className="h-4 w-4 text-destructive" />;
+      return { icon: ArrowDownRight, className: "h-4 w-4 text-destructive" };
     case 'EXIT_SHORT':
-      return <ArrowDownLeft className="h-4 w-4 text-muted-foreground" />;
+      return { icon: ArrowDownLeft, className: "h-4 w-4 text-muted-foreground" };
     default:
       return null;
   }
+};
+
+/**
+ * Render action icon component
+ * @param action - Signal action
+ * @returns JSX element with the appropriate icon
+ */
+export const renderActionIcon = (action: SignalAction) => {
+  const iconData = getActionIcon(action);
+  if (!iconData) return null;
+  
+  const { icon: Icon, className } = iconData;
+  return React.createElement(Icon, { className });
 };
 
 /**

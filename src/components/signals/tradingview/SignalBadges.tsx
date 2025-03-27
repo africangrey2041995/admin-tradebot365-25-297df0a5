@@ -2,6 +2,7 @@
 import React from 'react';
 import { StatusBadge, ActionBadge, UserStatusBadge } from '../core/badges';
 import { SignalAction, SignalStatus } from '@/types/signal';
+import { renderActionIcon } from '../core/utils/signalUtils';
 
 interface TradingViewStatusBadgeProps {
   status: string | SignalStatus;
@@ -25,4 +26,9 @@ interface TradingViewUserStatusBadgeProps {
 
 export const TradingViewUserStatusBadge: React.FC<TradingViewUserStatusBadgeProps> = ({ status }) => {
   return <UserStatusBadge status={status} />;
+};
+
+// Helper to render action icon directly
+export const TradingViewActionIcon: React.FC<{ action: SignalAction }> = ({ action }) => {
+  return <>{renderActionIcon(action)}</>;
 };
