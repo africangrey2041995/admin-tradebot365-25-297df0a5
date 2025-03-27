@@ -1,29 +1,20 @@
 
 import { ExtendedSignal } from '@/types/signal';
 
-export interface ErrorSignalsProps {
-  botId?: string;
-  limit?: number;
-  userId?: string;
-}
-
-export interface ErrorSignalsTableProps {
-  errorSignals: ExtendedSignal[];
-  unreadErrors: Set<string>;
-  onMarkAsRead: (signalId: string) => void;
-  onMarkAllAsRead?: () => void;
-  loading: boolean;
-  onRefresh?: () => void;
-  error?: Error | null;
-}
-
 export interface ErrorSignalRowProps {
   signal: ExtendedSignal;
   isUnread: boolean;
-  onMarkAsRead: (signalId: string) => void;
-  onViewDetails?: (signalId: string) => void;
+  onMarkAsRead: (id: string) => void;
+  onViewDetails?: (id: string) => void;
   isAdmin?: boolean;
 }
 
-// Re-export ExtendedSignal to make it available to components importing from this file
-export type { ExtendedSignal };
+export interface ErrorViewBaseProps {
+  signal: ExtendedSignal;
+  relatedSignals: ExtendedSignal[];
+  onViewDetails: (errorId: string) => void;
+}
+
+export interface UserBotErrorViewProps extends ErrorViewBaseProps {}
+export interface PremiumBotErrorViewProps extends ErrorViewBaseProps {}
+export interface PropTradingBotErrorViewProps extends ErrorViewBaseProps {}

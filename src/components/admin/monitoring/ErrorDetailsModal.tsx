@@ -13,9 +13,9 @@ import { ExtendedSignal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, ClipboardCopy, X } from 'lucide-react';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
-import AdminHierarchicalErrorView from '@/components/bots/error-signals/AdminHierarchicalErrorView';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
+import BotErrorView from '@/components/bots/error-signals/BotErrorView';
 
 interface ErrorDetailsModalProps {
   errorId: string | null;
@@ -154,7 +154,7 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
               </DialogDescription>
             </DialogHeader>
             
-            <AdminHierarchicalErrorView 
+            <BotErrorView 
               signal={error}
               relatedSignals={relatedErrors}
               onViewDetails={handleViewDetails}
