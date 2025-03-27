@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -7,6 +6,7 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   Clock, 
+  Info,
   LifeBuoy, 
   RefreshCw, 
   Search, 
@@ -53,7 +53,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
   useEffect(() => {
     setLoading(true);
     
-    // Simulate API call to fetch error signals
     setTimeout(() => {
       const filtered = mockErrorSignals.filter(
         signal => botType === BotType.ALL_BOTS || signal.botType?.toLowerCase().includes(botType.toLowerCase())
@@ -67,7 +66,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
   useEffect(() => {
     let results = [...signals];
     
-    // Apply search filter
     if (searchTerm) {
       results = results.filter(signal => 
         signal.errorMessage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,12 +77,10 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
       );
     }
     
-    // Apply severity filter
     if (severityFilter !== 'all') {
       results = results.filter(signal => signal.errorSeverity === severityFilter);
     }
     
-    // Apply category filter
     if (selectedCategory !== 'all') {
       results = results.filter(signal => {
         if (selectedCategory === 'authentication') {
@@ -105,7 +101,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
       });
     }
     
-    // Apply sorting
     results = sortSignals(results, sortOrder);
     
     setFilteredSignals(results);
@@ -155,7 +150,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
 
   const handleResolveError = (errorId: string) => {
     console.log("Admin resolved error:", errorId);
-    // Remove the error from the signals and filtered signals
     const updatedSignals = signals.filter(signal => signal.id !== errorId);
     setSignals(updatedSignals);
     setFilteredSignals(filteredSignals.filter(signal => signal.id !== errorId));
@@ -188,6 +182,37 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
         {config.label}
       </Badge>
     );
+  };
+
+  const formatErrorCode = (signal: ExtendedSignal) => {
+    let botTypePrefix = 'ERR';
+    if (signal.botType) {
+      if (signal.botType.toLowerCase().includes('user')) {
+        botTypePrefix = 'USR';
+      } else if (signal.botType.toLowerCase().includes('premium')) {
+        botTypePrefix = 'PRE';
+      } else if (signal.botType.toLowerCase().includes('prop')) {
+        botTypePrefix = 'PRP';
+      }
+    }
+    
+    let category = 'UNK';
+    const errorMsg = signal.errorMessage?.toLowerCase() || '';
+    if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
+      category = 'AUTH';
+    } else if (errorMsg.includes('api') || errorMsg.includes('request') || errorMsg.includes('response')) {
+      category = 'API';
+    } else if (errorMsg.includes('exec') || errorMsg.includes('execution')) {
+      category = 'EXE';
+    } else if (errorMsg.includes('time') || errorMsg.includes('timeout')) {
+      category = 'TIME';
+    } else if (errorMsg.includes('connect') || errorMsg.includes('network')) {
+      category = 'CONN';
+    }
+    
+    const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
+    
+    return `${botTypePrefix}-${category}-${numericPart.padStart(3, '0')}`;
   };
 
   if (loading) {
@@ -337,7 +362,7 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
               <TableRow>
                 <TableHead className="text-red-700 dark:text-red-400 w-[120px]">Mã lỗi</TableHead>
                 <TableHead className="text-red-700 dark:text-red-400 w-[100px]">Mức độ</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[180px]">Mô tả lỗi</TableHead>
                 <TableHead className="text-red-700 dark:text-red-400 w-[140px]">Thời gian</TableHead>
                 <TableHead className="text-red-700 dark:text-red-400 w-[120px]">Bot ID</TableHead>
                 <TableHead className="text-red-700 dark:text-red-400 w-[100px]">Loại bot</TableHead>
@@ -355,16 +380,16 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                     {renderSeverityBadge(signal.errorSeverity)}
                   </TableCell>
                   <TableCell>
-                    <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Không có thông tin'}>
-                      <span className="text-red-500 cursor-help">
-                        {signal.errorMessage 
-                          ? (signal.errorMessage.length > 50 
-                            ? `${signal.errorMessage.substring(0, 50)}...` 
-                            : signal.errorMessage)
-                          : 'Không có thông tin lỗi'
-                        }
+                    <div className="flex items-center">
+                      <span className="font-mono text-xs text-slate-500 mr-2">
+                        {signal.errorCode || formatErrorCode(signal)}
                       </span>
-                    </ErrorDetailsTooltip>
+                      <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Không có thông tin'}>
+                        <div className="flex items-center text-red-500 cursor-help">
+                          <Info className="h-4 w-4" />
+                        </div>
+                      </ErrorDetailsTooltip>
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm whitespace-nowrap">
                     {formatDate(signal.timestamp)}
@@ -429,7 +454,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
         </div>
       </div>
 
-      {/* Error Details Modal */}
       <ErrorDetailsModal
         errorId={selectedErrorId}
         open={isErrorModalOpen}

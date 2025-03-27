@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import ActionBadge from './ActionBadge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, ExternalLink, AlertTriangle, Info } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -23,7 +23,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const handleBotClick = () => {
     if (signal.botId) {
       try {
-        // Use botId for navigation to proper detail page
         navigateToBotDetail(signal.botId);
       } catch (error) {
         console.error('Error navigating to bot details:', error);
@@ -192,37 +191,35 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
           {renderSeverityBadge()}
           <span className="font-mono text-xs text-slate-500">{formatErrorCode()}</span>
         </div>
-        <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
-          <span className="text-red-500 cursor-help">
-            {signal.errorMessage 
-              ? (signal.errorMessage.length > 25 
-                ? `${signal.errorMessage.substring(0, 25)}...` 
-                : signal.errorMessage)
-              : 'Unknown error'
-            }
-          </span>
-        </ErrorDetailsTooltip>
-        {isUnread && (
-          <Button
-            size="sm" 
-            variant="ghost" 
-            onClick={handleMarkAsRead}
-            className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
-          >
-            <CheckCircle2 className="h-4 w-4 mr-1" />
-            <span className="text-xs">Mark as read</span>
-          </Button>
-        )}
-        {!isAdmin && onViewDetails && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={handleViewDetails}
-            className="ml-2 h-6 px-2"
-          >
-            <span className="text-xs">View details</span>
-          </Button>
-        )}
+        <div className="flex items-center mt-1">
+          <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
+            <div className="flex items-center text-red-500 cursor-help">
+              <Info className="h-4 w-4 mr-1" />
+              <span className="text-xs">Chi tiết lỗi</span>
+            </div>
+          </ErrorDetailsTooltip>
+          {isUnread && (
+            <Button
+              size="sm" 
+              variant="ghost" 
+              onClick={handleMarkAsRead}
+              className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              <span className="text-xs">Mark as read</span>
+            </Button>
+          )}
+          {!isAdmin && onViewDetails && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleViewDetails}
+              className="ml-2 h-6 px-2"
+            >
+              <span className="text-xs">View details</span>
+            </Button>
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );
