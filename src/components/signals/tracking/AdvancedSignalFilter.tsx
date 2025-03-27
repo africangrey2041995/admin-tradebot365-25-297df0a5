@@ -1,32 +1,20 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, Calendar, UserRound, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Separator } from '@/components/ui/separator';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar as CalendarIcon, Filter, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { SignalFilters, SignalUser } from '../types';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-
-// Export the interface as a type
-export type SignalFilters = {
-  search: string;
-  signalSource: 'all' | 'tradingview' | 'coinstrat';
-  status: 'all' | 'success' | 'failed' | 'pending';
-  dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
-  userId: string;
-}
 
 interface AdvancedSignalFilterProps {
   onFilterChange: (filters: SignalFilters) => void;
-  availableUsers?: { id: string; name: string }[];
-  initialFilters?: Partial<SignalFilters>;
+  availableUsers?: SignalUser[];
   showExport?: boolean;
   exportComponent?: React.ReactNode;
 }
@@ -34,201 +22,101 @@ interface AdvancedSignalFilterProps {
 export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   onFilterChange,
   availableUsers = [],
-  initialFilters,
   showExport = false,
   exportComponent
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<SignalFilters>({
-    search: initialFilters?.search || '',
-    signalSource: initialFilters?.signalSource || 'all',
-    status: initialFilters?.status || 'all',
-    dateRange: {
-      from: initialFilters?.dateRange?.from,
-      to: initialFilters?.dateRange?.to
-    },
-    userId: initialFilters?.userId || ''
+    dateRange: [null, null],
+    status: [],
+    actions: [],
+    instruments: [],
+    userId: '',
+    search: '',
+    sortBy: 'timestamp',
+    sortOrder: 'desc'
   });
   
-  const [showFilters, setShowFilters] = useState(false);
-  
-  // Handlers for each filter type
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFilters = {
-      ...filters,
-      search: e.target.value
-    };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: Partial<SignalFilters>) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
+    
+    // Count active filters
+    let count = 0;
+    if (updatedFilters.dateRange && (updatedFilters.dateRange[0] || updatedFilters.dateRange[1])) count++;
+    if (updatedFilters.status && updatedFilters.status.length > 0) count++;
+    if (updatedFilters.actions && updatedFilters.actions.length > 0) count++;
+    if (updatedFilters.instruments && updatedFilters.instruments.length > 0) count++;
+    if (updatedFilters.userId) count++;
+    if (updatedFilters.search) count++;
+    
+    setActiveFiltersCount(count);
   };
-  
-  const handleSignalSourceChange = (value: string) => {
-    // Only set if the value is actually different than the current value
-    if (value && value !== filters.signalSource) {
-      const newFilters = {
-        ...filters,
-        signalSource: value as 'all' | 'tradingview' | 'coinstrat'
-      };
-      setFilters(newFilters);
-      onFilterChange(newFilters);
-    }
-  };
-  
-  const handleStatusChange = (value: string) => {
-    // Only set if the value is actually different than the current value
-    if (value && value !== filters.status) {
-      const newFilters = {
-        ...filters,
-        status: value as 'all' | 'success' | 'failed' | 'pending'
-      };
-      setFilters(newFilters);
-      onFilterChange(newFilters);
-    }
-  };
-  
-  const handleUserChange = (value: string) => {
-    // Only set if the value is actually different than the current value
-    if (value !== filters.userId) {
-      const newFilters = {
-        ...filters,
-        userId: value
-      };
-      setFilters(newFilters);
-      onFilterChange(newFilters);
-    }
-  };
-  
-  const handleDateRangeChange = (from?: Date, to?: Date) => {
-    const newFilters = {
-      ...filters,
-      dateRange: { from, to }
-    };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-  
+
+  // Reset all filters
   const resetFilters = () => {
-    const resetFilters: SignalFilters = {
+    const defaultFilters = {
+      dateRange: [null, null],
+      status: [],
+      actions: [],
+      instruments: [],
+      userId: '',
       search: '',
-      signalSource: 'all',
-      status: 'all',
-      dateRange: {
-        from: undefined,
-        to: undefined
-      },
-      userId: ''
+      sortBy: 'timestamp',
+      sortOrder: 'desc'
     };
-    setFilters(resetFilters);
-    onFilterChange(resetFilters);
+    setFilters(defaultFilters);
+    onFilterChange(defaultFilters);
+    setActiveFiltersCount(0);
   };
-  
-  // Calculate active filter count
-  const activeFilterCount = (
-    (filters.search ? 1 : 0) +
-    (filters.signalSource !== 'all' ? 1 : 0) +
-    (filters.status !== 'all' ? 1 : 0) +
-    (filters.dateRange.from || filters.dateRange.to ? 1 : 0) +
-    (filters.userId ? 1 : 0)
-  );
-  
-  // Format date range for display
-  const formatDateRange = () => {
-    if (filters.dateRange.from && filters.dateRange.to) {
-      return `${format(filters.dateRange.from, 'MMM d, yyyy')} - ${format(filters.dateRange.to, 'MMM d, yyyy')}`;
-    } else if (filters.dateRange.from) {
-      return `From ${format(filters.dateRange.from, 'MMM d, yyyy')}`;
-    } else if (filters.dateRange.to) {
-      return `Until ${format(filters.dateRange.to, 'MMM d, yyyy')}`;
-    }
-    return '';
-  };
-  
-  // Get user name from ID
-  const getUserNameById = (userId: string) => {
-    const user = availableUsers.find(user => user.id === userId);
-    return user ? user.name : userId;
+
+  // Format date for display
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return format(date, "PPP", { locale: vi });
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search signals by ID, symbol or action..."
-            className="pl-9 pr-4"
-            value={filters.search}
-            onChange={handleSearchChange}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Popover>
+      <div className="flex flex-wrap justify-between items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="gap-1 min-w-[120px]">
+              <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
-                {activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1 rounded-full">
-                    {activeFilterCount}
-                  </Badge>
+                <span>Lọc</span>
+                {activeFiltersCount > 0 && (
+                  <Badge className="ml-1 bg-primary text-primary-foreground">{activeFiltersCount}</Badge>
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-4" align="end">
+            <PopoverContent className="w-[320px] p-4" align="start">
               <div className="space-y-4">
-                <h4 className="font-medium text-sm">Filter Signals</h4>
-                
-                {/* Signal Source filter */}
-                <div className="space-y-2">
-                  <Label htmlFor="signal-source">Signal Source</Label>
-                  <Select value={filters.signalSource} onValueChange={handleSignalSourceChange}>
-                    <SelectTrigger id="signal-source">
-                      <SelectValue placeholder="All sources" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All sources</SelectItem>
-                      <SelectItem value="tradingview">TradingView</SelectItem>
-                      <SelectItem value="coinstrat">Coinstrat</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Status filter */}
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={filters.status} onValueChange={handleStatusChange}>
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="All statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All statuses</SelectItem>
-                      <SelectItem value="success">Success</SelectItem>
-                      <SelectItem value="failed">Failed</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Date Range filter */}
-                <div className="space-y-2">
-                  <Label>Date Range</Label>
-                  <div className="flex gap-2">
+                <div>
+                  <h4 className="font-medium mb-2">Khoảng thời gian</h4>
+                  <div className="grid grid-cols-2 gap-2">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          size="sm"
-                          className="w-full justify-start text-left font-normal text-sm"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !filters.dateRange?.[0] && "text-muted-foreground"
+                          )}
                         >
-                          <Calendar className="h-4 w-4 mr-2" />
-                          {filters.dateRange.from ? format(filters.dateRange.from, 'PPP') : 'From date'}
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateRange?.[0] ? formatDate(filters.dateRange[0]) : "Từ ngày"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
                           mode="single"
-                          selected={filters.dateRange.from}
-                          onSelect={(date) => handleDateRangeChange(date, filters.dateRange.to)}
+                          selected={filters.dateRange?.[0] || undefined}
+                          onSelect={(date) => handleFilterChange({ dateRange: [date, filters.dateRange?.[1] || null] })}
                           initialFocus
                         />
                       </PopoverContent>
@@ -237,148 +125,92 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          size="sm"
-                          className="w-full justify-start text-left font-normal text-sm"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !filters.dateRange?.[1] && "text-muted-foreground"
+                          )}
                         >
-                          <Calendar className="h-4 w-4 mr-2" />
-                          {filters.dateRange.to ? format(filters.dateRange.to, 'PPP') : 'To date'}
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateRange?.[1] ? formatDate(filters.dateRange[1]) : "Đến ngày"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
                           mode="single"
-                          selected={filters.dateRange.to}
-                          onSelect={(date) => handleDateRangeChange(filters.dateRange.from, date)}
+                          selected={filters.dateRange?.[1] || undefined}
+                          onSelect={(date) => handleFilterChange({ dateRange: [filters.dateRange?.[0] || null, date] })}
                           initialFocus
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
                 </div>
-                
-                {/* User filter - only show if users are provided */}
+
                 {availableUsers.length > 0 && (
-                  <div className="space-y-2">
-                    <Label htmlFor="user">User</Label>
-                    <Select value={filters.userId} onValueChange={handleUserChange}>
-                      <SelectTrigger id="user">
-                        <SelectValue placeholder="All users" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">All users</SelectItem>
-                        {availableUsers.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div>
+                    <h4 className="font-medium mb-2">Người dùng</h4>
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value={filters.userId || ''}
+                      onChange={(e) => handleFilterChange({ userId: e.target.value })}
+                    >
+                      <option value="">Tất cả người dùng</option>
+                      {availableUsers.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
-                
-                <Separator />
-                
-                <Button onClick={resetFilters} variant="outline" size="sm" className="w-full">
-                  <X className="h-4 w-4 mr-2" />
-                  Reset filters
-                </Button>
+
+                <div>
+                  <h4 className="font-medium mb-2">Trạng thái</h4>
+                  <Tabs 
+                    defaultValue="all" 
+                    className="w-full"
+                    onValueChange={(value) => {
+                      if (value === 'all') handleFilterChange({ status: [] });
+                      else if (value === 'processed') handleFilterChange({ status: ['Processed'] });
+                      else if (value === 'failed') handleFilterChange({ status: ['Failed'] });
+                      else if (value === 'pending') handleFilterChange({ status: ['Pending'] });
+                    }}
+                  >
+                    <TabsList className="grid grid-cols-4 w-full">
+                      <TabsTrigger value="all">Tất cả</TabsTrigger>
+                      <TabsTrigger value="processed">Thành công</TabsTrigger>
+                      <TabsTrigger value="pending">Đang xử lý</TabsTrigger>
+                      <TabsTrigger value="failed">Lỗi</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+
+                <div className="flex justify-between pt-2">
+                  <Button variant="outline" size="sm" onClick={resetFilters}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                  <Button size="sm" onClick={() => setIsOpen(false)}>Áp dụng</Button>
+                </div>
               </div>
             </PopoverContent>
           </Popover>
-          
-          {showExport && exportComponent}
+
+          {/* Active filters display could go here */}
         </div>
+
+        {showExport && exportComponent && (
+          <div>
+            {exportComponent}
+          </div>
+        )}
       </div>
-      
-      {/* Active filters */}
-      {activeFilterCount > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {filters.search && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <span>Search: {filters.search}</span>
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
-                onClick={() => {
-                  const newFilters: SignalFilters = {...filters, search: ''};
-                  setFilters(newFilters);
-                  onFilterChange(newFilters);
-                }}
-              />
-            </Badge>
-          )}
-          
-          {filters.signalSource !== 'all' && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <span>Source: {filters.signalSource === 'tradingview' ? 'TradingView' : 'Coinstrat'}</span>
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
-                onClick={() => {
-                  const newFilters: SignalFilters = {...filters, signalSource: 'all'};
-                  setFilters(newFilters);
-                  onFilterChange(newFilters);
-                }}
-              />
-            </Badge>
-          )}
-          
-          {filters.status !== 'all' && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <span>Status: {filters.status.charAt(0).toUpperCase() + filters.status.slice(1)}</span>
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
-                onClick={() => {
-                  const newFilters: SignalFilters = {...filters, status: 'all'};
-                  setFilters(newFilters);
-                  onFilterChange(newFilters);
-                }}
-              />
-            </Badge>
-          )}
-          
-          {(filters.dateRange.from || filters.dateRange.to) && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>{formatDateRange()}</span>
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
-                onClick={() => {
-                  const newFilters: SignalFilters = {...filters, dateRange: {from: undefined, to: undefined}};
-                  setFilters(newFilters);
-                  onFilterChange(newFilters);
-                }}
-              />
-            </Badge>
-          )}
-          
-          {filters.userId && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <UserRound className="h-3 w-3 mr-1" />
-              <span>{getUserNameById(filters.userId)}</span>
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
-                onClick={() => {
-                  const newFilters: SignalFilters = {...filters, userId: ''};
-                  setFilters(newFilters);
-                  onFilterChange(newFilters);
-                }}
-              />
-            </Badge>
-          )}
-          
-          {activeFilterCount > 1 && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 px-2 text-xs" 
-              onClick={resetFilters}
-            >
-              Clear all
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 };
 
+// Export the component as default
 export default AdvancedSignalFilter;
+
+// Re-export the SignalFilters type
+export type { SignalFilters };

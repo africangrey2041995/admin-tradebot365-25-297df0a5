@@ -11,10 +11,13 @@ export * from './coinstrat';
 
 // Hooks
 export { useSignalFilters } from './hooks/useSignalFilters';
-export type { SignalFilters } from './hooks/useSignalFilters';
+export type { SignalFilters } from './types';
 
 // Tracking components
 export * from './tracking';
 
 // Error components
 export * from './errors';
+
+// Types
+export * from './types';
