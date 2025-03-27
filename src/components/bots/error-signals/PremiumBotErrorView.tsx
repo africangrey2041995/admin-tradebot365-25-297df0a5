@@ -1,13 +1,16 @@
+
 import React, { useState } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Users } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, ExternalLink, RefreshCw, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
 
 interface PremiumBotErrorViewProps {
   signal: ExtendedSignal;
@@ -20,6 +23,7 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
   relatedSignals,
   onViewDetails
 }) => {
+  const { navigateToUserDetail } = useNavigation();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     'error-details': true,
     'affected-users': false
@@ -73,6 +77,14 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
     } catch (err) {
       return timestamp;
     }
+  };
+
+  const handleUserClick = (userId: string) => {
+    if (!userId) {
+      toast.error("Không có ID người dùng để xem chi tiết");
+      return;
+    }
+    navigateToUserDetail(userId);
   };
 
   const mockAffectedUsers = [
@@ -285,11 +297,26 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
                   <div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 text-amber-500 mr-2" />
-                      <span className="font-medium">{user.name}</span>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto font-medium text-amber-600 dark:text-amber-400 flex items-center"
+                        onClick={() => handleUserClick(user.id)}
+                      >
+                        {user.name}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </Button>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">{user.email}</div>
                   </div>
-                  <Badge variant="outline" className="text-xs">{user.id}</Badge>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 text-xs"
+                    onClick={() => handleUserClick(user.id)}
+                  >
+                    <span className="mr-1">{user.id}</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md mt-2">
                   <div className="flex items-center mb-2">

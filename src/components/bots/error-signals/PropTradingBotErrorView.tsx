@@ -4,11 +4,13 @@ import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Server } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, ExternalLink, RefreshCw, Server } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
 
 interface PropTradingBotErrorViewProps {
   signal: ExtendedSignal;
@@ -21,6 +23,7 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
   relatedSignals,
   onViewDetails
 }) => {
+  const { navigateToUserDetail } = useNavigation();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     'error-details': true,
     'affected-accounts': false
@@ -33,7 +36,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
     }));
   };
 
-  // Get severity color
   const getSeverityColor = (severity?: string) => {
     switch (severity) {
       case 'critical':
@@ -49,7 +51,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
     }
   };
 
-  // Get severity icon
   const getSeverityIcon = (severity?: string) => {
     switch (severity) {
       case 'critical':
@@ -65,7 +66,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
     }
   };
 
-  // Format timestamp
   const formatTime = (timestamp?: string) => {
     if (!timestamp) return 'Không có thời gian';
     
@@ -77,6 +77,14 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
     } catch (err) {
       return timestamp;
     }
+  };
+
+  const handleUserClick = (userId: string) => {
+    if (!userId) {
+      toast.error("Không có ID người dùng để xem chi tiết");
+      return;
+    }
+    navigateToUserDetail(userId);
   };
 
   // Mock affected accounts
@@ -118,7 +126,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Main error information with prop trading styling */}
       <div className={`p-4 border-2 rounded-lg ${getSeverityColor(signal.errorSeverity)} bg-blue-50 dark:bg-blue-950/20`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
@@ -146,7 +153,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
         </div>
       </div>
 
-      {/* Error details section */}
       <Collapsible
         open={expandedSections['error-details']}
         onOpenChange={() => toggleSection('error-details')}
@@ -271,7 +277,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Affected accounts section */}
       <Collapsible
         open={expandedSections['affected-accounts']}
         onOpenChange={() => toggleSection('affected-accounts')}
@@ -305,19 +310,25 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
                       <span className="font-medium">{account.accountName}</span>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1 flex items-center">
-                      <span>{account.userName} ({account.userId})</span>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-xs text-blue-600 dark:text-blue-400 flex items-center"
+                        onClick={() => handleUserClick(account.userId)}
+                      >
+                        {account.userName}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
-                  <Badge 
-                    variant="outline" 
-                    className={
-                      account.phase === 'Verified' 
-                        ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800/30' 
-                        : 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/30'
-                    }
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs"
+                    onClick={() => handleUserClick(account.userId)}
                   >
-                    {account.phase}
-                  </Badge>
+                    <span className="mr-1">{account.userId}</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md mt-2">
                   <div className="grid grid-cols-2 gap-2 text-xs mb-2">
@@ -341,6 +352,10 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
                       <span className="text-muted-foreground">Balance:</span>
                       <span className="ml-2 font-medium">{account.balance}</span>
                     </div>
+                    <div>
+                      <span className="text-muted-foreground">Phase:</span>
+                      <span className="ml-2 font-medium">{account.phase}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -349,7 +364,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Action buttons */}
       <div className="flex justify-end space-x-2 mt-4">
         <Button variant="outline" size="sm" className="flex items-center">
           <RefreshCw className="h-4 w-4 mr-1" />
