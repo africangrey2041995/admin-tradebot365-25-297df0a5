@@ -10,7 +10,8 @@ export * from './tradingview';
 export * from './coinstrat';
 
 // Hooks
-export * from './hooks/useSignalFilters';
+export { useSignalFilters } from './hooks/useSignalFilters';
+export type { SignalFilters } from './hooks/useSignalFilters';
 
 // Tracking components
 export * from './tracking';

@@ -11,7 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
-export interface SignalFilters {
+// Export the interface as a type
+export type SignalFilters = {
   search: string;
   signalSource: 'all' | 'tradingview' | 'coinstrat';
   status: 'all' | 'success' | 'failed' | 'pending';
@@ -106,7 +107,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   };
   
   const resetFilters = () => {
-    const resetFilters = {
+    const resetFilters: SignalFilters = {
       search: '',
       signalSource: 'all',
       status: 'all',
@@ -298,7 +299,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => {
-                  const newFilters = {...filters, search: ''};
+                  const newFilters: SignalFilters = {...filters, search: ''};
                   setFilters(newFilters);
                   onFilterChange(newFilters);
                 }}
@@ -312,7 +313,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => {
-                  const newFilters = {...filters, signalSource: 'all'};
+                  const newFilters: SignalFilters = {...filters, signalSource: 'all'};
                   setFilters(newFilters);
                   onFilterChange(newFilters);
                 }}
@@ -326,7 +327,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => {
-                  const newFilters = {...filters, status: 'all'};
+                  const newFilters: SignalFilters = {...filters, status: 'all'};
                   setFilters(newFilters);
                   onFilterChange(newFilters);
                 }}
@@ -341,7 +342,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => {
-                  const newFilters = {...filters, dateRange: {from: undefined, to: undefined}};
+                  const newFilters: SignalFilters = {...filters, dateRange: {from: undefined, to: undefined}};
                   setFilters(newFilters);
                   onFilterChange(newFilters);
                 }}
@@ -356,7 +357,7 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => {
-                  const newFilters = {...filters, userId: ''};
+                  const newFilters: SignalFilters = {...filters, userId: ''};
                   setFilters(newFilters);
                   onFilterChange(newFilters);
                 }}

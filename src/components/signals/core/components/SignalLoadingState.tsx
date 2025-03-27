@@ -1,32 +1,24 @@
 
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { Loader2 } from 'lucide-react';
 
-interface SignalLoadingStateProps {
+export interface SignalLoadingStateProps {
   message?: string;
   showProgress?: boolean;
-  className?: string;
+  botType?: 'premium' | 'prop' | 'user';
+  isSimple?: boolean;
 }
 
-const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
-  message = "Loading signal data...",
+export const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
+  message = "Loading signals...",
   showProgress = false,
-  className = "",
+  botType = 'user',
+  isSimple = false
 }) => {
   return (
-    <div className={`flex flex-col items-center justify-center p-6 ${className}`}>
-      <RefreshCw className="h-10 w-10 text-primary/70 animate-spin mb-4" />
-      <h3 className="text-lg font-medium mb-2">{message}</h3>
-      {showProgress && (
-        <div className="w-full max-w-xs mt-2">
-          <Progress
-            value={100}
-            className="h-1"
-            indicatorClassName="animate-pulse bg-primary"
-          />
-        </div>
-      )}
+    <div className={`flex flex-col items-center justify-center py-8 ${isSimple ? 'min-h-[100px]' : 'min-h-[200px]'}`}>
+      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+      <p className="text-muted-foreground text-sm">{message}</p>
     </div>
   );
 };
