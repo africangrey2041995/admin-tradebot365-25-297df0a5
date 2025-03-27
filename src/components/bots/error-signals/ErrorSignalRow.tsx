@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
@@ -18,7 +19,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   onViewDetails,
   isAdmin = false
 }) => {
-  const { navigateToBotDetail } = useNavigation();
+  const { navigateToBotDetail, navigateToUserDetail } = useNavigation();
   
   const handleBotClick = () => {
     if (signal.botId) {
@@ -31,6 +32,20 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     } else {
       console.warn('Cannot navigate: Bot ID is missing from signal');
       toast.warning('Không thể điều hướng: ID bot không tồn tại trong tín hiệu');
+    }
+  };
+  
+  const handleUserClick = () => {
+    if (signal.userId) {
+      try {
+        navigateToUserDetail(signal.userId);
+      } catch (error) {
+        console.error('Error navigating to user details:', error);
+        toast.error('Không thể điều hướng đến trang người dùng. Vui lòng thử lại sau.');
+      }
+    } else {
+      console.warn('Cannot navigate: User ID is missing from signal');
+      toast.warning('Không thể điều hướng: ID người dùng không tồn tại trong tín hiệu');
     }
   };
   
@@ -170,7 +185,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       >
         {signal.botId || 'N/A'}
       </TableCell>
-      <TableCell>
+      <TableCell 
+        className={signal.userId ? "cursor-pointer text-blue-500 hover:text-blue-700 hover:underline" : ""}
+        onClick={signal.userId ? handleUserClick : undefined}
+      >
         {signal.userId || 'N/A'}
       </TableCell>
       <TableCell>

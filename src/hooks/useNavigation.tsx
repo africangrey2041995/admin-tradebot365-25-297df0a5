@@ -107,6 +107,31 @@ export function useNavigation() {
   };
   
   /**
+   * Điều hướng đến trang chi tiết người dùng
+   * @param userId ID của người dùng
+   */
+  const navigateToUserDetail = (userId: string) => {
+    if (!userId) {
+      console.error('Cannot navigate: User ID is empty');
+      toast.error('Không thể điều hướng: ID người dùng không hợp lệ');
+      return;
+    }
+    
+    try {
+      if (isAdminContext) {
+        navigate(ADMIN_ROUTES.USER_DETAIL(userId));
+      } else {
+        // In user context, navigate to profile if available
+        navigate(USER_ROUTES.PROFILE);
+      }
+    } catch (error) {
+      console.error(`Navigation error for user ID ${userId}:`, error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
+      navigate(isAdminContext ? ADMIN_ROUTES.USERS : USER_ROUTES.HOME);
+    }
+  };
+  
+  /**
    * Quay lại trang trước đó
    * @param fallbackRoute Đường dẫn dự phòng nếu không thể quay lại
    */
@@ -141,6 +166,7 @@ export function useNavigation() {
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
+    navigateToUserDetail,
     // Removed navigateToBotErrors
     navigateTo,
     goBack,

@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import ErrorDetailsModal from '@/components/admin/monitoring/ErrorDetailsModal';
+import { useNavigation } from '@/hooks/useNavigation';
 
 interface AdminErrorDisplayProps {
   botType: BotType; 
@@ -49,6 +50,7 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedErrorId, setSelectedErrorId] = useState<string | null>(null);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const { navigateToBotDetail, navigateToUserDetail } = useNavigation();
 
   useEffect(() => {
     setLoading(true);
@@ -155,6 +157,18 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     setFilteredSignals(filteredSignals.filter(signal => signal.id !== errorId));
     setIsErrorModalOpen(false);
     setSelectedErrorId(null);
+  };
+
+  const handleBotClick = (botId: string) => {
+    if (botId) {
+      navigateToBotDetail(botId);
+    }
+  };
+
+  const handleUserClick = (userId: string) => {
+    if (userId) {
+      navigateToUserDetail(userId);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -396,7 +410,7 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                   </TableCell>
                   <TableCell 
                     className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline font-mono text-xs"
-                    onClick={() => onViewDetails(signal.id)}
+                    onClick={() => handleBotClick(signal.botId || '')}
                   >
                     {signal.botId || 'N/A'}
                   </TableCell>
@@ -410,7 +424,10 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                       signal.botType?.includes('prop') ? 'Prop' : 'User'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">
+                  <TableCell 
+                    className={signal.userId ? "cursor-pointer text-blue-500 hover:text-blue-700 hover:underline font-mono text-xs" : "font-mono text-xs"}
+                    onClick={signal.userId ? () => handleUserClick(signal.userId || '') : undefined}
+                  >
                     {signal.userId || 'N/A'}
                   </TableCell>
                   <TableCell>
