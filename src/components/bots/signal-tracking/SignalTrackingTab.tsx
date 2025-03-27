@@ -6,7 +6,7 @@ import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignal
 import { useSignalManagement } from '@/hooks/premium-bot/useSignalManagement';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 import { AdvancedSignalFilter } from '@/components/signals/tracking';
-import { SignalLoadingState } from '@/components/signals/core/components/SignalLoadingState';
+import SignalLoadingState from '@/components/signals/core/components/SignalLoadingState';
 
 interface SignalTrackingTabProps {
   botId: string;
