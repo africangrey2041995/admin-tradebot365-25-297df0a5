@@ -30,7 +30,7 @@ export function PackagePreview() {
   };
 
   return (
-    <Card className="border-zinc-700 bg-zinc-800">
+    <Card className="border-zinc-700 bg-zinc-800 sticky top-0">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Xem trước gói dịch vụ</CardTitle>
       </CardHeader>

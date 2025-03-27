@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, PackagePlus, Edit } from 'lucide-react';
 import { FormProvider, UseFormReturn, SubmitHandler } from 'react-hook-form';
 import { FormValues } from './types';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FormStructureProps {
   open: boolean;
@@ -35,8 +36,8 @@ export function FormStructure({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white max-h-[90vh] flex flex-col">
+        <DialogHeader className="sticky top-0 z-20 bg-zinc-900 pb-4">
           <DialogTitle className="flex items-center gap-2">
             {isEdit ? (
               <>
@@ -53,10 +54,14 @@ export function FormStructure({
         </DialogHeader>
 
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {children}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+            <ScrollArea className="flex-1 pr-4">
+              <div className="space-y-6">
+                {children}
+              </div>
+            </ScrollArea>
             
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 z-20 bg-zinc-900 pt-4 mt-4">
               <Button
                 type="button"
                 variant="outline"
