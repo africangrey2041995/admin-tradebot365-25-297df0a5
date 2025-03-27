@@ -1,17 +1,17 @@
 
-// Signal components - main entry point
-// This file provides a centralized export for all signal components
+// Main entry point for the signals module
+// These exports provide backward compatibility while migrating
 
-// Core components and utilities
-export * from './core';
+// Core components
+export { default as StatusBadge } from './core/badges/StatusBadge';
+export { default as SignalLoadingState } from './core/components/SignalLoadingState';
 
-// Signal type specific components
-export * from './tradingview';
-export * from './coinstrat';
+// Hooks
+export { useSignalFilters } from './hooks/useSignalFilters';
+export type { SignalFilters } from './hooks/useSignalFilters';
 
-// Error handling and tracking components
-export * from './errors';
-export * from './tracking';
+// Tracking components
+export { AdvancedSignalFilter } from './tracking';
 
-// Signal hooks
-export * from './hooks';
+// Note: As migration progresses, additional components will be exported here
+// to maintain backward compatibility

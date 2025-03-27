@@ -1,9 +1,6 @@
 
-// Signal tracking components
-// These components will be implemented in future phases
+// Export components from the tracking module
+export { default as AdvancedSignalFilter } from './AdvancedSignalFilter';
+export type { SignalFilters } from './AdvancedSignalFilter';
 
-// Export placeholder
-export const SignalTracking = () => {
-  console.warn('Signal tracking components are not yet implemented');
-  return null;
-};
+// Additional exports will be added as more components are migrated
