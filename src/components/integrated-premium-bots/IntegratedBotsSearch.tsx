@@ -23,6 +23,13 @@ const IntegratedBotsSearch: React.FC<IntegratedBotsSearchProps> = ({
   riskFilter,
   onRiskFilterChange
 }) => {
+  // Ensure non-empty values for the filter
+  const handleRiskFilterChange = (value: string) => {
+    if (value && value.trim() !== '') {
+      onRiskFilterChange(value);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="md:col-span-2">
@@ -33,7 +40,7 @@ const IntegratedBotsSearch: React.FC<IntegratedBotsSearchProps> = ({
           className="w-full"
         />
       </div>
-      <Select value={riskFilter || "all"} onValueChange={onRiskFilterChange}>
+      <Select value={riskFilter || "all"} onValueChange={handleRiskFilterChange}>
         <SelectTrigger>
           <Filter className="h-4 w-4 mr-2" />
           <SelectValue placeholder="Mức độ rủi ro" />

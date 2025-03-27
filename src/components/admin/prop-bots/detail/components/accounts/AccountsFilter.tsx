@@ -26,6 +26,13 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange
     onFilterChange('searchQuery', value);
   };
 
+  // Ensure we always have a non-empty value for status filter
+  const handleStatusChange = (value: string) => {
+    if (value && value.trim() !== '') {
+      onFilterChange('filterStatus', value);
+    }
+  };
+
   return (
     <div className="space-x-2 flex">
       <div className="relative">
@@ -40,7 +47,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange
       
       <Select 
         value={filters.filterStatus} 
-        onValueChange={(value) => onFilterChange('filterStatus', value)}
+        onValueChange={handleStatusChange}
       >
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder="Status" />

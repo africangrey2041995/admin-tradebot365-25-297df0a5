@@ -30,11 +30,18 @@ export const PlanFilterSelect: React.FC<PlanFilterSelectProps> = ({
   placeholder = "Loại tài khoản",
   className = "w-full sm:max-w-[300px]"
 }) => {
+  // Ensure we always have a valid, non-empty value 
+  const handleValueChange = (value: string) => {
+    if (value && value !== '') {
+      onPlanFilterChange(value === 'all' ? null : value);
+    }
+  };
+
   return (
     <div className={className}>
       <Select 
         value={planFilter || "all"} 
-        onValueChange={(value) => onPlanFilterChange(value === 'all' ? null : value || null)}
+        onValueChange={handleValueChange}
       >
         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
           <SelectValue placeholder={placeholder} />

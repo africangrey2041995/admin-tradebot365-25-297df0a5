@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -88,7 +89,7 @@ const BotMetadata: React.FC<BotMetadataProps> = ({
             <PopoverContent className="w-56 p-3">
               <div className="space-y-3">
                 <h4 className="font-medium text-sm">Sàn giao dịch</h4>
-                <Select value={editedExchange} onValueChange={setEditedExchange}>
+                <Select value={editedExchange || "default"} onValueChange={setEditedExchange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Chọn sàn" />
                   </SelectTrigger>
@@ -97,6 +98,7 @@ const BotMetadata: React.FC<BotMetadataProps> = ({
                     <SelectItem value="Bybit">Bybit</SelectItem>
                     <SelectItem value="KuCoin">KuCoin</SelectItem>
                     <SelectItem value="OKX">OKX</SelectItem>
+                    <SelectItem value="default">Không xác định</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="flex justify-end gap-2 pt-2">
@@ -140,7 +142,7 @@ const BotMetadata: React.FC<BotMetadataProps> = ({
             <PopoverContent className="w-56 p-3">
               <div className="space-y-3">
                 <h4 className="font-medium text-sm">Prop Firm</h4>
-                <Select value={editedPropFirm} onValueChange={setEditedPropFirm}>
+                <Select value={editedPropFirm || "default"} onValueChange={setEditedPropFirm}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Chọn Prop Firm" />
                   </SelectTrigger>
@@ -150,6 +152,7 @@ const BotMetadata: React.FC<BotMetadataProps> = ({
                     <SelectItem value="The 5%ers">The 5%ers</SelectItem>
                     <SelectItem value="Earn2Trade">Earn2Trade</SelectItem>
                     <SelectItem value="TopstepTrader">TopstepTrader</SelectItem>
+                    <SelectItem value="default">Không xác định</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="flex justify-end gap-2 pt-2">

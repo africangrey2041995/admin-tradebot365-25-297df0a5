@@ -36,7 +36,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({
 
   // Handle status filter changes
   const handleStatusChange = (value: string) => {
-    if (!value) return; // Prevent empty string values
+    if (!value || value.trim() === '') return; // Prevent empty string values
     setFilterStatus(value);
     
     onFilterChange({
@@ -48,7 +48,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({
 
   // Handle live/demo filter changes
   const handleLiveDemoChange = (value: string) => {
-    if (!value) return; // Prevent empty string values
+    if (!value || value.trim() === '') return; // Prevent empty string values
     setFilterLiveDemo(value);
     
     onFilterChange({
