@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +14,8 @@ import SignalTrackingTab from '@/components/admin/premium-bots/detail/tabs/Signa
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
 import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
 import { Webhook } from 'lucide-react';
+import { BotRiskLevel } from '@/constants/botTypes';
+import { toast } from 'sonner';
 
 const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -53,6 +54,15 @@ const PremiumBotDetail = () => {
     navigate(ADMIN_ROUTES.PREMIUM_BOTS);
   };
 
+  // Handle risk level update
+  const handleUpdateRisk = (newRisk: BotRiskLevel) => {
+    // In a real app, you would call an API to update the risk level
+    if (bot) {
+      handleUpdateBotInfo({ risk: newRisk });
+      toast.success(`Đã cập nhật mức độ rủi ro thành: ${newRisk}`);
+    }
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -74,7 +84,8 @@ const PremiumBotDetail = () => {
         name={bot.name}
         status={bot.status}
         risk={bot.risk}
-        id={bot.botId} // Using botId instead of id
+        id={bot.botId}
+        onUpdateRisk={handleUpdateRisk}
       />
 
       {/* Stats Cards */}
@@ -100,10 +111,10 @@ const PremiumBotDetail = () => {
         <TabsContent value="overview" className="space-y-4">
           <PremiumBotOverviewTab
             bot={{
-              id: bot.botId || '', // Use botId instead of id
+              id: bot.botId || '', 
               longDescription: bot.description || '',
-              pairs: bot.pairs || [], // Make sure to use the pairs property safely with a fallback to empty array
-              features: bot.features || [],  // Use features property if it exists, otherwise empty array
+              pairs: bot.pairs || [],
+              features: bot.features || [],
               type: bot.type,
               exchange: bot.exchange || '',
               minCapital: bot.minCapital || '',

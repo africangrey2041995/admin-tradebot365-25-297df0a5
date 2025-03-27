@@ -1,9 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Edit, Power, Trash2, AlertTriangle, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { BotRiskLevel, BotStatus, BOT_RISK_DISPLAY, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
+import { BotRiskLevel, BotStatus, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -15,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import EditableRiskLevel from '@/components/admin/shared/EditableRiskLevel';
 
 interface PropBotDetailHeaderProps {
   botName: string;
@@ -26,6 +28,7 @@ interface PropBotDetailHeaderProps {
   onDelete?: () => void;
   onEdit?: () => void;
   onUpdateName?: (newName: string) => void;
+  onUpdateRisk?: (newRisk: BotRiskLevel) => void;
 }
 
 const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
@@ -38,6 +41,7 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
   onDelete = () => {},
   onEdit = () => {},
   onUpdateName = () => {},
+  onUpdateRisk = () => {},
 }) => {
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -50,15 +54,6 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
       nameInputRef.current.focus();
     }
   }, [isEditingName]);
-
-  const getRiskColor = (risk: BotRiskLevel) => {
-    switch (risk) {
-      case BotRiskLevel.LOW: return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      case BotRiskLevel.MEDIUM: return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
-      case BotRiskLevel.HIGH: return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
-      default: return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300';
-    }
-  };
 
   const getStatusColor = (status: BotStatus) => {
     switch (status) {
@@ -160,9 +155,8 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
           </div>
         )}
         
-        <Badge className={getRiskColor(risk)}>
-          Rủi ro: {BOT_RISK_DISPLAY[risk] || 'Không xác định'}
-        </Badge>
+        <EditableRiskLevel risk={risk} onUpdate={onUpdateRisk} />
+        
         <Badge className={getStatusColor(status)}>
           {BOT_STATUS_DISPLAY[status] || 'Không xác định'}
         </Badge>

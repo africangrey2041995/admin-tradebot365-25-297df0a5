@@ -6,12 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, Pencil, MoreVertical } from 'lucide-react';
 import { ADMIN_ROUTES } from '@/constants/routes';
+import EditableRiskLevel from '@/components/admin/shared/EditableRiskLevel';
+import { BotRiskLevel } from '@/constants/botTypes';
+import { toast } from 'sonner';
 
 interface PremiumBotDetailHeaderProps {
   name: string;
   status: string;
   risk: string;
   id: string;  // This is the botId
+  onUpdateRisk?: (newRisk: BotRiskLevel) => void;
 }
 
 // Utility function to get bot status badge UI
@@ -30,30 +34,26 @@ const getBotStatusBadge = (status: string) => {
   }
 };
 
-// Utility function to get risk level badge UI
-const getRiskBadge = (risk: string) => {
-  switch (risk.toLowerCase()) {
-    case 'low':
-      return <Badge className="bg-blue-500">Low Risk</Badge>;
-    case 'medium':
-      return <Badge className="bg-yellow-500">Medium Risk</Badge>;
-    case 'high':
-      return <Badge className="bg-red-500">High Risk</Badge>;
-    default:
-      return <Badge variant="outline">{risk}</Badge>;
-  }
-};
-
 const PremiumBotDetailHeader: React.FC<PremiumBotDetailHeaderProps> = ({
   name,
   status,
   risk,
-  id
+  id,
+  onUpdateRisk
 }) => {
   const navigate = useNavigate();
 
   const goBackToList = () => {
     navigate(ADMIN_ROUTES.PREMIUM_BOTS);
+  };
+
+  const handleUpdateRisk = (newRisk: BotRiskLevel) => {
+    if (onUpdateRisk) {
+      onUpdateRisk(newRisk);
+    } else {
+      // Fallback if no handler is provided
+      toast.success(`Đã cập nhật mức độ rủi ro thành: ${newRisk}`);
+    }
   };
 
   return (
@@ -65,7 +65,7 @@ const PremiumBotDetailHeader: React.FC<PremiumBotDetailHeaderProps> = ({
         </Button>
         <h1 className="text-2xl font-bold text-white">{name}</h1>
         {getBotStatusBadge(status)}
-        {getRiskBadge(risk)}
+        <EditableRiskLevel risk={risk} onUpdate={handleUpdateRisk} />
         <Badge variant="outline" className="ml-2 text-white border-white/20">{`ID: ${id}`}</Badge>
       </div>
       <div className="flex space-x-2">

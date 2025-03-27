@@ -10,7 +10,7 @@ import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import PropBotNotFound from '@/components/admin/prop-bots/detail/PropBotNotFound';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from "sonner";
-import { BotStatus } from '@/constants/botTypes';
+import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountsQueryKeys } from '@/hooks/accounts/useAccountsQuery';
 
@@ -69,6 +69,10 @@ const PropBotDetail: React.FC = () => {
     handleUpdateBot({ name: newName });
   };
 
+  const handleUpdateRisk = (newRisk: BotRiskLevel) => {
+    handleUpdateBot({ risk: newRisk });
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -89,6 +93,7 @@ const PropBotDetail: React.FC = () => {
         onDelete={handleDeleteBot}
         onEdit={handleEditBot}
         onUpdateName={handleUpdateBotName}
+        onUpdateRisk={handleUpdateRisk}
       />
       
       <PropBotInfoCard

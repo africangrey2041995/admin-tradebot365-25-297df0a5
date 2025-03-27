@@ -23,7 +23,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { BotType } from '@/constants/botTypes';
+import { BotType, BotRiskLevel } from '@/constants/botTypes';
+import EditableRiskLevel from '@/components/admin/shared/EditableRiskLevel';
 
 interface PremiumBotOverviewTabProps {
   bot: {
@@ -43,7 +44,7 @@ interface PremiumBotOverviewTabProps {
   onUpdateTradingPairs: (pairs: string[]) => void;
   onUpdateFeatures: (features: string[]) => void;
   onUpdateStatistics: (stats: { name: string; value: string; icon: React.ReactNode }[]) => void;
-  onUpdateBotInfo: (info: { type: string; exchange: string; minCapital: string }) => void;
+  onUpdateBotInfo: (info: { type: string; exchange: string; minCapital: string, risk?: BotRiskLevel }) => void;
 }
 
 // Định nghĩa schema cho form chỉnh sửa thông tin bot
@@ -94,6 +95,16 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
     toast.success('Thông tin Bot đã được cập nhật');
   };
 
+  // Handle risk update specific to this component
+  const handleRiskUpdate = (newRisk: BotRiskLevel) => {
+    onUpdateBotInfo({
+      type: bot.type,
+      exchange: bot.exchange,
+      minCapital: bot.minCapital,
+      risk: newRisk
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="md:col-span-2 space-y-4">
@@ -131,6 +142,17 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
             <div>
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Vốn tối thiểu</h3>
               <p>{bot.minCapital}</p>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Mức độ rủi ro</h3>
+              <div className="mt-1">
+                <EditableRiskLevel 
+                  risk={bot.type === BotType.PREMIUM_BOT ? BotRiskLevel.MEDIUM : BotRiskLevel.LOW} 
+                  onUpdate={handleRiskUpdate}
+                  size="sm"
+                  showIcon={false}
+                />
+              </div>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Số người đăng ký</h3>
