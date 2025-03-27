@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
@@ -10,7 +9,7 @@ import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
 import { ErrorSignalRowProps } from './types';
-import { formatUtils } from '@/utils/formatUtils';
+import { formatDate } from '@/utils/formatUtils';
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
   signal, 
@@ -52,7 +51,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
-  const formatDate = (dateString: string) => {
+  const formatDateTime = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd/MM/yyyy HH:mm');
     } catch (error) {
@@ -135,7 +134,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       {/* Timestamp */}
       <TableCell className="text-sm">
         <div className="flex items-center text-muted-foreground">
-          <span>{formatDate(signal.timestamp)}</span>
+          <span>{formatDateTime(signal.timestamp)}</span>
         </div>
       </TableCell>
       
