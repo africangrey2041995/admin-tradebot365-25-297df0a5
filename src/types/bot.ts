@@ -79,6 +79,8 @@ export interface PremiumBot extends BaseBot {
   performanceLastMonth: string;
   performanceAllTime: string;
   minCapital: string;
+  potentialProfit?: string; // Added this property to fix the TypeScript error
+  maxDrawdown?: string; // Also added maxDrawdown for consistency
   subscribers: number;
   colorScheme?: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;

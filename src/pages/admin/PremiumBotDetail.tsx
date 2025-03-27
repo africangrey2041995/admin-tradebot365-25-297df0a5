@@ -128,7 +128,10 @@ const PremiumBotDetail = () => {
               potentialProfit: bot.potentialProfit || '',
               subscribers: bot.subscribers || 0,
               createdAt: bot.createdDate || '',
-              updatedAt: bot.lastUpdated || ''
+              updatedAt: bot.lastUpdated || '',
+              isFeatured: bot.isFeatured,
+              isNew: bot.isNew,
+              isBestSeller: bot.isBestSeller
             }}
             statisticsData={statisticsData}
             onUpdateDescription={handleUpdateDescription}
