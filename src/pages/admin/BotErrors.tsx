@@ -4,13 +4,13 @@ import { motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
-import ErrorSignals from '@/components/bots/ErrorSignals';
-import { BotType } from '@/constants/botTypes';
+import { AlertTriangle, ArrowUp, ArrowDown, RefreshCw, PieChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import HierarchicalErrorView from '@/components/bots/error-signals/HierarchicalErrorView';
+import { BotType } from '@/constants/botTypes';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import { ExtendedSignal } from '@/types/signal';
+import AdminHierarchicalErrorView from '@/components/bots/error-signals/AdminHierarchicalErrorView';
+import AdminErrorDisplay from '@/components/bots/error-signals/AdminErrorDisplay';
 
 // Mock admin user ID for admin pages
 const ADMIN_USER_ID = 'ADMIN-001';
@@ -27,9 +27,12 @@ const BotErrors = () => {
     prop: 0
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [errorsByCategory, setErrorsByCategory] = useState<Record<string, number>>({});
+  const [errorsBySeverity, setErrorsBySeverity] = useState<Record<string, number>>({});
 
-  // Simulate loading error counts
+  // Simulate loading error counts and categorization
   useEffect(() => {
+    // Count errors by bot type
     const userErrors = mockErrorSignals.filter(
       err => err.botType?.toLowerCase().includes('user')
     ).length;
@@ -47,6 +50,50 @@ const BotErrors = () => {
       premium: premiumErrors,
       prop: propErrors
     });
+
+    // Calculate errors by category
+    const categoryMap: Record<string, number> = {
+      'authentication': 0,
+      'trading': 0,
+      'integration': 0,
+      'system': 0
+    };
+
+    // Calculate errors by severity
+    const severityMap: Record<string, number> = {
+      'critical': 0,
+      'high': 0,
+      'medium': 0,
+      'low': 0
+    };
+
+    // Process signals to categorize them (based on error messages and codes)
+    mockErrorSignals.forEach(signal => {
+      // Categorize by error type
+      if (signal.errorMessage?.toLowerCase().includes('auth') || signal.errorCode?.startsWith('AUTH')) {
+        categoryMap['authentication']++;
+      } else if (signal.errorMessage?.toLowerCase().includes('trade') || signal.errorCode?.startsWith('TRADE')) {
+        categoryMap['trading']++;
+      } else if (signal.errorMessage?.toLowerCase().includes('connect') || signal.errorCode?.startsWith('CONN')) {
+        categoryMap['integration']++;
+      } else {
+        categoryMap['system']++;
+      }
+
+      // Categorize by severity
+      if (signal.errorSeverity === 'critical') {
+        severityMap['critical']++;
+      } else if (signal.errorSeverity === 'high') {
+        severityMap['high']++;
+      } else if (signal.errorSeverity === 'medium') {
+        severityMap['medium']++;
+      } else {
+        severityMap['low']++;
+      }
+    });
+
+    setErrorsByCategory(categoryMap);
+    setErrorsBySeverity(severityMap);
   }, []);
 
   // Handle error selection for hierarchical view
@@ -56,11 +103,13 @@ const BotErrors = () => {
       if (error) {
         setSelectedError(error);
         
-        // Find related errors (same instrument or botId)
+        // Find related errors (same instrument or botId or error pattern)
         const related = mockErrorSignals.filter(
           err => 
             err.id !== selectedErrorId && 
-            (err.instrument === error.instrument || err.botId === error.botId)
+            (err.instrument === error.instrument || 
+             err.botId === error.botId ||
+             err.errorCode === error.errorCode)
         ).slice(0, 3); // Limit to 3 related errors
         
         setRelatedErrors(related);
@@ -81,6 +130,15 @@ const BotErrors = () => {
     setShowDetailedView(true);
   };
 
+  const botTypeFromTab = (tab: string): BotType => {
+    switch (tab) {
+      case 'user-bots': return BotType.USER_BOT;
+      case 'premium-bots': return BotType.PREMIUM_BOT;
+      case 'prop-bots': return BotType.PROP_BOT;
+      default: return BotType.USER_BOT;
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -96,7 +154,7 @@ const BotErrors = () => {
             disabled={isRefreshing}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            {isRefreshing ? 'Đang làm mới...' : 'Làm mới'}
           </Button>
         </div>
 
@@ -186,12 +244,145 @@ const BotErrors = () => {
           </Card>
         </div>
 
+        {/* Error Classification Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <PieChart className="h-5 w-5 mr-2 text-blue-500" />
+                Lỗi Theo Loại
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Xác thực / Uỷ quyền</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-blue-500" 
+                        style={{ width: `${(errorsByCategory['authentication'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsByCategory['authentication']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Giao dịch</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-green-500" 
+                        style={{ width: `${(errorsByCategory['trading'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsByCategory['trading']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Tích hợp</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-yellow-500" 
+                        style={{ width: `${(errorsByCategory['integration'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsByCategory['integration']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Hệ thống</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-purple-500" 
+                        style={{ width: `${(errorsByCategory['system'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsByCategory['system']}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
+                Lỗi Theo Mức Độ
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-red-600 dark:text-red-400">Nghiêm trọng</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-red-600" 
+                        style={{ width: `${(errorsBySeverity['critical'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsBySeverity['critical']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-orange-600 dark:text-orange-400">Cao</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-orange-600" 
+                        style={{ width: `${(errorsBySeverity['high'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsBySeverity['high']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-yellow-600 dark:text-yellow-400">Trung bình</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-yellow-600" 
+                        style={{ width: `${(errorsBySeverity['medium'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsBySeverity['medium']}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-green-600 dark:text-green-400">Thấp</span>
+                  <div className="flex items-center">
+                    <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mr-2">
+                      <div 
+                        className="h-full bg-green-600" 
+                        style={{ width: `${(errorsBySeverity['low'] / mockErrorSignals.length) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">{errorsBySeverity['low']}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Detailed error view for selected error */}
         {showDetailedView && selectedError && (
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex justify-between items-center">
-                <span>Chi tiết lỗi</span>
+                <span className="flex items-center">
+                  <span className="mr-2">Chi tiết lỗi</span>
+                  {selectedError.errorSeverity === 'critical' && 
+                    <span className="px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">Nghiêm trọng</span>
+                  }
+                  {selectedError.errorSeverity === 'high' && 
+                    <span className="px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full">Cao</span>
+                  }
+                </span>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -205,7 +396,7 @@ const BotErrors = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <HierarchicalErrorView 
+              <AdminHierarchicalErrorView 
                 signal={selectedError}
                 relatedSignals={relatedErrors}
                 onViewDetails={handleViewDetails}
@@ -261,23 +452,23 @@ const BotErrors = () => {
                 </TabsList>
 
                 <TabsContent value="user-bots" className="mt-0">
-                  <ErrorSignals 
-                    botType={BotType.USER_BOT} 
-                    userId={ADMIN_USER_ID} 
+                  <AdminErrorDisplay 
+                    botType={BotType.USER_BOT}
+                    onViewDetails={handleViewDetails}
                   />
                 </TabsContent>
 
                 <TabsContent value="premium-bots" className="mt-0">
-                  <ErrorSignals 
-                    botType={BotType.PREMIUM_BOT} 
-                    userId={ADMIN_USER_ID} 
+                  <AdminErrorDisplay 
+                    botType={BotType.PREMIUM_BOT}
+                    onViewDetails={handleViewDetails}
                   />
                 </TabsContent>
 
                 <TabsContent value="prop-bots" className="mt-0">
-                  <ErrorSignals 
-                    botType={BotType.PROP_BOT} 
-                    userId={ADMIN_USER_ID} 
+                  <AdminErrorDisplay 
+                    botType={BotType.PROP_BOT}
+                    onViewDetails={handleViewDetails}
                   />
                 </TabsContent>
               </Tabs>

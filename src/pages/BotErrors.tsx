@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import ErrorSignals from '@/components/bots/ErrorSignals';
 import { useUser } from '@clerk/clerk-react';
 import { BotType } from '@/constants/botTypes';
 import { Button } from '@/components/ui/button';
 import HierarchicalErrorView from '@/components/bots/error-signals/HierarchicalErrorView';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import { ExtendedSignal } from '@/types/signal';
+import UserErrorDisplay from '@/components/bots/error-signals/UserErrorDisplay';
 
 const BotErrors = () => {
   const [activeTab, setActiveTab] = useState('user-bots');
@@ -99,7 +99,7 @@ const BotErrors = () => {
               disabled={isRefreshing}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              {isRefreshing ? 'Đang làm mới...' : 'Làm mới'}
             </Button>
           </div>
 
@@ -124,6 +124,13 @@ const BotErrors = () => {
                       {errorCount.user} Lỗi
                     </h3>
                   </div>
+                  <div className={`p-2 rounded-full ${
+                    errorCount.user > 0 
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                      : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                  }`}>
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -138,6 +145,13 @@ const BotErrors = () => {
                     <h3 className="text-2xl font-bold mt-1">
                       {errorCount.premium} Lỗi
                     </h3>
+                  </div>
+                  <div className={`p-2 rounded-full ${
+                    errorCount.premium > 0 
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                      : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                  }`}>
+                    <AlertTriangle className="h-5 w-5" />
                   </div>
                 </div>
               </CardContent>
@@ -154,6 +168,13 @@ const BotErrors = () => {
                       {errorCount.prop} Lỗi
                     </h3>
                   </div>
+                  <div className={`p-2 rounded-full ${
+                    errorCount.prop > 0 
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                      : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                  }`}>
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -164,7 +185,15 @@ const BotErrors = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex justify-between items-center">
-                  <span>Chi tiết lỗi</span>
+                  <span className="flex items-center">
+                    <span className="mr-2">Chi tiết lỗi</span>
+                    {selectedError.errorSeverity === 'critical' && 
+                      <span className="px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">Nghiêm trọng</span>
+                    }
+                    {selectedError.errorSeverity === 'high' && 
+                      <span className="px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full">Cao</span>
+                    }
+                  </span>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -225,15 +254,27 @@ const BotErrors = () => {
                   </TabsList>
 
                   <TabsContent value="user-bots" className="mt-0">
-                    <ErrorSignals botType={BotType.USER_BOT} userId={userId} />
+                    <UserErrorDisplay 
+                      botType={BotType.USER_BOT} 
+                      userId={userId} 
+                      onViewDetails={handleViewDetails}
+                    />
                   </TabsContent>
 
                   <TabsContent value="premium-bots" className="mt-0">
-                    <ErrorSignals botType={BotType.PREMIUM_BOT} userId={userId} />
+                    <UserErrorDisplay 
+                      botType={BotType.PREMIUM_BOT} 
+                      userId={userId} 
+                      onViewDetails={handleViewDetails}
+                    />
                   </TabsContent>
 
                   <TabsContent value="prop-bots" className="mt-0">
-                    <ErrorSignals botType={BotType.PROP_BOT} userId={userId} />
+                    <UserErrorDisplay 
+                      botType={BotType.PROP_BOT} 
+                      userId={userId} 
+                      onViewDetails={handleViewDetails}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>
