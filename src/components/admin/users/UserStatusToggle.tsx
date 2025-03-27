@@ -68,7 +68,7 @@ export function UserStatusToggle({ userId, initialStatus, onStatusChange }: User
     }
   };
 
-  // Update local state when initialStatus changes (e.g., when account is locked)
+  // Update local state when initialStatus changes (e.g., when account is locked or unlocked)
   React.useEffect(() => {
     setStatus(initialStatus);
   }, [initialStatus]);

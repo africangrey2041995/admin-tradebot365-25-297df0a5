@@ -41,7 +41,8 @@ import {
   Key,
   AlertCircle,
   Lock,
-  MapPin
+  MapPin,
+  Unlock
 } from "lucide-react";
 import { UserPackageManagement } from '@/components/admin/users/UserPackageManagement';
 import UserAccountsTab from '@/components/admin/users/accounts/UserAccountsTab';
@@ -49,6 +50,7 @@ import { UserEditDialog } from '@/components/admin/users/UserEditDialog';
 import { ResetPasswordDialog } from '@/components/admin/users/ResetPasswordDialog';
 import { UserStatusToggle } from '@/components/admin/users/UserStatusToggle';
 import { LockAccountDialog } from '@/components/admin/users/LockAccountDialog';
+import { UnlockAccountDialog } from '@/components/admin/users/UnlockAccountDialog';
 import { toast } from 'sonner';
 
 const RoleBadge = ({ role }: { role: string }) => {
@@ -95,6 +97,7 @@ const AdminUserDetail = () => {
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [lockAccountDialogOpen, setLockAccountDialogOpen] = useState(false);
+  const [unlockAccountDialogOpen, setUnlockAccountDialogOpen] = useState(false);
 
   const user = {
     id: userId || 'USR-24051',
@@ -220,6 +223,8 @@ const AdminUserDetail = () => {
   const premiumBotCount = user.premiumBots.length;
   const propBotCount = user.propBots.length;
   const totalBotCount = customBotCount + premiumBotCount + propBotCount;
+
+  const isAccountSuspended = user.status === 'suspended';
 
   return (
     <div className="space-y-6">
@@ -461,17 +466,32 @@ const AdminUserDetail = () => {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium">Khóa tài khoản</h3>
-                    <p className="text-sm text-zinc-400 mt-1">Tạm thời khóa tài khoản người dùng.</p>
+                    <h3 className="font-medium">{isAccountSuspended ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}</h3>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      {isAccountSuspended 
+                        ? 'Mở khóa tài khoản để cho phép người dùng đăng nhập và sử dụng dịch vụ.' 
+                        : 'Tạm thời khóa tài khoản người dùng.'}
+                    </p>
                   </div>
-                  <Button 
-                    variant="destructive" 
-                    className="gap-2"
-                    onClick={() => setLockAccountDialogOpen(true)}
-                  >
-                    <Lock className="h-4 w-4" />
-                    Khóa tài khoản
-                  </Button>
+                  {isAccountSuspended ? (
+                    <Button 
+                      variant="outline" 
+                      className="border-green-500/30 text-green-500 hover:bg-green-500/10 gap-2"
+                      onClick={() => setUnlockAccountDialogOpen(true)}
+                    >
+                      <Unlock className="h-4 w-4" />
+                      Mở khóa tài khoản
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="destructive" 
+                      className="gap-2"
+                      onClick={() => setLockAccountDialogOpen(true)}
+                    >
+                      <Lock className="h-4 w-4" />
+                      Khóa tài khoản
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -961,6 +981,13 @@ const AdminUserDetail = () => {
       <LockAccountDialog 
         open={lockAccountDialogOpen}
         onOpenChange={setLockAccountDialogOpen}
+        user={user}
+        onStatusChange={handleStatusChange}
+      />
+
+      <UnlockAccountDialog 
+        open={unlockAccountDialogOpen}
+        onOpenChange={setUnlockAccountDialogOpen}
         user={user}
         onStatusChange={handleStatusChange}
       />
