@@ -21,10 +21,11 @@ interface NewBotState {
   name: string;
   description: string;
   riskLevel: string;
-  exchangeType: string;
+  exchange: string;
   maxDrawdown: string;
   supportedAssets: string[];
-  minInvestment: string;
+  minCapital: string;
+  potentialProfit: string;
   isFeatured: boolean;
   isNew: boolean;
   isBestSeller: boolean;
@@ -108,12 +109,12 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
                 </div>
                 
                 <div className="grid gap-2">
-                  <Label htmlFor="exchangeType">Sàn giao dịch</Label>
+                  <Label htmlFor="exchange">Sàn giao dịch</Label>
                   <Select 
-                    value={newBot.exchangeType} 
-                    onValueChange={(value) => setNewBot({...newBot, exchangeType: value})}
+                    value={newBot.exchange} 
+                    onValueChange={(value) => setNewBot({...newBot, exchange: value})}
                   >
-                    <SelectTrigger id="exchangeType" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectTrigger id="exchange" className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue placeholder="Chọn sàn giao dịch" />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
@@ -128,14 +129,14 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="minInvestment">Đầu tư tối thiểu (USDT)</Label>
+                  <Label htmlFor="minCapital">Đầu tư tối thiểu (USDT)</Label>
                   <Input
-                    id="minInvestment"
+                    id="minCapital"
                     type="number"
                     placeholder="ví dụ: 100"
                     className="bg-zinc-800 border-zinc-700 text-white"
-                    value={newBot.minInvestment}
-                    onChange={(e) => setNewBot({...newBot, minInvestment: e.target.value})}
+                    value={newBot.minCapital}
+                    onChange={(e) => setNewBot({...newBot, minCapital: e.target.value})}
                   />
                 </div>
                 
@@ -154,6 +155,18 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
                     <span className="min-w-[3rem] text-center font-medium">{newBot.maxDrawdown}%</span>
                   </div>
                 </div>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="potentialProfit">Lợi nhuận dự kiến (%/tháng)</Label>
+                <Input
+                  id="potentialProfit"
+                  type="text"
+                  placeholder="ví dụ: 5-10%"
+                  className="bg-zinc-800 border-zinc-700 text-white"
+                  value={newBot.potentialProfit}
+                  onChange={(e) => setNewBot({...newBot, potentialProfit: e.target.value})}
+                />
               </div>
             </div>
           </TabsContent>

@@ -1,152 +1,66 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { DollarSign, Calendar, Edit, Check, X } from 'lucide-react';
-import { 
-  Popover,
-  PopoverTrigger,
-  PopoverContent 
-} from '@/components/ui/popover';
-import { toast } from 'sonner';
+import React from 'react';
+import { DollarSign, ChartBar, Calendar, TrendingUp } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import { PropBot } from '@/types/bot';
 
 interface BotChallengeInfoProps {
   minCapital?: string;
+  potentialProfit?: string;
   maxDrawdown?: string;
   challengeDuration?: string;
-  onUpdate: (updatedData: Partial<PropBot>) => void;
+  onUpdate?: (updatedData: Partial<PropBot>) => void;
 }
 
 const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
   minCapital,
+  potentialProfit,
   maxDrawdown,
   challengeDuration,
-  onUpdate
+  onUpdate = () => {}
 }) => {
-  const [editedMinCapital, setEditedMinCapital] = useState(minCapital || '');
-  const [editedMaxDrawdown, setEditedMaxDrawdown] = useState(maxDrawdown || '');
-  const [editedChallengeDuration, setEditedChallengeDuration] = useState(challengeDuration || '');
-  
-  const [minCapitalPopoverOpen, setMinCapitalPopoverOpen] = useState(false);
-  const [maxDrawdownPopoverOpen, setMaxDrawdownPopoverOpen] = useState(false);
-  const [challengeDurationPopoverOpen, setChallengeDurationPopoverOpen] = useState(false);
-
-  const handleSaveMinCapital = () => {
-    onUpdate({ minCapital: editedMinCapital });
-    setMinCapitalPopoverOpen(false);
-    toast.success("Đã cập nhật vốn tối thiểu");
-  };
-
-  const handleSaveMaxDrawdown = () => {
-    onUpdate({ maxDrawdown: editedMaxDrawdown });
-    setMaxDrawdownPopoverOpen(false);
-    toast.success("Đã cập nhật drawdown tối đa");
-  };
-
-  const handleSaveChallengeDuration = () => {
-    onUpdate({ challengeDuration: editedChallengeDuration });
-    setChallengeDurationPopoverOpen(false);
-    toast.success("Đã cập nhật thời gian thử thách");
-  };
-
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4">
-      {minCapital && (
-        <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
-          <p className="text-xs text-gray-400 mb-1 flex items-center">
-            <DollarSign className="w-3 h-3 mr-1" />
-            Vốn tối thiểu
-          </p>
-          <div className="flex items-center">
-            <p className="text-sm font-medium text-white">{editedMinCapital}</p>
-            <Popover open={minCapitalPopoverOpen} onOpenChange={setMinCapitalPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6 ml-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56 p-3">
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Vốn tối thiểu</h4>
-                  <Input 
-                    value={editedMinCapital}
-                    onChange={(e) => setEditedMinCapital(e.target.value)}
-                    placeholder="Ví dụ: $5,000"
-                  />
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setMinCapitalPopoverOpen(false)}
-                    >
-                      <X className="h-3 w-3 mr-1" /> Hủy
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      onClick={handleSaveMinCapital}
-                    >
-                      <Check className="h-3 w-3 mr-1" /> Lưu
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-      )}
+    <div className="mt-6">
+      <h3 className="text-sm font-medium mb-2">Thông tin thử thách</h3>
+      <Separator className="mb-3 bg-gray-700" />
       
-      {challengeDuration && (
-        <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
-          <p className="text-xs text-gray-400 mb-1 flex items-center">
-            <Calendar className="w-3 h-3 mr-1" />
-            Thời gian thử thách
-          </p>
-          <div className="flex items-center">
-            <p className="text-sm font-medium text-white">{editedChallengeDuration}</p>
-            <Popover open={challengeDurationPopoverOpen} onOpenChange={setChallengeDurationPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6 ml-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56 p-3">
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Thời gian thử thách</h4>
-                  <Input 
-                    value={editedChallengeDuration}
-                    onChange={(e) => setEditedChallengeDuration(e.target.value)}
-                    placeholder="Ví dụ: 30 ngày"
-                  />
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setChallengeDurationPopoverOpen(false)}
-                    >
-                      <X className="h-3 w-3 mr-1" /> Hủy
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      onClick={handleSaveChallengeDuration}
-                    >
-                      <Check className="h-3 w-3 mr-1" /> Lưu
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+      <div className="space-y-2">
+        {minCapital && (
+          <div className="flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-green-400" />
+            <span className="text-sm">
+              Vốn tối thiểu: <span className="font-medium">{minCapital}</span>
+            </span>
           </div>
-        </div>
-      )}
+        )}
+        
+        {potentialProfit && (
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-400" />
+            <span className="text-sm">
+              Lợi nhuận dự kiến: <span className="font-medium">{potentialProfit}</span>
+            </span>
+          </div>
+        )}
+        
+        {maxDrawdown && (
+          <div className="flex items-center gap-2">
+            <ChartBar className="w-4 h-4 text-red-400" />
+            <span className="text-sm">
+              Drawdown tối đa: <span className="font-medium">{maxDrawdown}</span>
+            </span>
+          </div>
+        )}
+        
+        {challengeDuration && (
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-purple-400" />
+            <span className="text-sm">
+              Thời gian thử thách: <span className="font-medium">{challengeDuration}</span>
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

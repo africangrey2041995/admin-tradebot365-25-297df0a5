@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Pencil } from 'lucide-react';
+import { Pencil, Star, Sparkles, Trophy } from 'lucide-react';
 import EditableDescriptionCard from '@/components/admin/premium-bots/detail/EditableDescriptionCard';
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
@@ -9,6 +10,7 @@ import EditableStatisticsCard from '@/components/admin/premium-bots/detail/Edita
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
   Form,
@@ -34,16 +36,29 @@ interface PremiumBotOverviewTabProps {
     type: string;
     exchange: string;
     minCapital: string;
+    potentialProfit?: string;
     subscribers: number;
     createdAt: string;
     updatedAt: string;
+    isFeatured?: boolean;
+    isNew?: boolean;
+    isBestSeller?: boolean;
   };
   statisticsData: { name: string; value: string; icon: React.ReactNode }[];
   onUpdateDescription: (description: string) => void;
   onUpdateTradingPairs: (pairs: string[]) => void;
   onUpdateFeatures: (features: string[]) => void;
   onUpdateStatistics: (stats: { name: string; value: string; icon: React.ReactNode }[]) => void;
-  onUpdateBotInfo: (info: { type?: string; exchange?: string; minCapital?: string; risk?: BotRiskLevel }) => void;
+  onUpdateBotInfo: (info: { 
+    type?: string; 
+    exchange?: string; 
+    minCapital?: string; 
+    potentialProfit?: string;
+    risk?: BotRiskLevel;
+    isFeatured?: boolean;
+    isNew?: boolean;
+    isBestSeller?: boolean;
+  }) => void;
 }
 
 // Định nghĩa schema cho form chỉnh sửa thông tin bot
@@ -51,6 +66,7 @@ const botInfoFormSchema = z.object({
   type: z.string(),
   exchange: z.string(),
   minCapital: z.string(),
+  potentialProfit: z.string().optional(),
 });
 
 const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
@@ -63,6 +79,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
   onUpdateBotInfo
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isMarketingDialogOpen, setIsMarketingDialogOpen] = useState(false);
 
   // Form cho thông tin bot
   const botInfoForm = useForm({
@@ -71,6 +88,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
       type: bot.type || '',
       exchange: bot.exchange || '',
       minCapital: bot.minCapital || '',
+      potentialProfit: bot.potentialProfit || '',
     },
   });
 
@@ -79,6 +97,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
       type: bot.type || '',
       exchange: bot.exchange || '',
       minCapital: bot.minCapital || '',
+      potentialProfit: bot.potentialProfit || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -87,7 +106,8 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
     onUpdateBotInfo({
       type: data.type,
       exchange: data.exchange,
-      minCapital: data.minCapital
+      minCapital: data.minCapital,
+      potentialProfit: data.potentialProfit
     });
     
     setIsEditDialogOpen(false);
@@ -98,6 +118,29 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
   const handleRiskUpdate = (newRisk: BotRiskLevel) => {
     onUpdateBotInfo({
       risk: newRisk
+    });
+  };
+
+  // Handle marketing flags update
+  const handleMarketingUpdate = () => {
+    setIsMarketingDialogOpen(true);
+  };
+
+  const toggleFeatured = () => {
+    onUpdateBotInfo({
+      isFeatured: !bot.isFeatured
+    });
+  };
+
+  const toggleNew = () => {
+    onUpdateBotInfo({
+      isNew: !bot.isNew
+    });
+  };
+
+  const toggleBestSeller = () => {
+    onUpdateBotInfo({
+      isBestSeller: !bot.isBestSeller
     });
   };
 
@@ -139,6 +182,12 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Vốn tối thiểu</h3>
               <p>{bot.minCapital}</p>
             </div>
+            {bot.potentialProfit && (
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Lợi nhuận dự kiến</h3>
+                <p>{bot.potentialProfit}</p>
+              </div>
+            )}
             <div>
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Mức độ rủi ro</h3>
               <div className="mt-1">
@@ -165,7 +214,41 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
           </CardContent>
         </Card>
         
-        {/* Bot Integration Info removed */}
+        {/* Marketing Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Marketing</CardTitle>
+            <Button variant="ghost" size="sm" onClick={handleMarketingUpdate}>
+              <Pencil className="h-4 w-4 mr-1" />
+              Chỉnh sửa
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Star className={`h-5 w-5 ${bot.isFeatured ? 'text-amber-500 fill-amber-500' : 'text-gray-400'}`} />
+                <span>Bot nổi bật</span>
+              </div>
+              <Switch checked={bot.isFeatured} onCheckedChange={toggleFeatured} />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className={`h-5 w-5 ${bot.isNew ? 'text-blue-500' : 'text-gray-400'}`} />
+                <span>Bot mới</span>
+              </div>
+              <Switch checked={bot.isNew} onCheckedChange={toggleNew} />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy className={`h-5 w-5 ${bot.isBestSeller ? 'text-emerald-500 fill-emerald-500' : 'text-gray-400'}`} />
+                <span>Best Seller</span>
+              </div>
+              <Switch checked={bot.isBestSeller} onCheckedChange={toggleBestSeller} />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Edit Bot Info Dialog */}
@@ -218,6 +301,22 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={botInfoForm.control}
+                name="potentialProfit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lợi nhuận dự kiến</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ví dụ: 5-10%/tháng
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                   Hủy
@@ -228,6 +327,63 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Marketing Dialog */}
+      <Dialog open={isMarketingDialogOpen} onOpenChange={setIsMarketingDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Cài đặt marketing</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="featured">Đánh dấu là Bot nổi bật</Label>
+                <p className="text-sm text-gray-500">
+                  Hiển thị nhãn "Nổi bật" và ưu tiên trong danh sách
+                </p>
+              </div>
+              <Switch
+                id="featured"
+                checked={bot.isFeatured}
+                onCheckedChange={toggleFeatured}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="new">Đánh dấu là Bot mới</Label>
+                <p className="text-sm text-gray-500">
+                  Hiển thị nhãn "Mới" để thu hút sự chú ý
+                </p>
+              </div>
+              <Switch
+                id="new"
+                checked={bot.isNew}
+                onCheckedChange={toggleNew}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="bestSeller">Đánh dấu là Best Seller</Label>
+                <p className="text-sm text-gray-500">
+                  Hiển thị nhãn "Best Seller" để tăng độ tin cậy
+                </p>
+              </div>
+              <Switch
+                id="bestSeller"
+                checked={bot.isBestSeller}
+                onCheckedChange={toggleBestSeller}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMarketingDialogOpen(false)}>
+              Đóng
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

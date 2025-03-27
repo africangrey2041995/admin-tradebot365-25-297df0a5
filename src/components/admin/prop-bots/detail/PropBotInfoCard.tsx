@@ -23,6 +23,7 @@ export interface PropBotInfoCardProps {
   risk: string;
   colorScheme?: string;
   minCapital?: string;
+  potentialProfit?: string;
   maxDrawdown?: string;
   challengeDuration?: string;
   connectedAccounts: number;
@@ -43,6 +44,7 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   risk,
   colorScheme = 'green',
   minCapital,
+  potentialProfit,
   maxDrawdown,
   challengeDuration,
   connectedAccounts,
@@ -97,9 +99,10 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               onUpdate={onUpdate}
             />
             
-            {(minCapital || maxDrawdown || challengeDuration) && (
+            {(minCapital || maxDrawdown || challengeDuration || potentialProfit) && (
               <BotChallengeInfo 
                 minCapital={minCapital}
+                potentialProfit={potentialProfit}
                 maxDrawdown={maxDrawdown}
                 challengeDuration={challengeDuration}
                 onUpdate={onUpdate}
