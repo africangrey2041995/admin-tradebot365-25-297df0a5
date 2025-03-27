@@ -42,7 +42,10 @@ const AdminPremiumBots = () => {
     featureDynamicTp: true,
     featureSmartFilters: false,
     maxActivePositions: '3',
-    maxLeverage: '3'
+    maxLeverage: '3',
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   });
   
   const bots: PremiumBot[] = [
@@ -186,7 +189,10 @@ const AdminPremiumBots = () => {
       featureDynamicTp: true,
       featureSmartFilters: false,
       maxActivePositions: '3',
-      maxLeverage: '3'
+      maxLeverage: '3',
+      isFeatured: false,
+      isNew: false,
+      isBestSeller: false
     });
     
     setActiveTab('general');
@@ -341,6 +347,18 @@ const AdminPremiumBots = () => {
     clearSelections();
   };
 
+  const toggleFeatured = (botId: string) => {
+    // Implement logic to toggle featured status
+  };
+
+  const toggleNew = (botId: string) => {
+    // Implement logic to toggle new status
+  };
+
+  const toggleBestSeller = (botId: string) => {
+    // Implement logic to toggle best seller status
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -383,6 +401,9 @@ const AdminPremiumBots = () => {
             onSelectAll={handleSelectAllChange}
             onSelectBot={handleCheckboxChange}
             onViewBotDetail={viewBotDetail}
+            onToggleFeatured={toggleFeatured}
+            onToggleNew={toggleNew}
+            onToggleBestSeller={toggleBestSeller}
           />
 
           <PremiumBotsPagination 
