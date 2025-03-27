@@ -3,7 +3,6 @@ import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import ActionBadge from './ActionBadge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ExternalLink, AlertTriangle, Info } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
@@ -19,7 +18,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   onViewDetails,
   isAdmin = false
 }) => {
-  const { navigateToBotDetail, navigateToUserDetail } = useNavigation();
+  const { navigateToBotDetail } = useNavigation();
   
   const handleBotClick = () => {
     if (signal.botId) {
@@ -32,20 +31,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     } else {
       console.warn('Cannot navigate: Bot ID is missing from signal');
       toast.warning('Không thể điều hướng: ID bot không tồn tại trong tín hiệu');
-    }
-  };
-  
-  const handleUserClick = () => {
-    if (signal.userId) {
-      try {
-        navigateToUserDetail(signal.userId);
-      } catch (error) {
-        console.error('Error navigating to user details:', error);
-        toast.error('Không thể điều hướng đến trang người dùng. Vui lòng thử lại sau.');
-      }
-    } else {
-      console.warn('Cannot navigate: User ID is missing from signal');
-      toast.warning('Không thể điều hướng: ID người dùng không tồn tại trong tín hiệu');
     }
   };
   
@@ -75,24 +60,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
-  const formatTradingAccount = () => {
-    const parts = [];
-    
-    if (signal.tradingAccountId) {
-      parts.push(signal.tradingAccountId);
-    }
-    
-    if (signal.tradingAccountType) {
-      parts.push(signal.tradingAccountType);
-    }
-    
-    if (signal.tradingAccountBalance) {
-      parts.push(`$${signal.tradingAccountBalance}`);
-    }
-    
-    return parts.length > 0 ? parts.join(' | ') : 'N/A';
-  };
-  
   const renderSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityConfig = {
@@ -112,49 +79,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     );
   };
   
-  const formatErrorCode = () => {
-    if (signal.errorCode) {
-      return (
-        <span className="font-mono text-xs">
-          {signal.errorCode}
-        </span>
-      );
-    }
-    
-    let botTypePrefix = 'ERR';
-    if (signal.botType) {
-      if (signal.botType.toLowerCase().includes('user')) {
-        botTypePrefix = 'USR';
-      } else if (signal.botType.toLowerCase().includes('premium')) {
-        botTypePrefix = 'PRE';
-      } else if (signal.botType.toLowerCase().includes('prop')) {
-        botTypePrefix = 'PRP';
-      }
-    }
-    
-    let category = 'UNK';
-    const errorMsg = signal.errorMessage?.toLowerCase() || '';
-    if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
-      category = 'AUTH';
-    } else if (errorMsg.includes('api') || errorMsg.includes('request') || errorMsg.includes('response')) {
-      category = 'API';
-    } else if (errorMsg.includes('exec') || errorMsg.includes('execution')) {
-      category = 'EXE';
-    } else if (errorMsg.includes('time') || errorMsg.includes('timeout')) {
-      category = 'TIME';
-    } else if (errorMsg.includes('connect') || errorMsg.includes('network')) {
-      category = 'CONN';
-    }
-    
-    const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
-    
-    return (
-      <span className="font-mono text-xs">
-        ERR-{botTypePrefix}-{category}-{numericPart.padStart(3, '0')}
-      </span>
-    );
-  };
-  
   return (
     <TableRow className={isUnread ? "bg-red-50/10" : ""}>
       <TableCell className="font-mono text-xs">
@@ -165,76 +89,52 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
           {signal.instrument}
         </Badge>
       </TableCell>
-      <TableCell className="text-sm">
-        {formatDate(signal.timestamp)}
-      </TableCell>
-      <TableCell>
-        {signal.amount}
-      </TableCell>
-      <TableCell>
-        <ActionBadge action={signal.action} />
-      </TableCell>
-      <TableCell>
-        <Badge variant="destructive" className="bg-red-600">
-          Error
-        </Badge>
-      </TableCell>
       <TableCell 
         className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
         onClick={handleBotClick}
       >
-        {signal.botId || 'N/A'}
-      </TableCell>
-      <TableCell 
-        className={signal.userId ? "cursor-pointer text-blue-500 hover:text-blue-700 hover:underline" : ""}
-        onClick={signal.userId ? handleUserClick : undefined}
-      >
-        {signal.userId || 'N/A'}
+        {signal.botName || signal.botId || 'N/A'}
       </TableCell>
       <TableCell>
-        {formatTradingAccount()}
+        <div className="max-w-[250px] truncate">
+          {signal.errorMessage || 'Không có thông tin lỗi'}
+        </div>
       </TableCell>
       <TableCell>
-        {signal.coinstratLogId ? (
-          <div className="flex items-center gap-1">
-            <span className="font-mono text-xs">{signal.coinstratLogId}</span>
-            <ExternalLink className="h-3 w-3 text-blue-500" />
-          </div>
-        ) : (
-          <span className="text-gray-400 italic text-xs">No ID CPL</span>
-        )}
+        {renderSeverityBadge()}
+      </TableCell>
+      <TableCell className="text-sm">
+        {formatDate(signal.timestamp)}
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          {renderSeverityBadge()}
-          <span className="font-mono text-xs text-slate-500">{formatErrorCode()}</span>
-        </div>
-        <div className="flex items-center mt-1">
           <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
             <div className="flex items-center text-red-500 cursor-help">
               <Info className="h-4 w-4 mr-1" />
-              <span className="text-xs">Chi tiết lỗi</span>
+              <span className="text-xs">Chi tiết</span>
             </div>
           </ErrorDetailsTooltip>
+          
           {isUnread && (
             <Button
               size="sm" 
               variant="ghost" 
               onClick={handleMarkAsRead}
-              className="ml-2 h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+              className="h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
             >
               <CheckCircle2 className="h-4 w-4 mr-1" />
-              <span className="text-xs">Mark as read</span>
+              <span className="text-xs">Đã đọc</span>
             </Button>
           )}
+          
           {!isAdmin && onViewDetails && (
             <Button
               size="sm"
               variant="ghost"
               onClick={handleViewDetails}
-              className="ml-2 h-6 px-2"
+              className="h-6 px-2"
             >
-              <span className="text-xs">View details</span>
+              <span className="text-xs">Xem chi tiết</span>
             </Button>
           )}
         </div>
