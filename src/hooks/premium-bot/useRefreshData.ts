@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 
 interface UseRefreshDataProps {
@@ -18,7 +18,21 @@ export const useRefreshData = ({
   refreshSignalLogs
 }: UseRefreshDataProps) => {
   
+  // Add a ref to track last refresh time per tab
+  const lastTabRefreshTimeRef = useRef<Record<string, number>>({});
+  
   const refreshTabData = useCallback(() => {
+    const now = Date.now();
+    const lastRefreshForTab = lastTabRefreshTimeRef.current[activeTab] || 0;
+    
+    // Prevent refreshing if last refresh for this tab was less than 2 seconds ago
+    if (now - lastRefreshForTab < 2000) {
+      return;
+    }
+    
+    // Update the last refresh time for this tab
+    lastTabRefreshTimeRef.current[activeTab] = now;
+    
     startRefresh();
     
     // Determine which refresh function to call based on active tab

@@ -1,9 +1,12 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
 
 export const useSignalManagement = (botId: string, userId: string) => {
+  // Add a ref to track last refresh time
+  const lastRefreshTimeRef = useRef(0);
+  
   const {
     tradingViewLogs,
     coinstratLogs,
@@ -17,9 +20,15 @@ export const useSignalManagement = (botId: string, userId: string) => {
 
   const processedSignalsCount = coinstratLogs.length;
 
+  // Wrap refreshLogs with a cooldown mechanism
   const refreshSignalLogs = useCallback(() => {
-    refreshLogs();
-    toast.success("Signal logs refreshed");
+    const now = Date.now();
+    // Prevent refreshing if last refresh was less than 3 seconds ago
+    if (now - lastRefreshTimeRef.current > 3000) {
+      lastRefreshTimeRef.current = now;
+      refreshLogs();
+      toast.success("Signal logs refreshed");
+    }
   }, [refreshLogs]);
 
   return {

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
@@ -26,11 +26,30 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
     availableUsers,
     refreshSignalLogs
   } = useSignalManagement(botId, userId);
-
-  // When component mounts, refresh the logs
+  
+  // Use a ref to track if initial load has happened
+  const initialLoadRef = useRef(false);
+  // Use a ref to prevent rapid successive refreshes
+  const lastRefreshTimeRef = useRef(0);
+  
+  // Only refresh on mount if we haven't loaded before
   useEffect(() => {
-    refreshSignalLogs();
-  }, [refreshSignalLogs]);
+    // Only do the initial load once
+    if (!initialLoadRef.current && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
+      initialLoadRef.current = true;
+      refreshSignalLogs();
+    }
+  }, [refreshSignalLogs, tradingViewLogs.length, coinstratLogs.length]);
+
+  // Handler for manual refresh with cooldown
+  const handleManualRefresh = () => {
+    const now = Date.now();
+    // Prevent refreshing if last refresh was less than 2 seconds ago
+    if (now - lastRefreshTimeRef.current > 2000) {
+      lastRefreshTimeRef.current = now;
+      refreshSignalLogs();
+    }
+  };
 
   if (logsLoading && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
     return (
@@ -56,7 +75,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
             </CardDescription>
           </div>
           <Button 
-            onClick={refreshSignalLogs}
+            onClick={handleManualRefresh}
             disabled={logsLoading}
             className="min-w-[120px]"
           >
@@ -84,7 +103,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
         <UnifiedSignalView 
           tradingViewLogs={tradingViewLogs} 
           coinstratLogs={coinstratLogs} 
-          onRefresh={refreshSignalLogs} 
+          onRefresh={handleManualRefresh} 
           isLoading={logsLoading} 
         />
       </CardContent>
