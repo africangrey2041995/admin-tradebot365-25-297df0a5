@@ -21,6 +21,11 @@ const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   
+  // Define goBackToList function - the issue was this function wasn't available in the scope where it was being used
+  const goBackToList = () => {
+    navigate(ADMIN_ROUTES.PREMIUM_BOTS);
+  };
+  
   // Use our custom hook to manage all the data and logic
   const {
     isLoading,
@@ -63,10 +68,6 @@ const PremiumBotDetail = () => {
       // In a real app, you would call an API to update the name
       toast.success(`Đã cập nhật tên bot thành: ${newName}`);
     }
-  };
-
-  const goBackToList = () => {
-    navigate(ADMIN_ROUTES.PREMIUM_BOTS);
   };
 
   if (isLoading) {
