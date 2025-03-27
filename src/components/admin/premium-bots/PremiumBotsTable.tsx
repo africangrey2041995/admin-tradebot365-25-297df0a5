@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Play, Pause, Settings, Trash2, Eye } from "lucide-react";
+import { MoreHorizontal, Play, Pause, Settings, Trash2, Eye, Star, Sparkles, Trophy } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { BotStatusBadge } from './BotStatusBadge';
+import { BotTag } from '@/components/bots/BotTag';
 import { PremiumBot } from "@/types";
 
 interface PremiumBotsTableProps {
@@ -22,6 +23,9 @@ interface PremiumBotsTableProps {
   onSelectAll: () => void;
   onSelectBot: (botId: string) => void;
   onViewBotDetail: (botId: string) => void;
+  onToggleFeatured?: (botId: string) => void;
+  onToggleNew?: (botId: string) => void;
+  onToggleBestSeller?: (botId: string) => void;
 }
 
 export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
@@ -30,7 +34,10 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
   selectAll,
   onSelectAll,
   onSelectBot,
-  onViewBotDetail
+  onViewBotDetail,
+  onToggleFeatured,
+  onToggleNew,
+  onToggleBestSeller
 }) => {
   return (
     <div className="overflow-x-auto">
@@ -46,6 +53,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
             </TableHead>
             <TableHead className="text-zinc-400 w-28">ID</TableHead>
             <TableHead className="text-zinc-400">Tên Bot</TableHead>
+            <TableHead className="text-zinc-400">Tags</TableHead>
             <TableHead className="text-zinc-400">Trạng thái</TableHead>
             <TableHead className="text-zinc-400">Sàn giao dịch</TableHead>
             <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
@@ -67,6 +75,43 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                 </TableCell>
                 <TableCell className="font-mono text-xs text-zinc-400">{bot.botId}</TableCell>
                 <TableCell className="font-medium">{bot.name}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {bot.isFeatured && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-amber-500 hover:text-amber-600 hover:bg-amber-100/20"
+                        onClick={() => onToggleFeatured && onToggleFeatured(bot.botId)}
+                      >
+                        <Star className="h-4 w-4 fill-current" />
+                      </Button>
+                    )}
+                    {bot.isNew && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-100/20"
+                        onClick={() => onToggleNew && onToggleNew(bot.botId)}
+                      >
+                        <Sparkles className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {bot.isBestSeller && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100/20"
+                        onClick={() => onToggleBestSeller && onToggleBestSeller(bot.botId)}
+                      >
+                        <Trophy className="h-4 w-4 fill-current" />
+                      </Button>
+                    )}
+                    {!bot.isFeatured && !bot.isNew && !bot.isBestSeller && (
+                      <span className="text-zinc-500 text-xs">—</span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <BotStatusBadge status={bot.status} />
                 </TableCell>
@@ -108,6 +153,34 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-zinc-800" />
+                      {!bot.isFeatured && (
+                        <DropdownMenuItem 
+                          className="focus:bg-zinc-800"
+                          onClick={() => onToggleFeatured && onToggleFeatured(bot.botId)}
+                        >
+                          <Star className="mr-2 h-4 w-4" />
+                          <span>Đánh dấu nổi bật</span>
+                        </DropdownMenuItem>
+                      )}
+                      {!bot.isNew && (
+                        <DropdownMenuItem 
+                          className="focus:bg-zinc-800"
+                          onClick={() => onToggleNew && onToggleNew(bot.botId)}
+                        >
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          <span>Đánh dấu là mới</span>
+                        </DropdownMenuItem>
+                      )}
+                      {!bot.isBestSeller && (
+                        <DropdownMenuItem 
+                          className="focus:bg-zinc-800"
+                          onClick={() => onToggleBestSeller && onToggleBestSeller(bot.botId)}
+                        >
+                          <Trophy className="mr-2 h-4 w-4" />
+                          <span>Đánh dấu best seller</span>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator className="bg-zinc-800" />
                       <DropdownMenuItem className="focus:bg-zinc-800 text-red-500 focus:text-red-500">
                         <Trash2 className="mr-2 h-4 w-4" />
                         <span>Xóa Bot</span>
@@ -119,7 +192,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+              <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                 Không tìm thấy kết quả phù hợp.
               </TableCell>
             </TableRow>

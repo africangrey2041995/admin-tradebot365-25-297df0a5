@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { BotTag } from './BotTag';
 
 interface PremiumBotCardProps {
   botId: string;
@@ -22,6 +24,9 @@ interface PremiumBotCardProps {
   isIntegrated?: boolean;
   accountCount?: string;
   externalId?: string;
+  isFeatured?: boolean;
+  isNew?: boolean;
+  isBestSeller?: boolean;
 }
 
 export const PremiumBotCard = ({
@@ -40,6 +45,9 @@ export const PremiumBotCard = ({
   isIntegrated = false,
   accountCount,
   externalId,
+  isFeatured = false,
+  isNew = false,
+  isBestSeller = false,
 }: PremiumBotCardProps) => {
   const navigate = useNavigate();
 
@@ -162,7 +170,7 @@ export const PremiumBotCard = ({
             <div>
               <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
                 {name}
-                <Sparkles className="h-3 w-3 text-yellow-500 ml-1" />
+                {isNew && <Sparkles className="h-3 w-3 text-yellow-500 ml-1" />}
               </h3>
               <div className="flex gap-1 mt-1 items-center text-xs">
                 {getExchangeLogo(exchange)}
@@ -176,10 +184,18 @@ export const PremiumBotCard = ({
               </div>
             </div>
           </div>
-          <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
-            {getRiskIcon(risk)}
-            <span>{getRiskLabel(risk)}</span>
-          </Badge>
+          <div className="flex flex-col gap-1 items-end">
+            <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
+              {getRiskIcon(risk)}
+              <span>{getRiskLabel(risk)}</span>
+            </Badge>
+            {(isFeatured || isBestSeller) && (
+              <div className="flex gap-1">
+                {isFeatured && <BotTag type="featured" size="sm" />}
+                {isBestSeller && <BotTag type="bestSeller" size="sm" />}
+              </div>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-3">

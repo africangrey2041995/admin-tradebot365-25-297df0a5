@@ -3,8 +3,9 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Sparkles, Trophy } from 'lucide-react';
 import { BotStatusBadge } from '../premium-bots/BotStatusBadge';
+import { BotTag } from '@/components/bots/BotTag';
 import { PropBot } from '@/types/bot';
 
 interface PropBotsTableProps {
@@ -13,6 +14,9 @@ interface PropBotsTableProps {
   setCurrentPage: (page: number) => void;
   totalPages: number;
   onRowClick?: (botId: string) => void;
+  onToggleFeatured?: (botId: string) => void;
+  onToggleNew?: (botId: string) => void;
+  onToggleBestSeller?: (botId: string) => void;
 }
 
 export const PropBotsTable: React.FC<PropBotsTableProps> = ({
@@ -20,7 +24,10 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
   currentPage,
   setCurrentPage,
   totalPages,
-  onRowClick
+  onRowClick,
+  onToggleFeatured,
+  onToggleNew,
+  onToggleBestSeller
 }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
@@ -30,6 +37,7 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
             <TableRow>
               <TableHead className="text-zinc-400 font-medium">Bot ID</TableHead>
               <TableHead className="text-zinc-400 font-medium">Tên</TableHead>
+              <TableHead className="text-zinc-400 font-medium">Tags</TableHead>
               <TableHead className="text-zinc-400 font-medium">Prop Firm</TableHead>
               <TableHead className="text-zinc-400 font-medium">Trạng thái</TableHead>
               <TableHead className="text-zinc-400 font-medium">Vốn tối thiểu</TableHead>
@@ -40,7 +48,7 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
           <TableBody>
             {currentBots.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-zinc-500">
+                <TableCell colSpan={8} className="h-24 text-center text-zinc-500">
                   Không tìm thấy Prop Bot nào phù hợp với tiêu chí tìm kiếm.
                 </TableCell>
               </TableRow>
@@ -56,6 +64,52 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                 >
                   <TableCell className="font-medium text-white">{bot.botId}</TableCell>
                   <TableCell className="text-white">{bot.name}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {bot.isFeatured && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-amber-500 hover:text-amber-600 hover:bg-amber-100/20"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            onToggleFeatured && onToggleFeatured(bot.botId); 
+                          }}
+                        >
+                          <Star className="h-4 w-4 fill-current" />
+                        </Button>
+                      )}
+                      {bot.isNew && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-100/20"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            onToggleNew && onToggleNew(bot.botId); 
+                          }}
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {bot.isBestSeller && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100/20"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            onToggleBestSeller && onToggleBestSeller(bot.botId); 
+                          }}
+                        >
+                          <Trophy className="h-4 w-4 fill-current" />
+                        </Button>
+                      )}
+                      {!bot.isFeatured && !bot.isNew && !bot.isBestSeller && (
+                        <span className="text-zinc-500 text-xs">—</span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-zinc-400">{bot.propFirm || "—"}</TableCell>
                   <TableCell>
                     <BotStatusBadge status={bot.status} />

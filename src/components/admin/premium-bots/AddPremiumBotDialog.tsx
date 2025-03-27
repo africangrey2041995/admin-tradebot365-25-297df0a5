@@ -15,6 +15,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Star, Sparkles, Trophy } from 'lucide-react';
 
 interface NewBotState {
   name: string;
@@ -34,6 +35,9 @@ interface NewBotState {
   featureSmartFilters: boolean;
   maxActivePositions: string;
   maxLeverage: string;
+  isFeatured: boolean;
+  isNew: boolean;
+  isBestSeller: boolean;
 }
 
 interface AddPremiumBotDialogProps {
@@ -66,10 +70,11 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
+          <TabsList className="grid grid-cols-4 mb-4">
             <TabsTrigger value="general">Thông tin chung</TabsTrigger>
             <TabsTrigger value="trading">Cài đặt giao dịch</TabsTrigger>
             <TabsTrigger value="features">Tính năng</TabsTrigger>
+            <TabsTrigger value="marketing">Marketing</TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="space-y-4">
@@ -319,6 +324,61 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
                   id="featureSmartFilters"
                   checked={newBot.featureSmartFilters}
                   onCheckedChange={(checked) => setNewBot({...newBot, featureSmartFilters: checked})}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="marketing" className="space-y-4">
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                  <div>
+                    <Label htmlFor="isFeatured">Đánh dấu là Bot nổi bật</Label>
+                    <p className="text-sm text-zinc-400">
+                      Hiển thị nhãn "Nổi bật" và ưu tiên trong danh sách
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="isFeatured"
+                  checked={newBot.isFeatured}
+                  onCheckedChange={(checked) => setNewBot({...newBot, isFeatured: checked})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-blue-500" />
+                  <div>
+                    <Label htmlFor="isNew">Đánh dấu là Bot mới</Label>
+                    <p className="text-sm text-zinc-400">
+                      Hiển thị nhãn "Mới" để thu hút sự chú ý
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="isNew"
+                  checked={newBot.isNew}
+                  onCheckedChange={(checked) => setNewBot({...newBot, isNew: checked})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-emerald-500 fill-emerald-500" />
+                  <div>
+                    <Label htmlFor="isBestSeller">Đánh dấu là Best Seller</Label>
+                    <p className="text-sm text-zinc-400">
+                      Hiển thị nhãn "Best Seller" để tăng độ tin cậy
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="isBestSeller"
+                  checked={newBot.isBestSeller}
+                  onCheckedChange={(checked) => setNewBot({...newBot, isBestSeller: checked})}
                 />
               </div>
             </div>

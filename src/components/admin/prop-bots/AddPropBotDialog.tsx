@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Star, Sparkles, Trophy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ADMIN_API } from '@/constants/apiEndpoints';
@@ -32,6 +31,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
+import { Switch } from '@/components/ui/switch';
 import {
   Popover,
   PopoverContent,
@@ -51,7 +51,6 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 
-// Updated the schema to use enum values for risk
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tên bot phải có ít nhất 2 ký tự",
@@ -74,6 +73,9 @@ const formSchema = z.object({
   propFirm: z.string().optional(),
   challengeDuration: z.string().optional(),
   accountSizes: z.string().optional(),
+  isFeatured: z.boolean().default(false),
+  isNew: z.boolean().default(true),
+  isBestSeller: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -107,6 +109,9 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
     propFirm: '',
     challengeDuration: '30 ngày',
     accountSizes: '$5,000, $10,000, $25,000',
+    isFeatured: false,
+    isNew: true,
+    isBestSeller: false,
   };
 
   const form = useForm<FormValues>({
@@ -117,18 +122,16 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      // Convert string risk to BotRiskLevel enum
       const riskLevel = data.risk === 'low' 
         ? BotRiskLevel.LOW 
         : data.risk === 'high' 
           ? BotRiskLevel.HIGH 
           : BotRiskLevel.MEDIUM;
 
-      // Generate a random ID with leading zeros for consistent formatting
       const randomId = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
       
       const propBotData: PropBot = {
-        botId: `PROP-${randomId}`, // Use standardized ID format with hyphen
+        botId: `PROP-${randomId}`,
         type: BotType.PROP_BOT,
         createdDate: format(data.createdDate || new Date(), 'yyyy-MM-dd'),
         lastUpdated: format(new Date(), 'yyyy-MM-dd'),
@@ -140,11 +143,14 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
         name: data.name,
         description: data.description || '',
         status: (data.status as BotStatus) || BotStatus.INACTIVE,
-        risk: riskLevel, // Use the converted enum value
+        risk: riskLevel,
         accountSizes: data.accountSizes ? data.accountSizes.split(',').map(size => size.trim()) : [],
         propFirm: data.propFirm,
         challengeDuration: data.challengeDuration,
         exchange: data.exchange,
+        isFeatured: data.isFeatured,
+        isNew: data.isNew,
+        isBestSeller: data.isBestSeller,
       };
 
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -182,10 +188,11 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
+              <TabsList className="grid grid-cols-4 mb-6">
                 <TabsTrigger value="basic">Thông tin cơ bản</TabsTrigger>
                 <TabsTrigger value="performance">Hiệu suất</TabsTrigger>
                 <TabsTrigger value="settings">Cài đặt nâng cao</TabsTrigger>
+                <TabsTrigger value="marketing">Marketing</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-4">
@@ -502,23 +509,97 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
                   />
                 </div>
               </TabsContent>
+
+              <TabsContent value="marketing" className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="isFeatured"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start justify-between space-y-0 rounded-md border border-zinc-700 p-4">
+                      <div className="space-y-0.5 flex items-center gap-2">
+                        <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                        <div>
+                          <FormLabel>Đánh dấu là Bot nổi bật</FormLabel>
+                          <FormDescription className="text-zinc-500">
+                            Hiển thị nhãn "Nổi bật" và ưu tiên trong danh sách
+                          </FormDescription>
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isNew"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start justify-between space-y-0 rounded-md border border-zinc-700 p-4">
+                      <div className="space-y-0.5 flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <FormLabel>Đánh dấu là Bot mới</FormLabel>
+                          <FormDescription className="text-zinc-500">
+                            Hiển thị nhãn "Mới" để thu hút sự chú ý
+                          </FormDescription>
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isBestSeller"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start justify-between space-y-0 rounded-md border border-zinc-700 p-4">
+                      <div className="space-y-0.5 flex items-center gap-2">
+                        <Trophy className="h-5 w-5 text-emerald-500 fill-emerald-500" />
+                        <div>
+                          <FormLabel>Đánh dấu là Best Seller</FormLabel>
+                          <FormDescription className="text-zinc-500">
+                            Hiển thị nhãn "Best Seller" để tăng độ tin cậy
+                          </FormDescription>
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
             </Tabs>
 
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <DialogFooter>
               <Button 
-                type="button" 
                 variant="outline" 
+                type="button"
                 onClick={() => onOpenChange(false)}
-                className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700"
+                className="border-zinc-700 text-zinc-400"
               >
                 Hủy
               </Button>
               <Button 
-                type="submit" 
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={isSubmitting}
-                className="bg-green-600 hover:bg-green-700 text-white"
               >
-                {isSubmitting ? "Đang xử lý..." : "Tạo Prop Bot"}
+                {isSubmitting ? 'Đang tạo...' : 'Tạo Bot'}
               </Button>
             </DialogFooter>
           </form>

@@ -56,6 +56,9 @@ export interface BaseBot {
   performance?: BotPerformance;
   ownerId?: string; // Standardized ownerId field
   externalId?: string; // Optional external identifier for the bot if needed
+  isFeatured?: boolean; // New property for featured bots
+  isNew?: boolean; // New property for new bots
+  isBestSeller?: boolean; // New property for best seller bots
 }
 
 // Bot của người dùng
