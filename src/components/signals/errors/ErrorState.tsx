@@ -1,30 +1,41 @@
 
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface ErrorStateProps {
-  error: Error;
-  onRetry: () => void;
+  error: Error | string;
+  onRetry?: () => void;
+  title?: string;
+  botType?: 'premium' | 'prop' | 'user';
 }
 
-const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
+const ErrorState: React.FC<ErrorStateProps> = ({
+  error,
+  onRetry,
+  title = "Error Loading Signals",
+  botType = 'user'
+}) => {
+  const errorMessage = error instanceof Error ? error.message : error;
+
   return (
-    <div className="py-8 rounded-md text-center border border-red-200 bg-red-50/30 dark:border-red-800/30 dark:bg-red-900/10">
-      <div className="max-w-md mx-auto">
-        <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium mb-2 text-red-700">Đã xảy ra lỗi khi tải dữ liệu</h3>
-        <p className="text-sm text-red-600 mb-4">{error.message}</p>
-        <Button 
-          variant="outline" 
-          onClick={onRetry}
-          className="border-red-300 hover:bg-red-50"
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Thử lại
-        </Button>
-      </div>
-    </div>
+    <Alert variant="destructive" className="bg-red-50 border-red-300 text-red-800 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30">
+      <AlertTriangle className="h-4 w-4" />
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription className="mt-2">
+        <p className="mb-3">{errorMessage}</p>
+        {onRetry && (
+          <Button 
+            variant="outline" 
+            className="border-red-200 hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-900/50"
+            onClick={onRetry}
+          >
+            Try Again
+          </Button>
+        )}
+      </AlertDescription>
+    </Alert>
   );
 };
 

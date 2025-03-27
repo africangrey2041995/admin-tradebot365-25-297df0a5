@@ -3,8 +3,9 @@ import React from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { RefreshCw } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
-export interface LoadingStateProps {
+interface LoadingStateProps {
   isSimple?: boolean;
   message?: string;
   botType?: 'premium' | 'prop' | 'user';
@@ -13,7 +14,7 @@ export interface LoadingStateProps {
 
 const LoadingState: React.FC<LoadingStateProps> = ({ 
   isSimple = false,
-  message = "Loading signal logs...",
+  message = "Loading signal data...",
   botType = 'user',
   showProgress = false
 }) => {
@@ -22,6 +23,15 @@ const LoadingState: React.FC<LoadingStateProps> = ({
       <div className="flex flex-col items-center justify-center py-8">
         <RefreshCw className="h-8 w-8 text-muted-foreground animate-spin mb-3" />
         <p className="text-sm text-muted-foreground">{message}</p>
+        {showProgress && (
+          <div className="w-48 mt-4">
+            <Progress 
+              value={100} 
+              className="h-1" 
+              indicatorClassName="animate-pulse bg-blue-500" 
+            />
+          </div>
+        )}
       </div>
     );
   }

@@ -1,52 +1,39 @@
 
 import React from 'react';
+import { format, formatDistanceToNow } from 'date-fns';
 
 interface FormatDateTimeProps {
   timestamp: string;
-  showSeconds?: boolean;
-  options?: Intl.DateTimeFormatOptions;
+  showRelative?: boolean;
+  dateFormat?: string;
+  className?: string;
 }
 
-const FormatDateTime: React.FC<FormatDateTimeProps> = ({ 
-  timestamp, 
-  showSeconds = false,
-  options: customOptions
+const FormatDateTime: React.FC<FormatDateTimeProps> = ({
+  timestamp,
+  showRelative = true,
+  dateFormat = 'MMM d, yyyy HH:mm:ss',
+  className = "text-sm text-muted-foreground"
 }) => {
-  // Safely parse the date
-  const date = new Date(timestamp);
-  
-  // Check if the date is valid
-  if (isNaN(date.getTime())) {
-    return <span className="text-gray-400">Invalid date</span>;
-  }
-  
-  // Format the date
-  let options: Intl.DateTimeFormatOptions;
-  
-  if (customOptions) {
-    // Use the custom options if provided
-    options = customOptions;
-  } else {
-    // Use default options
-    options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    
-    if (showSeconds) {
-      options.second = '2-digit';
-    }
-  }
+  if (!timestamp) return null;
   
   try {
-    const formattedDate = new Intl.DateTimeFormat('default', options).format(date);
-    return <span>{formattedDate}</span>;
+    const date = new Date(timestamp);
+    const formattedDate = format(date, dateFormat);
+    
+    if (showRelative) {
+      const relativeTime = formatDistanceToNow(date, { addSuffix: true });
+      return (
+        <span className={className} title={formattedDate}>
+          {relativeTime}
+        </span>
+      );
+    }
+    
+    return <span className={className}>{formattedDate}</span>;
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return <span className="text-gray-400">Format error</span>;
+    console.error("Error formatting date:", error);
+    return <span className={className}>{timestamp}</span>;
   }
 };
 

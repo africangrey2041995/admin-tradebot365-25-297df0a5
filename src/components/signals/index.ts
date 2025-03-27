@@ -12,3 +12,6 @@ export * from './coinstrat';
 // Tracking and error components
 export * from './tracking';
 export * from './errors';
+
+// Re-export hooks
+export * from './hooks';

@@ -1,35 +1,35 @@
 
 import React from 'react';
-import FormatDateTime from './FormatDateTime';
-import { InfoTooltip } from './CopyableField';
+import { formatDistanceToNow, format } from 'date-fns';
 
 interface TimestampSectionProps {
   timestamp: string;
+  showRelative?: boolean;
+  showExactTime?: boolean;
+  label?: string;
+  className?: string;
 }
 
 const TimestampSection: React.FC<TimestampSectionProps> = ({
-  timestamp
+  timestamp,
+  showRelative = true,
+  showExactTime = true,
+  label = "Received",
+  className = ""
 }) => {
+  if (!timestamp) return null;
+  
+  const date = new Date(timestamp);
+  const relativeTime = formatDistanceToNow(date, { addSuffix: true });
+  const exactTime = format(date, 'PPpp'); // Format: Mar 20, 2023, 3:45 PM
+  
   return (
-    <div className="border-t pt-4">
-      <h4 className="text-xs text-muted-foreground">
-        <InfoTooltip content="Date and time when this signal was received by the system">
-          Timestamp
-        </InfoTooltip>
-      </h4>
-      <p className="text-sm font-medium">
-        <FormatDateTime
-          timestamp={timestamp}
-          options={{
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          }}
-        />
-      </p>
+    <div className={`text-sm ${className}`}>
+      <span className="text-muted-foreground">{label}: </span>
+      {showRelative && <span className="font-medium">{relativeTime}</span>}
+      {showExactTime && showRelative && <span className="text-muted-foreground"> (</span>}
+      {showExactTime && <span className="text-muted-foreground">{exactTime}</span>}
+      {showExactTime && showRelative && <span className="text-muted-foreground">)</span>}
     </div>
   );
 };

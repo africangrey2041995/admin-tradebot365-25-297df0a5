@@ -1,26 +1,34 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { RefreshCw, AlertTriangle } from "lucide-react";
 
 interface EmptyStateProps {
   message?: string;
+  subMessage?: string;
   onRefresh?: () => void;
+  refreshButtonText?: string;
   botType?: 'premium' | 'prop' | 'user';
+  icon?: 'warning' | 'info' | 'error';
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({
-  message = "No signal logs found for this bot.",
+  message = "No signal logs found",
+  subMessage = "There are no signal logs available for this bot.",
   onRefresh,
-  botType = 'user'
+  refreshButtonText = "Refresh Logs",
+  botType = 'user',
+  icon = 'warning'
 }) => {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800/30 rounded-lg p-6 text-center">
-      <p className="text-gray-500 dark:text-gray-400 mb-4">{message}</p>
+    <div className="bg-muted/50 p-6 rounded-lg text-center">
+      <AlertTriangle className="h-10 w-10 text-muted-foreground mx-auto mb-3" aria-label={message} />
+      <h3 className="text-lg font-medium mb-1">{message}</h3>
+      <p className="text-sm text-muted-foreground mb-4">{subMessage}</p>
       {onRefresh && (
         <Button variant="outline" size="sm" onClick={onRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh Logs
+          {refreshButtonText}
         </Button>
       )}
     </div>

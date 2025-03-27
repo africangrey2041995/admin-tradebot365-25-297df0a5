@@ -1,39 +1,59 @@
 
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 
-export interface UseSignalLogsOptions {
+/**
+ * Common properties for all signal log hook props
+ */
+export interface BaseSignalLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
-  initialData?: any[];
   skipLoadingState?: boolean;
 }
 
-export interface UseSignalLogsResult<T> {
+/**
+ * Props for the TradingView logs hook
+ */
+export interface TradingViewLogsProps extends BaseSignalLogsProps {
+  initialData?: TradingViewSignal[];
+}
+
+/**
+ * Props for the Coinstrat logs hook
+ */
+export interface CoinstratLogsProps extends BaseSignalLogsProps {
+  initialData?: CoinstratSignal[];
+}
+
+/**
+ * Common return type for signal log hooks
+ */
+export interface BaseSignalLogsResult<T> {
   logs: T[];
   loading: boolean;
   error: Error | null;
   fetchLogs: () => void;
 }
 
-export interface SignalFilters {
-  search: string;
-  signalSource: 'all' | 'tradingview' | 'coinstrat';
-  status: 'all' | 'success' | 'failed' | 'pending';
-  dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
-  userId: string;
-}
+/**
+ * Return type for TradingView logs hook
+ */
+export interface TradingViewLogsResult extends BaseSignalLogsResult<TradingViewSignal> {}
 
-export interface UseCombinedSignalLogsProps {
-  botId: string;
-  userId: string;
-  refreshTrigger?: boolean;
-}
+/**
+ * Return type for Coinstrat logs hook
+ */
+export interface CoinstratLogsResult extends BaseSignalLogsResult<CoinstratSignal> {}
 
-export interface UseCombinedSignalLogsResult {
+/**
+ * Props for the combined signal logs hook
+ */
+export interface CombinedSignalLogsProps extends BaseSignalLogsProps {}
+
+/**
+ * Return type for combined signal logs hook
+ */
+export interface CombinedSignalLogsResult {
   tradingViewLogs: TradingViewSignal[];
   coinstratLogs: CoinstratSignal[];
   loading: boolean;
