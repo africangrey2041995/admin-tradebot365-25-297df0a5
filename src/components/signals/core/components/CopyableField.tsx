@@ -1,42 +1,34 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Copy, Info } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Copy, InfoIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface InfoTooltipProps {
-  content: string;
-  children: React.ReactNode;
-}
-
-export const InfoTooltip: React.FC<InfoTooltipProps> = ({ content, children }) => (
-  <TooltipProvider>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="inline-flex items-center">
-          {children}
-          <Info className="h-3 w-3 ml-1 text-muted-foreground" />
-        </span>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p className="text-xs">{content}</p>
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
-
-interface CopyableFieldProps {
+export interface CopyableFieldProps {
   label: string;
-  value: string;
-  tooltip: string;
+  value: string | number | undefined;
+  tooltip?: string;
   className?: string;
-  onCopy: (text: string, label: string) => void;
+  onCopy?: (text: string, label: string) => void;
 }
+
+export const InfoTooltip: React.FC<{ content: string; children: React.ReactNode }> = ({ content, children }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center cursor-help">
+            {children}
+            <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground" />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs max-w-[200px]">{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const CopyableField: React.FC<CopyableFieldProps> = ({
   label,
@@ -44,23 +36,46 @@ const CopyableField: React.FC<CopyableFieldProps> = ({
   tooltip,
   className = "",
   onCopy
-}) => (
-  <div className={className}>
-    <h4 className="text-xs text-muted-foreground">
-      <InfoTooltip content={tooltip}>{label}</InfoTooltip>
-    </h4>
-    <div className="flex items-center mt-1">
-      <p className="text-sm font-medium break-all mr-1">{value}</p>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-6 w-6 p-0"
-        onClick={() => onCopy(value, label)}
-      >
-        <Copy className="h-3 w-3" />
-      </Button>
+}) => {
+  const handleCopy = () => {
+    const textToCopy = value?.toString() || '';
+    
+    // Use the provided onCopy handler if available
+    if (onCopy) {
+      onCopy(textToCopy, label);
+    } else {
+      // Fallback to navigator.clipboard
+      navigator.clipboard.writeText(textToCopy);
+    }
+  };
+
+  return (
+    <div className={`space-y-1 ${className}`}>
+      <div className="text-xs text-muted-foreground">
+        {tooltip ? (
+          <InfoTooltip content={tooltip}>
+            {label}
+          </InfoTooltip>
+        ) : (
+          label
+        )}
+      </div>
+      <div className="flex items-center">
+        <span className="text-sm font-medium truncate flex-1">
+          {value !== undefined ? value : '-'}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 p-0 px-1"
+          onClick={handleCopy}
+          aria-label={`Copy ${label}`}
+        >
+          <Copy className="h-3 w-3" />
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default CopyableField;

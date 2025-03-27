@@ -11,8 +11,52 @@ This directory contains all components related to trading signals in the applica
 - `/tradingview`: Components specific to TradingView signals
 - `/coinstrat`: Components specific to Coinstrat signals
 - `/errors`: Error handling and display components
-- `/tracking`: Signal tracking components (future implementation)
+- `/tracking`: Signal tracking components
 - `/hooks`: Custom hooks for signal data and management
+
+## Core Components
+
+The core components are designed to be reused across the application. They include:
+
+- **Badges**: Visual indicators of signal states and actions
+  - `StatusBadge`: Shows the current status of a signal (processed, failed, etc.)
+  - `ActionBadge`: Displays the action type (buy, sell, etc.)
+  - `UserStatusBadge`: Indicates user/account status
+
+- **Components**: UI building blocks for signals
+  - `SignalLoadingState`: Loading indicators
+  - `SignalEmptyState`: Empty state message
+  - `SignalErrorState`: Error state display
+  - `CopyableField`: Field with copy capability
+  - `FormatDateTime`: Date/time formatter
+  - `TimestampSection`: Standard timestamp display
+
+## Signal-Specific Components
+
+Each signal source has its own components:
+
+- **TradingView**:
+  - `TradingViewLogItem`: Individual TradingView signal item
+  - Signal-specific badges and formatting
+
+- **Coinstrat**:
+  - `CoinstratSignalItem`: Individual Coinstrat signal item
+  - `AccountSection`: Shows accounts that processed a signal
+  - Signal-specific badges and formatting
+
+## Tracking Components
+
+Components for tracking and monitoring signals:
+
+- `AdvancedSignalFilter`: Filter interface for signals with multiple criteria
+- Unified signal views and displays
+
+## Hooks
+
+Custom hooks for signal management:
+
+- `useSignalFilters`: Manages filter state for signal displays
+- `useSafeLoading`: Provides safe loading state with timeouts
 
 ## Usage Guidelines
 
@@ -30,27 +74,34 @@ import { ActionBadge, StatusBadge } from '@/components/signals/core/badges';
 Each signal type has its own directory with specific components:
 
 ```tsx
-import { TradingViewActionBadge } from '@/components/signals/tradingview';
-import { CoinstratStatusBadge } from '@/components/signals/coinstrat';
+import { TradingViewLogItem } from '@/components/signals/tradingview/components';
+import { CoinstratSignalItem, AccountSection } from '@/components/signals/coinstrat/components';
 ```
 
-### Backward Compatibility
+### Tracking Components
 
-For backward compatibility, components are also accessible through legacy import paths.
-However, new code should use the new import paths directly.
+For signal tracking and filtering:
 
-## Adding New Components
+```tsx
+import { AdvancedSignalFilter } from '@/components/signals/tracking';
+```
 
-When adding new signal components:
+### Hooks
 
-1. Place them in the appropriate directory based on their purpose
-2. Export them through the relevant index.ts file
-3. Keep components small and focused on a single responsibility
-4. Maintain TypeScript type safety throughout
-5. Document props and usage in component files
+Use the signal-specific hooks:
 
-## Future Improvements
+```tsx
+import { useSignalFilters } from '@/components/signals/hooks/useSignalFilters';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
+```
 
-- Consider adding storybook examples for each component
-- Add unit tests for core components
-- Further optimize bundle size through code splitting
+## Backward Compatibility
+
+To maintain backward compatibility during the transition, components are also accessible through their original import paths. However, new code should use the new import paths directly.
+
+## Best Practices
+
+- Use the appropriate component for the signal type
+- Leverage the core components for consistency
+- Use the hooks to manage state
+- Follow the established patterns for new components

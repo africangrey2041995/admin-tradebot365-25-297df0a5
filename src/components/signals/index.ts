@@ -3,15 +3,17 @@
 // These exports provide backward compatibility while migrating
 
 // Core components
-export { default as StatusBadge } from './core/badges/StatusBadge';
-export { default as SignalLoadingState } from './core/components/SignalLoadingState';
+export * from './core';
+
+// Type-specific components
+export * from './tradingview';
+export * from './coinstrat';
 
 // Hooks
-export { useSignalFilters } from './hooks/useSignalFilters';
-export type { SignalFilters } from './hooks/useSignalFilters';
+export * from './hooks/useSignalFilters';
 
 // Tracking components
-export { AdvancedSignalFilter } from './tracking';
+export * from './tracking';
 
-// Note: As migration progresses, additional components will be exported here
-// to maintain backward compatibility
+// Error components
+export * from './errors';

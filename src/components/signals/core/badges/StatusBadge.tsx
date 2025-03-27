@@ -1,62 +1,67 @@
 
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
   status: string;
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'outline' | 'solid';
-  showIcon?: boolean;
+  className?: string;
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({
-  status,
+const StatusBadge: React.FC<StatusBadgeProps> = ({ 
+  status, 
   size = 'md',
-  variant = 'outline',
-  showIcon = true
+  className 
 }) => {
-  // Normalize status to lowercase for comparison
-  const normalizedStatus = status.toLowerCase();
-  
-  // Determine badge styling based on status
-  let badgeStyle = '';
-  let Icon = CheckCircle;
-  
-  if (normalizedStatus.includes('success') || normalizedStatus.includes('processed')) {
-    badgeStyle = variant === 'outline' 
-      ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800' 
-      : 'bg-green-600 text-white';
-    Icon = CheckCircle;
-  } else if (normalizedStatus.includes('fail') || normalizedStatus.includes('error') || normalizedStatus === 'rejected') {
-    badgeStyle = variant === 'outline' 
-      ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800' 
-      : 'bg-red-600 text-white';
-    Icon = XCircle;
-  } else if (normalizedStatus.includes('pending') || normalizedStatus.includes('waiting') || normalizedStatus === 'processing') {
-    badgeStyle = variant === 'outline' 
-      ? 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800' 
-      : 'bg-yellow-500 text-white';
-    Icon = Clock;
-  } else {
-    badgeStyle = variant === 'outline' 
-      ? 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700' 
-      : 'bg-gray-600 text-white';
-    Icon = AlertTriangle;
-  }
-  
-  // Size classes
+  // Size classes for the badge
   const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5',
-    md: 'text-sm px-2.5 py-0.5',
-    lg: 'px-3 py-1'
+    sm: 'px-1.5 py-0.5 text-xs',
+    md: 'px-2 py-1 text-xs',
+    lg: 'px-2.5 py-1.5 text-sm',
   };
-  
+
+  // Set icon and colors based on status
+  let Icon;
+  let colorClasses;
+  let statusText = status;
+
+  const normalizedStatus = status?.toLowerCase() || '';
+
+  if (normalizedStatus.includes('success') || normalizedStatus.includes('processed')) {
+    Icon = CheckCircle;
+    colorClasses = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+    statusText = normalizedStatus.includes('processed') ? 'Processed' : 'Success';
+  } else if (normalizedStatus.includes('fail') || normalizedStatus.includes('error')) {
+    Icon = XCircle;
+    colorClasses = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+    statusText = normalizedStatus.includes('failed') ? 'Failed' : 'Error';
+  } else if (normalizedStatus.includes('pend') || normalizedStatus.includes('process')) {
+    Icon = Clock;
+    colorClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+    statusText = 'Pending';
+  } else if (normalizedStatus.includes('warn')) {
+    Icon = AlertTriangle;
+    colorClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+    statusText = 'Warning';
+  } else {
+    Icon = AlertTriangle;
+    colorClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-300';
+  }
+
   return (
-    <Badge variant="outline" className={`${badgeStyle} ${sizeClasses[size]} flex items-center gap-1.5`}>
-      {showIcon && <Icon className={size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'} />}
-      <span>{status}</span>
-    </Badge>
+    <span className={cn(
+      'inline-flex items-center gap-1 rounded-full font-medium',
+      sizeClasses[size],
+      colorClasses,
+      className
+    )}>
+      <Icon className={cn(
+        'shrink-0',
+        size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-3.5 w-3.5' : 'h-4 w-4'
+      )} />
+      <span>{statusText}</span>
+    </span>
   );
 };
 

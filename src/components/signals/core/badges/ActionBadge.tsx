@@ -1,35 +1,68 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowUpRight, ArrowDownRight, ArrowRight, Plus, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-/**
- * ActionBadge component for displaying signal action types
- * 
- * Supported actions:
- * - ENTER_LONG: Green badge for opening buy positions
- * - EXIT_LONG: Red badge for closing buy positions
- * - ENTER_SHORT: Blue badge for opening sell positions
- * - EXIT_SHORT: Purple badge for closing sell positions
- * 
- * @param action - The signal action to display (ENTER_LONG, EXIT_LONG, etc.)
- */
 interface ActionBadgeProps {
   action: string;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-const ActionBadge: React.FC<ActionBadgeProps> = ({ action }) => {
-  switch (action) {
-    case 'ENTER_LONG':
-      return <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">{action}</Badge>;
-    case 'EXIT_LONG':
-      return <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">{action}</Badge>;
-    case 'ENTER_SHORT':
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">{action}</Badge>;
-    case 'EXIT_SHORT':
-      return <Badge variant="outline" className="bg-purple-50 text-purple-700 hover:bg-purple-50 border-purple-200">{action}</Badge>;
+const ActionBadge: React.FC<ActionBadgeProps> = ({ 
+  action, 
+  size = 'md',
+  className 
+}) => {
+  // Define size classes
+  const sizeClasses = {
+    sm: 'px-1.5 py-0.5 text-xs',
+    md: 'px-2 py-1 text-xs',
+    lg: 'px-2.5 py-1.5 text-sm',
+  };
+
+  // Set icon based on action
+  let Icon;
+  let colorClasses;
+
+  switch (action?.toLowerCase()) {
+    case 'buy':
+    case 'long':
+      Icon = ArrowUpRight;
+      colorClasses = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      break;
+    case 'sell':
+    case 'short':
+      Icon = ArrowDownRight;
+      colorClasses = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+      break;
+    case 'add':
+      Icon = Plus;
+      colorClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      break;
+    case 'reduce':
+      Icon = Minus;
+      colorClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+      break;
     default:
-      return <Badge variant="outline">{action}</Badge>;
+      Icon = ArrowRight;
+      colorClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-300';
   }
+
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-1 rounded-full font-medium',
+      sizeClasses[size],
+      colorClasses,
+      className
+    )}>
+      <Icon className={cn(
+        'shrink-0',
+        size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-3.5 w-3.5' : 'h-4 w-4'
+      )} />
+      <span>{action}</span>
+    </span>
+  );
 };
 
 export default ActionBadge;
