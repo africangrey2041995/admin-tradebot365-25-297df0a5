@@ -33,7 +33,7 @@ const IntegratedBotsSearch: React.FC<IntegratedBotsSearchProps> = ({
           className="w-full"
         />
       </div>
-      <Select value={riskFilter} onValueChange={onRiskFilterChange}>
+      <Select value={riskFilter || "all"} onValueChange={onRiskFilterChange}>
         <SelectTrigger>
           <Filter className="h-4 w-4 mr-2" />
           <SelectValue placeholder="Mức độ rủi ro" />

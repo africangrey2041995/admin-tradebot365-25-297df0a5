@@ -46,6 +46,7 @@ const PropBotSettingsTab: React.FC<PropBotSettingsTabProps> = ({
   };
   
   const handleSelectChange = (name: string, value: string) => {
+    if (!value) return; // Prevent empty string values
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   

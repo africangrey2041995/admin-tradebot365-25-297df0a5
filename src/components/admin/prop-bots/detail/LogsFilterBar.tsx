@@ -32,11 +32,13 @@ const LogsFilterBar: React.FC<LogsFilterBarProps> = ({
   };
 
   const handleStatusChange = (value: string) => {
+    if (!value) return; // Safety check against empty values
     setStatusFilter(value);
     applyFilters(searchValue, value, timeRange);
   };
 
   const handleTimeRangeChange = (value: string) => {
+    if (!value) return; // Safety check against empty values
     setTimeRange(value);
     applyFilters(searchValue, statusFilter, value);
   };

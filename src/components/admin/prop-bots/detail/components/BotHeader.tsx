@@ -42,6 +42,7 @@ const BotHeader: React.FC<BotHeaderProps> = ({
   };
 
   const handleSaveStatus = () => {
+    if (!editedStatus) return; // Prevent empty status values
     onUpdate({ status: editedStatus });
     setStatusPopoverOpen(false);
     toast.success("Đã cập nhật trạng thái");

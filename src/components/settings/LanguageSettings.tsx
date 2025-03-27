@@ -63,6 +63,7 @@ const LanguageSettings = () => {
   const { toast } = useToast();
   
   const handleLanguageSelect = (currentValue: string) => {
+    if (!currentValue) return; // Prevent empty string values
     setLanguage(currentValue);
     setOpen(false);
     
@@ -75,6 +76,7 @@ const LanguageSettings = () => {
   };
 
   const handleTimezoneChange = (value: string) => {
+    if (!value) return; // Prevent empty string values
     const selectedTimezone = timezones.find(tz => tz.value === value);
     
     toast({
@@ -84,6 +86,7 @@ const LanguageSettings = () => {
   };
 
   const handleFormatChange = (type: string, value: string) => {
+    if (!value) return; // Prevent empty string values
     toast({
       title: `Định dạng ${type === 'date' ? 'ngày' : 'giờ'} đã được thay đổi`,
       description: `Định dạng ${type === 'date' ? 'ngày' : 'giờ'} đã được đặt thành ${value}.`,

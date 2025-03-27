@@ -33,7 +33,7 @@ export const PlanFilterSelect: React.FC<PlanFilterSelectProps> = ({
   return (
     <div className={className}>
       <Select 
-        value={planFilter || ""} 
+        value={planFilter || "all"} 
         onValueChange={(value) => onPlanFilterChange(value === 'all' ? null : value || null)}
       >
         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">

@@ -38,12 +38,14 @@ const BotMetadata: React.FC<BotMetadataProps> = ({
   const [exchangePopoverOpen, setExchangePopoverOpen] = useState(false);
 
   const handleSavePropFirm = () => {
+    if (!editedPropFirm) return; // Prevent empty values
     onUpdate({ propFirm: editedPropFirm });
     setPropFirmPopoverOpen(false);
     toast.success("Đã cập nhật Prop Firm");
   };
 
   const handleSaveExchange = () => {
+    if (!editedExchange) return; // Prevent empty values
     onUpdate({ exchange: editedExchange });
     setExchangePopoverOpen(false);
     toast.success("Đã cập nhật sàn giao dịch");
