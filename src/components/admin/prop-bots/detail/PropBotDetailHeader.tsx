@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Edit, Power, Trash2, AlertTriangle, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -190,7 +189,6 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
         </Button>
       </div>
 
-      {/* Status change confirmation dialog */}
       <AlertDialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -214,7 +212,6 @@ const PropBotDetailHeader: React.FC<PropBotDetailHeaderProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

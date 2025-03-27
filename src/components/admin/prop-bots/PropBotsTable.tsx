@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PropBot } from '@/types/bot';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { BotStatus } from '@/constants/botTypes';
 
 interface PropBotsTableProps {
   currentBots: PropBot[];
@@ -21,6 +21,28 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
   totalPages,
   onRowClick
 }) => {
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case BotStatus.ACTIVE: return "Đang hoạt động";
+      case BotStatus.INACTIVE: return "Không hoạt động";
+      case BotStatus.MAINTENANCE: return "Bảo trì";
+      case BotStatus.ERROR: return "Lỗi";
+      case BotStatus.SUSPENDED: return "Đã dừng";
+      default: return status;
+    }
+  };
+
+  const getStatusClasses = (status: string) => {
+    switch (status) {
+      case BotStatus.ACTIVE: return "bg-green-500/20 text-green-500";
+      case BotStatus.INACTIVE: return "bg-zinc-500/20 text-zinc-400";
+      case BotStatus.MAINTENANCE: return "bg-yellow-500/20 text-yellow-500";
+      case BotStatus.ERROR: return "bg-red-500/20 text-red-500";
+      case BotStatus.SUSPENDED: return "bg-red-800/20 text-red-400";
+      default: return "bg-gray-500/20 text-gray-400";
+    }
+  };
+
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
@@ -59,17 +81,9 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                   <TableCell>
                     <span className={cn(
                       "px-2 py-1 rounded-full text-xs font-medium",
-                      bot.status === 'active' && "bg-green-500/20 text-green-500",
-                      bot.status === 'inactive' && "bg-zinc-500/20 text-zinc-400",
-                      bot.status === 'maintenance' && "bg-yellow-500/20 text-yellow-500",
-                      bot.status === 'error' && "bg-red-500/20 text-red-500",
-                      bot.status === 'suspended' && "bg-red-800/20 text-red-400",
+                      getStatusClasses(bot.status)
                     )}>
-                      {bot.status === 'active' && "Đang hoạt động"}
-                      {bot.status === 'inactive' && "Không hoạt động"}
-                      {bot.status === 'maintenance' && "Bảo trì"}
-                      {bot.status === 'error' && "Lỗi"}
-                      {bot.status === 'suspended' && "Đã dừng"}
+                      {getStatusDisplay(bot.status)}
                     </span>
                   </TableCell>
                   <TableCell className="text-zinc-400">{bot.minCapital}</TableCell>
@@ -86,7 +100,6 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
         </Table>
       </div>
       
-      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
           <div className="text-sm text-zinc-500">

@@ -1,5 +1,5 @@
 
-import { BotType, BOT_ID_PREFIXES, ID_PREFIX_TO_BOT_TYPE } from '@/constants/botTypes';
+import { BotType, BotStatus, BotRiskLevel, BOT_ID_PREFIXES, ID_PREFIX_TO_BOT_TYPE } from '@/constants/botTypes';
 
 /**
  * Xác định loại bot dựa trên ID
@@ -12,7 +12,7 @@ export function determineBotType(botId: string): BotType | undefined {
   // Kiểm tra từng prefix để xác định loại bot
   for (const [prefix, botType] of Object.entries(ID_PREFIX_TO_BOT_TYPE)) {
     if (botId.startsWith(prefix)) {
-      return botType;
+      return botType as BotType;
     }
   }
   

@@ -124,7 +124,7 @@ export const useAdminPropBot = (botId?: string): UseAdminPropBotReturn => {
         newStatus === BotStatus.INACTIVE ? 'Không hoạt động' :
         // Fix the PAUSED reference which doesn't exist in BotStatus
         // Using a proper value from BotStatus enum
-        newStatus === BotStatus.MAINTENANCE ? 'Tạm dừng' : 'Đang bảo trì';
+        newStatus === BotStatus.MAINTENANCE ? 'Bảo trì' : 'Đang bảo trì';
       
       toast.success(`Trạng thái của bot đã được cập nhật thành: ${statusText}`);
     }

@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { PremiumBot } from "@/types";
+import { BotStatus } from '@/constants/botTypes';
 
 interface PremiumBotStatsCardsProps {
   bots: PremiumBot[];
@@ -9,8 +9,8 @@ interface PremiumBotStatsCardsProps {
 
 export const PremiumBotStatsCards: React.FC<PremiumBotStatsCardsProps> = ({ bots }) => {
   const totalBots = bots.length;
-  const activeBots = bots.filter(bot => bot.status === 'active').length;
-  const inactiveBots = bots.filter(bot => bot.status === 'inactive' || bot.status === 'maintenance').length;
+  const activeBots = bots.filter(bot => bot.status === BotStatus.ACTIVE).length;
+  const inactiveBots = bots.filter(bot => bot.status === BotStatus.INACTIVE || bot.status === BotStatus.MAINTENANCE).length;
   const totalUsers = bots.reduce((sum, bot) => sum + (bot.users || 0), 0);
   const positivePerformance = bots.filter(bot => bot.profit && parseFloat(bot.profit) > 0).length;
   const averageProfit = (bots.reduce((sum, bot) => sum + (bot.profit ? parseFloat(bot.profit) : 0), 0) / totalBots).toFixed(1) + '%';
