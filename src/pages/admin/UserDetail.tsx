@@ -36,10 +36,18 @@ import {
   Eye,
   Search,
   Package,
-  Database
+  Database,
+  Edit,
+  Key,
+  AlertCircle,
+  MapPin
 } from "lucide-react";
 import { UserPackageManagement } from '@/components/admin/users/UserPackageManagement';
 import UserAccountsTab from '@/components/admin/users/accounts/UserAccountsTab';
+import { UserEditDialog } from '@/components/admin/users/UserEditDialog';
+import { ResetPasswordDialog } from '@/components/admin/users/ResetPasswordDialog';
+import { UserStatusToggle } from '@/components/admin/users/UserStatusToggle';
+import { toast } from 'sonner';
 
 const RoleBadge = ({ role }: { role: string }) => {
   return (
@@ -82,6 +90,8 @@ const AdminUserDetail = () => {
   const [selectedBotId, setSelectedBotId] = useState<string | null>(null);
   const [accountsDialogOpen, setAccountsDialogOpen] = useState(false);
   const [selectedAccountsList, setSelectedAccountsList] = useState<any[]>([]);
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
 
   const user = {
     id: userId || 'USR-24051',
@@ -196,6 +206,10 @@ const AdminUserDetail = () => {
     );
   };
 
+  const handleStatusChange = (newStatus: 'active' | 'inactive' | 'suspended') => {
+    toast.success(`Trạng thái người dùng đã được thay đổi thành ${newStatus === 'active' ? 'Hoạt động' : 'Không hoạt động'}`);
+  };
+
   const customBotCount = user.userBots.length;
   const premiumBotCount = user.premiumBots.length;
   const propBotCount = user.propBots.length;
@@ -249,10 +263,30 @@ const AdminUserDetail = () => {
                 {user.email}
               </CardDescription>
             </div>
-            <div className="mt-4 sm:mt-0">
+            <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
               <Badge className="bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border-0">
                 {user.subscription}
               </Badge>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setEditUserDialogOpen(true)}
+                className="border-zinc-800 gap-1"
+              >
+                <Edit className="h-3.5 w-3.5" />
+                Chỉnh sửa
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setResetPasswordDialogOpen(true)}
+                className="border-zinc-800 gap-1"
+              >
+                <Key className="h-3.5 w-3.5" />
+                Đặt lại mật khẩu
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -260,15 +294,24 @@ const AdminUserDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Ngày tham gia</div>
-              <div>{user.joinDate}</div>
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4 text-zinc-500" />
+                {user.joinDate}
+              </div>
             </div>
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Lần cuối đăng nhập</div>
-              <div>{user.lastLogin}</div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4 text-zinc-500" />
+                {user.lastLogin}
+              </div>
             </div>
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Số dư tài khoản</div>
-              <div>{user.balance}</div>
+              <div className="flex items-center gap-1">
+                <CreditCard className="h-4 w-4 text-zinc-500" />
+                {user.balance}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -301,7 +344,10 @@ const AdminUserDetail = () => {
         <TabsContent value="profile" className="space-y-6">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardHeader>
-              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Thông tin cá nhân
+              </CardTitle>
               <CardDescription className="text-zinc-400">
                 Thông tin chi tiết về người dùng.
               </CardDescription>
@@ -310,23 +356,38 @@ const AdminUserDetail = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Họ và tên</div>
-                  <div>{user.name}</div>
+                  <div className="flex items-center gap-1">
+                    <User className="h-4 w-4 text-zinc-500" />
+                    {user.name}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Email</div>
-                  <div>{user.email}</div>
+                  <div className="flex items-center gap-1">
+                    <Mail className="h-4 w-4 text-zinc-500" />
+                    {user.email}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Số điện thoại</div>
-                  <div>{user.phone}</div>
+                  <div className="flex items-center gap-1">
+                    <Phone className="h-4 w-4 text-zinc-500" />
+                    {user.phone}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">��ịa chỉ</div>
-                  <div>{user.address || "Chưa cập nhật"}</div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4 text-zinc-500" />
+                    {user.address || "Chưa cập nhật"}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Loại tài khoản</div>
-                  <div>{user.accountType}</div>
+                  <div className="flex items-center gap-1">
+                    <Shield className="h-4 w-4 text-zinc-500" />
+                    {user.accountType}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="text-sm text-zinc-400">Giới thiệu (Affiliate)</div>
@@ -334,6 +395,86 @@ const AdminUserDetail = () => {
                     <span>Chưa có</span>
                     <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">Tính năng tương lai</Badge>
                   </div>
+                </div>
+              </div>
+
+              <div className="mt-8 border-t border-zinc-800 pt-6">
+                <UserStatusToggle 
+                  userId={user.id} 
+                  initialStatus={user.status as 'active' | 'inactive' | 'suspended'}
+                  onStatusChange={handleStatusChange}
+                />
+              </div>
+
+              <div className="mt-8 flex justify-end">
+                <Button 
+                  onClick={() => setEditUserDialogOpen(true)}
+                  className="gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Cập nhật thông tin
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-800 bg-zinc-900 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5 text-amber-500" />
+                Bảo mật tài khoản
+              </CardTitle>
+              <CardDescription className="text-zinc-400">
+                Quản lý bảo mật cho tài khoản người dùng.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Đặt lại mật khẩu</h3>
+                    <p className="text-sm text-zinc-400 mt-1">Gửi email đặt lại mật khẩu cho người dùng này.</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setResetPasswordDialogOpen(true)}
+                    className="border-zinc-700 gap-2"
+                  >
+                    <Key className="h-4 w-4" />
+                    Đặt lại mật khẩu
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Xác thực hai yếu tố</h3>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      {user.role === 'admin' ? 'Người dùng này đã bật xác thực hai yếu tố.' : 'Người dùng này chưa bật xác thực hai yếu tố.'}
+                    </p>
+                  </div>
+                  <Badge 
+                    variant="outline" 
+                    className={user.role === 'admin' ? 'border-green-500/30 text-green-500' : 'border-amber-500/30 text-amber-500'}
+                  >
+                    {user.role === 'admin' ? 'Đã bật' : 'Chưa bật'}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Khóa tài khoản</h3>
+                    <p className="text-sm text-zinc-400 mt-1">Tạm thời khóa tài khoản người dùng.</p>
+                  </div>
+                  <Button 
+                    variant="destructive" 
+                    className="gap-2"
+                    onClick={() => {
+                      toast.error("Tính năng đang được phát triển!");
+                    }}
+                  >
+                    <AlertCircle className="h-4 w-4" />
+                    Khóa tài khoản
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -750,6 +891,18 @@ const AdminUserDetail = () => {
         </TabsContent>
       </Tabs>
 
+      <UserEditDialog 
+        open={editUserDialogOpen}
+        onOpenChange={setEditUserDialogOpen}
+        user={user}
+      />
+
+      <ResetPasswordDialog 
+        open={resetPasswordDialogOpen}
+        onOpenChange={setResetPasswordDialogOpen}
+        user={user}
+      />
+
       <Dialog open={accountsDialogOpen} onOpenChange={setAccountsDialogOpen}>
         <DialogContent className="bg-zinc-900 text-white border-zinc-800 sm:max-w-3xl">
           <DialogHeader>
@@ -812,4 +965,3 @@ const AdminUserDetail = () => {
 };
 
 export default AdminUserDetail;
-
