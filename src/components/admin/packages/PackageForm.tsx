@@ -9,6 +9,7 @@ import { FeaturesSection } from './form/FeaturesSection';
 import { LimitsSection } from './form/LimitsSection';
 import { PricingSection } from './form/PricingSection';
 import { SettingsSection } from './form/SettingsSection';
+import { PackagePreview } from './form/PackagePreview';
 import { packageSchema, getDefaultValues, FormValues } from './form/types';
 
 interface PackageFormProps {
@@ -69,15 +70,23 @@ export const PackageForm: React.FC<PackageFormProps> = ({
       isEdit={isEdit}
       isSubmitting={isSubmitting}
     >
-      <BasicInfo isEdit={isEdit} />
-      <FeaturesSection />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <LimitsSection />
-        <PricingSection />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
+          <BasicInfo isEdit={isEdit} />
+          <FeaturesSection />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <LimitsSection />
+            <PricingSection />
+          </div>
+          
+          <SettingsSection />
+        </div>
+        
+        <div className="md:col-span-1">
+          <PackagePreview />
+        </div>
       </div>
-      
-      <SettingsSection />
     </FormStructure>
   );
 };

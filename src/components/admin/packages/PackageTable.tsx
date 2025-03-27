@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Edit, 
   Trash2, 
-  Eye,
   CheckCircle, 
   XCircle 
 } from 'lucide-react';
@@ -40,11 +39,16 @@ export const PackageTable: React.FC<PackageTableProps> = ({
       accessorKey: 'name',
       header: 'Tên gói',
       cell: (value: string, row: Package) => (
-        <div className="font-medium">
+        <div className="font-medium flex items-center gap-2">
           {value}
           {row.isPopular && (
-            <Badge className="ml-2 bg-amber-500/20 text-amber-500 hover:bg-amber-500/30 border-0">
+            <Badge className="bg-primary/20 text-primary hover:bg-primary/30 border-0">
               Phổ biến
+            </Badge>
+          )}
+          {row.isEnterprise && (
+            <Badge className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-0">
+              Doanh nghiệp
             </Badge>
           )}
         </div>
@@ -55,8 +59,16 @@ export const PackageTable: React.FC<PackageTableProps> = ({
       header: 'Giới hạn',
       cell: (value: Package['limits'], row: Package) => (
         <div>
-          <div>Bots: {value.bots === Infinity ? 'Không giới hạn' : value.bots}</div>
-          <div>Accounts: {value.accounts === Infinity ? 'Không giới hạn' : value.accounts}</div>
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className="text-xs font-normal">
+              Bots: {value.bots === Infinity ? 'Không giới hạn' : value.bots}
+            </Badge>
+          </div>
+          <div className="mt-1 flex items-center gap-1">
+            <Badge variant="outline" className="text-xs font-normal">
+              Accounts: {value.accounts === Infinity ? 'Không giới hạn' : value.accounts}
+            </Badge>
+          </div>
         </div>
       ),
     },
@@ -64,7 +76,7 @@ export const PackageTable: React.FC<PackageTableProps> = ({
       accessorKey: 'pricing',
       header: 'Giá (Tháng)',
       cell: (value: Package['pricing']) => (
-        <div>{formatPrice(value.monthly, value.currency)}</div>
+        <div className="font-medium">{formatPrice(value.monthly, value.currency)}</div>
       ),
     },
     {
@@ -95,7 +107,7 @@ export const PackageTable: React.FC<PackageTableProps> = ({
             size="sm" 
             variant="ghost" 
             onClick={() => onEdit(row)}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/10"
           >
             <span className="sr-only">Chỉnh sửa</span>
             <Edit className="h-4 w-4" />
@@ -104,7 +116,7 @@ export const PackageTable: React.FC<PackageTableProps> = ({
             size="sm" 
             variant="ghost" 
             onClick={() => onDelete(row.id)}
-            className="h-8 w-8 p-0 text-destructive"
+            className="h-8 w-8 p-0 text-destructive hover:text-destructive/80 hover:bg-destructive/10"
           >
             <span className="sr-only">Xóa</span>
             <Trash2 className="h-4 w-4" />

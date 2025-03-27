@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, CheckCircle, TrendingUp, Calendar, ArrowUpRight } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import PlanCard from '@/components/shared/PlanCard';
+import { UserPlan } from '@/constants/userConstants';
 
 type PlanType = 'free' | 'basic' | 'premium' | 'enterprise';
 
@@ -12,9 +14,10 @@ interface PlanOption {
   type: PlanType;
   name: string;
   description: string;
-  price: string;
+  price: string | number;
   features: string[];
   popular?: boolean;
+  enterprise?: boolean;
 }
 
 const BillingSettings = () => {
@@ -27,7 +30,7 @@ const BillingSettings = () => {
       type: 'free',
       name: 'Free',
       description: 'Truy cập cơ bản vào Trade Bot 365',
-      price: '0₫',
+      price: 0,
       features: [
         'Số lượng bot giới hạn',
         'Số lượng tài khoản giới hạn',
@@ -38,7 +41,7 @@ const BillingSettings = () => {
       type: 'basic',
       name: 'Basic',
       description: 'Dành cho nhà giao dịch cá nhân',
-      price: '299.000₫',
+      price: 299000,
       features: [
         'Tối đa 3 bot',
         'Tối đa 2 tài khoản',
@@ -50,7 +53,7 @@ const BillingSettings = () => {
       type: 'premium',
       name: 'Premium',
       description: 'Dành cho nhà giao dịch chuyên nghiệp',
-      price: '799.000₫',
+      price: 799000,
       features: [
         'Bot không giới hạn',
         'Tối đa 5 tài khoản',
@@ -72,6 +75,7 @@ const BillingSettings = () => {
         'API riêng',
         'SLA',
       ],
+      enterprise: true,
     },
   ];
 
@@ -119,7 +123,11 @@ const BillingSettings = () => {
                   <p className="text-sm text-muted-foreground mt-1">{currentPlanDetails?.description}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl font-bold">{currentPlanDetails?.price}</div>
+                  <div className="text-xl font-bold">
+                    {typeof currentPlanDetails?.price === 'number' 
+                      ? (currentPlanDetails.price === 0 ? 'Miễn phí' : `${currentPlanDetails.price.toLocaleString()}₫`)
+                      : currentPlanDetails?.price}
+                  </div>
                   <p className="text-sm text-muted-foreground">mỗi tháng</p>
                 </div>
               </div>
@@ -180,53 +188,18 @@ const BillingSettings = () => {
           
           <div className="grid gap-4 py-4 md:grid-cols-2 lg:grid-cols-4">
             {plans.map((plan) => (
-              <Card 
+              <PlanCard
                 key={plan.type}
-                className={`border ${selectedPlan === plan.type ? 'border-primary ring-2 ring-primary/20' : 'border-border'} 
-                  ${plan.popular ? 'relative overflow-hidden' : ''}`}
-                onClick={() => handlePlanSelect(plan.type)}
-              >
-                {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-bl-md">
-                    Phổ biến
-                  </div>
-                )}
-                
-                <CardContent className="p-4 space-y-4 cursor-pointer">
-                  <div className="space-y-1">
-                    <h4 className="font-bold">{plan.name}</h4>
-                    <p className="text-xs text-muted-foreground">{plan.description}</p>
-                  </div>
-                  
-                  <div>
-                    <div className="text-2xl font-bold">{plan.price}</div>
-                    {plan.type !== 'enterprise' && <div className="text-xs text-muted-foreground">mỗi tháng</div>}
-                  </div>
-                  
-                  <ul className="space-y-2 text-sm">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  {currentPlan === plan.type ? (
-                    <Badge variant="outline" className="w-full justify-center py-1">
-                      Gói hiện tại
-                    </Badge>
-                  ) : (
-                    <Button 
-                      variant={plan.popular ? "default" : "outline"} 
-                      className="w-full"
-                      onClick={() => handlePlanSelect(plan.type)}
-                    >
-                      {plan.type === 'enterprise' ? 'Liên hệ' : 'Chọn gói'}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+                name={plan.name}
+                description={plan.description}
+                price={plan.price}
+                features={plan.features}
+                isPopular={plan.popular}
+                isEnterprise={plan.enterprise}
+                isCurrentPlan={currentPlan === plan.type}
+                isSelected={selectedPlan === plan.type}
+                onSelect={() => handlePlanSelect(plan.type)}
+              />
             ))}
           </div>
           

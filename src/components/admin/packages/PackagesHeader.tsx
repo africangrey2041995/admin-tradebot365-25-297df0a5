@@ -28,7 +28,7 @@ export const PackagesHeader: React.FC<PackagesHeaderProps> = ({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center">
-        <Package className="h-6 w-6 mr-2 text-amber-500" />
+        <Package className="h-6 w-6 mr-2 text-primary" />
         <h1 className="text-2xl font-semibold text-white">Quản lý gói dịch vụ</h1>
       </div>
       
@@ -45,7 +45,7 @@ export const PackagesHeader: React.FC<PackagesHeaderProps> = ({
         </div>
         
         <Button 
-          className="bg-amber-500 hover:bg-amber-600 text-white font-medium"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
           onClick={onAddPackage}
         >
           <Plus className="mr-1 h-4 w-4" />

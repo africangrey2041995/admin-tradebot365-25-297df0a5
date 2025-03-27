@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PackagePlus, Edit } from 'lucide-react';
 import { FormProvider, UseFormReturn, SubmitHandler } from 'react-hook-form';
 import { FormValues } from './types';
 
@@ -37,8 +37,18 @@ export function FormStructure({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white">
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? 'Chỉnh sửa gói dịch vụ' : 'Thêm gói dịch vụ mới'}
+          <DialogTitle className="flex items-center gap-2">
+            {isEdit ? (
+              <>
+                <Edit className="h-5 w-5 text-primary" />
+                Chỉnh sửa gói dịch vụ
+              </>
+            ) : (
+              <>
+                <PackagePlus className="h-5 w-5 text-primary" />
+                Thêm gói dịch vụ mới
+              </>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -58,10 +68,10 @@ export function FormStructure({
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="bg-amber-500 hover:bg-amber-600 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? 'Cập nhật' : 'Tạo gói'}
+                {isEdit ? 'Cập nhật gói' : 'Tạo gói mới'}
               </Button>
             </DialogFooter>
           </form>
