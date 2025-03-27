@@ -23,8 +23,7 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
 }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     'error-details': true,
-    'affected-accounts': false,
-    'prop-details': false
+    'affected-accounts': false
   });
 
   const toggleSection = (section: string) => {
@@ -280,70 +279,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
               </div>
             </TabsContent>
           </Tabs>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Prop Trading details section */}
-      <Collapsible
-        open={expandedSections['prop-details']}
-        onOpenChange={() => toggleSection('prop-details')}
-        className="border rounded-lg overflow-hidden"
-      >
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex w-full justify-between p-4 h-auto"
-          >
-            <div className="flex items-center">
-              <Briefcase className="h-5 w-5 mr-2 text-blue-600" />
-              <span className="font-medium">Thông tin Prop Trading</span>
-            </div>
-            {expandedSections['prop-details'] ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="px-4 pb-4">
-          <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/20 rounded-md p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium mb-3">Thông tin chung</h4>
-                <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Prop Firm:</dt>
-                    <dd className="font-medium">{mockPropDetails.firm}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Loại thử thách:</dt>
-                    <dd className="font-medium">{mockPropDetails.challenge}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Kích thước tài khoản:</dt>
-                    <dd className="font-medium">{mockPropDetails.accountSize}</dd>
-                  </div>
-                </dl>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-3">Quy tắc</h4>
-                <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Drawdown tối đa:</dt>
-                    <dd className="font-medium">{mockPropDetails.maxDrawdown}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Số ngày giao dịch:</dt>
-                    <dd className="font-medium">{mockPropDetails.tradingDays} ngày</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Số người dùng bị ảnh hưởng:</dt>
-                    <dd className="font-medium">{mockPropDetails.affectedUsers}</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-          </div>
         </CollapsibleContent>
       </Collapsible>
 
