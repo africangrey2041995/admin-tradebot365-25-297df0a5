@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
@@ -7,6 +7,23 @@ import EditableDescriptionCard from '@/components/admin/premium-bots/detail/Edit
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
 import EditableStatisticsCard from '@/components/admin/premium-bots/detail/EditableStatisticsCard';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { BotType } from '@/constants/botTypes';
 
 interface PremiumBotOverviewTabProps {
   bot: {
@@ -29,6 +46,13 @@ interface PremiumBotOverviewTabProps {
   onUpdateBotInfo: (info: { type: string; exchange: string; minCapital: string }) => void;
 }
 
+// Định nghĩa schema cho form chỉnh sửa thông tin bot
+const botInfoFormSchema = z.object({
+  type: z.string(),
+  exchange: z.string(),
+  minCapital: z.string(),
+});
+
 const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
   bot,
   statisticsData,
@@ -38,6 +62,38 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
   onUpdateStatistics,
   onUpdateBotInfo
 }) => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Form cho thông tin bot
+  const botInfoForm = useForm({
+    resolver: zodResolver(botInfoFormSchema),
+    defaultValues: {
+      type: bot.type || '',
+      exchange: bot.exchange || '',
+      minCapital: bot.minCapital || '',
+    },
+  });
+
+  const handleEditButtonClick = () => {
+    botInfoForm.reset({
+      type: bot.type || '',
+      exchange: bot.exchange || '',
+      minCapital: bot.minCapital || '',
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const onBotInfoSubmit = (data: z.infer<typeof botInfoFormSchema>) => {
+    onUpdateBotInfo({
+      type: data.type,
+      exchange: data.exchange,
+      minCapital: data.minCapital
+    });
+    
+    setIsEditDialogOpen(false);
+    toast.success('Thông tin Bot đã được cập nhật');
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="md:col-span-2 space-y-4">
@@ -58,7 +114,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Thông tin Bot</CardTitle>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={handleEditButtonClick}>
               <Pencil className="h-4 w-4 mr-1" />
               Chỉnh sửa
             </Button>
@@ -93,6 +149,69 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
         
         {/* Bot Integration Info removed */}
       </div>
+
+      {/* Edit Bot Info Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa thông tin Bot</DialogTitle>
+          </DialogHeader>
+          <Form {...botInfoForm}>
+            <form onSubmit={botInfoForm.handleSubmit(onBotInfoSubmit)} className="space-y-4">
+              <FormField
+                control={botInfoForm.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Loại Bot</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={botInfoForm.control}
+                name="exchange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sàn giao dịch</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={botInfoForm.control}
+                name="minCapital"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vốn tối thiểu</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ví dụ: $500
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Hủy
+                </Button>
+                <Button type="submit">
+                  Lưu thay đổi
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
