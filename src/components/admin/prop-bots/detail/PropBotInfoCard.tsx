@@ -58,13 +58,14 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
           propFirm={propFirm}
           exchange={exchange}
           status={status}
+          onUpdate={onUpdate}
         />
         
         <Separator className="my-4 bg-gray-700" />
         
         <BotDescription 
           description={description} 
-          onUpdate={(newDescription) => onUpdate({ description: newDescription })}
+          onUpdate={onUpdate}
         />
         
         <BotMetrics
@@ -77,12 +78,15 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
         
         <BotRiskLevel 
           risk={risk} 
-          onUpdate={(newRisk) => onUpdate({ risk: newRisk })}
+          onUpdate={onUpdate}
         />
         
         <BotMetadata
           createdDate={createdDate}
           lastUpdated={lastUpdated}
+          propFirm={propFirm}
+          exchange={exchange}
+          onUpdate={onUpdate}
         />
         
         <BotChallengeInfo

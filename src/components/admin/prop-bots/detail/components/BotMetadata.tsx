@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -18,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { PropBot } from '@/types/bot';
 
-interface BotMetadataProps {
+export interface BotMetadataProps {
   createdDate: string;
   lastUpdated: string;
   exchange?: string;

@@ -5,7 +5,7 @@ import { PropBot } from '@/types/bot';
 import EditableRiskLevel from '@/components/admin/shared/EditableRiskLevel';
 
 interface BotRiskLevelProps {
-  risk: string;
+  risk?: RiskLevelEnum;
   onUpdate: (updatedData: Partial<PropBot>) => void;
 }
 

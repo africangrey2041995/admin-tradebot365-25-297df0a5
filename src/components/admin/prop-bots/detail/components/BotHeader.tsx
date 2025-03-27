@@ -12,14 +12,18 @@ import { BotStatus, BOT_STATUS_DISPLAY } from '@/constants/botTypes';
 import { toast } from 'sonner';
 import { PropBot } from '@/types/bot';
 
-interface BotHeaderProps {
+export interface BotHeaderProps {
   botId: string;
-  status: string;
+  propFirm?: string;
+  exchange?: string;
+  status: BotStatus;
   onUpdate: (updatedData: Partial<PropBot>) => void;
 }
 
 const BotHeader: React.FC<BotHeaderProps> = ({ 
   botId, 
+  propFirm,
+  exchange,
   status, 
   onUpdate 
 }) => {

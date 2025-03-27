@@ -2,12 +2,18 @@
 import React from 'react';
 import { Users, Activity } from 'lucide-react';
 
-interface BotMetricsProps {
+export interface BotMetricsProps {
+  performanceLastMonth?: string;
+  performanceAllTime?: string;
+  colorScheme?: 'default' | 'red' | 'blue' | 'green' | 'purple';
   connectedAccounts: number;
   processedSignals: number;
 }
 
 const BotMetrics: React.FC<BotMetricsProps> = ({ 
+  performanceLastMonth,
+  performanceAllTime,
+  colorScheme = 'default',
   connectedAccounts, 
   processedSignals 
 }) => {
@@ -32,6 +38,28 @@ const BotMetrics: React.FC<BotMetricsProps> = ({
           <p className="text-xl font-bold text-white">{processedSignals}</p>
         </div>
       </div>
+
+      {performanceLastMonth && (
+        <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
+          <p className="text-xs text-gray-400 mb-1">
+            Hiệu suất tháng gần đây
+          </p>
+          <div className="flex items-center">
+            <p className="text-xl font-bold text-white">{performanceLastMonth}</p>
+          </div>
+        </div>
+      )}
+
+      {performanceAllTime && (
+        <div className="bg-gray-700/50 p-3 rounded-md border border-gray-600/50 group relative">
+          <p className="text-xs text-gray-400 mb-1">
+            Hiệu suất tổng thể
+          </p>
+          <div className="flex items-center">
+            <p className="text-xl font-bold text-white">{performanceAllTime}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

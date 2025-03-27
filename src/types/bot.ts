@@ -1,4 +1,3 @@
-
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 
 /**
@@ -79,8 +78,8 @@ export interface PremiumBot extends BaseBot {
   performanceLastMonth: string;
   performanceAllTime: string;
   minCapital: string;
-  potentialProfit?: string; // Added this property to fix the TypeScript error
-  maxDrawdown?: string; // Also added maxDrawdown for consistency
+  potentialProfit?: string;
+  maxDrawdown?: string;
   subscribers: number;
   colorScheme?: 'default' | 'red' | 'blue' | 'green' | 'purple';
   isIntegrated?: boolean;
@@ -88,7 +87,7 @@ export interface PremiumBot extends BaseBot {
   tradingStyle?: string;
   timeframe?: string;
   markets?: string[];
-  pairs?: string[]; // Added pairs property to fix TypeScript errors
+  pairs?: string[];
   accounts?: Account[] | number;
   users?: number; // Number of users for admin context
   profit?: string; // Profit in percentage for admin context
@@ -106,6 +105,7 @@ export interface PropBot extends BaseBot {
   propFirm?: string;
   challengeDuration?: string;
   accountSizes?: string[];
+  potentialProfit?: string; // Added this property to fix TypeScript errors
 }
 
 // Bot đã tích hợp

@@ -56,9 +56,9 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
   const handleSave = () => {
     onUpdate({
       minCapital: editValues.minCapital,
-      potentialProfit: editValues.potentialProfit,
       maxDrawdown: editValues.maxDrawdown,
-      challengeDuration: editValues.challengeDuration
+      challengeDuration: editValues.challengeDuration,
+      potentialProfit: editValues.potentialProfit
     });
     setIsEditing(false);
     toast.success("Thông tin thử thách đã được cập nhật");
