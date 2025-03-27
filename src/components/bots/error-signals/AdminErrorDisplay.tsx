@@ -12,7 +12,8 @@ import {
   Search, 
   Server, 
   Shield,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Users as UsersIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -165,8 +166,8 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     }
   };
 
-  const handleUserClick = (userId: string) => {
-    if (userId) {
+  const handleUserClick = (userId: string, botType?: string) => {
+    if (userId && (!botType || botType.toLowerCase().includes('user'))) {
       navigateToUserDetail(userId);
     }
   };
@@ -227,6 +228,11 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
     
     return `${botTypePrefix}-${category}-${numericPart.padStart(3, '0')}`;
+  };
+
+  const isPremiumOrPropBot = (botType?: string): boolean => {
+    if (!botType) return false;
+    return botType.toLowerCase().includes('premium') || botType.toLowerCase().includes('prop');
   };
 
   if (loading) {
@@ -424,11 +430,20 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                       signal.botType?.includes('prop') ? 'Prop' : 'User'}
                     </Badge>
                   </TableCell>
-                  <TableCell 
-                    className={signal.userId ? "cursor-pointer text-blue-500 hover:text-blue-700 hover:underline font-mono text-xs" : "font-mono text-xs"}
-                    onClick={signal.userId ? () => handleUserClick(signal.userId || '') : undefined}
-                  >
-                    {signal.userId || 'N/A'}
+                  <TableCell>
+                    {isPremiumOrPropBot(signal.botType) ? (
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <UsersIcon className="h-3 w-3 mr-1" />
+                        <span>ADMIN</span>
+                      </div>
+                    ) : (
+                      <div 
+                        className={signal.userId ? "cursor-pointer text-blue-500 hover:text-blue-700 hover:underline font-mono text-xs" : "font-mono text-xs"}
+                        onClick={signal.userId ? () => handleUserClick(signal.userId || '', signal.botType) : undefined}
+                      >
+                        {signal.userId || 'N/A'}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Button 
