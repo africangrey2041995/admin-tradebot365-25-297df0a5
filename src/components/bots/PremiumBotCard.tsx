@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { BotTag } from './BotTag';
+import { BotTag, BotTagType } from './BotTag';
 
 interface PremiumBotCardProps {
   botId: string;
@@ -50,6 +49,15 @@ export const PremiumBotCard = ({
   isBestSeller = false,
 }: PremiumBotCardProps) => {
   const navigate = useNavigate();
+
+  const getTagToShow = (): BotTagType | null => {
+    if (isFeatured) return 'featured';
+    if (isNew) return 'new';
+    if (isBestSeller) return 'bestSeller';
+    return null;
+  };
+
+  const tagToShow = getTagToShow();
 
   const getRiskLabel = (risk: string) => {
     switch (risk) {
@@ -148,10 +156,8 @@ export const PremiumBotCard = ({
   const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
 
   return (
-    <div className="pt-3 pl-3 pr-3 relative">
-      {isFeatured && <BotTag type="featured" />}
-      {isNew && <BotTag type="new" />}
-      {isBestSeller && <BotTag type="bestSeller" />}
+    <div className="pt-6 px-3 relative">
+      {tagToShow && <BotTag type={tagToShow} />}
       
       <Card className={`border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
         <CardHeader className="p-3 pb-0">

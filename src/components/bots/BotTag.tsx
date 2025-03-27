@@ -12,38 +12,36 @@ interface BotTagProps {
 
 export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
   const getTagClass = () => {
+    const baseClasses = `
+      absolute -top-3 right-3 z-10
+      text-white font-bold shadow-lg
+      flex items-center justify-center rounded-lg
+      ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
+    `;
+    
     switch (type) {
       case 'featured':
         return `
-          absolute -top-3 -right-3 transform rotate-12 z-10
+          ${baseClasses}
           bg-gradient-to-r from-amber-300 to-amber-500
-          text-white font-bold shadow-lg
-          flex items-center justify-center rounded-lg
           border-2 border-amber-200 dark:border-amber-600
-          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
           shadow-amber-300/50 dark:shadow-amber-500/30
           animate-pulse-slow
         `;
       
       case 'new':
         return `
-          absolute -top-3 -left-3 transform -rotate-12 z-10
+          ${baseClasses}
           bg-gradient-to-r from-blue-400 to-blue-600
-          text-white font-bold shadow-lg
-          flex items-center justify-center rounded-lg
           border-2 border-blue-300 dark:border-blue-700
-          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
           shadow-blue-400/50 dark:shadow-blue-600/30
         `;
       
       case 'bestSeller':
         return `
-          absolute -top-3 -left-3 transform -rotate-6 z-10
+          ${baseClasses}
           bg-gradient-to-r from-emerald-400 to-emerald-600
-          text-white font-bold shadow-lg
-          flex items-center justify-center rounded-lg
           border-2 border-emerald-300 dark:border-emerald-700
-          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
           shadow-emerald-400/50 dark:shadow-emerald-600/30
         `;
       
