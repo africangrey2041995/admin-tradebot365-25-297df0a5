@@ -12,7 +12,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Star, Sparkles, Trophy } from 'lucide-react';
@@ -151,18 +150,14 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
                 
                 <div className="grid gap-2">
                   <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
-                  <div className="flex items-center gap-4">
-                    <Slider
-                      id="maxDrawdown"
-                      defaultValue={[5]}
-                      max={25}
-                      step={1}
-                      value={[parseInt(newBot.maxDrawdown)]}
-                      onValueChange={(value) => setNewBot({...newBot, maxDrawdown: value[0].toString()})}
-                      className="flex-1"
-                    />
-                    <span className="min-w-[3rem] text-center font-medium">{newBot.maxDrawdown}%</span>
-                  </div>
+                  <Input
+                    id="maxDrawdown"
+                    type="number"
+                    placeholder="ví dụ: 5"
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                    value={newBot.maxDrawdown}
+                    onChange={(e) => setNewBot({...newBot, maxDrawdown: e.target.value})}
+                  />
                 </div>
               </div>
               
@@ -248,3 +243,4 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
     </Dialog>
   );
 };
+
