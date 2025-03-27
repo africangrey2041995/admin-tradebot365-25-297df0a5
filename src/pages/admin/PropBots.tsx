@@ -69,6 +69,67 @@ const PropBots: React.FC = () => {
     navigate(ADMIN_ROUTES.PROP_BOT_DETAIL(botId));
   };
 
+  // Add toggling functions for bot tags
+  const handleToggleFeatured = (botId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent navigation to detail page
+    setPropBots(prevBots => 
+      prevBots.map(bot => 
+        bot.botId === botId 
+          ? { ...bot, isFeatured: !bot.isFeatured } 
+          : bot
+      )
+    );
+    
+    const bot = propBots.find(b => b.botId === botId);
+    if (bot) {
+      const action = bot.isFeatured ? "đã bỏ đánh dấu" : "đã đánh dấu";
+      toast({
+        title: `Bot ${action} là Nổi Bật`,
+        description: `Bot "${bot.name}" ${action} là Nổi Bật`,
+      });
+    }
+  };
+
+  const handleToggleNew = (botId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent navigation to detail page
+    setPropBots(prevBots => 
+      prevBots.map(bot => 
+        bot.botId === botId 
+          ? { ...bot, isNew: !bot.isNew } 
+          : bot
+      )
+    );
+    
+    const bot = propBots.find(b => b.botId === botId);
+    if (bot) {
+      const action = bot.isNew ? "đã bỏ đánh dấu" : "đã đánh dấu";
+      toast({
+        title: `Bot ${action} là Mới`,
+        description: `Bot "${bot.name}" ${action} là Mới`,
+      });
+    }
+  };
+
+  const handleToggleBestSeller = (botId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent navigation to detail page
+    setPropBots(prevBots => 
+      prevBots.map(bot => 
+        bot.botId === botId 
+          ? { ...bot, isBestSeller: !bot.isBestSeller } 
+          : bot
+      )
+    );
+    
+    const bot = propBots.find(b => b.botId === botId);
+    if (bot) {
+      const action = bot.isBestSeller ? "đã bỏ đánh dấu" : "đã đánh dấu";
+      toast({
+        title: `Bot ${action} là Bán Chạy`,
+        description: `Bot "${bot.name}" ${action} là Bán Chạy`,
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:items-center">
@@ -101,6 +162,9 @@ const PropBots: React.FC = () => {
         setCurrentPage={setCurrentPage}
         totalPages={totalPages}
         onRowClick={navigateToBotDetail}
+        onToggleFeatured={handleToggleFeatured}
+        onToggleNew={handleToggleNew}
+        onToggleBestSeller={handleToggleBestSeller}
       />
 
       <AddPropBotDialog 

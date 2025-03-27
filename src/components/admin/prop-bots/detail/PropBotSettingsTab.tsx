@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Star, Sparkles, Trophy } from 'lucide-react';
 
 interface PropBotSettingsTabProps {
   botId: string;
@@ -22,6 +23,9 @@ interface PropBotSettingsTabProps {
     isPromoted: boolean;
     isArchived: boolean;
     adminNotes?: string;
+    isFeatured?: boolean;
+    isNew?: boolean;
+    isBestSeller?: boolean;
   };
 }
 
@@ -184,7 +188,57 @@ const PropBotSettingsTab: React.FC<PropBotSettingsTabProps> = ({
           </CardContent>
         </Card>
         
-        <Card className="border-gray-700 bg-gray-800/50 lg:col-span-2">
+        <Card className="border-gray-700 bg-gray-800/50">
+          <CardHeader>
+            <CardTitle>Cài đặt Tags</CardTitle>
+            <CardDescription>Quản lý các tag của Bot</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5 text-amber-500" fill={formData.isFeatured ? "currentColor" : "none"} />
+                <div>
+                  <Label>Nổi Bật</Label>
+                  <p className="text-sm text-gray-400">Đánh dấu bot như một lựa chọn nổi bật</p>
+                </div>
+              </div>
+              <Switch
+                checked={formData.isFeatured || false}
+                onCheckedChange={(checked) => handleSwitchChange('isFeatured', checked)}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="h-5 w-5 text-blue-500" />
+                <div>
+                  <Label>Mới</Label>
+                  <p className="text-sm text-gray-400">Đánh dấu bot là mới ra mắt</p>
+                </div>
+              </div>
+              <Switch
+                checked={formData.isNew || false}
+                onCheckedChange={(checked) => handleSwitchChange('isNew', checked)}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Trophy className="h-5 w-5 text-emerald-500" fill={formData.isBestSeller ? "currentColor" : "none"} />
+                <div>
+                  <Label>Bán Chạy</Label>
+                  <p className="text-sm text-gray-400">Đánh dấu bot là sản phẩm bán chạy</p>
+                </div>
+              </div>
+              <Switch
+                checked={formData.isBestSeller || false}
+                onCheckedChange={(checked) => handleSwitchChange('isBestSeller', checked)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-gray-700 bg-gray-800/50">
           <CardHeader>
             <CardTitle>Ghi chú của Admin</CardTitle>
             <CardDescription>Thêm ghi chú nội bộ dành cho admin</CardDescription>

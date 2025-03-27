@@ -14,9 +14,9 @@ interface PropBotsTableProps {
   setCurrentPage: (page: number) => void;
   totalPages: number;
   onRowClick?: (botId: string) => void;
-  onToggleFeatured?: (botId: string) => void;
-  onToggleNew?: (botId: string) => void;
-  onToggleBestSeller?: (botId: string) => void;
+  onToggleFeatured?: (botId: string, event: React.MouseEvent) => void;
+  onToggleNew?: (botId: string, event: React.MouseEvent) => void;
+  onToggleBestSeller?: (botId: string, event: React.MouseEvent) => void;
 }
 
 export const PropBotsTable: React.FC<PropBotsTableProps> = ({
@@ -66,48 +66,51 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                   <TableCell className="text-white">{bot.name}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {bot.isFeatured && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6 text-amber-500 hover:text-amber-600 hover:bg-amber-100/20"
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            onToggleFeatured && onToggleFeatured(bot.botId); 
-                          }}
-                        >
-                          <Star className="h-4 w-4 fill-current" />
-                        </Button>
-                      )}
-                      {bot.isNew && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-100/20"
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            onToggleNew && onToggleNew(bot.botId); 
-                          }}
-                        >
-                          <Sparkles className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {bot.isBestSeller && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-100/20"
-                          onClick={(e) => { 
-                            e.stopPropagation(); 
-                            onToggleBestSeller && onToggleBestSeller(bot.botId); 
-                          }}
-                        >
-                          <Trophy className="h-4 w-4 fill-current" />
-                        </Button>
-                      )}
-                      {!bot.isFeatured && !bot.isNew && !bot.isBestSeller && (
-                        <span className="text-zinc-500 text-xs">—</span>
-                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={cn(
+                          "h-6 w-6 hover:bg-amber-100/20",
+                          bot.isFeatured ? "text-amber-500" : "text-zinc-500"
+                        )}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          onToggleFeatured && onToggleFeatured(bot.botId, e); 
+                        }}
+                        title={bot.isFeatured ? "Xóa tag Nổi Bật" : "Đánh dấu là Nổi Bật"}
+                      >
+                        <Star className={cn("h-4 w-4", bot.isFeatured && "fill-current")} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className={cn(
+                          "h-6 w-6 hover:bg-blue-100/20",
+                          bot.isNew ? "text-blue-500" : "text-zinc-500"
+                        )}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          onToggleNew && onToggleNew(bot.botId, e); 
+                        }}
+                        title={bot.isNew ? "Xóa tag Mới" : "Đánh dấu là Mới"}
+                      >
+                        <Sparkles className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className={cn(
+                          "h-6 w-6 hover:bg-emerald-100/20",
+                          bot.isBestSeller ? "text-emerald-500" : "text-zinc-500"
+                        )}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          onToggleBestSeller && onToggleBestSeller(bot.botId, e); 
+                        }}
+                        title={bot.isBestSeller ? "Xóa tag Bán Chạy" : "Đánh dấu là Bán Chạy"}
+                      >
+                        <Trophy className={cn("h-4 w-4", bot.isBestSeller && "fill-current")} />
+                      </Button>
                     </div>
                   </TableCell>
                   <TableCell className="text-zinc-400">{bot.propFirm || "—"}</TableCell>
