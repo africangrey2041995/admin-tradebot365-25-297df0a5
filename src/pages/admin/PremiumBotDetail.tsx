@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { ADMIN_ROUTES } from '@/constants/routes';
 import LoadingState from '@/components/admin/prop-bots/detail/LoadingState';
 import PremiumBotStatsCards from '@/components/admin/premium-bots/detail/PremiumBotStatsCards';
@@ -12,6 +13,8 @@ import PremiumBotOverviewTab from '@/components/admin/premium-bots/detail/tabs/P
 import AccountsTab from '@/components/admin/premium-bots/detail/tabs/AccountsTab';
 import SignalTrackingTab from '@/components/admin/premium-bots/detail/tabs/SignalTrackingTab';
 import { usePremiumBotDetail } from '@/hooks/usePremiumBotDetail';
+import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
+import { Webhook } from 'lucide-react';
 
 const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
@@ -83,10 +86,14 @@ const PremiumBotDetail = () => {
 
       {/* Bot Detail Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="accounts">Tài Khoản Kết Nối</TabsTrigger>
           <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
+          <TabsTrigger value="integration">
+            <Webhook className="h-4 w-4 mr-1" />
+            Tích Hợp TradingView
+          </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -135,6 +142,15 @@ const PremiumBotDetail = () => {
             availableUsers={availableUsers}
             onRefresh={refreshSignalLogs}
           />
+        </TabsContent>
+        
+        {/* TradingView Integration Tab */}
+        <TabsContent value="integration">
+          <Card>
+            <CardContent className="p-6">
+              <BotIntegrationInfo botId={botId} />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
