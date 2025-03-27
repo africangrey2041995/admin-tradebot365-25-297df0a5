@@ -34,7 +34,11 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   relatedSignals = [],
   onViewDetails
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+  const [expandedSections, setExpandedSections] = useState<{
+    main: boolean;
+    csp: boolean;
+    accounts: Record<string, boolean>;
+  }>({
     main: true,
     csp: false,
     accounts: {}
@@ -43,7 +47,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section as keyof typeof prev]
     }));
   };
 
@@ -87,7 +91,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     }
     
     // Extract numeric part from signal ID or generate sequential
-    const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
+    const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)?.[0] || '001' : '001';
     
     return `ERR-${botTypePrefix}-${category}-${numericPart.padStart(3, '0')}`;
   };
@@ -95,7 +99,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   // Generate severity badge
   const getSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
-    const severityMap = {
+    const severityMap: Record<string, { color: string, label: string }> = {
       low: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300', label: 'Low' },
       medium: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300', label: 'Medium' },
       high: { color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300', label: 'High' },
@@ -307,7 +311,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
                       {cspAccount.accounts.map(account => (
                         <Collapsible 
                           key={account.id}
-                          open={expandedSections.accounts[account.id]}
+                          open={!!expandedSections.accounts[account.id]}
                           onOpenChange={() => toggleAccount(account.id)}
                         >
                           <CollapsibleTrigger asChild>
