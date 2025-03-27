@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import ActionBadge from './ActionBadge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink } from 'lucide-react';
+import { CheckCircle2, ExternalLink, AlertTriangle } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -78,6 +78,73 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     return parts.length > 0 ? parts.join(' | ') : 'N/A';
   };
   
+  // Generate a severity badge based on errorSeverity
+  const renderSeverityBadge = () => {
+    const severity = signal.errorSeverity || 'medium';
+    const severityConfig = {
+      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Low' },
+      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Medium' },
+      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'High' },
+      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200', label: 'Critical' }
+    };
+    
+    const config = severityConfig[severity];
+    
+    return (
+      <Badge className={`${config.bg} ${config.text} border-none`}>
+        <AlertTriangle className="h-3 w-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
+  };
+  
+  // Format structured error code
+  const formatErrorCode = () => {
+    if (signal.errorCode) {
+      return (
+        <span className="font-mono text-xs">
+          {signal.errorCode}
+        </span>
+      );
+    }
+    
+    // Generate structured error code based on bot type
+    let botTypePrefix = 'ERR';
+    if (signal.botType) {
+      if (signal.botType.toLowerCase().includes('user')) {
+        botTypePrefix = 'USR';
+      } else if (signal.botType.toLowerCase().includes('premium')) {
+        botTypePrefix = 'PRE';
+      } else if (signal.botType.toLowerCase().includes('prop')) {
+        botTypePrefix = 'PRP';
+      }
+    }
+    
+    // Generate error category based on error message
+    let category = 'UNK';
+    const errorMsg = signal.errorMessage?.toLowerCase() || '';
+    if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
+      category = 'AUTH';
+    } else if (errorMsg.includes('api') || errorMsg.includes('request') || errorMsg.includes('response')) {
+      category = 'API';
+    } else if (errorMsg.includes('exec') || errorMsg.includes('execution')) {
+      category = 'EXE';
+    } else if (errorMsg.includes('time') || errorMsg.includes('timeout')) {
+      category = 'TIME';
+    } else if (errorMsg.includes('connect') || errorMsg.includes('network')) {
+      category = 'CONN';
+    }
+    
+    // Extract numeric part from signal ID or generate sequential
+    const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
+    
+    return (
+      <span className="font-mono text-xs">
+        ERR-{botTypePrefix}-{category}-{numericPart.padStart(3, '0')}
+      </span>
+    );
+  };
+  
   return (
     <TableRow className={isUnread ? "bg-red-50/10" : ""}>
       <TableCell className="font-mono text-xs">
@@ -125,6 +192,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
         )}
       </TableCell>
       <TableCell>
+        <div className="flex items-center gap-2">
+          {renderSeverityBadge()}
+          <span className="font-mono text-xs text-slate-500">{formatErrorCode()}</span>
+        </div>
         <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
           <span className="text-red-500 cursor-help">
             {signal.errorMessage 
