@@ -27,6 +27,7 @@ interface PremiumBotsTableProps {
   onToggleFeatured?: (botId: string) => void;
   onToggleNew?: (botId: string) => void;
   onToggleBestSeller?: (botId: string) => void;
+  onToggleStatus: (botId: string, currentStatus: BotStatus) => void; // New prop for status toggling
 }
 
 export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
@@ -38,17 +39,9 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
   onViewBotDetail,
   onToggleFeatured,
   onToggleNew,
-  onToggleBestSeller
+  onToggleBestSeller,
+  onToggleStatus // Add the new prop here
 }) => {
-  // Handle toggle bot status
-  const handleToggleStatus = (botId: string, currentStatus: BotStatus) => {
-    const newStatus = currentStatus === BotStatus.ACTIVE ? BotStatus.INACTIVE : BotStatus.ACTIVE;
-    const actionText = newStatus === BotStatus.ACTIVE ? 'kích hoạt' : 'tạm dừng';
-    
-    // In a real application, this would make an API call to update the bot status
-    toast.success(`Đã ${actionText} bot thành công`);
-  };
-  
   // Handle delete bot
   const handleDeleteBot = (botId: string, botName: string) => {
     // In a real application, this would show a confirmation dialog first
@@ -157,7 +150,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="focus:bg-zinc-800 cursor-pointer"
-                        onClick={() => handleToggleStatus(bot.botId, bot.status)}
+                        onClick={() => onToggleStatus(bot.botId, bot.status)}
                       >
                         {bot.status === BotStatus.ACTIVE ? (
                           <>

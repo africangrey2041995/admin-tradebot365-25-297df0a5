@@ -340,7 +340,17 @@ const AdminPremiumBots = () => {
       return;
     }
     
+    const newStatus = bulkAction === 'activate' ? BotStatus.ACTIVE : BotStatus.INACTIVE;
     const actionText = bulkAction === 'activate' ? 'kích hoạt' : 'tạm dừng';
+    
+    setBots(prevBots => 
+      prevBots.map(bot => 
+        selectedBots.includes(bot.botId) 
+          ? { ...bot, status: newStatus } 
+          : bot
+      )
+    );
+    
     toast.success(`Đã ${actionText} ${selectedBots.length} bot thành công`);
     
     setIsBulkActionDialogOpen(false);
@@ -381,6 +391,19 @@ const AdminPremiumBots = () => {
       }
       return bot;
     }));
+  };
+
+  const handleToggleStatus = (botId: string, currentStatus: BotStatus) => {
+    const newStatus = currentStatus === BotStatus.ACTIVE ? BotStatus.INACTIVE : BotStatus.ACTIVE;
+    const actionText = newStatus === BotStatus.ACTIVE ? 'kích hoạt' : 'tạm dừng';
+    
+    setBots(bots.map(bot => 
+      bot.botId === botId 
+        ? { ...bot, status: newStatus } 
+        : bot
+    ));
+    
+    toast.success(`Đã ${actionText} bot ${bots.find(b => b.botId === botId)?.name || botId} thành công`);
   };
 
   return (
@@ -428,6 +451,7 @@ const AdminPremiumBots = () => {
             onToggleFeatured={toggleFeatured}
             onToggleNew={toggleNew}
             onToggleBestSeller={toggleBestSeller}
+            onToggleStatus={handleToggleStatus}
           />
 
           <PremiumBotsPagination 
