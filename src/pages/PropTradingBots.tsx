@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
 import { PlusCircle, Filter, ArrowUpDown, ListFilter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { PremiumBotCard } from '@/components/bots/PremiumBotCard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import { useNavigate } from 'react-router-dom';
 import { BotType, BotRiskLevel, BotStatus } from '@/constants/botTypes';
 import { mockPropBots } from '@/mocks/propBotsMock';
@@ -32,7 +32,10 @@ const propTradingBots = mockPropBots.slice(0, 3).map(bot => ({
   subscribers: bot.users,
   imageUrl: null,
   colorScheme: bot.botId === 'PROP-001' ? 'blue' : 
-               bot.botId === 'PROP-002' ? 'green' : 'purple'
+               bot.botId === 'PROP-002' ? 'green' : 'purple',
+  isFeatured: bot.isFeatured || false,
+  isNew: bot.isNew || false,
+  isBestSeller: bot.isBestSeller || false
 }));
 
 // Create standardized integrated prop bots data based on mockPropBots
@@ -211,6 +214,9 @@ const PropTradingBots = () => {
                       subscribers={bot.subscribers}
                       imageUrl={bot.imageUrl}
                       colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                      isFeatured={bot.isFeatured}
+                      isNew={bot.isNew}
+                      isBestSeller={bot.isBestSeller}
                     />
                   </motion.div>
                 ))}

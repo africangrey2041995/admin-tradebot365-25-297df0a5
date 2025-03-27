@@ -21,7 +21,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'Coinstrat Pro',
     challengeDuration: '30 ngày',
     exchange: 'Binance',
-    accountSizes: ['$5,000', '$10,000', '$25,000', '$50,000']
+    accountSizes: ['$5,000', '$10,000', '$25,000', '$50,000'],
+    isFeatured: true,
+    isNew: false,
+    isBestSeller: true
   },
   {
     botId: 'PROP-002',
@@ -41,7 +44,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'FTMO',
     challengeDuration: '25 ngày',
     exchange: 'Binance',
-    accountSizes: ['$10,000', '$25,000', '$50,000', '$100,000']
+    accountSizes: ['$10,000', '$25,000', '$50,000', '$100,000'],
+    isFeatured: false,
+    isNew: true,
+    isBestSeller: false
   },
   {
     botId: 'PROP-003',
@@ -61,7 +67,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'The 5%ers',
     challengeDuration: '60 ngày',
     exchange: 'Bybit',
-    accountSizes: ['$5,000', '$10,000', '$20,000']
+    accountSizes: ['$5,000', '$10,000', '$20,000'],
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'PROP-004',
@@ -81,7 +90,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'Earn2Trade',
     challengeDuration: '45 ngày',
     exchange: 'Bybit',
-    accountSizes: ['$10,000', '$25,000', '$50,000']
+    accountSizes: ['$10,000', '$25,000', '$50,000'],
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'PROP-005',
@@ -101,7 +113,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'The 5%ers',
     challengeDuration: '90 ngày',
     exchange: 'KuCoin',
-    accountSizes: ['$5,000', '$10,000', '$15,000']
+    accountSizes: ['$5,000', '$10,000', '$15,000'],
+    isFeatured: true,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'PROP-006',
@@ -121,7 +136,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'TopstepTrader',
     challengeDuration: '30 ngày',
     exchange: 'Binance',
-    accountSizes: ['$15,000', '$30,000', '$50,000']
+    accountSizes: ['$15,000', '$30,000', '$50,000'],
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'PROP-007',
@@ -141,6 +159,10 @@ export const mockPropBots: PropBot[] = [
     propFirm: 'FTMO',
     challengeDuration: '45 ngày',
     exchange: 'OKX',
-    accountSizes: ['$10,000', '$25,000', '$50,000', '$100,000']
+    accountSizes: ['$10,000', '$25,000', '$50,000', '$100,000'],
+    isFeatured: false,
+    isNew: true,
+    isBestSeller: false
   }
 ];
+

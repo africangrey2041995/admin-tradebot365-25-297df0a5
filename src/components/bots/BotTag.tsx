@@ -38,7 +38,7 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
       return (
         <Badge variant="outline" className={`${getSize()} bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800/30 font-medium flex items-center gap-0.5`}>
           <Trophy className={`${size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'} fill-current`} />
-          <span>Best Seller</span>
+          <span>Bán Chạy</span>
         </Badge>
       );
     default:

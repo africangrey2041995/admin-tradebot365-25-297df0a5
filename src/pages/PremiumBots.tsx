@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
 import { ListFilter, Filter, ArrowUpDown, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { PremiumBotCard } from '@/components/bots/PremiumBotCard';
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import { useNavigate } from 'react-router-dom';
 
 // Mocking premium bot data
@@ -29,7 +29,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 86,
     imageUrl: null,
-    colorScheme: 'green'
+    colorScheme: 'green',
+    isFeatured: true,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'pb-002',
@@ -44,7 +47,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 42,
     imageUrl: null,
-    colorScheme: 'red'
+    colorScheme: 'red',
+    isFeatured: false,
+    isNew: true,
+    isBestSeller: false
   },
   {
     botId: 'pb-003',
@@ -59,7 +65,10 @@ const premiumBots = [
     minCapital: '$800',
     subscribers: 64,
     imageUrl: null,
-    colorScheme: 'blue'
+    colorScheme: 'blue',
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: true
   },
   {
     botId: 'pb-004',
@@ -74,7 +83,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 98,
     imageUrl: null,
-    colorScheme: 'purple'
+    colorScheme: 'purple',
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'pb-005',
@@ -89,7 +101,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 73,
     imageUrl: null,
-    colorScheme: 'default'
+    colorScheme: 'default',
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
   {
     botId: 'ptb-001',
@@ -104,7 +119,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 120,
     imageUrl: null,
-    colorScheme: 'blue'
+    colorScheme: 'blue',
+    isFeatured: true,
+    isNew: false,
+    isBestSeller: true
   },
   {
     botId: 'ptb-002',
@@ -119,7 +137,10 @@ const premiumBots = [
     status: 'active',
     subscribers: 95,
     imageUrl: null,
-    colorScheme: 'green'
+    colorScheme: 'green',
+    isFeatured: false,
+    isNew: true,
+    isBestSeller: false
   },
   {
     botId: 'ptb-003',
@@ -134,7 +155,10 @@ const premiumBots = [
     minCapital: '$600',
     subscribers: 83,
     imageUrl: null,
-    colorScheme: 'purple'
+    colorScheme: 'purple',
+    isFeatured: false,
+    isNew: false,
+    isBestSeller: false
   },
 ];
 
@@ -274,6 +298,9 @@ const PremiumBots = () => {
                   subscribers={bot.subscribers}
                   imageUrl={bot.imageUrl}
                   colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
+                  isFeatured={bot.isFeatured}
+                  isNew={bot.isNew}
+                  isBestSeller={bot.isBestSeller}
                 />
               </motion.div>
             ))}
