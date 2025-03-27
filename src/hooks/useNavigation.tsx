@@ -1,3 +1,4 @@
+
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES, USER_ROUTES, SHARED_ROUTES } from '@/constants/routes';
 import { BotType } from '@/constants/botTypes';
@@ -120,17 +121,7 @@ export function useNavigation() {
     }
   };
 
-  /**
-   * Điều hướng tới trang lỗi bot
-   */
-  const navigateToBotErrors = () => {
-    try {
-      navigate(SHARED_ROUTES.BOT_ERRORS(isAdminContext));
-    } catch (error) {
-      console.error('Error navigating to bot errors:', error);
-      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
-    }
-  };
+  // Removed navigateToBotErrors function
 
   /**
    * Điều hướng đến một đường dẫn cụ thể với xử lý lỗi
@@ -150,7 +141,7 @@ export function useNavigation() {
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
-    navigateToBotErrors,
+    // Removed navigateToBotErrors
     navigateTo,
     goBack,
     isAdminContext

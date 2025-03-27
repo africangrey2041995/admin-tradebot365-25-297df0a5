@@ -25,7 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-import BotErrors from "./pages/BotErrors"; // Add import for the new page
+// Remove import for BotErrors
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -42,10 +42,10 @@ import AdminManagement from "./pages/admin/AdminManagement";
 import AdminPremiumBots from "./pages/admin/PremiumBots";
 import AdminPremiumBotDetail from "./pages/admin/PremiumBotDetail";
 import AdminPropBots from "./pages/admin/PropBots";
-import AdminPropBotDetail from "./pages/admin/PropBotDetail"; // Import the new PropBotDetail component
+import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
-import AdminBotErrors from "./pages/admin/BotErrors";
+// Remove import for AdminBotErrors
 import AdminPackages from "./pages/admin/Packages";
 
 // Fixed Clerk publishable key - this is your test key
@@ -101,7 +101,7 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/bot-errors" element={<BotErrors />} /> {/* Add new route */}
+                {/* Remove BotErrors route */}
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
@@ -113,11 +113,11 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  <Route path="bot-errors" element={<AdminBotErrors />} />
+                  {/* Remove AdminBotErrors route */}
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
-                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} /> {/* Add new route for PropBotDetail */}
+                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
                   <Route path="user-bots" element={<AdminUserBots />} />
                   <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
                   <Route path="packages" element={<AdminPackages />} />
