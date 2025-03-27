@@ -42,7 +42,11 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
       userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
       status: 'Failed',
       errorMessage: 'Insufficient balance'
-    })) : []
+    })) : [],
+    // Adding the missing required properties
+    signalToken: `Token-${1000 + index}`,
+    maxLag: `${Math.floor(Math.random() * 10) + 1}s`,
+    investmentType: 'crypto'
   }));
 };
 

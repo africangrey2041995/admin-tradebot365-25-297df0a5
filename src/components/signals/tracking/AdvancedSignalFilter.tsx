@@ -100,7 +100,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   const handleStatusChange = (value: string) => {
     const newFilters = {
       ...filters,
-      status: value as string // Fix: Use 'as string' to match the SignalFilters type
+      status: value
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -108,15 +108,17 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   
   // Handle date range selection
   const handleDateRangeChange = (field: 'from' | 'to', value: Date | undefined) => {
-    const dateRange = filters.dateRange;
-    const newDateRange = Array.isArray(dateRange) 
-      ? (field === 'from' ? [value, dateRange[1]] : [dateRange[0], value])
-      : { ...dateRange, [field]: value };
+    // Always use object format for dateRange to avoid type issues
+    const currentDateRange = filters.dateRange;
+    const newDateRange = Array.isArray(currentDateRange)
+      ? { from: field === 'from' ? value : currentDateRange[0], to: field === 'to' ? value : currentDateRange[1] }
+      : { ...currentDateRange, [field]: value };
     
-    const newFilters = {
+    const newFilters: SignalFilters = {
       ...filters,
       dateRange: newDateRange
     };
+    
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
@@ -197,7 +199,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select
-                  value={typeof filters.status === 'string' ? filters.status : filters.status?.[0] || 'all'}
+                  value={typeof filters.status === 'string' ? filters.status : 'all'}
                   onValueChange={handleStatusChange}
                 >
                   <SelectTrigger>
