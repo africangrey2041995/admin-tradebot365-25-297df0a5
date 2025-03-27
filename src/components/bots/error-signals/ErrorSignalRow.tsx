@@ -4,7 +4,7 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink, AlertTriangle, Info } from 'lucide-react';
+import { CheckCircle2, ExternalLink, AlertTriangle, Info, User } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -78,34 +78,71 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       </Badge>
     );
   };
+
+  const getBotTypeBadge = () => {
+    const botType = signal.botType || 'unknown';
+    const typeConfig = {
+      'USER_BOT': { bg: 'bg-green-100', text: 'text-green-700', label: 'Bot Người Dùng' },
+      'PREMIUM_BOT': { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Bot Premium' },
+      'PROP_BOT': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Bot Prop Trading' },
+      'unknown': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Không xác định' }
+    };
+    
+    const config = typeConfig[botType as keyof typeof typeConfig] || typeConfig.unknown;
+    
+    return (
+      <Badge variant="outline" className={`${config.bg} ${config.text} font-medium`}>
+        {config.label}
+      </Badge>
+    );
+  };
   
   return (
     <TableRow className={isUnread ? "bg-red-50/10" : ""}>
+      {/* ID */}
       <TableCell className="font-mono text-xs">
         {signal.id}
       </TableCell>
+      
+      {/* Severity Level */}
       <TableCell>
-        <Badge variant="outline" className="font-medium">
-          {signal.instrument}
-        </Badge>
+        {renderSeverityBadge()}
       </TableCell>
+      
+      {/* Error Description */}
+      <TableCell>
+        <div className="max-w-[250px] truncate">
+          {signal.errorMessage || 'Không có thông tin lỗi'}
+        </div>
+      </TableCell>
+      
+      {/* Timestamp */}
+      <TableCell className="text-sm">
+        {formatDate(signal.timestamp)}
+      </TableCell>
+      
+      {/* Bot Name/ID */}
       <TableCell 
         className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
         onClick={handleBotClick}
       >
         {signal.botName || signal.botId || 'N/A'}
       </TableCell>
+      
+      {/* Bot Type */}
       <TableCell>
-        <div className="max-w-[250px] truncate">
-          {signal.errorMessage || 'Không có thông tin lỗi'}
+        {getBotTypeBadge()}
+      </TableCell>
+      
+      {/* User ID */}
+      <TableCell>
+        <div className="flex items-center">
+          <User className="h-3 w-3 mr-1 text-muted-foreground" />
+          <span className="text-xs font-mono">{signal.userId || 'N/A'}</span>
         </div>
       </TableCell>
-      <TableCell>
-        {renderSeverityBadge()}
-      </TableCell>
-      <TableCell className="text-sm">
-        {formatDate(signal.timestamp)}
-      </TableCell>
+      
+      {/* Actions */}
       <TableCell>
         <div className="flex items-center gap-2">
           <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>

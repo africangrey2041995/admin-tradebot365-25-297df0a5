@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -196,11 +195,12 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
         <TableHeader>
           <TableRow className="bg-red-50 dark:bg-red-900/20">
             <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Mức độ</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Thời gian</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Loại Bot</TableHead>
+            <TableHead className="text-red-700 dark:text-red-400">Người dùng</TableHead>
             <TableHead className="text-red-700 dark:text-red-400">Hành động</TableHead>
           </TableRow>
         </TableHeader>
