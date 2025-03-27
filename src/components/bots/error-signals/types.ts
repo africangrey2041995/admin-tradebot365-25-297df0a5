@@ -1,3 +1,4 @@
+
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
 
@@ -5,7 +6,7 @@ export interface ErrorSignalsProps {
   botId?: string;
   limit?: number;
   userId?: string;
-  botType?: BotType;
+  botType?: BotType | string; // Support both enum and string values
 }
 
 export interface ErrorSignalsTableProps {

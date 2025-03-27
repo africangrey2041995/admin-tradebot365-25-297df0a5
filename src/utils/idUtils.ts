@@ -7,11 +7,11 @@ import { BotType, BOT_ID_PREFIXES } from '@/constants/botTypes';
  * @param botType The type of bot
  * @returns A standardized bot ID
  */
-export function standardizeBotId(botId: string, botType: BotType): string {
+export function standardizeBotId(botId: string, botType: BotType | string): string {
   if (!botId) return '';
   
   // Get the prefix for the bot type
-  const prefix = BOT_ID_PREFIXES[botType] || '';
+  const prefix = BOT_ID_PREFIXES[botType as BotType] || '';
   
   // If the ID already has the correct prefix, return it
   if (botId.startsWith(prefix)) {

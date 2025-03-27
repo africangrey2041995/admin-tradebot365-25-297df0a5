@@ -15,7 +15,8 @@ export enum BotType {
   GRID = 'grid',
   FTMO = 'FTMO',
   FUNDEDNEXT = 'FundedNext',
-  COINSTRAT_PRO = 'Coinstrat Pro'
+  COINSTRAT_PRO = 'Coinstrat Pro',
+  SYSTEM = 'system'
 }
 
 // Legacy enum values for backward compatibility - this will be removed in favor of BotType enum
@@ -84,5 +85,6 @@ export const BOT_TYPE_DISPLAY: Record<string, string> = {
   [BotType.GRID]: 'Grid',
   [BotType.FTMO]: 'FTMO',
   [BotType.FUNDEDNEXT]: 'FundedNext',
-  [BotType.COINSTRAT_PRO]: 'Coinstrat Pro'
+  [BotType.COINSTRAT_PRO]: 'Coinstrat Pro',
+  [BotType.SYSTEM]: 'System'
 };

@@ -23,5 +23,16 @@ export function useNavigation() {
     navigate(-1);
   };
   
-  return { navigateToBotDetail, navigateToSettings, navigateToErrorDetail, goBack };
+  // Add navigateTo method for backward compatibility
+  const navigateTo = (path: string) => {
+    navigate(path);
+  };
+  
+  return { 
+    navigateToBotDetail, 
+    navigateToSettings, 
+    navigateToErrorDetail, 
+    goBack,
+    navigateTo 
+  };
 }
