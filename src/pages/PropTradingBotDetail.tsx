@@ -12,6 +12,7 @@ import AddAccountDialog from '@/components/bots/AddAccountDialog';
 import { mockPropBots } from '@/mocks/propBotsMock';
 import { BotStatus, BotRiskLevel } from '@/constants/botTypes';
 import { toast } from 'sonner';
+import ChallengeRulesCard from '@/components/bots/details/prop/ChallengeRulesCard';
 
 const propTradingBots = mockPropBots.map(bot => ({
   ...bot,
@@ -122,6 +123,16 @@ const PropTradingBotDetail = () => {
     });
     navigate('/premium-bots');
   };
+  
+  const challengeRules = [
+    "Minimum 10 trading days required",
+    "Maximum daily drawdown: 4%",
+    "Maximum total drawdown: 8%",
+    "Profit target: 10% to advance to next phase",
+    "No weekend trading allowed",
+    "No holding positions overnight",
+    "Maximum position size: 2% of account"
+  ];
   
   return (
     <MainLayout title={bot.name}>
@@ -319,6 +330,10 @@ const PropTradingBotDetail = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        <div className="pt-4">
+          <ChallengeRulesCard rules={challengeRules} />
         </div>
       </motion.div>
       
