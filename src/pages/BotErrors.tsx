@@ -11,10 +11,8 @@ import { useUser } from '@clerk/clerk-react';
 import { BotType } from '@/constants/botTypes';
 import { Button } from '@/components/ui/button';
 import HierarchicalErrorView from '@/components/bots/error-signals/HierarchicalErrorView';
-import ErrorPatternAnalytics from '@/components/bots/error-signals/ErrorPatternAnalytics';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import { ExtendedSignal } from '@/types/signal';
-import ErrorFilterBar from '@/components/bots/error-signals/ErrorFilterBar';
 
 const BotErrors = () => {
   const [activeTab, setActiveTab] = useState('user-bots');
@@ -22,7 +20,6 @@ const BotErrors = () => {
   const [selectedError, setSelectedError] = useState<ExtendedSignal | null>(null);
   const [relatedErrors, setRelatedErrors] = useState<ExtendedSignal[]>([]);
   const [showDetailedView, setShowDetailedView] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
   const { user } = useUser();
   const userId = user?.id || '';
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -31,14 +28,6 @@ const BotErrors = () => {
     premium: 0,
     prop: 0
   });
-  
-  const [filters, setFilters] = useState({
-    severity: 'all',
-    category: 'all',
-    timeRange: 'week'
-  });
-  
-  const [filteredErrors, setFilteredErrors] = useState<ExtendedSignal[]>([]);
 
   // Simulate loading error counts
   useEffect(() => {
@@ -59,9 +48,6 @@ const BotErrors = () => {
       premium: premiumErrors,
       prop: propErrors
     });
-    
-    // Set initial filtered errors
-    setFilteredErrors(mockErrorSignals.filter(err => err.userId === userId));
   }, [userId]);
 
   // Handle error selection for hierarchical view
@@ -83,42 +69,6 @@ const BotErrors = () => {
       }
     }
   }, [selectedErrorId, userId]);
-  
-  // Handle filters change
-  useEffect(() => {
-    let filtered = mockErrorSignals.filter(err => err.userId === userId);
-    
-    // Filter by severity
-    if (filters.severity !== 'all') {
-      filtered = filtered.filter(err => err.errorSeverity === filters.severity);
-    }
-    
-    // Filter by category
-    if (filters.category !== 'all') {
-      filtered = filtered.filter(err => {
-        const errorMsg = err.errorMessage?.toLowerCase() || '';
-        
-        switch (filters.category) {
-          case 'AUTH':
-            return errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission');
-          case 'TRADING':
-            return errorMsg.includes('trade') || errorMsg.includes('order') || errorMsg.includes('position');
-          case 'INTEGRATION':
-            return errorMsg.includes('api') || errorMsg.includes('webhook') || errorMsg.includes('format');
-          case 'SYSTEM':
-            return errorMsg.includes('system') || errorMsg.includes('internal') || errorMsg.includes('crash');
-          case 'TIME':
-            return errorMsg.includes('time') || errorMsg.includes('timeout');
-          case 'CONN':
-            return errorMsg.includes('connect') || errorMsg.includes('network');
-          default:
-            return true;
-        }
-      });
-    }
-    
-    setFilteredErrors(filtered);
-  }, [filters, userId]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -131,14 +81,6 @@ const BotErrors = () => {
   const handleViewDetails = (errorId: string) => {
     setSelectedErrorId(errorId);
     setShowDetailedView(true);
-    setShowAnalytics(false);
-  };
-  
-  const handleToggleAnalytics = () => {
-    setShowAnalytics(!showAnalytics);
-    if (showDetailedView) {
-      setShowDetailedView(false);
-    }
   };
 
   return (
@@ -151,22 +93,14 @@ const BotErrors = () => {
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Quản Lý Lỗi Bot</h1>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant={showAnalytics ? "default" : "outline"} 
-                onClick={handleToggleAnalytics}
-              >
-                {showAnalytics ? "Ẩn phân tích" : "Phân tích lỗi"}
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {isRefreshing ? 'Refreshing...' : 'Refresh'}
-              </Button>
-            </div>
+            <Button 
+              variant="outline" 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
           </div>
 
           <Alert variant="destructive" className="bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900">
@@ -177,71 +111,53 @@ const BotErrors = () => {
             </AlertDescription>
           </Alert>
 
-          {/* Error filtering */}
-          <ErrorFilterBar 
-            onFilterChange={setFilters} 
-            currentFilters={filters}
-            errorCount={filteredErrors.length}
-          />
-
-          {/* Error Analytics Dashboard */}
-          {showAnalytics && (
-            <ErrorPatternAnalytics 
-              errors={filteredErrors} 
-              timeRange={filters.timeRange as 'day' | 'week' | 'month'} 
-              loading={isRefreshing}
-            />
-          )}
-
           {/* Error Statistics Cards */}
-          {!showAnalytics && !showDetailedView && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className={errorCount.user > 0 ? "border-red-400 dark:border-red-700" : ""}>
-                <CardContent className="pt-6 px-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Bot Người Dùng
-                      </p>
-                      <h3 className="text-2xl font-bold mt-1">
-                        {errorCount.user} Lỗi
-                      </h3>
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className={errorCount.user > 0 ? "border-red-400 dark:border-red-700" : ""}>
+              <CardContent className="pt-6 px-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Bot Người Dùng
+                    </p>
+                    <h3 className="text-2xl font-bold mt-1">
+                      {errorCount.user} Lỗi
+                    </h3>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card className={errorCount.premium > 0 ? "border-red-400 dark:border-red-700" : ""}>
-                <CardContent className="pt-6 px-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Premium Bots
-                      </p>
-                      <h3 className="text-2xl font-bold mt-1">
-                        {errorCount.premium} Lỗi
-                      </h3>
-                    </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className={errorCount.premium > 0 ? "border-red-400 dark:border-red-700" : ""}>
+              <CardContent className="pt-6 px-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Premium Bots
+                    </p>
+                    <h3 className="text-2xl font-bold mt-1">
+                      {errorCount.premium} Lỗi
+                    </h3>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card className={errorCount.prop > 0 ? "border-red-400 dark:border-red-700" : ""}>
-                <CardContent className="pt-6 px-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Prop Trading Bots
-                      </p>
-                      <h3 className="text-2xl font-bold mt-1">
-                        {errorCount.prop} Lỗi
-                      </h3>
-                    </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className={errorCount.prop > 0 ? "border-red-400 dark:border-red-700" : ""}>
+              <CardContent className="pt-6 px-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Prop Trading Bots
+                    </p>
+                    <h3 className="text-2xl font-bold mt-1">
+                      {errorCount.prop} Lỗi
+                    </h3>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Detailed error view for selected error */}
           {showDetailedView && selectedError && (
@@ -272,7 +188,7 @@ const BotErrors = () => {
           )}
 
           {/* Error listing by bot type */}
-          {!showDetailedView && !showAnalytics && (
+          {!showDetailedView && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle>Lỗi Kết Nối Bot</CardTitle>
