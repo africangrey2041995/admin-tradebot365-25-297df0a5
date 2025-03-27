@@ -76,7 +76,6 @@ const AdminSidebarNav = () => {
             icon={Users} 
             isActive={isActive('/admin/users')} 
           />
-          {/* Removed the redundant "Bot Hệ Thống" menu item */}
           <NavMenuItem 
             path="/admin/bot-errors" 
             label="Lỗi Bot" 
