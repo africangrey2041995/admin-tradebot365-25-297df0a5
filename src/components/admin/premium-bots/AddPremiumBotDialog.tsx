@@ -17,7 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Star, Sparkles, Trophy } from 'lucide-react';
 
-interface NewBotState {
+export interface NewBotState {
   name: string;
   description: string;
   riskLevel: string;
@@ -29,6 +29,15 @@ interface NewBotState {
   isFeatured: boolean;
   isNew: boolean;
   isBestSeller: boolean;
+  tradingStrategy: string;
+  timeframe: string;
+  indicatorsUsed: string;
+  featureAdvancedEntries: boolean;
+  featureAutomaticSl: boolean;
+  featureDynamicTp: boolean;
+  featureSmartFilters: boolean;
+  maxActivePositions: string;
+  maxLeverage: string;
 }
 
 interface AddPremiumBotDialogProps {
