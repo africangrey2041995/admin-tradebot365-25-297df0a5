@@ -18,7 +18,8 @@ import {
   ShieldAlert,
   Sparkles,
   TrendingUp,
-  Package
+  Package,
+  ActivitySquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -75,7 +76,16 @@ const AdminSidebarNav = () => {
             icon={Users} 
             isActive={isActive('/admin/users')} 
           />
-          {/* Removed the "Lỗi Bot" menu item */}
+        </NavGroup>
+        
+        {/* Monitoring Section - New */}
+        <NavGroup label="Giám sát">
+          <NavMenuItem 
+            path="/admin/bot-monitoring" 
+            label="Giám sát Bot" 
+            icon={ActivitySquare} 
+            isActive={isActive('/admin/bot-monitoring')} 
+          />
         </NavGroup>
         
         {/* Premium Section */}

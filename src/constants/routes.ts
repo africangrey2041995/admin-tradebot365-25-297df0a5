@@ -31,7 +31,8 @@ export const ADMIN_ROUTES = {
   USERS: '/admin/users',
   USER_DETAIL: (userId: string) => `/admin/users/${userId}`,
   BOTS: '/admin/bots',
-  // Removed BOT_ERRORS route
+  // Added new bot monitoring route
+  BOT_MONITORING: '/admin/bot-monitoring',
   PREMIUM_BOTS: '/admin/premium-bots',
   PREMIUM_BOT_DETAIL: (botId: string) => `/admin/premium-bots/${botId}`,
   PROP_BOTS: '/admin/prop-bots',
@@ -64,5 +65,4 @@ export const SHARED_ROUTES = {
     }
   },
   SETTINGS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.SETTINGS : USER_ROUTES.SETTINGS,
-  // Removed BOT_ERRORS route
 };

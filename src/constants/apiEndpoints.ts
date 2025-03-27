@@ -78,4 +78,12 @@ export const ADMIN_API = {
   LOGS: `${API_BASE_URL}/admin/logs`,
   DASHBOARD: `${API_BASE_URL}/admin/dashboard`,
   ERROR_SIGNALS: `${API_BASE_URL}/admin/signals/errors`,
+  // New monitoring endpoints
+  MONITORING: {
+    BOT_ERRORS: `${API_BASE_URL}/admin/monitoring/bot-errors`,
+    BOT_ERROR_STATS: `${API_BASE_URL}/admin/monitoring/bot-error-stats`,
+    BOT_ERROR_DETAIL: (errorId: string) => `${API_BASE_URL}/admin/monitoring/bot-errors/${errorId}`,
+    RESOLVE_ERROR: (errorId: string) => `${API_BASE_URL}/admin/monitoring/bot-errors/${errorId}/resolve`,
+    ERROR_HISTORY: (botId: string) => `${API_BASE_URL}/admin/monitoring/bot-errors/history/${botId}`,
+  }
 };
