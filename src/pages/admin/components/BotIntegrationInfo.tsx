@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 
 interface BotIntegrationInfoProps {
   botId: string;
+  isAdmin?: boolean;
 }
 
-const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId }) => {
+const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId, isAdmin = false }) => {
   const [showToken, setShowToken] = useState(false);
   
   // This would come from API in production
@@ -22,7 +23,10 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId }) => {
   };
 
   const toggleShowToken = () => {
-    setShowToken(!showToken);
+    // Only allow toggling if not an admin view
+    if (!isAdmin) {
+      setShowToken(!showToken);
+    }
   };
 
   return (
@@ -64,16 +68,19 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId }) => {
           </h3>
           <div className="flex items-center gap-2">
             <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-sm w-full font-mono border border-slate-200 dark:border-slate-700">
-              {showToken ? signalToken : '••••••••••••••••••••••••••••••'}
+              {/* Always show masked token for admins */}
+              {'••••••••••••••••••••••••••••••'}
             </div>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={toggleShowToken}
-              className="shrink-0"
-            >
-              {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
+            {!isAdmin && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={toggleShowToken}
+                className="shrink-0"
+              >
+                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            )}
             <Button 
               variant="outline" 
               size="icon" 
@@ -85,6 +92,7 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId }) => {
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Token này cần được bao gồm trong message của TradingView Alert để xác thực
+            {isAdmin && <span className="text-amber-500 ml-1">(Ẩn cho quản trị viên)</span>}
           </p>
         </div>
         
@@ -92,7 +100,7 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId }) => {
           <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Mẫu TradingView Alert Message</h4>
           <pre className="bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/50 p-3 rounded text-xs overflow-auto text-slate-700 dark:text-slate-200">
 {`{
-  "token": "${showToken ? signalToken : '[Signal Token]'}",
+  "token": "${isAdmin ? '[Signal Token]' : (showToken ? signalToken : '[Signal Token]')}",
   "action": "{{strategy.order.action}}",
   "price": {{strategy.order.price}},
   "symbol": "{{ticker}}",

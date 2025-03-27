@@ -86,7 +86,7 @@ const UserBotDetailContent: React.FC<UserBotDetailContentProps> = ({
           </div>
         </div>
 
-        <BotIntegrationInfo botId={botId || ''} />
+        <BotIntegrationInfo botId={botId || ''} isAdmin={true} />
 
         <UserBotDetailTabs 
           botId={botId || ''}
