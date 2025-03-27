@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink, AlertTriangle, Info, User, CircleInfo } from 'lucide-react';
+import { CheckCircle2, ExternalLink, AlertTriangle, Info, User, HelpCircle } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -107,7 +108,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
           {errorCode}
         </span>
         <ErrorDetailsTooltip errorMessage={errorMessage}>
-          <CircleInfo className="h-4 w-4 text-blue-500 cursor-help" />
+          <HelpCircle className="h-4 w-4 text-blue-500 cursor-help" />
         </ErrorDetailsTooltip>
       </div>
     );
