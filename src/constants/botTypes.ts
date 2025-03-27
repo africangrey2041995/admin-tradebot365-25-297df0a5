@@ -4,14 +4,13 @@
  */
 
 // Enum để quản lý các loại bot
-export type BotType = 'USER_BOT' | 'PREMIUM_BOT' | 'PROP_BOT' | 'user' | 'premium' | 'prop' | 'momentum' | 'grid' | 'FTMO' | 'FundedNext' | 'Coinstrat Pro';
-
-// Legacy enum values for backward compatibility
-export enum BotTypeEnum {
+export enum BotType {
   USER_BOT = 'USER_BOT',
   PREMIUM_BOT = 'PREMIUM_BOT',
   PROP_BOT = 'PROP_BOT',
-  // Additional values used in the codebase
+  USER = 'user',
+  PREMIUM = 'premium',
+  PROP = 'prop',
   MOMENTUM = 'momentum',
   GRID = 'grid',
   FTMO = 'FTMO',
@@ -19,23 +18,26 @@ export enum BotTypeEnum {
   COINSTRAT_PRO = 'Coinstrat Pro'
 }
 
+// Legacy enum values for backward compatibility - this will be removed in favor of BotType enum
+export const BotTypeEnum = BotType;
+
 // Cấu trúc ID prefix cho mỗi loại bot
 export const BOT_ID_PREFIXES: Record<string, string> = {
-  'USER_BOT': 'MY-', // Bot người dùng: MY-001, MY-002
-  'PREMIUM_BOT': 'PRE-', // Premium bots: PRE-001, PRE-002
-  'PROP_BOT': 'PROP-', // Prop trading bots: PROP-001, PROP-002
-  'user': 'MY-',
-  'premium': 'PRE-',
-  'prop': 'PROP-'
+  [BotType.USER_BOT]: 'MY-', // Bot người dùng: MY-001, MY-002
+  [BotType.PREMIUM_BOT]: 'PRE-', // Premium bots: PRE-001, PRE-002
+  [BotType.PROP_BOT]: 'PROP-', // Prop trading bots: PROP-001, PROP-002
+  [BotType.USER]: 'MY-',
+  [BotType.PREMIUM]: 'PRE-',
+  [BotType.PROP]: 'PROP-'
 };
 
 // Cấu trúc thể hiện mối quan hệ giữa tiền tố ID và loại bot
 export const ID_PREFIX_TO_BOT_TYPE: Record<string, BotType> = {
-  'MY-': 'USER_BOT',
-  'PRE-': 'PREMIUM_BOT',
-  'PROP-': 'PROP_BOT',
-  'pb-': 'PREMIUM_BOT', // Xử lý cả các định dạng ID cũ
-  'ptb-': 'PROP_BOT', // Xử lý cả các định dạng ID cũ
+  'MY-': BotType.USER_BOT,
+  'PRE-': BotType.PREMIUM_BOT,
+  'PROP-': BotType.PROP_BOT,
+  'pb-': BotType.PREMIUM_BOT, // Xử lý cả các định dạng ID cũ
+  'ptb-': BotType.PROP_BOT, // Xử lý cả các định dạng ID cũ
 };
 
 // Trạng thái hoạt động của bot
@@ -72,15 +74,15 @@ export const BOT_RISK_DISPLAY: Record<BotRiskLevel, string> = {
 
 // Định dạng hiển thị loại bot
 export const BOT_TYPE_DISPLAY: Record<string, string> = {
-  'USER_BOT': 'Bot Người Dùng',
-  'PREMIUM_BOT': 'Bot Premium',
-  'PROP_BOT': 'Bot Prop Trading',
-  'user': 'Bot Người Dùng',
-  'premium': 'Bot Premium',
-  'prop': 'Bot Prop Trading',
-  'momentum': 'Momentum',
-  'grid': 'Grid',
-  'FTMO': 'FTMO',
-  'FundedNext': 'FundedNext',
-  'Coinstrat Pro': 'Coinstrat Pro'
+  [BotType.USER_BOT]: 'Bot Người Dùng',
+  [BotType.PREMIUM_BOT]: 'Bot Premium',
+  [BotType.PROP_BOT]: 'Bot Prop Trading',
+  [BotType.USER]: 'Bot Người Dùng',
+  [BotType.PREMIUM]: 'Bot Premium',
+  [BotType.PROP]: 'Bot Prop Trading',
+  [BotType.MOMENTUM]: 'Momentum',
+  [BotType.GRID]: 'Grid',
+  [BotType.FTMO]: 'FTMO',
+  [BotType.FUNDEDNEXT]: 'FundedNext',
+  [BotType.COINSTRAT_PRO]: 'Coinstrat Pro'
 };

@@ -1,4 +1,3 @@
-
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
 
@@ -27,5 +26,4 @@ export interface ErrorSignalRowProps {
   isAdmin?: boolean;
 }
 
-// Re-export ExtendedSignal to make it available to components importing from this file
 export type { ExtendedSignal };

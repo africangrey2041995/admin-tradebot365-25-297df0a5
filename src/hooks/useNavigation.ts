@@ -19,5 +19,9 @@ export function useNavigation() {
     navigate(SHARED_ROUTES.BOT_ERROR_DETAIL(isAdmin, errorId));
   };
   
-  return { navigateToBotDetail, navigateToSettings, navigateToErrorDetail };
+  const goBack = () => {
+    navigate(-1);
+  };
+  
+  return { navigateToBotDetail, navigateToSettings, navigateToErrorDetail, goBack };
 }
