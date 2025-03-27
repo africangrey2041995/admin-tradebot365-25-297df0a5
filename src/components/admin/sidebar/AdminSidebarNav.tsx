@@ -10,7 +10,7 @@ import {
 import { 
   LayoutDashboard, 
   Users, 
-  Bot,
+  AlertTriangle,
   Database,
   Scroll,
   Bell,
@@ -19,7 +19,6 @@ import {
   ShieldAlert,
   Sparkles,
   TrendingUp,
-  AlertTriangle,
   Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -77,12 +76,7 @@ const AdminSidebarNav = () => {
             icon={Users} 
             isActive={isActive('/admin/users')} 
           />
-          <NavMenuItem 
-            path="/admin/bots" 
-            label="Bot hệ thống" 
-            icon={Bot} 
-            isActive={isActive('/admin/bots')} 
-          />
+          {/* Removed the redundant "Bot Hệ Thống" menu item */}
           <NavMenuItem 
             path="/admin/bot-errors" 
             label="Lỗi Bot" 
