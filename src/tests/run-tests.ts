@@ -9,6 +9,7 @@
  * - npm run test                      # Run all tests
  * - npm run test security             # Run security tests only
  * - npm run test bot-differentiation  # Run bot differentiation tests only
+ * - npm run test signals              # Run signal component tests only
  */
 
 import { runAllTests, runSpecificTest } from './index';

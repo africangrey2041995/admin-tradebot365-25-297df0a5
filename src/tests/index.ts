@@ -9,6 +9,9 @@
 // Import security tests
 import { runAllSecurityTests } from './security/index';
 
+// Import signal tests
+import { runAllSignalTests } from './signals/signals.test';
+
 // Import new test modules
 import runBotDifferentiationTests from './bot-differentiation.test';
 import runUserIdNormalizationTests from './user-id-normalization.test';
@@ -43,6 +46,10 @@ export const runAllTests = () => {
   console.log('\n----- RUNNING LOADING STATES TESTS -----\n');
   runLoadingStatesTests();
   
+  // Run signal component tests
+  console.log('\n----- RUNNING SIGNAL COMPONENT TESTS -----\n');
+  runAllSignalTests();
+  
   console.log('\n==================================================');
   console.log('============= ALL TESTS COMPLETED ===============');
   console.log('==================================================\n');
@@ -54,6 +61,7 @@ export const runAllTests = () => {
   console.log('- UserId Normalization Tests: COMPLETED');
   console.log('- Component Integration Tests: COMPLETED');
   console.log('- Loading States Tests: COMPLETED');
+  console.log('- Signal Component Tests: COMPLETED');
   console.log('\nNote: For detailed test results, review the console output above.');
 };
 
@@ -84,6 +92,10 @@ export const runSpecificTest = (testName: string) => {
     case 'states':
       runLoadingStatesTests();
       break;
+    case 'signals':
+    case 'signal':
+      runAllSignalTests();
+      break;
     default:
       console.error(`Unknown test suite: ${testName}`);
       console.log('Available test suites:');
@@ -92,6 +104,7 @@ export const runSpecificTest = (testName: string) => {
       console.log('- user-id');
       console.log('- component');
       console.log('- loading');
+      console.log('- signals');
   }
 };
 
