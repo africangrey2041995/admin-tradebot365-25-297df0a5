@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Star, Sparkles, Trophy } from "lucide-react";
+import { Star, Sparkles, Trophy, Ribbon } from "lucide-react";
 
 export type BotTagType = 'featured' | 'new' | 'bestSeller';
 
@@ -13,27 +13,28 @@ interface BotTagProps {
 export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
   const getTagClass = () => {
     const baseClasses = `
-      absolute -top-3 right-3 z-10
-      text-white font-bold shadow-lg
-      flex items-center justify-center rounded-lg
-      ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
+      absolute top-0 right-0 z-20
+      transform rotate-45 origin-top-right
+      text-white font-bold shadow-md
+      flex items-center justify-center
+      w-32 h-8
+      ${size === 'sm' ? 'w-28 h-6 text-[10px]' : size === 'lg' ? 'w-36 h-10 text-sm' : 'w-32 h-8 text-xs'}
     `;
     
     switch (type) {
       case 'featured':
         return `
           ${baseClasses}
-          bg-gradient-to-r from-amber-300 to-amber-500
-          border-2 border-amber-200 dark:border-amber-600
+          bg-gradient-to-r from-amber-400 to-amber-600
+          border-t border-r border-amber-200 dark:border-amber-600
           shadow-amber-300/50 dark:shadow-amber-500/30
-          animate-pulse-slow
         `;
       
       case 'new':
         return `
           ${baseClasses}
           bg-gradient-to-r from-blue-400 to-blue-600
-          border-2 border-blue-300 dark:border-blue-700
+          border-t border-r border-blue-300 dark:border-blue-700
           shadow-blue-400/50 dark:shadow-blue-600/30
         `;
       
@@ -41,7 +42,7 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
         return `
           ${baseClasses}
           bg-gradient-to-r from-emerald-400 to-emerald-600
-          border-2 border-emerald-300 dark:border-emerald-700
+          border-t border-r border-emerald-300 dark:border-emerald-700
           shadow-emerald-400/50 dark:shadow-emerald-600/30
         `;
       
@@ -58,22 +59,28 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
     case 'featured':
       return (
         <div className={getTagClass()}>
-          <Star className={`${getIconSize()} fill-white mr-1`} />
-          <span className="drop-shadow-md">Nổi Bật</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Star className={`${getIconSize()} fill-white mr-1`} />
+            <span className="drop-shadow-md">Nổi Bật</span>
+          </div>
         </div>
       );
     case 'new':
       return (
         <div className={getTagClass()}>
-          <Sparkles className={`${getIconSize()} mr-1`} />
-          <span className="drop-shadow-md">Mới</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Sparkles className={`${getIconSize()} mr-1`} />
+            <span className="drop-shadow-md">Mới</span>
+          </div>
         </div>
       );
     case 'bestSeller':
       return (
         <div className={getTagClass()}>
-          <Trophy className={`${getIconSize()} fill-white mr-1`} />
-          <span className="drop-shadow-md">Bán Chạy</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Trophy className={`${getIconSize()} fill-white mr-1`} />
+            <span className="drop-shadow-md">Bán Chạy</span>
+          </div>
         </div>
       );
     default:

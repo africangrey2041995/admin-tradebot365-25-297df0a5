@@ -156,10 +156,10 @@ export const PremiumBotCard = ({
   const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
 
   return (
-    <div className="pt-6 px-3 relative">
-      {tagToShow && <BotTag type={tagToShow} />}
-      
-      <Card className={`border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
+    <div className="px-3 pb-3 relative">
+      <Card className={`border hover:shadow-md transition-all overflow-hidden ${getCardColors(colorScheme)}`}>
+        {tagToShow && <BotTag type={tagToShow} />}
+        
         <CardHeader className="p-3 pb-0">
           <div className="flex justify-between items-start">
             <div className="flex gap-2 items-center">
