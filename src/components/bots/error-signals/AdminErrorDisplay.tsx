@@ -25,6 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
+import ErrorDetailsModal from '@/components/admin/monitoring/ErrorDetailsModal';
 
 interface AdminErrorDisplayProps {
   botType: BotType; 
@@ -46,6 +47,8 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedErrorId, setSelectedErrorId] = useState<string | null>(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -138,6 +141,26 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
 
   const handleMarkAsRead = (signalId: string) => {
     console.log("Admin marked signal as read:", signalId);
+  };
+
+  const handleViewErrorDetails = (errorId: string) => {
+    setSelectedErrorId(errorId);
+    setIsErrorModalOpen(true);
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setSelectedErrorId(null);
+  };
+
+  const handleResolveError = (errorId: string) => {
+    console.log("Admin resolved error:", errorId);
+    // Remove the error from the signals and filtered signals
+    const updatedSignals = signals.filter(signal => signal.id !== errorId);
+    setSignals(updatedSignals);
+    setFilteredSignals(filteredSignals.filter(signal => signal.id !== errorId));
+    setIsErrorModalOpen(false);
+    setSelectedErrorId(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -369,7 +392,7 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                     <Button 
                       size="sm" 
                       variant="ghost" 
-                      onClick={() => onViewDetails(signal.id)}
+                      onClick={() => handleViewErrorDetails(signal.id)}
                       className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                     >
                       Chi tiết
@@ -385,14 +408,14 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
       {viewMode === 'categories' && (
         <ErrorCategoryList 
           signals={filteredSignals} 
-          onViewDetails={onViewDetails}
+          onViewDetails={handleViewErrorDetails}
         />
       )}
 
       {viewMode === 'grouped' && (
         <ErrorGroupList 
           signals={filteredSignals} 
-          onViewDetails={onViewDetails}
+          onViewDetails={handleViewErrorDetails}
         />
       )}
 
@@ -405,6 +428,14 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
           Cập nhật lần cuối: {new Date().toLocaleTimeString()}
         </div>
       </div>
+
+      {/* Error Details Modal */}
+      <ErrorDetailsModal
+        errorId={selectedErrorId}
+        open={isErrorModalOpen}
+        onClose={handleCloseErrorModal}
+        onResolve={handleResolveError}
+      />
     </div>
   );
 };

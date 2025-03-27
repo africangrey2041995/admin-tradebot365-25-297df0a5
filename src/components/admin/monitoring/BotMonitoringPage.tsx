@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ActivitySquare, AlertTriangle, RefreshCw, Shield, UserCircle } from 'lucide-react';
 import { BotType } from '@/types/index';
 import AdminErrorDisplay from '@/components/bots/error-signals/AdminErrorDisplay';
+import ErrorDetailsModal from './ErrorDetailsModal';
 
 /**
  * Component hiển thị trang giám sát Bot trong admin dashboard
@@ -18,6 +19,8 @@ const BotMonitoringPage: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedErrorId, setSelectedErrorId] = useState<string | null>(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [stats, setStats] = useState({
     total: 0,
     premium: 0,
@@ -59,10 +62,29 @@ const BotMonitoringPage: React.FC = () => {
   // Function to handle error details view
   const handleViewErrorDetails = (errorId: string) => {
     console.log("Viewing error details for:", errorId);
+    setSelectedErrorId(errorId);
+    setIsErrorModalOpen(true);
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setSelectedErrorId(null);
+  };
+
+  const handleResolveError = (errorId: string) => {
     toast({
-      title: "Xem chi tiết lỗi",
-      description: `Đang tải chi tiết lỗi ${errorId.substring(0, 8)}...`,
+      title: "Đã xử lý lỗi",
+      description: `Lỗi ${errorId.substring(0, 8)}... đã được đánh dấu là đã xử lý`,
     });
+    
+    // In a real app, you would make an API call to update the error status
+    
+    // Reset modal state
+    setIsErrorModalOpen(false);
+    setSelectedErrorId(null);
+    
+    // Re-fetch stats to update counters
+    fetchErrorStats();
   };
 
   return (

@@ -11,9 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { ExtendedSignal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { Check, CheckCircle, X } from 'lucide-react';
+import { CheckCircle, ClipboardCopy, X } from 'lucide-react';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import AdminHierarchicalErrorView from '@/components/bots/error-signals/AdminHierarchicalErrorView';
+import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
 
 interface ErrorDetailsModalProps {
   errorId: string | null;
@@ -28,7 +30,8 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
   onClose,
   onResolve
 }) => {
-  const { toast } = useToast();
+  const { toast: hookToast } = useToast();
+  const { navigateToBotDetail } = useNavigation();
   const [loading, setLoading] = useState(false);
   const [resolving, setResolving] = useState(false);
   const [error, setError] = useState<ExtendedSignal | null>(null);
@@ -58,7 +61,7 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
         }, 800);
       } catch (e) {
         console.error("Error fetching error details:", e);
-        toast({
+        hookToast({
           title: "Lỗi",
           description: "Không thể tải chi tiết lỗi",
           variant: "destructive",
@@ -68,7 +71,7 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
     };
     
     fetchErrorDetails();
-  }, [errorId, open, toast]);
+  }, [errorId, open, hookToast]);
 
   // Handle resolving error
   const handleResolve = async () => {
@@ -79,7 +82,7 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
       // Mock API call
       setTimeout(() => {
         onResolve(errorId);
-        toast({
+        hookToast({
           title: "Thành công",
           description: "Lỗi đã được đánh dấu là đã xử lý",
           variant: "default",
@@ -89,7 +92,7 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
       }, 800);
     } catch (e) {
       console.error("Error resolving error:", e);
-      toast({
+      hookToast({
         title: "Lỗi",
         description: "Không thể đánh dấu lỗi là đã xử lý",
         variant: "destructive",
@@ -98,13 +101,40 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
     }
   };
 
+  const handleNavigateToBotDetails = () => {
+    if (!error?.botId) return;
+    
+    try {
+      navigateToBotDetail(error.botId);
+    } catch (e) {
+      console.error("Error navigating to bot details:", e);
+      toast.error("Không thể điều hướng đến trang chi tiết bot");
+    }
+  };
+
+  const handleCopyErrorId = () => {
+    if (!errorId) return;
+    
+    navigator.clipboard.writeText(errorId);
+    toast.success("Đã sao chép mã lỗi vào clipboard");
+  };
+
   const handleViewDetails = (errorId: string) => {
     // In a real app, this would navigate to the error details page
-    console.log("Viewing error details for:", errorId);
-    toast({
-      title: "Chuyển hướng",
-      description: `Đang chuyển đến chi tiết lỗi ${errorId.substring(0, 8)}...`,
-    });
+    console.log("Viewing related error details for:", errorId);
+    
+    // Close current modal
+    onClose();
+    
+    // Re-open with new error ID
+    setTimeout(() => {
+      setError(null);
+      setRelatedErrors([]);
+      // In a real app, you would set state to open modal with new error ID
+      // Here we just log for demo purposes
+      console.log("Would show details for error ID:", errorId);
+      toast.info(`Đang chuyển đến chi tiết lỗi ${errorId.substring(0, 8)}...`);
+    }, 300);
   };
 
   return (
@@ -129,6 +159,26 @@ const ErrorDetailsModal: React.FC<ErrorDetailsModalProps> = ({
               relatedSignals={relatedErrors}
               onViewDetails={handleViewDetails}
             />
+            
+            <div className="mt-4 flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleNavigateToBotDetails}
+                className="text-blue-600"
+              >
+                Xem chi tiết Bot
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleCopyErrorId}
+              >
+                <ClipboardCopy className="h-4 w-4 mr-1" />
+                Sao chép mã lỗi
+              </Button>
+            </div>
             
             <DialogFooter className="flex items-center justify-between space-x-2 mt-6">
               <div className="text-sm text-muted-foreground">

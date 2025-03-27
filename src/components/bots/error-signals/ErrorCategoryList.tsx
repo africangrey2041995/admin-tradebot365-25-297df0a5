@@ -1,174 +1,230 @@
 
-import React, { useMemo } from 'react';
-import { ExtendedSignal } from '@/types/signal';
-import { AlertTriangle, Server, Shield, LifeBuoy } from 'lucide-react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { AlertTriangle, ChevronRight, Server, Shield, UserCircle } from 'lucide-react';
+import { ExtendedSignal } from '@/types';
 
 interface ErrorCategoryListProps {
   signals: ExtendedSignal[];
   onViewDetails: (errorId: string) => void;
 }
 
-// Helper function to format time
-const formatTime = (timestamp?: string) => {
-  if (!timestamp) return '';
-  
-  try {
-    return formatDistanceToNow(new Date(timestamp), { 
-      addSuffix: true,
-      locale: vi
-    });
-  } catch (err) {
-    return timestamp;
-  }
-};
-
-// Helper function to get severity badge
-const getSeverityBadge = (severity?: string) => {
-  switch (severity) {
-    case 'critical':
-      return <Badge className="bg-red-500">Nghiêm trọng</Badge>;
-    case 'high':
-      return <Badge className="bg-orange-500">Cao</Badge>;
-    case 'medium':
-      return <Badge className="bg-yellow-500">Trung bình</Badge>;
-    case 'low':
-      return <Badge className="bg-green-500">Thấp</Badge>;
-    default:
-      return <Badge variant="outline">Không xác định</Badge>;
-  }
-};
-
-const ErrorCategoryList: React.FC<ErrorCategoryListProps> = ({
+const ErrorCategoryList: React.FC<ErrorCategoryListProps> = ({ 
   signals,
   onViewDetails
 }) => {
-  const categories = useMemo(() => {
-    // Initialize categories
-    const result: {
-      [key: string]: {
-        icon: React.ReactNode;
-        title: string;
-        description: string;
-        color: string;
-        signals: ExtendedSignal[];
-      }
-    } = {
-      authentication: {
-        icon: <Shield className="h-6 w-6 text-blue-500" />,
-        title: 'Xác thực / Uỷ quyền',
-        description: 'Lỗi liên quan đến xác thực API, uỷ quyền và truy cập',
-        color: 'border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800',
-        signals: []
-      },
-      trading: {
-        icon: <LifeBuoy className="h-6 w-6 text-green-500" />,
-        title: 'Giao dịch',
-        description: 'Lỗi liên quan đến quá trình giao dịch, lệnh và thị trường',
-        color: 'border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800',
-        signals: []
-      },
-      integration: {
-        icon: <Server className="h-6 w-6 text-purple-500" />,
-        title: 'Tích hợp',
-        description: 'Lỗi liên quan đến kết nối, webhook và tích hợp với hệ thống bên thứ ba',
-        color: 'border-purple-200 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-800',
-        signals: []
-      },
-      system: {
-        icon: <AlertTriangle className="h-6 w-6 text-red-500" />,
-        title: 'Hệ thống',
-        description: 'Lỗi hệ thống nội bộ và lỗi khác không thuộc các danh mục khác',
-        color: 'border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800',
-        signals: []
-      }
-    };
-
-    // Categorize signals
-    signals.forEach(signal => {
-      if (signal.errorMessage?.toLowerCase().includes('auth') || 
-          signal.errorCode?.startsWith('AUTH')) {
-        result.authentication.signals.push(signal);
-      } else if (signal.errorMessage?.toLowerCase().includes('trade') || 
-                signal.errorCode?.startsWith('TRADE')) {
-        result.trading.signals.push(signal);
-      } else if (signal.errorMessage?.toLowerCase().includes('connect') || 
-                signal.errorCode?.startsWith('CONN')) {
-        result.integration.signals.push(signal);
-      } else {
-        result.system.signals.push(signal);
-      }
-    });
-
-    return result;
-  }, [signals]);
-
+  // Group signals by category
+  const authErrors = signals.filter(s => 
+    s.errorMessage?.toLowerCase().includes('auth') || 
+    s.errorCode?.startsWith('AUTH')
+  );
+  
+  const tradingErrors = signals.filter(s => 
+    s.errorMessage?.toLowerCase().includes('trade') || 
+    s.errorCode?.startsWith('TRADE')
+  );
+  
+  const integrationErrors = signals.filter(s => 
+    s.errorMessage?.toLowerCase().includes('connect') || 
+    s.errorCode?.startsWith('CONN')
+  );
+  
+  const systemErrors = signals.filter(s => 
+    !s.errorMessage?.toLowerCase().includes('auth') && 
+    !s.errorMessage?.toLowerCase().includes('trade') && 
+    !s.errorMessage?.toLowerCase().includes('connect')
+  );
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {Object.entries(categories).map(([key, category]) => (
-        <Card key={key} className={`${category.color} overflow-hidden`}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                {category.icon}
-                <CardTitle className="ml-2 text-lg">{category.title}</CardTitle>
-              </div>
-              <Badge variant="outline">{category.signals.length}</Badge>
-            </div>
-            <CardDescription>{category.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {category.signals.length > 0 ? (
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-                {category.signals.map(signal => (
-                  <div 
-                    key={signal.id} 
-                    className="p-3 border rounded-md bg-background hover:border-primary transition-colors cursor-pointer"
-                    onClick={() => onViewDetails(signal.id)}
-                  >
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="text-sm font-medium line-clamp-1">
-                        {signal.errorMessage || 'Lỗi không xác định'}
-                      </h4>
-                      {getSeverityBadge(signal.errorSeverity)}
+      <Card className="border-red-100 dark:border-red-900/20">
+        <CardHeader className="bg-red-50 dark:bg-red-900/10 pb-2">
+          <CardTitle className="text-red-700 dark:text-red-400 flex items-center">
+            <Shield className="h-5 w-5 mr-2" />
+            Lỗi xác thực / ủy quyền
+          </CardTitle>
+          <CardDescription>
+            Các lỗi liên quan đến đăng nhập, token, phân quyền
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {authErrors.length > 0 ? (
+            <ul className="space-y-2">
+              {authErrors.slice(0, 5).map(error => (
+                <li key={error.id} className="flex justify-between items-center p-2 hover:bg-red-50 dark:hover:bg-red-900/10 rounded">
+                  <div>
+                    <div className="font-medium text-red-600 dark:text-red-400">
+                      {error.errorCode || 'AUTH-ERROR'}
                     </div>
-                    <div className="text-xs text-muted-foreground mb-2 flex items-center space-x-2">
-                      <span>ID: {signal.id.substring(0, 8)}...</span>
-                      <span>•</span>
-                      <span>{formatTime(signal.timestamp)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">Bot: </span>
-                        <span>{signal.botName || signal.botId || 'N/A'}</span>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onViewDetails(signal.id);
-                        }}
-                      >
-                        Xem chi tiết
-                      </Button>
+                    <div className="text-sm text-muted-foreground line-clamp-1">
+                      {error.errorMessage}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Không có lỗi nào trong danh mục này
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onViewDetails(error.id)}
+                    className="text-blue-600"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+              {authErrors.length > 5 && (
+                <li className="text-center text-sm text-muted-foreground pt-2">
+                  + {authErrors.length - 5} lỗi khác
+                </li>
+              )}
+            </ul>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              Không có lỗi xác thực
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Card className="border-orange-100 dark:border-orange-900/20">
+        <CardHeader className="bg-orange-50 dark:bg-orange-900/10 pb-2">
+          <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center">
+            <AlertTriangle className="h-5 w-5 mr-2" />
+            Lỗi giao dịch
+          </CardTitle>
+          <CardDescription>
+            Các lỗi liên quan đến thực thi lệnh giao dịch
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {tradingErrors.length > 0 ? (
+            <ul className="space-y-2">
+              {tradingErrors.slice(0, 5).map(error => (
+                <li key={error.id} className="flex justify-between items-center p-2 hover:bg-orange-50 dark:hover:bg-orange-900/10 rounded">
+                  <div>
+                    <div className="font-medium text-orange-600 dark:text-orange-400">
+                      {error.errorCode || 'TRADE-ERROR'}
+                    </div>
+                    <div className="text-sm text-muted-foreground line-clamp-1">
+                      {error.errorMessage}
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onViewDetails(error.id)}
+                    className="text-blue-600"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+              {tradingErrors.length > 5 && (
+                <li className="text-center text-sm text-muted-foreground pt-2">
+                  + {tradingErrors.length - 5} lỗi khác
+                </li>
+              )}
+            </ul>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              Không có lỗi giao dịch
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Card className="border-blue-100 dark:border-blue-900/20">
+        <CardHeader className="bg-blue-50 dark:bg-blue-900/10 pb-2">
+          <CardTitle className="text-blue-700 dark:text-blue-400 flex items-center">
+            <Server className="h-5 w-5 mr-2" />
+            Lỗi tích hợp
+          </CardTitle>
+          <CardDescription>
+            Các lỗi liên quan đến kết nối API, webhook
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {integrationErrors.length > 0 ? (
+            <ul className="space-y-2">
+              {integrationErrors.slice(0, 5).map(error => (
+                <li key={error.id} className="flex justify-between items-center p-2 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded">
+                  <div>
+                    <div className="font-medium text-blue-600 dark:text-blue-400">
+                      {error.errorCode || 'CONN-ERROR'}
+                    </div>
+                    <div className="text-sm text-muted-foreground line-clamp-1">
+                      {error.errorMessage}
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onViewDetails(error.id)}
+                    className="text-blue-600"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+              {integrationErrors.length > 5 && (
+                <li className="text-center text-sm text-muted-foreground pt-2">
+                  + {integrationErrors.length - 5} lỗi khác
+                </li>
+              )}
+            </ul>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              Không có lỗi tích hợp
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Card className="border-gray-200 dark:border-gray-800">
+        <CardHeader className="bg-gray-50 dark:bg-gray-800/30 pb-2">
+          <CardTitle className="text-gray-700 dark:text-gray-400 flex items-center">
+            <UserCircle className="h-5 w-5 mr-2" />
+            Lỗi hệ thống
+          </CardTitle>
+          <CardDescription>
+            Các lỗi hệ thống khác và lỗi chưa phân loại
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {systemErrors.length > 0 ? (
+            <ul className="space-y-2">
+              {systemErrors.slice(0, 5).map(error => (
+                <li key={error.id} className="flex justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-900/10 rounded">
+                  <div>
+                    <div className="font-medium text-gray-600 dark:text-gray-400">
+                      {error.errorCode || 'SYSTEM-ERROR'}
+                    </div>
+                    <div className="text-sm text-muted-foreground line-clamp-1">
+                      {error.errorMessage}
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onViewDetails(error.id)}
+                    className="text-blue-600"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+              {systemErrors.length > 5 && (
+                <li className="text-center text-sm text-muted-foreground pt-2">
+                  + {systemErrors.length - 5} lỗi khác
+                </li>
+              )}
+            </ul>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              Không có lỗi hệ thống
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
