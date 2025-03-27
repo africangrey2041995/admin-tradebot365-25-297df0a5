@@ -1,4 +1,235 @@
 
-// This file has been refactored into multiple files in the mockData/ directory
-// It's kept for backward compatibility
-export * from './mockData/index';
+import { ExtendedSignal } from '@/types/signal';
+
+// Mock data for bot error signals
+export const mockErrorSignals: ExtendedSignal[] = [
+  {
+    id: 'ERR-00123',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+    instrument: 'BTCUSDT',
+    quantity: '0.05',
+    action: 'BUY',
+    price: '42000',
+    signal: 'tradingview',
+    botId: 'MY-001',
+    botName: 'BTC Trend Tracker',
+    userId: 'USR-001',
+    accountId: 'ACC-001',
+    status: 'failure',
+    errorMessage: 'API Connection failed: timeout after 30 seconds',
+    errorCode: 'API-TIMEOUT-001',
+    botType: 'user',
+    errorSeverity: 'high'
+  },
+  {
+    id: 'ERR-00124',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
+    instrument: 'ETHUSDT',
+    quantity: '0.5',
+    action: 'SELL',
+    price: '3100',
+    signal: 'tradingview',
+    botId: 'MY-001',
+    botName: 'BTC Trend Tracker',
+    userId: 'USR-001',
+    accountId: 'ACC-002',
+    status: 'failure',
+    errorMessage: 'Insufficient balance for order execution',
+    errorCode: 'FUNDS-001',
+    botType: 'user',
+    errorSeverity: 'critical'
+  },
+  {
+    id: 'ERR-00125',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
+    instrument: 'SOLUSDT',
+    quantity: '10',
+    action: 'BUY',
+    price: '100',
+    signal: 'tradingview',
+    botId: 'PRE-001',
+    botName: 'VIP Crypto Signals',
+    userId: 'USR-002',
+    accountId: 'ACC-003',
+    status: 'failure',
+    errorMessage: 'Authentication failed: invalid API key',
+    errorCode: 'AUTH-001',
+    botType: 'premium',
+    errorSeverity: 'high'
+  },
+  {
+    id: 'ERR-00126',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(), // 3 hours ago
+    instrument: 'BNBUSDT',
+    quantity: '1',
+    action: 'SELL',
+    price: '350',
+    signal: 'tradingview',
+    botId: 'PROP-001',
+    botName: 'PropFirm Trader Pro',
+    userId: 'USR-003',
+    accountId: 'ACC-004',
+    status: 'failure',
+    errorMessage: 'Order rejected: market closed',
+    errorCode: 'MARKET-001',
+    botType: 'prop',
+    errorSeverity: 'medium'
+  },
+  {
+    id: 'ERR-00127',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 240).toISOString(), // 4 hours ago
+    instrument: 'ADAUSDT',
+    quantity: '100',
+    action: 'BUY',
+    price: '0.5',
+    signal: 'tradingview',
+    botId: 'MY-002',
+    botName: 'ADA Momentum',
+    userId: 'USR-001',
+    accountId: 'ACC-001',
+    status: 'failure',
+    errorMessage: 'Rate limit exceeded: too many requests',
+    errorCode: 'RATE-001',
+    botType: 'user',
+    errorSeverity: 'low'
+  },
+  {
+    id: 'ERR-00128',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 300).toISOString(), // 5 hours ago
+    instrument: 'DOGEUSDT',
+    quantity: '1000',
+    action: 'BUY',
+    price: '0.08',
+    signal: 'tradingview',
+    botId: 'PRE-002',
+    botName: 'Crypto Pump Detector',
+    userId: 'USR-004',
+    accountId: 'ACC-005',
+    status: 'failure',
+    errorMessage: 'Symbol temporarily unavailable for trading',
+    errorCode: 'SYMBOL-001',
+    botType: 'premium',
+    errorSeverity: 'medium'
+  },
+  {
+    id: 'ERR-00129',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 360).toISOString(), // 6 hours ago
+    instrument: 'XRPUSDT',
+    quantity: '200',
+    action: 'SELL',
+    price: '0.6',
+    signal: 'tradingview',
+    botId: 'PROP-002',
+    botName: 'PropFirm Standard',
+    userId: 'USR-005',
+    accountId: 'ACC-006',
+    status: 'failure',
+    errorMessage: 'Network connection interrupted during order execution',
+    errorCode: 'NETWORK-001',
+    botType: 'prop',
+    errorSeverity: 'high'
+  },
+  {
+    id: 'ERR-00130',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 420).toISOString(), // 7 hours ago
+    instrument: 'LINKUSDT',
+    quantity: '10',
+    action: 'BUY',
+    price: '13',
+    signal: 'tradingview',
+    botId: 'MY-003',
+    botName: 'Chainlink Trader',
+    userId: 'USR-001',
+    accountId: 'ACC-002',
+    status: 'failure',
+    errorMessage: 'Order size below minimum allowed for this symbol',
+    errorCode: 'SIZE-001',
+    botType: 'user',
+    errorSeverity: 'low'
+  },
+  {
+    id: 'ERR-00131',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 480).toISOString(), // 8 hours ago
+    instrument: 'LTCUSDT',
+    quantity: '2',
+    action: 'SELL',
+    price: '94',
+    signal: 'tradingview',
+    botId: 'PRE-003',
+    botName: 'Whale Alert Pro',
+    userId: 'USR-002',
+    accountId: 'ACC-003',
+    status: 'failure',
+    errorMessage: 'Webhook signature verification failed',
+    errorCode: 'WEBHOOK-001',
+    botType: 'premium',
+    errorSeverity: 'critical'
+  },
+  {
+    id: 'ERR-00132',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 540).toISOString(), // 9 hours ago
+    instrument: 'DOTUSDT',
+    quantity: '10',
+    action: 'BUY',
+    price: '7',
+    signal: 'tradingview',
+    botId: 'PROP-003',
+    botName: 'PropFirm Advanced',
+    userId: 'USR-003',
+    accountId: 'ACC-004',
+    status: 'failure',
+    errorMessage: 'Account balance check failed',
+    errorCode: 'BALANCE-001',
+    botType: 'prop',
+    errorSeverity: 'medium'
+  },
+  // Admin-only error signals
+  {
+    id: 'ERR-ADMIN-001',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // 10 minutes ago
+    instrument: 'SYSTEM',
+    quantity: '0',
+    action: 'SYSTEM',
+    price: '0',
+    signal: 'system',
+    botId: 'SYSTEM',
+    botName: 'System Monitor',
+    userId: 'ADMIN-001',
+    accountId: 'SYS-001',
+    status: 'failure',
+    errorMessage: 'Database connection pool exhausted',
+    errorCode: 'DB-POOL-001',
+    botType: 'system',
+    errorSeverity: 'critical'
+  },
+  {
+    id: 'ERR-ADMIN-002',
+    type: 'error',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
+    instrument: 'SYSTEM',
+    quantity: '0',
+    action: 'SYSTEM',
+    price: '0',
+    signal: 'system',
+    botId: 'SYSTEM',
+    botName: 'API Gateway',
+    userId: 'ADMIN-001',
+    accountId: 'SYS-002',
+    status: 'failure',
+    errorMessage: 'Exchange API rate limit warning: 80% of limit reached',
+    errorCode: 'API-RATE-001',
+    botType: 'system',
+    errorSeverity: 'high'
+  }
+];

@@ -1,21 +1,16 @@
 
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from '@clerk/clerk-react';
 
+/**
+ * A simple hook to determine if the current user is an admin
+ * In a real application, this would check roles from your authentication system
+ */
 export function useAdmin() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   
-  // For testing purposes, always return true to ensure admin features are visible
-  // In production, would check actual admin metadata
-  const isAdmin = true; // Force true for testing
-  // const isAdmin = user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "superadmin";
+  // Check if user is signed in and has admin role
+  // For demo purposes, we'll assume certain email patterns indicate admin status
+  const isAdmin = isSignedIn && user?.primaryEmailAddress?.emailAddress?.includes('admin');
   
-  // Check if user is a super admin
-  const isSuperAdmin = true; // Force true for testing
-  // const isSuperAdmin = user?.publicMetadata?.role === "superadmin";
-  
-  // Return a boolean indicating if the user is an admin
-  return {
-    isAdmin,
-    isSuperAdmin
-  };
+  return { isAdmin };
 }

@@ -23,6 +23,7 @@ export const USER_ROUTES = {
   SIGNALS: '/signals',
   CONNECTIONS: '/connections',
   BOT_ERRORS: '/bot-errors',
+  BOT_ERROR_DETAIL: (errorId: string) => `/bot-errors/${errorId}`,
 };
 
 // Admin Routes
@@ -45,6 +46,7 @@ export const ADMIN_ROUTES = {
   EMAIL: '/admin/email',
   DATABASE: '/admin/database',
   SETTINGS: '/admin/settings',
+  PACKAGES: '/admin/packages',
 };
 
 // Shared Routes (common routes with same structure for both admin and user)
@@ -66,5 +68,5 @@ export const SHARED_ROUTES = {
   },
   SETTINGS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.SETTINGS : USER_ROUTES.SETTINGS,
   BOT_ERRORS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.BOT_ERRORS : USER_ROUTES.BOT_ERRORS,
-  BOT_ERROR_DETAIL: (isAdmin: boolean, errorId: string) => isAdmin ? ADMIN_ROUTES.BOT_ERROR_DETAIL(errorId) : `${USER_ROUTES.BOT_ERRORS}/${errorId}`,
+  BOT_ERROR_DETAIL: (isAdmin: boolean, errorId: string) => isAdmin ? ADMIN_ROUTES.BOT_ERROR_DETAIL(errorId) : USER_ROUTES.BOT_ERROR_DETAIL(errorId),
 };

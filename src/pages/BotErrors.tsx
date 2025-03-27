@@ -7,7 +7,7 @@ import { useUser } from '@clerk/clerk-react';
 import { ExtendedSignal } from '@/types/signal';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import { BotType } from '@/constants/botTypes';
-import ErrorSignals from '@/components/bots/error-signals/ErrorSignals';
+import ErrorSignals from '@/components/bots/ErrorSignals';
 import NoErrorsState from '@/components/bots/error-signals/NoErrorsState';
 import { Helmet } from 'react-helmet-async';
 
