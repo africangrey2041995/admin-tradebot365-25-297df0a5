@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,18 @@ const PremiumBotDetail = () => {
       toast.success(`Đã cập nhật mức độ rủi ro thành: ${newRisk}`);
     }
   };
+  
+  // Handle name update
+  const handleUpdateName = (newName: string) => {
+    if (bot) {
+      // In a real app, you would call an API to update the name
+      toast.success(`Đã cập nhật tên bot thành: ${newName}`);
+    }
+  };
+
+  const goBackToList = () => {
+    navigate(ADMIN_ROUTES.PREMIUM_BOTS);
+  };
 
   if (isLoading) {
     return <LoadingState />;
@@ -79,6 +92,7 @@ const PremiumBotDetail = () => {
         risk={bot.risk}
         id={bot.botId}
         onUpdateRisk={handleUpdateRisk}
+        onUpdateName={handleUpdateName}
       />
 
       {/* Stats Cards */}

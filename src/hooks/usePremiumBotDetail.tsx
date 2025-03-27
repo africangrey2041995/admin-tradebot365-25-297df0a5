@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useBotAccounts } from '@/hooks/useBotAccounts';
@@ -262,12 +261,19 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
 
   // Handle update bot information
   const handleUpdateBotInfo = (info: {
-    type: string;
-    exchange: string;
-    minCapital: string;
+    type?: string;
+    exchange?: string;
+    minCapital?: string;
+    risk?: BotRiskLevel;
   }) => {
     toast.success("Bot information updated");
     console.log("Updated bot information:", info);
+  };
+
+  // Handle update bot name
+  const handleUpdateName = (newName: string) => {
+    toast.success("Bot name updated");
+    console.log("Updated bot name:", newName);
   };
 
   // Centralized function for refreshing tab data
@@ -322,13 +328,15 @@ export const usePremiumBotDetail = (botId: string | undefined) => {
       console.log("Updated statistics:", updatedStats);
     },
     handleUpdateBotInfo: (info: {
-      type: string;
-      exchange: string;
-      minCapital: string;
+      type?: string;
+      exchange?: string;
+      minCapital?: string;
+      risk?: BotRiskLevel;
     }) => {
       toast.success("Bot information updated");
       console.log("Updated bot information:", info);
     },
+    handleUpdateName,
     refreshSignalLogs: refreshLogs,
     refreshLoading: logsLoading || accountsLoading,
     refreshTabData
