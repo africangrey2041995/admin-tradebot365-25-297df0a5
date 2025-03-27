@@ -15,7 +15,7 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
     switch (type) {
       case 'featured':
         return `
-          absolute -top-3 -right-2 transform rotate-12
+          absolute -top-3 -right-3 transform rotate-12 z-10
           bg-gradient-to-r from-amber-300 to-amber-500
           text-white font-bold shadow-lg
           flex items-center justify-center rounded-lg
@@ -27,7 +27,7 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
       
       case 'new':
         return `
-          absolute -top-2 -left-2 transform -rotate-12
+          absolute -top-3 -left-3 transform -rotate-12 z-10
           bg-gradient-to-r from-blue-400 to-blue-600
           text-white font-bold shadow-lg
           flex items-center justify-center rounded-lg
@@ -38,7 +38,7 @@ export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
       
       case 'bestSeller':
         return `
-          absolute -top-3 -left-2 transform -rotate-6
+          absolute -top-3 -left-3 transform -rotate-6 z-10
           bg-gradient-to-r from-emerald-400 to-emerald-600
           text-white font-bold shadow-lg
           flex items-center justify-center rounded-lg

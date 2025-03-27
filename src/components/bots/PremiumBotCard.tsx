@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
@@ -147,123 +148,125 @@ export const PremiumBotCard = ({
   const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
 
   return (
-    <Card className={`overflow-hidden border hover:shadow-md transition-all relative ${getCardColors(colorScheme)}`}>
+    <div className="pt-3 pl-3 pr-3 relative">
       {isFeatured && <BotTag type="featured" />}
       {isNew && <BotTag type="new" />}
       {isBestSeller && <BotTag type="bestSeller" />}
       
-      <CardHeader className="p-3 pb-0">
-        <div className="flex justify-between items-start">
-          <div className="flex gap-2 items-center">
-            <div className={`p-1.5 rounded-lg ${
-              colorScheme === 'default' ? 'bg-slate-100 dark:bg-zinc-800' : 
-              colorScheme === 'red' ? 'bg-red-100/80 dark:bg-red-900/30' : 
-              colorScheme === 'blue' ? 'bg-blue-100/80 dark:bg-blue-900/30' : 
-              colorScheme === 'green' ? 'bg-green-100/80 dark:bg-green-900/30' : 
-              'bg-purple-100/80 dark:bg-purple-900/30'
-            }`}>
-              <Bot className={`h-4 w-4 ${
-                colorScheme === 'default' ? 'text-slate-600 dark:text-slate-300' : 
-                colorScheme === 'red' ? 'text-red-600 dark:text-red-300' : 
-                colorScheme === 'blue' ? 'text-blue-600 dark:text-blue-300' : 
-                colorScheme === 'green' ? 'text-green-600 dark:text-green-300' : 
-                'text-purple-600 dark:text-purple-300'
-              }`} />
+      <Card className={`border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
+        <CardHeader className="p-3 pb-0">
+          <div className="flex justify-between items-start">
+            <div className="flex gap-2 items-center">
+              <div className={`p-1.5 rounded-lg ${
+                colorScheme === 'default' ? 'bg-slate-100 dark:bg-zinc-800' : 
+                colorScheme === 'red' ? 'bg-red-100/80 dark:bg-red-900/30' : 
+                colorScheme === 'blue' ? 'bg-blue-100/80 dark:bg-blue-900/30' : 
+                colorScheme === 'green' ? 'bg-green-100/80 dark:bg-green-900/30' : 
+                'bg-purple-100/80 dark:bg-purple-900/30'
+              }`}>
+                <Bot className={`h-4 w-4 ${
+                  colorScheme === 'default' ? 'text-slate-600 dark:text-slate-300' : 
+                  colorScheme === 'red' ? 'text-red-600 dark:text-red-300' : 
+                  colorScheme === 'blue' ? 'text-blue-600 dark:text-blue-300' : 
+                  colorScheme === 'green' ? 'text-green-600 dark:text-green-300' : 
+                  'text-purple-600 dark:text-purple-300'
+                }`} />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
+                  {name}
+                </h3>
+                <div className="flex gap-1 mt-1 items-center text-xs">
+                  {getExchangeLogo(exchange)}
+                  <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
+                  {externalId && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                      <span className="text-xs text-slate-500">{externalId}</span>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
-                {name}
-              </h3>
-              <div className="flex gap-1 mt-1 items-center text-xs">
-                {getExchangeLogo(exchange)}
-                <Badge className={`text-[10px] py-0 px-1.5 ${getTypeColor(type)}`}>{getTypeLabel(type)}</Badge>
-                {externalId && (
-                  <>
-                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                    <span className="text-xs text-slate-500">{externalId}</span>
-                  </>
-                )}
+            <div className="flex flex-col gap-1 items-end">
+              <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
+                {getRiskIcon(risk)}
+                <span>{getRiskLabel(risk)}</span>
+              </Badge>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-3">
+          <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 h-[32px] mb-2">
+            {description}
+          </p>
+          
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
+              <div className="flex items-center gap-1 mb-0.5">
+                <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Người dùng đăng ký</span>
+              </div>
+              <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                {subscribers}
+              </div>
+            </div>
+            
+            <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
+              <div className="flex items-center gap-1 mb-0.5">
+                <Briefcase className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tài khoản kết nối</span>
+              </div>
+              <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                {connectedAccounts}
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-1 items-end">
-            <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
-              {getRiskIcon(risk)}
-              <span>{getRiskLabel(risk)}</span>
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-3">
-        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 h-[32px] mb-2">
-          {description}
-        </p>
-        
-        <div className="grid grid-cols-2 gap-2 mb-2">
-          <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
-            <div className="flex items-center gap-1 mb-0.5">
-              <Users className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Người dùng đăng ký</span>
-            </div>
-            <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-              {subscribers}
-            </div>
-          </div>
           
-          <div className="bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
-            <div className="flex items-center gap-1 mb-0.5">
-              <Briefcase className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tài khoản kết nối</span>
-            </div>
-            <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-              {connectedAccounts}
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between mb-1 bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
-          <div className="flex items-center gap-1">
-            <Wallet className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-            <span className="text-[10px]">Vốn tối thiểu:</span>
-            <span className="text-xs font-semibold">{minCapital}</span>
-          </div>
-          {isIntegrated && (
+          <div className="flex items-center justify-between mb-1 bg-white/80 dark:bg-zinc-800/80 p-2 rounded-lg">
             <div className="flex items-center gap-1">
-              <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400">Đã tích hợp</Badge>
+              <Wallet className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              <span className="text-[10px]">Vốn tối thiểu:</span>
+              <span className="text-xs font-semibold">{minCapital}</span>
             </div>
+            {isIntegrated && (
+              <div className="flex items-center gap-1">
+                <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400">Đã tích hợp</Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+        <CardFooter className="p-3 pt-0 gap-1 flex-col">
+          {isIntegrated ? (
+            <Button 
+              variant="default" 
+              size="sm"
+              className="w-full text-xs h-8" 
+              onClick={() => navigate(`/premium-bots/${botId}`)}
+            >
+              Quản Lý Bot
+            </Button>
+          ) : (
+            <Button 
+              variant="default" 
+              size="sm"
+              className="w-full text-xs h-8" 
+              onClick={handleSubscribe}
+            >
+              Đăng Ký Sử Dụng
+            </Button>
           )}
-        </div>
-      </CardContent>
-      <CardFooter className="p-3 pt-0 gap-1 flex-col">
-        {isIntegrated ? (
           <Button 
-            variant="default" 
+            variant="outline" 
             size="sm"
-            className="w-full text-xs h-8" 
-            onClick={() => navigate(`/premium-bots/${botId}`)}
+            className="w-full text-xs h-7" 
+            onClick={handleViewDetails}
           >
-            Quản Lý Bot
+            <ExternalLink className="h-3 w-3 mr-1" />
+            Chi Tiết
           </Button>
-        ) : (
-          <Button 
-            variant="default" 
-            size="sm"
-            className="w-full text-xs h-8" 
-            onClick={handleSubscribe}
-          >
-            Đăng Ký Sử Dụng
-          </Button>
-        )}
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="w-full text-xs h-7" 
-          onClick={handleViewDetails}
-        >
-          <ExternalLink className="h-3 w-3 mr-1" />
-          Chi Tiết
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
