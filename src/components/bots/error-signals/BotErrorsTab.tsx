@@ -3,6 +3,7 @@ import React from 'react';
 import { UserErrorDisplay } from './UserErrorDisplay';
 import { BotType } from '@/constants/botTypes';
 import ErrorDetailsModal from '@/components/admin/monitoring/ErrorDetailsModal';
+import { toast } from 'sonner';
 
 interface BotErrorsTabProps {
   botId: string;
@@ -14,6 +15,7 @@ const BotErrorsTab: React.FC<BotErrorsTabProps> = ({ botId, userId }) => {
   const [isErrorModalOpen, setIsErrorModalOpen] = React.useState<boolean>(false);
 
   const handleViewErrorDetails = (errorId: string) => {
+    console.log("Viewing error details for:", errorId);
     setSelectedErrorId(errorId);
     setIsErrorModalOpen(true);
   };
@@ -25,6 +27,7 @@ const BotErrorsTab: React.FC<BotErrorsTabProps> = ({ botId, userId }) => {
 
   const handleResolveError = (errorId: string) => {
     console.log("Resolving error:", errorId);
+    toast.success(`Đã xử lý lỗi ${errorId}`);
     setIsErrorModalOpen(false);
     setSelectedErrorId(null);
   };

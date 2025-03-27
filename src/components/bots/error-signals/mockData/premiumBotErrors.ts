@@ -19,7 +19,8 @@ export const premiumBotErrors: ExtendedSignal[] = [
     errorMessage: 'Market closed, order rejected',
     botId: 'PRE-001',
     botName: 'Alpha Momentum',
-    userId: 'USR-001',
+    userId: 'USR-001', // Bot owner
+    connectedUserIds: ['USR-001', 'USR-003'], // Users with trading accounts connected
     tradingAccount: 'Interactive Brokers',
     tradingAccountType: 'Margin',
     tradingAccountId: generateAccountId(),
@@ -41,7 +42,8 @@ export const premiumBotErrors: ExtendedSignal[] = [
     errorMessage: 'Position not found or already closed',
     botId: 'PRE-002',
     botName: 'Gamma Grid',
-    userId: 'USR-001',
+    userId: 'USR-002', // Bot owner
+    connectedUserIds: ['USR-001', 'USR-004'], // Users with trading accounts connected
     tradingAccount: 'TradingView',
     tradingAccountType: 'Paper',
     tradingAccountId: generateAccountId(),
@@ -65,7 +67,8 @@ export const premiumBotErrors: ExtendedSignal[] = [
     errorMessage: 'Margin requirements not met',
     botId: 'PRE-003',
     botName: 'Tech Momentum',
-    userId: 'USR-001',
+    userId: 'USR-003', // Bot owner
+    connectedUserIds: ['USR-002', 'USR-005'], // Users with trading accounts connected
     tradingAccount: 'Alpaca',
     tradingAccountType: 'Margin',
     tradingAccountId: generateAccountId(),
@@ -89,7 +92,8 @@ export const premiumBotErrors: ExtendedSignal[] = [
     errorMessage: 'Strategy execution timeout',
     botId: 'PRE-004',
     botName: 'ETF Strategy',
-    userId: 'USR-001',
+    userId: 'USR-004', // Bot owner
+    connectedUserIds: ['USR-001', 'USR-003'], // Users with trading accounts connected
     tradingAccount: 'TD Ameritrade',
     tradingAccountType: 'Margin',
     tradingAccountId: generateAccountId(),

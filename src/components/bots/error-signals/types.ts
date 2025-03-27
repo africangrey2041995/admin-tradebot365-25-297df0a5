@@ -27,3 +27,8 @@ export interface ErrorSignalsProps {
   limit?: number;
   userId?: string;
 }
+
+// Extended interface for signal types that includes connected users
+export interface ErrorSignalWithConnections extends ExtendedSignal {
+  connectedUserIds?: string[]; // Array of user IDs that have trading accounts connected to this bot
+}

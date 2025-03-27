@@ -19,7 +19,7 @@ export const userBotErrors: ExtendedSignal[] = [
     errorMessage: 'Insufficient funds in account',
     botId: 'MY-001',
     botName: 'My Bitcoin Strategy',
-    userId: 'USR-001',
+    userId: 'USR-001', // User who created this bot
     tradingAccount: 'Binance-Main',
     tradingAccountType: 'Spot',
     tradingAccountId: generateAccountId(),
@@ -41,7 +41,7 @@ export const userBotErrors: ExtendedSignal[] = [
     errorMessage: 'API key expired or invalid',
     botId: 'MY-002',
     botName: 'Ethereum Scalper',
-    userId: 'USR-001',
+    userId: 'USR-001', // User who created this bot
     tradingAccount: 'Bybit-Demo',
     tradingAccountType: 'Futures',
     tradingAccountId: generateAccountId(),
@@ -65,7 +65,7 @@ export const userBotErrors: ExtendedSignal[] = [
     errorMessage: 'Order rejected: Market volatility too high',
     botId: 'MY-003',
     botName: 'Solana Alpha',
-    userId: 'USR-001',
+    userId: 'USR-002', // User who created this bot (different user)
     tradingAccount: 'Binance-Futures',
     tradingAccountType: 'Futures',
     tradingAccountId: generateAccountId(),
@@ -89,7 +89,7 @@ export const userBotErrors: ExtendedSignal[] = [
     errorMessage: 'TradingView webhook format invalid',
     botId: 'MY-004',
     botName: 'ADA Momentum',
-    userId: 'USR-001',
+    userId: 'USR-003', // User who created this bot (different user)
     tradingAccount: 'Kraken-Main',
     tradingAccountType: 'Spot',
     tradingAccountId: generateAccountId(),

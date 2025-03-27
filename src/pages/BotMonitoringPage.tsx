@@ -9,6 +9,8 @@ import { BotType } from '@/constants/botTypes';
 import { RefreshCw, AlertTriangle, Clock } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import ErrorDetailsModal from '@/components/admin/monitoring/ErrorDetailsModal';
+import { toast } from 'sonner';
+import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 
 /**
  * Trang Giám sát Bot cho người dùng
@@ -16,7 +18,7 @@ import ErrorDetailsModal from '@/components/admin/monitoring/ErrorDetailsModal';
  */
 const BotMonitoringPage: React.FC = () => {
   const { user } = useUser();
-  const userId = user?.id || '';
+  const userId = user?.id || 'USR-001'; // Default to USR-001 for testing
   const [activeTab, setActiveTab] = useState<string>("all");
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedErrorId, setSelectedErrorId] = useState<string | null>(null);
@@ -28,24 +30,45 @@ const BotMonitoringPage: React.FC = () => {
     user: 0
   });
 
+  // Function to count errors by type for the current user
+  const countUserErrors = () => {
+    const userBotsCount = mockErrorSignals.filter(signal => 
+      signal.botType === BotType.USER_BOT && signal.userId === userId
+    ).length;
+    
+    const premiumBotsCount = mockErrorSignals.filter(signal => 
+      signal.botType === BotType.PREMIUM_BOT && 
+      (signal.connectedUserIds as string[] | undefined)?.includes(userId)
+    ).length;
+    
+    const propBotsCount = mockErrorSignals.filter(signal => 
+      signal.botType === BotType.PROP_BOT && 
+      (signal.connectedUserIds as string[] | undefined)?.includes(userId)
+    ).length;
+    
+    const totalCount = userBotsCount + premiumBotsCount + propBotsCount;
+    
+    return {
+      total: totalCount,
+      premium: premiumBotsCount,
+      prop: propBotsCount,
+      user: userBotsCount
+    };
+  };
+
   // Fetch initial data
   useEffect(() => {
     fetchErrorStats();
-  }, []);
+  }, [userId]);
 
   // Function to fetch error statistics
   const fetchErrorStats = async () => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // For now, we'll use mock data
+      // Calculate stats based on mock data visibility rules
       setTimeout(() => {
-        setStats({
-          total: 9,
-          premium: 3,
-          prop: 2,
-          user: 4
-        });
+        const errorCounts = countUserErrors();
+        setStats(errorCounts);
         setLoading(false);
       }, 800);
     } catch (error) {
@@ -67,8 +90,7 @@ const BotMonitoringPage: React.FC = () => {
   };
 
   const handleResolveError = (errorId: string) => {
-    console.log("Resolving error:", errorId);
-    // In a real app, you would make an API call to update the error status
+    toast.success(`Đã xử lý lỗi ${errorId.substring(0, 6)}...`);
     
     // Reset modal state
     setIsErrorModalOpen(false);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -38,16 +37,25 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
     setLoading(true);
     
     setTimeout(() => {
-      // Lọc theo botType, userId và specificBotId (nếu có)
-      const filtered = mockErrorSignals.filter(
-        signal => {
-          const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
-          const matchesUserId = signal.userId === userId;
-          const matchesBotId = !specificBotId || signal.botId === specificBotId;
-          
-          return matchesBotType && matchesUserId && matchesBotId;
+      const filtered = mockErrorSignals.filter(signal => {
+        const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
+        const matchesBotId = !specificBotId || signal.botId === specificBotId;
+        
+        let userHasAccess = false;
+        
+        if (signal.botType === BotType.USER_BOT) {
+          userHasAccess = signal.userId === userId;
+        } else if (signal.botType === BotType.PREMIUM_BOT || signal.botType === BotType.PROP_BOT) {
+          const connectedUsers = signal.connectedUserIds as string[] | undefined;
+          userHasAccess = connectedUsers?.includes(userId) || false;
         }
-      );
+        
+        console.log(`Filtering signal ${signal.id} - Bot Type: ${signal.botType}, User Access: ${userHasAccess}, Matches Bot Type: ${matchesBotType}, Matches Bot ID: ${matchesBotId}`);
+        
+        return matchesBotType && matchesBotId && userHasAccess;
+      });
+      
+      console.log(`Filtered ${filtered.length} signals for user ${userId} and bot type ${botType}`);
       
       setSignals(filtered);
       setFilteredSignals(filtered);

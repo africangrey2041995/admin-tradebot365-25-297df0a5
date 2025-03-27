@@ -19,7 +19,8 @@ export const propBotErrors: ExtendedSignal[] = [
     errorMessage: 'Maximum daily drawdown reached',
     botId: 'PROP-001',
     botName: 'Prop Master',
-    userId: 'USR-001',
+    userId: 'USR-005', // Bot owner
+    connectedUserIds: ['USR-001', 'USR-002'], // Users with trading accounts connected
     tradingAccount: 'FTMO Challenge',
     tradingAccountType: 'Prop',
     tradingAccountId: generateAccountId(),
@@ -41,7 +42,8 @@ export const propBotErrors: ExtendedSignal[] = [
     errorMessage: 'Connection timeout, order not confirmed',
     botId: 'PROP-002',
     botName: 'FX Scalper Pro',
-    userId: 'USR-001',
+    userId: 'ADMIN-001', // Bot owner (admin)
+    connectedUserIds: ['USR-001', 'USR-003'], // Users with trading accounts connected
     tradingAccount: 'MFF Evaluation',
     tradingAccountType: 'Prop',
     tradingAccountId: generateAccountId(),
@@ -65,7 +67,8 @@ export const propBotErrors: ExtendedSignal[] = [
     errorMessage: 'Account locked: Risk management violation',
     botId: 'PROP-003',
     botName: 'Forex Navigator',
-    userId: 'USR-001',
+    userId: 'USR-002', // Bot owner
+    connectedUserIds: ['USR-004', 'USR-005'], // Users with trading accounts connected
     tradingAccount: 'Topstep',
     tradingAccountType: 'Prop',
     tradingAccountId: generateAccountId(),
@@ -89,7 +92,8 @@ export const propBotErrors: ExtendedSignal[] = [
     errorMessage: 'Slippage exceeded allowed limit',
     botId: 'PROP-004',
     botName: 'Aussie Trend',
-    userId: 'USR-001',
+    userId: 'USR-003', // Bot owner
+    connectedUserIds: ['USR-001'], // Users with trading accounts connected
     tradingAccount: 'FTMO Live',
     tradingAccountType: 'Prop',
     tradingAccountId: generateAccountId(),
