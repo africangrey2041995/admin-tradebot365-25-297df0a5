@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -142,48 +141,74 @@ const AdminHierarchicalErrorView: React.FC<AdminHierarchicalErrorViewProps> = ({
               <TabsTrigger value="technical" className="flex-1">Thông tin kỹ thuật</TabsTrigger>
             </TabsList>
             <TabsContent value="general">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Thông tin giao dịch</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Cặp giao dịch:</span>
-                      <span className="text-sm font-medium">{signal.instrument || 'N/A'}</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Thông tin giao dịch</h4>
+                  <dl className="space-y-3">
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Cặp giao dịch:</dt>
+                      <dd className="col-span-7 text-sm font-medium">
+                        {signal.instrument ? (
+                          <Badge variant="outline">{signal.instrument}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground italic">N/A</span>
+                        )}
+                      </dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Hành động:</span>
-                      <span className="text-sm font-medium">{signal.action || 'N/A'}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Hành động:</dt>
+                      <dd className="col-span-7 text-sm font-medium">
+                        {signal.action ? (
+                          <Badge variant={signal.action.toLowerCase() === 'buy' ? 'success' : 'destructive'} className="capitalize">
+                            {signal.action}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground italic">N/A</span>
+                        )}
+                      </dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Số lượng:</span>
-                      <span className="text-sm font-medium">{signal.amount || 'N/A'}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Số lượng:</dt>
+                      <dd className="col-span-7 text-sm font-medium">{signal.amount || 'N/A'}</dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Thời gian:</span>
-                      <span className="text-sm font-medium">{formatTime(signal.timestamp)}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Thời gian:</dt>
+                      <dd className="col-span-7 text-sm font-medium">{formatTime(signal.timestamp)}</dd>
                     </div>
-                  </div>
+                  </dl>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Thông tin bot</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Bot ID:</span>
-                      <span className="text-sm font-medium">{signal.botId || 'N/A'}</span>
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Thông tin bot</h4>
+                  <dl className="space-y-3">
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Bot ID:</dt>
+                      <dd className="col-span-7 text-sm font-medium text-blue-600 dark:text-blue-400 truncate hover:underline cursor-pointer" title={signal.botId || 'N/A'}>
+                        {signal.botId || 'N/A'}
+                      </dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Tên Bot:</span>
-                      <span className="text-sm font-medium">{signal.botName || 'N/A'}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Tên Bot:</dt>
+                      <dd className="col-span-7 text-sm font-medium">{signal.botName || 'N/A'}</dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Loại Bot:</span>
-                      <span className="text-sm font-medium">{signal.botType || 'N/A'}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">Loại Bot:</dt>
+                      <dd className="col-span-7 text-sm font-medium">
+                        {signal.botType ? (
+                          <Badge variant="outline" className="capitalize">
+                            {signal.botType}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground italic">N/A</span>
+                        )}
+                      </dd>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">User ID:</span>
-                      <span className="text-sm font-medium">{signal.userId || 'N/A'}</span>
+                    <div className="grid grid-cols-12 gap-2">
+                      <dt className="col-span-5 text-sm text-muted-foreground">User ID:</dt>
+                      <dd className="col-span-7 text-sm font-medium text-blue-600 dark:text-blue-400 truncate hover:underline cursor-pointer" title={signal.userId || 'N/A'}>
+                        {signal.userId || 'N/A'}
+                      </dd>
                     </div>
-                  </div>
+                  </dl>
                 </div>
               </div>
             </TabsContent>
