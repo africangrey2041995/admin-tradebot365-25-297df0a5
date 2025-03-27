@@ -24,7 +24,6 @@ const UserBotErrorView: React.FC<UserBotErrorViewProps> = ({
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     'error-details': true,
     'account-info': false,
-    'related-errors': false,
     'timeline': false
   });
 
@@ -299,71 +298,6 @@ const UserBotErrorView: React.FC<UserBotErrorViewProps> = ({
               </div>
             </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Related errors section */}
-      <Collapsible
-        open={expandedSections['related-errors']}
-        onOpenChange={() => toggleSection('related-errors')}
-        className="border rounded-lg overflow-hidden"
-      >
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex w-full justify-between p-4 h-auto"
-          >
-            <div className="flex items-center">
-              <AlertTriangle className="h-5 w-5 mr-2" />
-              <span className="font-medium">Lỗi liên quan</span>
-              {relatedSignals.length > 0 && (
-                <Badge variant="secondary" className="ml-2">{relatedSignals.length}</Badge>
-              )}
-            </div>
-            {expandedSections['related-errors'] ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="px-4 pb-4">
-          {relatedSignals.length > 0 ? (
-            <div className="space-y-3">
-              {relatedSignals.map((related) => (
-                <Card key={related.id} className="overflow-hidden">
-                  <div className={`h-1 w-full ${getSeverityColor(related.errorSeverity)}`}></div>
-                  <CardContent className="p-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center mb-1">
-                          {getSeverityIcon(related.errorSeverity)}
-                          <span className="text-sm font-medium ml-2 truncate max-w-[250px]">
-                            {related.errorMessage || 'Lỗi không xác định'}
-                          </span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {related.instrument} • {formatTime(related.timestamp)}
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-xs h-7 px-2"
-                        onClick={() => onViewDetails(related.id)}
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-4 text-muted-foreground">
-              Không tìm thấy lỗi liên quan
-            </div>
-          )}
         </CollapsibleContent>
       </Collapsible>
 
