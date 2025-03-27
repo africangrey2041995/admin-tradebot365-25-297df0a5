@@ -1,0 +1,2 @@
+
+// Coinstrat specific components
