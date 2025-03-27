@@ -7,7 +7,6 @@ import EditableDescriptionCard from '@/components/admin/premium-bots/detail/Edit
 import EditableTradingPairsCard from '@/components/admin/premium-bots/detail/EditableTradingPairsCard';
 import EditableFeaturesCard from '@/components/admin/prop-bots/detail/EditableFeaturesCard';
 import EditableStatisticsCard from '@/components/admin/premium-bots/detail/EditableStatisticsCard';
-import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
 
 interface PremiumBotOverviewTabProps {
   bot: {
@@ -92,8 +91,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
           </CardContent>
         </Card>
         
-        {/* Bot Integration Info */}
-        <BotIntegrationInfo botId={bot.id} />
+        {/* Bot Integration Info removed */}
       </div>
     </div>
   );
