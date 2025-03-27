@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { BotType } from '@/constants/botTypes';
 
 interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
@@ -58,7 +59,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   // State for bot info edit dialog
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    botType: propBot.type || '',
+    botType: propBot.type || BotType.PROP_BOT,
     exchange: propBot.exchange || '',
     propFirm: propBot.propFirm || '',
     challengeDuration: propBot.challengeDuration || ''
@@ -96,7 +97,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   
   const handleEditFormSubmit = () => {
     onUpdateBot({
-      type: editFormData.botType,
+      type: BotType.PROP_BOT, // Always use the enum value, not a string
       exchange: editFormData.exchange,
       propFirm: editFormData.propFirm,
       challengeDuration: editFormData.challengeDuration
