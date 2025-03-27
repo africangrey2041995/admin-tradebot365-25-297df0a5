@@ -13,25 +13,35 @@ import { PropBot } from '@/types/bot';
 
 interface BotChallengeInfoProps {
   minCapital?: string;
+  maxDrawdown?: string;
   challengeDuration?: string;
   onUpdate: (updatedData: Partial<PropBot>) => void;
 }
 
 const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
   minCapital,
+  maxDrawdown,
   challengeDuration,
   onUpdate
 }) => {
   const [editedMinCapital, setEditedMinCapital] = useState(minCapital || '');
+  const [editedMaxDrawdown, setEditedMaxDrawdown] = useState(maxDrawdown || '');
   const [editedChallengeDuration, setEditedChallengeDuration] = useState(challengeDuration || '');
   
   const [minCapitalPopoverOpen, setMinCapitalPopoverOpen] = useState(false);
+  const [maxDrawdownPopoverOpen, setMaxDrawdownPopoverOpen] = useState(false);
   const [challengeDurationPopoverOpen, setChallengeDurationPopoverOpen] = useState(false);
 
   const handleSaveMinCapital = () => {
     onUpdate({ minCapital: editedMinCapital });
     setMinCapitalPopoverOpen(false);
     toast.success("Đã cập nhật vốn tối thiểu");
+  };
+
+  const handleSaveMaxDrawdown = () => {
+    onUpdate({ maxDrawdown: editedMaxDrawdown });
+    setMaxDrawdownPopoverOpen(false);
+    toast.success("Đã cập nhật drawdown tối đa");
   };
 
   const handleSaveChallengeDuration = () => {
