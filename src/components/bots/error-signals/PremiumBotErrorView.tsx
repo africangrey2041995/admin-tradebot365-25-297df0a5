@@ -4,7 +4,7 @@ import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Server, Signal, Users } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
@@ -23,8 +23,7 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
 }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     'error-details': true,
-    'affected-users': false,
-    'timeline': false
+    'affected-users': false
   });
 
   const toggleSection = (section: string) => {
@@ -320,67 +319,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
                 </div>
               </div>
             ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Timeline section */}
-      <Collapsible
-        open={expandedSections['timeline']}
-        onOpenChange={() => toggleSection('timeline')}
-        className="border rounded-lg overflow-hidden"
-      >
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex w-full justify-between p-4 h-auto"
-          >
-            <div className="flex items-center">
-              <Signal className="h-5 w-5 mr-2" />
-              <span className="font-medium">Dòng thời gian</span>
-            </div>
-            {expandedSections['timeline'] ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="px-4 pb-4">
-          <div className="space-y-4">
-            <div className="relative pl-8 py-4">
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-amber-500"></div>
-              
-              {/* Signal received */}
-              <div className="relative mb-6">
-                <div className="absolute left-[-8px] w-4 h-4 rounded-full bg-amber-500 border-2 border-background"></div>
-                <div className="ml-4">
-                  <h4 className="text-sm font-medium">Nhận tín hiệu</h4>
-                  <p className="text-xs text-muted-foreground">{formatTime(signal.timestamp)}</p>
-                  <p className="text-sm mt-1">Tín hiệu {signal.action} được khởi tạo cho {signal.instrument}</p>
-                </div>
-              </div>
-
-              {/* Signal processing */}
-              <div className="relative mb-6">
-                <div className="absolute left-[-8px] w-4 h-4 rounded-full bg-orange-500 border-2 border-background"></div>
-                <div className="ml-4">
-                  <h4 className="text-sm font-medium">Xử lý tín hiệu</h4>
-                  <p className="text-xs text-muted-foreground">{formatTime(signal.timestamp)}</p>
-                  <p className="text-sm mt-1">Premium Bot {signal.botName} bắt đầu xử lý tín hiệu</p>
-                </div>
-              </div>
-
-              {/* Error occurred */}
-              <div className="relative">
-                <div className="absolute left-[-8px] w-4 h-4 rounded-full bg-red-500 border-2 border-background"></div>
-                <div className="ml-4">
-                  <h4 className="text-sm font-medium">Lỗi xảy ra</h4>
-                  <p className="text-xs text-muted-foreground">{formatTime(signal.timestamp)}</p>
-                  <p className="text-sm mt-1">{signal.errorMessage}</p>
-                </div>
-              </div>
-            </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
