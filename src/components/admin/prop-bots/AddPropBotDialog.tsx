@@ -486,27 +486,6 @@ const AddPropBotDialog: React.FC<AddPropBotDialogProps> = ({
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="accountSizes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kích thước tài khoản</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="$5,000, $10,000, $25,000" 
-                            {...field}
-                            className="bg-zinc-800 border-zinc-700" 
-                          />
-                        </FormControl>
-                        <FormDescription className="text-zinc-500">
-                          Các mức vốn có sẵn (phân cách bằng dấu phẩy)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
               </TabsContent>
 
