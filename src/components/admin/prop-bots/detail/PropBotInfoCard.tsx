@@ -43,7 +43,6 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
   risk,
   colorScheme = 'green',
   minCapital,
-  maxDrawdown,
   challengeDuration,
   connectedAccounts,
   processedSignals,
@@ -97,10 +96,9 @@ const PropBotInfoCard: React.FC<PropBotInfoCardProps> = ({
               onUpdate={onUpdate}
             />
             
-            {(minCapital || maxDrawdown || challengeDuration) && (
+            {(minCapital || challengeDuration) && (
               <BotChallengeInfo 
                 minCapital={minCapital}
-                maxDrawdown={maxDrawdown}
                 challengeDuration={challengeDuration}
                 onUpdate={onUpdate}
               />
