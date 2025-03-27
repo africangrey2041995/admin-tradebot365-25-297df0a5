@@ -27,6 +27,24 @@ export const BotStatusBadge: React.FC<BotStatusBadgeProps> = ({ status }) => {
           Bảo trì
         </Badge>
       );
+    case BotStatus.PENDING:
+      return (
+        <Badge variant="outline" className="bg-blue-950 border-blue-700 text-blue-500">
+          Đang chờ
+        </Badge>
+      );
+    case BotStatus.ERROR:
+      return (
+        <Badge variant="outline" className="bg-red-950 border-red-700 text-red-500">
+          Lỗi
+        </Badge>
+      );
+    case BotStatus.SUSPENDED:
+      return (
+        <Badge variant="outline" className="bg-purple-950 border-purple-700 text-purple-500">
+          Tạm ngưng
+        </Badge>
+      );
     default:
       return (
         <Badge variant="outline" className="bg-zinc-900 border-zinc-700 text-zinc-400">

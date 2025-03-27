@@ -70,7 +70,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                   <BotStatusBadge status={bot.status} />
                 </TableCell>
                 <TableCell className="text-right">{bot.users}</TableCell>
-                <TableCell className={`text-right ${bot.profit.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
+                <TableCell className={`text-right ${bot.profit && bot.profit.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
                   {bot.profit}
                 </TableCell>
                 <TableCell>{bot.createdDate}</TableCell>

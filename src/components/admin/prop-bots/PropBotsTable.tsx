@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PropBot } from '@/types/bot';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { BotStatus } from '@/constants/botTypes';
+import { BotStatusBadge } from '../premium-bots/BotStatusBadge';
+import { PropBot } from '@/types/bot';
 
 interface PropBotsTableProps {
   currentBots: PropBot[];
@@ -21,28 +22,6 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
   totalPages,
   onRowClick
 }) => {
-  const getStatusDisplay = (status: string) => {
-    switch (status) {
-      case BotStatus.ACTIVE: return "Đang hoạt động";
-      case BotStatus.INACTIVE: return "Không hoạt động";
-      case BotStatus.MAINTENANCE: return "Bảo trì";
-      case BotStatus.ERROR: return "Lỗi";
-      case BotStatus.SUSPENDED: return "Đã dừng";
-      default: return status;
-    }
-  };
-
-  const getStatusClasses = (status: string) => {
-    switch (status) {
-      case BotStatus.ACTIVE: return "bg-green-500/20 text-green-500";
-      case BotStatus.INACTIVE: return "bg-zinc-500/20 text-zinc-400";
-      case BotStatus.MAINTENANCE: return "bg-yellow-500/20 text-yellow-500";
-      case BotStatus.ERROR: return "bg-red-500/20 text-red-500";
-      case BotStatus.SUSPENDED: return "bg-red-800/20 text-red-400";
-      default: return "bg-gray-500/20 text-gray-400";
-    }
-  };
-
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
@@ -79,16 +58,11 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                   <TableCell className="text-white">{bot.name}</TableCell>
                   <TableCell className="text-zinc-400">{bot.propFirm || "—"}</TableCell>
                   <TableCell>
-                    <span className={cn(
-                      "px-2 py-1 rounded-full text-xs font-medium",
-                      getStatusClasses(bot.status)
-                    )}>
-                      {getStatusDisplay(bot.status)}
-                    </span>
+                    <BotStatusBadge status={bot.status} />
                   </TableCell>
                   <TableCell className="text-zinc-400">{bot.minCapital}</TableCell>
                   <TableCell className={cn(
-                    bot.profit.startsWith('+') ? "text-green-500" : "text-red-500"
+                    bot.profit && bot.profit.startsWith('+') ? "text-green-500" : "text-red-500"
                   )}>
                     {bot.profit}
                   </TableCell>
