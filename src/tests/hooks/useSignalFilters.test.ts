@@ -1,96 +1,104 @@
-
-import { renderHook, act } from '@testing-library/react-hooks';
-import { useSignalFilters } from '@/components/signals/hooks/useSignalFilters';
+import { renderHook, act } from '@testing-library/react';
+import { useSignalFilters } from '@/hooks/signals/useSignalFilters';
 
 /**
  * Unit tests for the useSignalFilters hook
  */
 export const runSignalFiltersTests = () => {
   describe('useSignalFilters Hook', () => {
-    it('initializes with default filters', () => {
+    it('returns initial filter values', () => {
       const { result } = renderHook(() => useSignalFilters());
       
       expect(result.current.filters).toEqual({
+        search: '',
+        signalSource: 'all',
+        status: 'all',
         dateRange: {
           from: undefined,
           to: undefined
         },
-        status: 'all',
-        search: '',
-        sortBy: 'timestamp',
-        sortOrder: 'desc',
-        signalSource: 'all',
         userId: ''
       });
     });
     
-    it('updates a single filter', () => {
-      const { result } = renderHook(() => useSignalFilters());
-      
-      act(() => {
-        result.current.updateFilter('status', 'success');
-      });
-      
-      expect(result.current.filters.status).toBe('success');
-    });
-    
-    it('resets filters to default values', () => {
-      const { result } = renderHook(() => useSignalFilters());
-      
-      // First update some filters
-      act(() => {
-        result.current.updateFilter('status', 'failed');
-        result.current.updateFilter('search', 'test query');
-      });
-      
-      // Then reset
-      act(() => {
-        result.current.resetFilters();
-      });
-      
-      // Check that values are reset
-      expect(result.current.filters).toEqual({
-        dateRange: {
-          from: undefined,
-          to: undefined
-        },
-        status: 'all',
-        search: '',
-        sortBy: 'timestamp',
-        sortOrder: 'desc',
-        signalSource: 'all',
-        userId: ''
-      });
-    });
-    
-    it('initializes with custom filter values', () => {
+    it('accepts and merges initial values', () => {
       const initialFilters = {
-        status: 'pending',
-        search: 'initial query'
+        search: 'test query',
+        status: 'processed' as const
       };
       
       const { result } = renderHook(() => useSignalFilters(initialFilters));
       
-      expect(result.current.filters.status).toBe('pending');
-      expect(result.current.filters.search).toBe('initial query');
+      expect(result.current.filters).toEqual({
+        search: 'test query',
+        signalSource: 'all',
+        status: 'processed',
+        dateRange: {
+          from: undefined,
+          to: undefined
+        },
+        userId: ''
+      });
     });
     
-    it('updates date range filter', () => {
+    it('updates a single filter when updateFilter is called', () => {
       const { result } = renderHook(() => useSignalFilters());
       
-      const fromDate = new Date('2023-01-01');
-      const toDate = new Date('2023-01-31');
+      act(() => {
+        result.current.updateFilter('search', 'new search');
+      });
+      
+      expect(result.current.filters.search).toBe('new search');
+      
+      // Other filters remain unchanged
+      expect(result.current.filters.signalSource).toBe('all');
+    });
+    
+    it('updates multiple filters with setFilters', () => {
+      const { result } = renderHook(() => useSignalFilters());
       
       act(() => {
-        result.current.updateFilter('dateRange', {
-          from: fromDate,
-          to: toDate
+        result.current.setFilters({
+          ...result.current.filters,
+          search: 'updated search',
+          status: 'failed'
         });
       });
       
-      expect(result.current.filters.dateRange).toEqual({
-        from: fromDate,
-        to: toDate
+      expect(result.current.filters).toEqual({
+        search: 'updated search',
+        signalSource: 'all',
+        status: 'failed',
+        dateRange: {
+          from: undefined,
+          to: undefined
+        },
+        userId: ''
+      });
+    });
+    
+    it('resets all filters to defaults when resetFilters is called', () => {
+      const initialFilters = {
+        search: 'test query',
+        status: 'processed' as const,
+        userId: 'user-123'
+      };
+      
+      const { result } = renderHook(() => useSignalFilters(initialFilters));
+      
+      act(() => {
+        result.current.resetFilters();
+      });
+      
+      expect(result.current.filters).toEqual({
+        search: '',
+        signalSource: 'all',
+        status: 'all',
+        dateRange: {
+          from: undefined,
+          to: undefined
+        },
+        userId: ''
       });
     });
   });

@@ -1,100 +1,100 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { TradingViewSignal } from '@/types';
-import { useSafeLoading } from '@/hooks/useSafeLoading';
+import { useState, useEffect, useCallback } from 'react';
+import { TradingViewSignal } from '@/types/signal';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
-// Mock data for testing
-const mockLogs: TradingViewSignal[] = [
-  {
-    id: 'tv-signal-1',
-    action: 'ENTER_LONG',
-    instrument: 'BTCUSDT',
-    timestamp: new Date().toISOString(),
-    signalToken: 'token123',
-    maxLag: '3600',
-    investmentType: 'contract',
-    amount: '1',
-    status: 'Processed'
-  },
-  {
-    id: 'tv-signal-2',
-    action: 'EXIT_LONG',
-    instrument: 'ETHUSDT',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    signalToken: 'token123',
-    maxLag: '3600',
-    investmentType: 'contract',
-    amount: '0.5',
-    status: 'Processed'
-  },
-  {
-    id: 'tv-signal-3',
-    action: 'ENTER_SHORT',
-    instrument: 'SOLUSDT',
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    signalToken: 'token123',
-    maxLag: '3600',
-    investmentType: 'contract',
-    amount: '10',
-    status: 'Failed',
-    errorMessage: 'Insufficient balance'
-  }
-];
+// Create a sample data set
+const createMockTradeViewLogs = (): TradingViewSignal[] => {
+  return Array(15)
+    .fill(null)
+    .map((_, index) => ({
+      id: `TV-${1000 + index}`,
+      action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][Math.floor(Math.random() * 4)] as any,
+      instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][Math.floor(Math.random() * 4)],
+      timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+      signalToken: `TradingView_Bot_${Math.floor(Math.random() * 5) + 1}`,
+      maxLag: (Math.floor(Math.random() * 5) + 1) * 60 + '',
+      investmentType: 'contract',
+      amount: (Math.random() * 0.5 + 0.01).toFixed(3),
+      status: ['Processed', 'Pending', 'Failed', 'Sent'][Math.floor(Math.random() * 4)],
+      processingTime: Math.floor(Math.random() * 5000) + '',
+      errorMessage: Math.random() > 0.8 ? 'Connection timeout or symbol issues' : undefined,
+      botId: `BOT-${1000 + Math.floor(Math.random() * 5)}`,
+      userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
+    }));
+};
 
 interface UseTradingViewLogsProps {
-  botId: string;
-  userId: string;
+  botId?: string;
+  userId?: string;
   refreshTrigger?: boolean;
-  initialData?: TradingViewSignal[];
   skipLoadingState?: boolean;
 }
 
-export const useTradingViewLogs = ({ 
-  botId, 
-  userId, 
+interface UseTradingViewLogsResult {
+  logs: TradingViewSignal[];
+  loading: boolean;
+  error: Error | null;
+  fetchLogs: () => void;
+}
+
+export const useTradingViewLogs = ({
+  botId,
+  userId,
   refreshTrigger = false,
-  initialData,
   skipLoadingState = false
-}: UseTradingViewLogsProps) => {
-  const [logs, setLogs] = useState<TradingViewSignal[]>(initialData || []);
+}: UseTradingViewLogsProps): UseTradingViewLogsResult => {
+  const [logs, setLogs] = useState<TradingViewSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
   
+  // Use our safe loading hook
   const { loading, startLoading, stopLoading } = useSafeLoading({
-    timeoutMs: 10000,
-    minLoadingDurationMs: 500,
     debugComponent: 'TradingViewLogs',
     skipLoadingState
   });
   
   const fetchLogs = useCallback(() => {
-    console.log(`Fetching TradingView logs for bot ${botId} and user ${userId}`);
-    startLoading();
-    
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        // In a real application, this would be an API call
-        // For now, we'll just use mock data
-        const fetchedLogs = [...mockLogs];
-        setLogs(fetchedLogs);
-        setError(null);
-        stopLoading();
-      } catch (err) {
-        console.error('Error fetching TradingView logs:', err);
-        setError(err instanceof Error ? err : new Error('Failed to fetch TradingView logs'));
-        stopLoading();
-      }
-    }, 1000);
+    try {
+      startLoading();
+      
+      // In a real app, we would fetch data from API here
+      setTimeout(() => {
+        try {
+          const allLogs = createMockTradeViewLogs();
+          
+          // Filter logs based on botId and/or userId
+          let filteredLogs = [...allLogs];
+          
+          if (botId) {
+            filteredLogs = filteredLogs.filter(log => log.botId === botId);
+          }
+          
+          if (userId) {
+            filteredLogs = filteredLogs.filter(log => log.userId === userId);
+          }
+          
+          setLogs(filteredLogs);
+          setError(null);
+          stopLoading();
+        } catch (err) {
+          console.error('Error processing TradingView logs:', err);
+          setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+          stopLoading();
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Error fetching TradingView logs:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      stopLoading();
+    }
   }, [botId, userId, startLoading, stopLoading]);
   
-  // Initial fetch when component mounts
+  // Fetch logs on mount and when dependencies change
   useEffect(() => {
-    if (!initialData) {
-      fetchLogs();
-    }
-  }, [fetchLogs, initialData]);
+    fetchLogs();
+  }, [fetchLogs]);
   
-  // Fetch when refreshTrigger changes
+  // Handle refresh trigger from parent
   useEffect(() => {
     if (refreshTrigger) {
       fetchLogs();

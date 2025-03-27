@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import { useTradingViewLogs } from '@/components/bots/trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
-import { useSafeLoading } from '@/hooks/useSafeLoading';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
 interface UseCombinedSignalLogsProps {
   botId: string;

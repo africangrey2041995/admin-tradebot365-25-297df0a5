@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, Clock, BadgeCheck, AlertTriangle } from "lucide-react";
+import { Loader2, Clock, BadgeCheck, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 
@@ -212,7 +212,7 @@ const SignalPerformanceTracker: React.FC<SignalPerformanceTrackerProps> = ({
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <CircleNotch 
+          <Loader2 
             className={cn(
               "h-5 w-5 mr-2", 
               isCalculating ? "animate-spin text-blue-500" : "text-muted-foreground"

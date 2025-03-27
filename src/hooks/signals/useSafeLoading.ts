@@ -14,7 +14,7 @@ export const useSafeLoading = ({
   debugComponent = '',
   skipLoadingState = false
 }: UseSafeLoadingProps = {}) => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   
@@ -22,7 +22,7 @@ export const useSafeLoading = ({
     if (skipLoadingState) return;
     
     console.debug(`${debugComponent} - Starting loading state`);
-    setLoading(true);
+    setIsLoading(true);
     startTimeRef.current = Date.now();
     
     // Set a timeout to prevent infinite loading
@@ -32,7 +32,7 @@ export const useSafeLoading = ({
     
     timeoutRef.current = setTimeout(() => {
       console.warn(`${debugComponent} - Loading timeout reached, forcing state reset`);
-      setLoading(false);
+      setIsLoading(false);
       startTimeRef.current = null;
     }, timeoutMs);
   };
@@ -50,7 +50,7 @@ export const useSafeLoading = ({
         
         setTimeout(() => {
           console.debug(`${debugComponent} - Min duration satisfied, stopping loading state`);
-          setLoading(false);
+          setIsLoading(false);
           startTimeRef.current = null;
           
           if (timeoutRef.current) {
@@ -65,7 +65,7 @@ export const useSafeLoading = ({
     
     // If no min duration or it's already satisfied
     console.debug(`${debugComponent} - Stopping loading state`);
-    setLoading(false);
+    setIsLoading(false);
     startTimeRef.current = null;
     
     if (timeoutRef.current) {
@@ -84,7 +84,7 @@ export const useSafeLoading = ({
   }, []);
   
   return {
-    loading,
+    loading: isLoading,
     startLoading,
     stopLoading
   };

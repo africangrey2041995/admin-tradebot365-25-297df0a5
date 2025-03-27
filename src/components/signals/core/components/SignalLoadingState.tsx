@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CircleNotch, Bot, RefreshCw } from 'lucide-react';
+import { Loader2, Bot, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
@@ -77,7 +77,7 @@ const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
               className="h-10 w-10 text-blue-500 dark:text-blue-400" 
               aria-hidden="true"
             />
-            <CircleNotch 
+            <Loader2 
               className="absolute top-1/2 -right-3 h-5 w-5 text-blue-600 dark:text-blue-300 animate-spin" 
               aria-hidden="true"
             />
@@ -90,7 +90,7 @@ const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
               className="h-10 w-10 text-purple-500 dark:text-purple-400" 
               aria-hidden="true"
             />
-            <CircleNotch 
+            <Loader2 
               className="absolute top-1/2 -right-3 h-5 w-5 text-purple-600 dark:text-purple-300 animate-spin" 
               aria-hidden="true"
             />
@@ -103,7 +103,7 @@ const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
               className="h-10 w-10 text-green-500 dark:text-green-400" 
               aria-hidden="true"
             />
-            <CircleNotch 
+            <Loader2 
               className="absolute top-1/2 -right-3 h-5 w-5 text-green-600 dark:text-green-300 animate-spin" 
               aria-hidden="true"
             />
