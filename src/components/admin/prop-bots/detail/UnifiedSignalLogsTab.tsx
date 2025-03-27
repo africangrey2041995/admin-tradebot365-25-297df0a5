@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,8 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       from: undefined,
       to: undefined
     },
-    userId: ''
+    userId: '',
+    errorOnly: false
   });
   
   const [filteredTvLogs, setFilteredTvLogs] = useState<TradingViewSignal[]>([]);
@@ -37,10 +37,8 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [manualRefreshAttempted, setManualRefreshAttempted] = useState(false);
   
-  // Add timeout reference for safety
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Use the combined logs hook
   const {
     tradingViewLogs,
     coinstratLogs,
@@ -54,13 +52,11 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     refreshTrigger
   });
 
-  // Handle manual refresh with safety timeout
   const handleRefresh = () => {
     console.log('UnifiedSignalLogsTab - Manual refresh triggered');
     setManualRefreshAttempted(true);
     setRefreshTrigger(!refreshTrigger);
     
-    // Set a safety timeout to prevent infinite loading state
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
     }
@@ -69,14 +65,12 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     
     loadingTimeoutRef.current = setTimeout(() => {
       console.warn('UnifiedSignalLogsTab - Safety timeout reached, forcing refresh completion');
-      // Force refreshTrigger to change to ensure we don't get stuck
       setRefreshTrigger(prev => !prev);
       setManualRefreshAttempted(false);
       toast.error("Refresh timed out. Please try again.");
-    }, 15000); // 15 second safety timeout
+    }, 15000);
   };
-  
-  // Clean up timeout on unmount
+
   useEffect(() => {
     return () => {
       if (loadingTimeoutRef.current) {
@@ -84,8 +78,7 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       }
     };
   }, []);
-  
-  // Reset manual refresh flag when loading completes
+
   useEffect(() => {
     if (!loading && manualRefreshAttempted) {
       setManualRefreshAttempted(false);
@@ -96,12 +89,9 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     }
   }, [loading, manualRefreshAttempted]);
 
-  // Apply filters to both log types
   useEffect(() => {
-    // Filter TradingView logs
     let tvLogsFiltered = [...tradingViewLogs];
     
-    // Apply search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       tvLogsFiltered = tvLogsFiltered.filter(log => 
@@ -111,12 +101,10 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       );
     }
     
-    // Apply source filter
     if (filters.signalSource === 'coinstrat') {
       tvLogsFiltered = [];
     }
     
-    // Apply status filter
     if (filters.status !== 'all') {
       const statusMap: Record<string, string> = {
         'success': 'Processed',
@@ -129,7 +117,13 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       );
     }
     
-    // Apply date filter
+    if (filters.errorOnly) {
+      tvLogsFiltered = tvLogsFiltered.filter(log => 
+        log.status.toString().toLowerCase() === 'failed' || 
+        !!log.errorMessage
+      );
+    }
+    
     if (filters.dateRange.from || filters.dateRange.to) {
       tvLogsFiltered = tvLogsFiltered.filter(log => {
         const logDate = new Date(log.timestamp);
@@ -140,7 +134,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
         }
         
         if (filters.dateRange.to) {
-          // Add one day to include the end date
           const endDate = new Date(filters.dateRange.to);
           endDate.setDate(endDate.getDate() + 1);
           isInRange = isInRange && logDate <= endDate;
@@ -152,10 +145,8 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     
     setFilteredTvLogs(tvLogsFiltered);
     
-    // Filter Coinstrat logs
     let csLogsFiltered = [...coinstratLogs];
     
-    // Apply search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       csLogsFiltered = csLogsFiltered.filter(log => 
@@ -166,12 +157,10 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       );
     }
     
-    // Apply source filter
     if (filters.signalSource === 'tradingview') {
       csLogsFiltered = [];
     }
     
-    // Apply status filter
     if (filters.status !== 'all') {
       const statusFilter = filters.status;
       
@@ -187,7 +176,13 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       });
     }
     
-    // Apply date filter
+    if (filters.errorOnly) {
+      csLogsFiltered = csLogsFiltered.filter(log => 
+        log.failedAccounts.length > 0 || 
+        !!log.errorMessage
+      );
+    }
+    
     if (filters.dateRange.from || filters.dateRange.to) {
       csLogsFiltered = csLogsFiltered.filter(log => {
         const logDate = new Date(log.timestamp);
@@ -198,7 +193,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
         }
         
         if (filters.dateRange.to) {
-          // Add one day to include the end date
           const endDate = new Date(filters.dateRange.to);
           endDate.setDate(endDate.getDate() + 1);
           isInRange = isInRange && logDate <= endDate;
@@ -208,10 +202,8 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       });
     }
     
-    // Apply user filter
     if (filters.userId) {
       csLogsFiltered = csLogsFiltered.filter(log => {
-        // Check if any processed or failed account belongs to the selected user
         const hasUserInProcessed = log.processedAccounts.some(
           account => account.userId === filters.userId
         );
@@ -226,12 +218,10 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     
     setFilteredCsLogs(csLogsFiltered);
   }, [tradingViewLogs, coinstratLogs, filters]);
-  
-  // Prepare export data based on both log types
+
   const prepareExportData = () => {
     const exportData: string[][] = [];
     
-    // Add TradingView logs
     filteredTvLogs.forEach(log => {
       exportData.push([
         log.id,
@@ -245,7 +235,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
       ]);
     });
     
-    // Add Coinstrat logs
     filteredCsLogs.forEach(log => {
       exportData.push([
         log.id,
@@ -263,7 +252,7 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     
     return exportData;
   };
-  
+
   const exportHeaders = [
     'ID',
     'Source',
@@ -277,7 +266,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     'Execution Summary'
   ];
 
-  // If loading and no data yet, show full loading state
   if (loading && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
     return (
       <Card>
@@ -296,7 +284,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     <Card>
       <CardContent className="p-6">
         <div className="space-y-6">
-          {/* Advanced filtering */}
           <AdvancedSignalFilter
             onFilterChange={setFilters}
             availableUsers={availableUsers}
@@ -310,7 +297,6 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
             }
           />
           
-          {/* Signal table with hierarchical view */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">
