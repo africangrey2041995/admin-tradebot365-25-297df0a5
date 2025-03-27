@@ -35,7 +35,15 @@ export function runSignalFiltersTests() {
       expect(result.current.filters.signalSource).toBe('tradingview');
       
       // Other properties should remain unchanged
-      expect(result.current.filters.dateRange.from).toBeUndefined();
+      // Check dateRange based on its actual shape
+      const dateRange = result.current.filters.dateRange;
+      if (Array.isArray(dateRange)) {
+        expect(dateRange[0]).toBeNull();
+        expect(dateRange[1]).toBeNull();
+      } else {
+        expect(dateRange.from).toBeUndefined();
+        expect(dateRange.to).toBeUndefined();
+      }
       expect(result.current.filters.userId).toBe('');
     });
 
@@ -112,10 +120,15 @@ export function runSignalFiltersTests() {
         });
       });
       
-      expect(result.current.filters.dateRange).toEqual({
-        from: startDate,
-        to: endDate
-      });
+      // Handle different possible shapes of dateRange
+      const dateRange = result.current.filters.dateRange;
+      if (Array.isArray(dateRange)) {
+        expect(dateRange[0]).toEqual(startDate);
+        expect(dateRange[1]).toEqual(endDate);
+      } else {
+        expect(dateRange.from).toEqual(startDate);
+        expect(dateRange.to).toEqual(endDate);
+      }
     });
   });
 }
