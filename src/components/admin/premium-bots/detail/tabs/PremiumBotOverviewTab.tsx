@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -44,7 +43,7 @@ interface PremiumBotOverviewTabProps {
   onUpdateTradingPairs: (pairs: string[]) => void;
   onUpdateFeatures: (features: string[]) => void;
   onUpdateStatistics: (stats: { name: string; value: string; icon: React.ReactNode }[]) => void;
-  onUpdateBotInfo: (info: { type: string; exchange: string; minCapital: string, risk?: BotRiskLevel }) => void;
+  onUpdateBotInfo: (info: { type?: string; exchange?: string; minCapital?: string; risk?: BotRiskLevel }) => void;
 }
 
 // Định nghĩa schema cho form chỉnh sửa thông tin bot
@@ -98,9 +97,6 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
   // Handle risk update specific to this component
   const handleRiskUpdate = (newRisk: BotRiskLevel) => {
     onUpdateBotInfo({
-      type: bot.type,
-      exchange: bot.exchange,
-      minCapital: bot.minCapital,
       risk: newRisk
     });
   };

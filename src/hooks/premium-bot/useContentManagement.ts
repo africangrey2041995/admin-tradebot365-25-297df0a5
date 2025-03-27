@@ -1,6 +1,7 @@
 
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { BotRiskLevel } from '@/constants/botTypes';
 
 export const useContentManagement = () => {
   // Handle update bot description
@@ -29,9 +30,10 @@ export const useContentManagement = () => {
 
   // Handle update bot information
   const handleUpdateBotInfo = useCallback((info: {
-    type: string;
-    exchange: string;
-    minCapital: string;
+    type?: string;
+    exchange?: string;
+    minCapital?: string;
+    risk?: BotRiskLevel;
   }) => {
     toast.success("Bot information updated");
     console.log("Updated bot information:", info);

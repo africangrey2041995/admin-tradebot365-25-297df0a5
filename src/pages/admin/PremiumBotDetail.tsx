@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,6 @@ const PremiumBotDetail = () => {
   const navigate = useNavigate();
   
   // Use our custom hook to manage all the data and logic
-  // Adding 'admin' as the second parameter since usePremiumBotDetail expects two arguments
   const {
     isLoading,
     activeTab,
@@ -48,11 +46,6 @@ const PremiumBotDetail = () => {
     handleUpdateBotInfo,
     refreshSignalLogs
   } = usePremiumBotDetail(botId, 'admin');
-
-  // Go back to premium bots list
-  const goBackToList = () => {
-    navigate(ADMIN_ROUTES.PREMIUM_BOTS);
-  };
 
   // Handle risk level update
   const handleUpdateRisk = (newRisk: BotRiskLevel) => {
