@@ -47,6 +47,8 @@ import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
 // Remove import for AdminBotErrors
 import AdminPackages from "./pages/admin/Packages";
+// Import the BotMonitoringPage
+import BotMonitoringPage from "./pages/admin/BotMonitoringPage";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -113,7 +115,8 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  {/* Remove AdminBotErrors route */}
+                  {/* Add the Bot Monitoring route */}
+                  <Route path="bot-monitoring" element={<BotMonitoringPage />} />
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
