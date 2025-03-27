@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -54,6 +53,7 @@ interface PremiumBotOverviewTabProps {
     exchange?: string; 
     minCapital?: string; 
     potentialProfit?: string;
+    maxDrawdown?: string;
     risk?: BotRiskLevel;
     isFeatured?: boolean;
     isNew?: boolean;
@@ -121,6 +121,15 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
     });
   };
 
+  // Handle updates from the statistics card that should sync with bot properties
+  const handleStatsWithBotInfoUpdate = (info: {
+    potentialProfit?: string;
+    maxDrawdown?: string;
+  }) => {
+    onUpdateBotInfo(info);
+    toast.success('Cập nhật thông tin hiệu suất và bot thành công');
+  };
+
   // Handle marketing flags update
   const handleMarketingUpdate = () => {
     setIsMarketingDialogOpen(true);
@@ -149,10 +158,11 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
       <div className="md:col-span-2 space-y-4">
         <EditableDescriptionCard description={bot.longDescription} onUpdate={onUpdateDescription} />
         
-        {/* Trade Statistics */}
+        {/* Trade Statistics - now with synchronized bot info */}
         <EditableStatisticsCard 
           statistics={statisticsData} 
-          onUpdate={onUpdateStatistics} 
+          onUpdate={onUpdateStatistics}
+          onUpdateBotInfo={handleStatsWithBotInfoUpdate}  
         />
         
         <EditableTradingPairsCard tradingPairs={bot.pairs} onUpdate={onUpdateTradingPairs} />
@@ -160,6 +170,7 @@ const PremiumBotOverviewTab: React.FC<PremiumBotOverviewTabProps> = ({
         {/* Features List */}
         {bot.features && <EditableFeaturesCard features={bot.features} onUpdate={onUpdateFeatures} />}
       </div>
+      
       <div className="space-y-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">

@@ -18,7 +18,7 @@ export interface StatData {
 // Schema for validation
 const statisticsFormSchema = z.object({
   winRate: z.string().min(1, { message: "Win rate is required" }),
-  avgProfit: z.string().min(1, { message: "Average profit is required" }),
+  exProfit: z.string().min(1, { message: "Expected profit is required" }),
   maxDrawdown: z.string().min(1, { message: "Max drawdown is required" }),
   sharpRatio: z.string().min(1, { message: "Sharp ratio is required" }),
 });
@@ -28,11 +28,16 @@ type StatisticsFormValues = z.infer<typeof statisticsFormSchema>;
 interface EditableStatisticsCardProps {
   statistics: StatData[];
   onUpdate: (updatedStats: StatData[]) => void;
+  onUpdateBotInfo?: (info: { 
+    potentialProfit?: string;
+    maxDrawdown?: string;
+  }) => void;
 }
 
 const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({ 
   statistics, 
-  onUpdate 
+  onUpdate,
+  onUpdateBotInfo
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   
@@ -41,7 +46,7 @@ const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({
     resolver: zodResolver(statisticsFormSchema),
     defaultValues: {
       winRate: statistics.find(s => s.name === "Win Rate")?.value || "",
-      avgProfit: statistics.find(s => s.name === "Avg Profit")?.value || "",
+      exProfit: statistics.find(s => s.name === "Ex. Profit")?.value || "",
       maxDrawdown: statistics.find(s => s.name === "Max Drawdown")?.value || "",
       sharpRatio: statistics.find(s => s.name === "Sharp Ratio")?.value || "",
     },
@@ -51,7 +56,7 @@ const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({
     if (isEditing) {
       form.reset({
         winRate: statistics.find(s => s.name === "Win Rate")?.value || "",
-        avgProfit: statistics.find(s => s.name === "Avg Profit")?.value || "",
+        exProfit: statistics.find(s => s.name === "Ex. Profit")?.value || "",
         maxDrawdown: statistics.find(s => s.name === "Max Drawdown")?.value || "",
         sharpRatio: statistics.find(s => s.name === "Sharp Ratio")?.value || "",
       });
@@ -70,10 +75,10 @@ const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({
       value: values.winRate 
     };
     
-    const avgProfitIndex = updatedStats.findIndex(s => s.name === "Avg Profit");
-    if (avgProfitIndex >= 0) updatedStats[avgProfitIndex] = { 
-      ...updatedStats[avgProfitIndex], 
-      value: values.avgProfit 
+    const exProfitIndex = updatedStats.findIndex(s => s.name === "Ex. Profit");
+    if (exProfitIndex >= 0) updatedStats[exProfitIndex] = { 
+      ...updatedStats[exProfitIndex], 
+      value: values.exProfit 
     };
     
     const maxDrawdownIndex = updatedStats.findIndex(s => s.name === "Max Drawdown");
@@ -88,7 +93,17 @@ const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({
       value: values.sharpRatio 
     };
 
+    // First update the statistics
     onUpdate(updatedStats);
+    
+    // If onUpdateBotInfo is provided, also update bot info
+    if (onUpdateBotInfo) {
+      onUpdateBotInfo({
+        potentialProfit: values.exProfit,
+        maxDrawdown: values.maxDrawdown
+      });
+    }
+    
     setIsEditing(false);
   };
 
@@ -132,12 +147,12 @@ const EditableStatisticsCard: React.FC<EditableStatisticsCardProps> = ({
                 
                 <FormField
                   control={form.control}
-                  name="avgProfit"
+                  name="exProfit"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-green-500" />
-                        Avg Profit
+                        Ex. Profit
                       </FormLabel>
                       <FormControl>
                         <Input {...field} />

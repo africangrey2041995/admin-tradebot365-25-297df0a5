@@ -35,7 +35,7 @@ export const useBotStatistics = () => {
       icon: <Activity className="h-4 w-4 text-green-500" /> 
     },
     { 
-      name: 'Avg Profit', 
+      name: 'Ex. Profit', 
       value: '2.7%', 
       icon: <TrendingUp className="h-4 w-4 text-green-500" /> 
     },

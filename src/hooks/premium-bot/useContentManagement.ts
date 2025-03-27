@@ -33,7 +33,13 @@ export const useContentManagement = () => {
     type?: string;
     exchange?: string;
     minCapital?: string;
+    potentialProfit?: string;
+    maxDrawdown?: string;
     risk?: BotRiskLevel;
+    name?: string;
+    isFeatured?: boolean;
+    isNew?: boolean;
+    isBestSeller?: boolean;
   }) => {
     toast.success("Bot information updated");
     console.log("Updated bot information:", info);

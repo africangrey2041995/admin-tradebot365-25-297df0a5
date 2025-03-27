@@ -21,7 +21,7 @@ const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   
-  // Define goBackToList function - the issue was this function wasn't available in the scope where it was being used
+  // Define goBackToList function
   const goBackToList = () => {
     navigate(ADMIN_ROUTES.PREMIUM_BOTS);
   };
@@ -55,7 +55,6 @@ const PremiumBotDetail = () => {
 
   // Handle risk level update
   const handleUpdateRisk = (newRisk: BotRiskLevel) => {
-    // In a real app, you would call an API to update the risk level
     if (bot) {
       handleUpdateBotInfo({ risk: newRisk });
       toast.success(`Đã cập nhật mức độ rủi ro thành: ${newRisk}`);
@@ -65,7 +64,7 @@ const PremiumBotDetail = () => {
   // Handle name update
   const handleUpdateName = (newName: string) => {
     if (bot) {
-      // In a real app, you would call an API to update the name
+      handleUpdateBotInfo({ name: newName });
       toast.success(`Đã cập nhật tên bot thành: ${newName}`);
     }
   };
@@ -126,6 +125,7 @@ const PremiumBotDetail = () => {
               type: bot.type,
               exchange: bot.exchange || '',
               minCapital: bot.minCapital || '',
+              potentialProfit: bot.potentialProfit || '',
               subscribers: bot.subscribers || 0,
               createdAt: bot.createdDate || '',
               updatedAt: bot.lastUpdated || ''
