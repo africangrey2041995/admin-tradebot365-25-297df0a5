@@ -32,6 +32,9 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
     handleSelectAllUsers,
     handleBulkAction,
     handleConfirmBulkAction,
+    handleUserUpdated,
+    handleUserDeleted,
+    handleUserStatusChange,
     setBulkActionDialogOpen,
     handleExportCSV,
     handleExportExcel
@@ -72,6 +75,9 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
           selectedUsers={selectedUsers}
           onSelectUser={handleSelectUser}
           onSelectAllUsers={handleSelectAllUsers}
+          onUserUpdated={handleUserUpdated}
+          onUserDeleted={handleUserDeleted}
+          onUserStatusChange={handleUserStatusChange}
         />
         
         <BulkActionDialog

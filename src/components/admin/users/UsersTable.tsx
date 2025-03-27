@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Trash2, Lock, Unlock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -13,6 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserPlanBadge } from "../users/UserPlanBadge";
+import { EditUserDialog } from "./EditUserDialog";
+import { DeleteUserDialog } from "./DeleteUserDialog";
+import { LockAccountDialog } from "./LockAccountDialog";
+import { UnlockAccountDialog } from "./UnlockAccountDialog";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -30,6 +35,9 @@ interface UsersTableProps {
   selectedUsers: string[];
   onSelectUser: (userId: string, isSelected: boolean) => void;
   onSelectAllUsers: (isSelected: boolean) => void;
+  onUserUpdated?: (userData: User) => void;
+  onUserDeleted?: (userId: string) => void;
+  onUserStatusChange?: (userId: string, status: 'active' | 'inactive' | 'suspended') => void;
 }
 
 export const UsersTable: React.FC<UsersTableProps> = ({ 
@@ -37,10 +45,17 @@ export const UsersTable: React.FC<UsersTableProps> = ({
   onViewUserDetail, 
   selectedUsers,
   onSelectUser,
-  onSelectAllUsers
+  onSelectAllUsers,
+  onUserUpdated,
+  onUserDeleted,
+  onUserStatusChange
 }) => {
   const allSelected = users.length > 0 && selectedUsers.length === users.length;
   const someSelected = selectedUsers.length > 0 && selectedUsers.length < users.length;
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [lockingUser, setLockingUser] = useState<User | null>(null);
+  const [unlockingUser, setUnlockingUser] = useState<User | null>(null);
 
   const handleSelectAll = (checked: boolean) => {
     onSelectAllUsers(checked);
@@ -48,6 +63,40 @@ export const UsersTable: React.FC<UsersTableProps> = ({
 
   const handleSelectUser = (userId: string, checked: boolean) => {
     onSelectUser(userId, checked);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+  };
+
+  const handleDeleteUser = (user: User) => {
+    setDeletingUser(user);
+  };
+
+  const handleLockAccount = (user: User) => {
+    setLockingUser(user);
+  };
+
+  const handleUnlockAccount = (user: User) => {
+    setUnlockingUser(user);
+  };
+
+  const handleUserUpdated = (userData: User) => {
+    if (onUserUpdated) {
+      onUserUpdated(userData);
+    }
+  };
+
+  const handleUserDeleted = () => {
+    if (deletingUser && onUserDeleted) {
+      onUserDeleted(deletingUser.id);
+    }
+  };
+
+  const handleUserStatusChange = (status: 'active' | 'inactive' | 'suspended') => {
+    if ((lockingUser || unlockingUser) && onUserStatusChange) {
+      onUserStatusChange(lockingUser?.id || unlockingUser?.id || '', status);
+    }
   };
 
   return (
@@ -97,14 +146,48 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                     <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => onViewUserDetail(user.id)}>
+                    <DropdownMenuItem 
+                      onClick={() => onViewUserDetail(user.id)}
+                      className="flex items-center gap-2 focus:bg-zinc-800 cursor-pointer"
+                    >
+                      <Eye className="h-4 w-4 text-blue-500" />
                       Xem chi tiết
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                    <DropdownMenuItem>Xóa</DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-zinc-800" />
+                    <DropdownMenuItem 
+                      onClick={() => handleEditUser(user)}
+                      className="flex items-center gap-2 focus:bg-zinc-800 cursor-pointer"
+                    >
+                      <Edit className="h-4 w-4 text-amber-500" />
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                    {user.status === 'suspended' ? (
+                      <DropdownMenuItem 
+                        onClick={() => handleUnlockAccount(user)}
+                        className="flex items-center gap-2 focus:bg-zinc-800 cursor-pointer"
+                      >
+                        <Unlock className="h-4 w-4 text-green-500" />
+                        Mở khóa tài khoản
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem 
+                        onClick={() => handleLockAccount(user)}
+                        className="flex items-center gap-2 focus:bg-zinc-800 cursor-pointer"
+                      >
+                        <Lock className="h-4 w-4 text-red-500" />
+                        Khóa tài khoản
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator className="bg-zinc-800" />
+                    <DropdownMenuItem 
+                      onClick={() => handleDeleteUser(user)}
+                      className="flex items-center gap-2 focus:bg-zinc-800 cursor-pointer text-red-500"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Xóa
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
@@ -112,6 +195,43 @@ export const UsersTable: React.FC<UsersTableProps> = ({
           ))}
         </TableBody>
       </Table>
+
+      {/* Dialogs */}
+      {editingUser && (
+        <EditUserDialog
+          open={!!editingUser}
+          onOpenChange={(open) => !open && setEditingUser(null)}
+          user={editingUser}
+          onUserUpdated={handleUserUpdated}
+        />
+      )}
+
+      {deletingUser && (
+        <DeleteUserDialog
+          open={!!deletingUser}
+          onOpenChange={(open) => !open && setDeletingUser(null)}
+          user={deletingUser}
+          onUserDeleted={handleUserDeleted}
+        />
+      )}
+
+      {lockingUser && (
+        <LockAccountDialog
+          open={!!lockingUser}
+          onOpenChange={(open) => !open && setLockingUser(null)}
+          user={lockingUser}
+          onStatusChange={handleUserStatusChange}
+        />
+      )}
+
+      {unlockingUser && (
+        <UnlockAccountDialog
+          open={!!unlockingUser}
+          onOpenChange={(open) => !open && setUnlockingUser(null)}
+          user={unlockingUser}
+          onStatusChange={handleUserStatusChange}
+        />
+      )}
     </div>
   );
 };

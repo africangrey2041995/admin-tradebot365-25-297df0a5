@@ -3,17 +3,19 @@ import { useState } from 'react';
 import { mockUsers } from '@/mocks/usersMock';
 import { toast } from "sonner";
 import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
+import { UserStatus, UserPlan } from '@/constants/userConstants';
 
 export const useUsersManagement = () => {
+  const [users, setUsers] = useState(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [planFilter, setPlanFilter] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | null>(null);
+  const [bulkAction, setBulkAction] = useState<'activate' | 'deactivate' | 'delete' | 'premium' | 'basic' | null>(null);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
 
   // Filter users based on search term and filters
-  const filteredUsers = mockUsers.filter(user => {
+  const filteredUsers = users.filter(user => {
     const searchRegex = new RegExp(searchTerm, 'i');
     const matchesSearch = searchRegex.test(user.name) || searchRegex.test(user.email);
 
@@ -64,6 +66,12 @@ export const useUsersManagement = () => {
       case 'delete':
         setBulkAction('delete');
         break;
+      case 'premium':
+        setBulkAction('premium');
+        break;
+      case 'basic':
+        setBulkAction('basic');
+        break;
       default:
         toast.info(`Đã thực hiện hành động "${action}" cho ${selectedUsers.length} người dùng`);
         return;
@@ -73,11 +81,91 @@ export const useUsersManagement = () => {
   };
 
   const handleConfirmBulkAction = () => {
-    console.log(`Confirmed bulk action ${bulkAction} for users:`, selectedUsers);
+    if (!bulkAction) return;
     
+    const updatedUsers = [...users];
+    
+    // Apply the bulk action to the selected users
+    switch (bulkAction) {
+      case 'activate':
+        // Update status to active for selected users
+        updatedUsers.forEach(user => {
+          if (selectedUsers.includes(user.id)) {
+            user.status = UserStatus.ACTIVE;
+          }
+        });
+        toast.success(`Đã kích hoạt ${selectedUsers.length} tài khoản người dùng`);
+        break;
+        
+      case 'deactivate':
+        // Update status to suspended for selected users
+        updatedUsers.forEach(user => {
+          if (selectedUsers.includes(user.id)) {
+            user.status = UserStatus.SUSPENDED;
+          }
+        });
+        toast.success(`Đã khóa ${selectedUsers.length} tài khoản người dùng`);
+        break;
+        
+      case 'delete':
+        // Remove selected users from the array
+        const remainingUsers = updatedUsers.filter(user => !selectedUsers.includes(user.id));
+        setUsers(remainingUsers);
+        toast.success(`Đã xóa ${selectedUsers.length} người dùng`);
+        setSelectedUsers([]);
+        setBulkAction(null);
+        setBulkActionDialogOpen(false);
+        return;
+        
+      case 'premium':
+        // Update plan to premium for selected users
+        updatedUsers.forEach(user => {
+          if (selectedUsers.includes(user.id)) {
+            user.plan = UserPlan.PREMIUM;
+          }
+        });
+        toast.success(`Đã nâng cấp ${selectedUsers.length} người dùng lên gói Premium`);
+        break;
+        
+      case 'basic':
+        // Update plan to basic for selected users
+        updatedUsers.forEach(user => {
+          if (selectedUsers.includes(user.id)) {
+            user.plan = UserPlan.BASIC;
+          }
+        });
+        toast.success(`Đã chuyển ${selectedUsers.length} người dùng sang gói Basic`);
+        break;
+    }
+    
+    setUsers(updatedUsers);
     setSelectedUsers([]);
     setBulkAction(null);
-    toast.success("Thao tác hàng loạt thành công!");
+    setBulkActionDialogOpen(false);
+  };
+
+  const handleUserUpdated = (userData: any) => {
+    // Update the user in the users array
+    const updatedUsers = users.map(user => 
+      user.id === userData.id ? { ...user, ...userData } : user
+    );
+    
+    setUsers(updatedUsers);
+  };
+
+  const handleUserDeleted = (userId: string) => {
+    // Remove the user from the users array
+    const updatedUsers = users.filter(user => user.id !== userId);
+    setUsers(updatedUsers);
+  };
+
+  const handleUserStatusChange = (userId: string, status: 'active' | 'inactive' | 'suspended') => {
+    // Update the user status in the users array
+    const updatedUsers = users.map(user => 
+      user.id === userId ? { ...user, status } : user
+    );
+    
+    setUsers(updatedUsers);
   };
 
   const handleExportCSV = () => {
@@ -111,6 +199,7 @@ export const useUsersManagement = () => {
   };
 
   return {
+    users,
     searchTerm,
     filterStatus,
     planFilter,
@@ -125,6 +214,9 @@ export const useUsersManagement = () => {
     handleSelectAllUsers,
     handleBulkAction,
     handleConfirmBulkAction,
+    handleUserUpdated,
+    handleUserDeleted,
+    handleUserStatusChange,
     setBulkActionDialogOpen,
     handleExportCSV,
     handleExportExcel

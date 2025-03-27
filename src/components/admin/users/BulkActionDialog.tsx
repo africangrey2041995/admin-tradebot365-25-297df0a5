@@ -9,10 +9,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle, XCircle, UserX } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Package, XCircle, UserX } from 'lucide-react';
 import { toast } from "sonner";
 
-type BulkAction = 'activate' | 'deactivate' | 'delete' | null;
+type BulkAction = 'activate' | 'deactivate' | 'delete' | 'premium' | 'basic' | null;
 
 interface BulkActionDialogProps {
   open: boolean;
@@ -39,15 +39,8 @@ export function BulkActionDialog({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       onConfirm();
-      onOpenChange(false);
       
-      const actionText = bulkAction === 'activate' 
-        ? 'kích hoạt' 
-        : bulkAction === 'deactivate' 
-          ? 'vô hiệu hóa' 
-          : 'xóa';
-      
-      toast.success(`Đã ${actionText} ${selectedUsersCount} người dùng thành công!`);
+      // The success toast is now handled in the parent component
     } catch (error) {
       toast.error("Có lỗi xảy ra khi thực hiện hành động hàng loạt!");
       console.error(error);
@@ -68,10 +61,10 @@ export function BulkActionDialog({
         };
       case 'deactivate':
         return {
-          title: "Vô hiệu hóa người dùng",
-          description: `Bạn có chắc chắn muốn vô hiệu hóa ${selectedUsersCount} người dùng đã chọn không?`,
+          title: "Khóa người dùng",
+          description: `Bạn có chắc chắn muốn khóa ${selectedUsersCount} người dùng đã chọn không?`,
           icon: <XCircle className="h-12 w-12 text-amber-500 mb-2" />,
-          confirmLabel: "Vô hiệu hóa",
+          confirmLabel: "Khóa tài khoản",
           confirmClass: "bg-amber-600 hover:bg-amber-700",
         };
       case 'delete':
@@ -81,6 +74,22 @@ export function BulkActionDialog({
           icon: <UserX className="h-12 w-12 text-red-500 mb-2" />,
           confirmLabel: "Xóa",
           confirmClass: "bg-red-600 hover:bg-red-700",
+        };
+      case 'premium':
+        return {
+          title: "Nâng cấp lên Premium",
+          description: `Bạn có chắc chắn muốn nâng cấp ${selectedUsersCount} người dùng đã chọn lên gói Premium không?`,
+          icon: <Package className="h-12 w-12 text-amber-500 mb-2" />,
+          confirmLabel: "Nâng cấp",
+          confirmClass: "bg-amber-600 hover:bg-amber-700",
+        };
+      case 'basic':
+        return {
+          title: "Chuyển sang gói Basic",
+          description: `Bạn có chắc chắn muốn chuyển ${selectedUsersCount} người dùng đã chọn sang gói Basic không?`,
+          icon: <Package className="h-12 w-12 text-blue-500 mb-2" />,
+          confirmLabel: "Chuyển đổi",
+          confirmClass: "bg-blue-600 hover:bg-blue-700",
         };
       default:
         return {
