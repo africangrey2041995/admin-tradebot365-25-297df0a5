@@ -1,66 +1,64 @@
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { SignalLoadingState } from '@/components/signals/core/components/SignalLoadingState';
+import SignalLoadingState from '@/components/signals/core/components/SignalLoadingState';
 
-// Export the test suite function for running through the test runner
-export function runSignalLoadingStateTests() {
+/**
+ * Unit tests for the SignalLoadingState component
+ */
+export const runSignalLoadingStateTests = () => {
   describe('SignalLoadingState Component', () => {
-    // Test basic rendering
-    test('renders with default props', () => {
+    it('renders with default message', () => {
       render(<SignalLoadingState />);
       expect(screen.getByText('Loading signals...')).toBeInTheDocument();
-      expect(screen.getByRole('img', { name: /loading/i })).toBeInTheDocument();
     });
-
-    // Test custom message
-    test('renders with custom message', () => {
+    
+    it('renders with custom message', () => {
       const customMessage = 'Custom loading message';
       render(<SignalLoadingState message={customMessage} />);
       expect(screen.getByText(customMessage)).toBeInTheDocument();
     });
-
-    // Test progress indicator
-    test('renders progress bar when showProgress is true', () => {
-      const { container } = render(<SignalLoadingState showProgress={true} />);
-      expect(container.querySelector('.bg-gray-200')).toBeInTheDocument();
-      expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    
+    it('renders progress bar when showProgress is true', () => {
+      const { container } = render(<SignalLoadingState showProgress />);
+      expect(container.querySelector('[role="progressbar"]')).toBeInTheDocument();
     });
-
-    // Test bot type styling
-    test('applies premium bot styling correctly', () => {
-      const { container } = render(<SignalLoadingState botType="premium" />);
-      const loader = container.querySelector('.animate-spin');
-      expect(loader).toHaveClass('text-amber-600');
+    
+    it('renders progress with value when isDeterminate is true', () => {
+      const progressValue = 75;
+      const { container } = render(
+        <SignalLoadingState 
+          showProgress 
+          progressValue={progressValue} 
+          isDeterminate 
+        />
+      );
+      
+      const progressElement = container.querySelector('[role="progressbar"]');
+      expect(progressElement).toHaveAttribute('aria-valuenow', progressValue.toString());
     });
-
-    test('applies prop bot styling correctly', () => {
-      const { container } = render(<SignalLoadingState botType="prop" />);
-      const loader = container.querySelector('.animate-spin');
-      expect(loader).toHaveClass('text-emerald-600');
+    
+    it('renders in simple mode when isSimple is true', () => {
+      const { container } = render(<SignalLoadingState isSimple />);
+      
+      // Should not contain the heading element
+      expect(container.querySelector('h3')).not.toBeInTheDocument();
+      
+      // Should contain a simpler loading indicator
+      expect(screen.getByRole('status')).toHaveClass('flex items-center justify-center p-4');
     });
-
-    test('applies user bot styling correctly', () => {
-      const { container } = render(<SignalLoadingState botType="user" />);
-      const loader = container.querySelector('.animate-spin');
-      expect(loader).toHaveClass('text-primary');
-    });
-
-    // Test simple mode
-    test('renders in simple mode with reduced height', () => {
-      const { container } = render(<SignalLoadingState isSimple={true} />);
-      const loadingContainer = container.firstChild;
-      expect(loadingContainer).toHaveClass('min-h-[100px]');
-      expect(loadingContainer).not.toHaveClass('min-h-[200px]');
-    });
-
-    // Test custom className
-    test('applies custom className correctly', () => {
-      const customClass = 'my-custom-class';
-      const { container } = render(<SignalLoadingState className={customClass} />);
-      expect(container.firstChild).toHaveClass(customClass);
+    
+    it('renders different icon based on botType', () => {
+      const { rerender, container } = render(<SignalLoadingState botType="user" />);
+      expect(container.querySelector('.text-blue-500')).toBeInTheDocument();
+      
+      rerender(<SignalLoadingState botType="premium" />);
+      expect(container.querySelector('.text-purple-500')).toBeInTheDocument();
+      
+      rerender(<SignalLoadingState botType="prop" />);
+      expect(container.querySelector('.text-green-500')).toBeInTheDocument();
+      
+      rerender(<SignalLoadingState botType="default" />);
+      expect(container.querySelector('.text-gray-500')).toBeInTheDocument();
     });
   });
-}
-
-export default runSignalLoadingStateTests;
+};
