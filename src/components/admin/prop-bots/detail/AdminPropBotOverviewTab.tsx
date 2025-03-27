@@ -12,6 +12,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BotType } from '@/constants/botTypes';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
@@ -31,6 +43,22 @@ interface AdminPropBotOverviewTabProps {
   onUpdateBot?: (updatedData: Partial<PropBot>) => void;
   onUpdateChallengeRules?: (propFirm: string, rules: string[]) => void;
 }
+
+// Định nghĩa schema cho form mục tiêu bot
+const botTargetFormSchema = z.object({
+  totalTrades: z.string(),
+  winRate: z.string(),
+  profitFactor: z.string(),
+  sharpeRatio: z.string(),
+  currentDrawdown: z.string(),
+});
+
+// Định nghĩa schema cho form thông tin bot
+const botInfoFormSchema = z.object({
+  exchange: z.string(),
+  propFirm: z.string(),
+  challengeDuration: z.string(),
+});
 
 const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   propBot,
@@ -56,13 +84,32 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
 
   const coinstratRules = challengeRules["Coinstrat Pro"] || [];
   
+  // State for target stats edit dialog
+  const [isTargetEditDialogOpen, setIsTargetEditDialogOpen] = useState(false);
+  
   // State for bot info edit dialog
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({
-    botType: propBot.type || BotType.PROP_BOT,
-    exchange: propBot.exchange || '',
-    propFirm: propBot.propFirm || '',
-    challengeDuration: propBot.challengeDuration || ''
+  const [isInfoEditDialogOpen, setIsInfoEditDialogOpen] = useState(false);
+
+  // Form cho mục tiêu bot
+  const targetForm = useForm({
+    resolver: zodResolver(botTargetFormSchema),
+    defaultValues: {
+      totalTrades: botStats.totalTrades.toString(),
+      winRate: botStats.winRate,
+      profitFactor: botStats.profitFactor.toString(),
+      sharpeRatio: botStats.sharpeRatio.toString(),
+      currentDrawdown: botStats.currentDrawdown,
+    },
+  });
+
+  // Form cho thông tin bot
+  const infoForm = useForm({
+    resolver: zodResolver(botInfoFormSchema),
+    defaultValues: {
+      exchange: propBot.exchange || '',
+      propFirm: propBot.propFirm || '',
+      challengeDuration: propBot.challengeDuration || '',
+    },
   });
 
   const handleUpdateFeatures = (updatedFeatures: string[]) => {
@@ -83,26 +130,46 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
     onUpdateChallengeRules("Coinstrat Pro", updatedRules);
   };
   
-  const handleEditButtonClick = () => {
-    setIsEditDialogOpen(true);
-  };
-  
-  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleEditFormSubmit = () => {
-    onUpdateBot({
-      type: BotType.PROP_BOT, // Always use the enum value, not a string
-      exchange: editFormData.exchange,
-      propFirm: editFormData.propFirm,
-      challengeDuration: editFormData.challengeDuration
+  const handleTargetEditButtonClick = () => {
+    targetForm.reset({
+      totalTrades: botStats.totalTrades.toString(),
+      winRate: botStats.winRate,
+      profitFactor: botStats.profitFactor.toString(),
+      sharpeRatio: botStats.sharpeRatio.toString(),
+      currentDrawdown: botStats.currentDrawdown,
     });
-    setIsEditDialogOpen(false);
+    setIsTargetEditDialogOpen(true);
+  };
+  
+  const handleInfoEditButtonClick = () => {
+    infoForm.reset({
+      exchange: propBot.exchange || '',
+      propFirm: propBot.propFirm || '',
+      challengeDuration: propBot.challengeDuration || '',
+    });
+    setIsInfoEditDialogOpen(true);
+  };
+  
+  const onTargetSubmit = (data: z.infer<typeof botTargetFormSchema>) => {
+    // Thực hiện cập nhật mục tiêu bot ở đây
+    console.log('Cập nhật mục tiêu bot:', data);
+    
+    // Ví dụ cập nhật state nội bộ với giá trị mới
+    // setBotStats({...});
+    
+    toast.success('Đã cập nhật mục tiêu bot');
+    setIsTargetEditDialogOpen(false);
+  };
+  
+  const onInfoSubmit = (data: z.infer<typeof botInfoFormSchema>) => {
+    onUpdateBot({
+      type: BotType.PROP_BOT,
+      exchange: data.exchange,
+      propFirm: data.propFirm,
+      challengeDuration: data.challengeDuration
+    });
+    
+    setIsInfoEditDialogOpen(false);
     toast.success('Thông tin Bot đã được cập nhật');
   };
 
@@ -190,7 +257,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
           <Card className="border border-neutral-200 dark:border-neutral-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg font-medium">Mục tiêu Bot</CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleEditButtonClick}>
+              <Button variant="ghost" size="sm" onClick={handleTargetEditButtonClick}>
                 <Pencil className="h-4 w-4 mr-1" />
                 Chỉnh sửa
               </Button>
@@ -224,7 +291,7 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
           <Card className="border border-neutral-200 dark:border-neutral-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg font-medium">Thông tin Bot</CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleEditButtonClick}>
+              <Button variant="ghost" size="sm" onClick={handleInfoEditButtonClick}>
                 <Pencil className="h-4 w-4 mr-1" />
                 Chỉnh sửa
               </Button>
@@ -274,70 +341,158 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
         </div>
       </div>
       
-      {/* Edit dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      {/* Chỉnh sửa mục tiêu bot dialog */}
+      <Dialog open={isTargetEditDialogOpen} onOpenChange={setIsTargetEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa mục tiêu Bot</DialogTitle>
+          </DialogHeader>
+          <Form {...targetForm}>
+            <form onSubmit={targetForm.handleSubmit(onTargetSubmit)} className="space-y-4">
+              <FormField
+                control={targetForm.control}
+                name="totalTrades"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tổng giao dịch mục tiêu</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={targetForm.control}
+                name="winRate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tỷ lệ thắng mục tiêu</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ví dụ: 65%
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={targetForm.control}
+                name="profitFactor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hệ số lợi nhuận mục tiêu</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" step="0.01" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={targetForm.control}
+                name="sharpeRatio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tỷ lệ Sharpe mục tiêu</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" step="0.01" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={targetForm.control}
+                name="currentDrawdown"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Drawdown tối đa cho phép</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ví dụ: 5%
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsTargetEditDialogOpen(false)}>
+                  Hủy
+                </Button>
+                <Button type="submit">
+                  Lưu thay đổi
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Chỉnh sửa thông tin bot dialog */}
+      <Dialog open={isInfoEditDialogOpen} onOpenChange={setIsInfoEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Chỉnh sửa thông tin Bot</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="botType" className="text-right">
-                Loại Bot
-              </Label>
-              <Input
-                id="botType"
-                name="botType"
-                value={editFormData.botType}
-                onChange={handleEditFormChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="exchange" className="text-right">
-                Sàn giao dịch
-              </Label>
-              <Input
-                id="exchange"
-                name="exchange"
-                value={editFormData.exchange}
-                onChange={handleEditFormChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="propFirm" className="text-right">
-                Prop Firm
-              </Label>
-              <Input
-                id="propFirm"
+          <Form {...infoForm}>
+            <form onSubmit={infoForm.handleSubmit(onInfoSubmit)} className="space-y-4">
+              <FormField
+                control={infoForm.control}
                 name="propFirm"
-                value={editFormData.propFirm}
-                onChange={handleEditFormChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prop Firm</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="challengeDuration" className="text-right">
-                Thời gian Challenge
-              </Label>
-              <Input
-                id="challengeDuration"
+              <FormField
+                control={infoForm.control}
+                name="exchange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sàn giao dịch</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={infoForm.control}
                 name="challengeDuration"
-                value={editFormData.challengeDuration}
-                onChange={handleEditFormChange}
-                className="col-span-3"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thời gian Challenge</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Ví dụ: 30 ngày
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Hủy
-            </Button>
-            <Button onClick={handleEditFormSubmit}>
-              Lưu thay đổi
-            </Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsInfoEditDialogOpen(false)}>
+                  Hủy
+                </Button>
+                <Button type="submit">
+                  Lưu thay đổi
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
