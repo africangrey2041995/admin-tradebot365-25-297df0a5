@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
@@ -148,7 +147,11 @@ export const PremiumBotCard = ({
   const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
 
   return (
-    <Card className={`overflow-hidden border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
+    <Card className={`overflow-hidden border hover:shadow-md transition-all relative ${getCardColors(colorScheme)}`}>
+      {isFeatured && <BotTag type="featured" />}
+      {isNew && <BotTag type="new" />}
+      {isBestSeller && <BotTag type="bestSeller" />}
+      
       <CardHeader className="p-3 pb-0">
         <div className="flex justify-between items-start">
           <div className="flex gap-2 items-center">
@@ -170,7 +173,6 @@ export const PremiumBotCard = ({
             <div>
               <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
                 {name}
-                {isNew && <Sparkles className="h-3 w-3 text-yellow-500 ml-1" />}
               </h3>
               <div className="flex gap-1 mt-1 items-center text-xs">
                 {getExchangeLogo(exchange)}
@@ -189,12 +191,6 @@ export const PremiumBotCard = ({
               {getRiskIcon(risk)}
               <span>{getRiskLabel(risk)}</span>
             </Badge>
-            {(isFeatured || isBestSeller) && (
-              <div className="flex gap-1">
-                {isFeatured && <BotTag type="featured" size="sm" />}
-                {isBestSeller && <BotTag type="bestSeller" size="sm" />}
-              </div>
-            )}
           </div>
         </div>
       </CardHeader>

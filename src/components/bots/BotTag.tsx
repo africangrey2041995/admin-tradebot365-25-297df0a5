@@ -11,35 +11,72 @@ interface BotTagProps {
 }
 
 export const BotTag: React.FC<BotTagProps> = ({ type, size = 'md' }) => {
-  const getSize = () => {
-    switch (size) {
-      case 'sm': return 'text-[10px] py-0 px-1';
-      case 'lg': return 'text-xs py-1 px-2';
-      default: return 'text-xs py-0.5 px-1.5';
+  const getTagClass = () => {
+    switch (type) {
+      case 'featured':
+        return `
+          absolute -top-3 -right-2 transform rotate-12
+          bg-gradient-to-r from-amber-300 to-amber-500
+          text-white font-bold shadow-lg
+          flex items-center justify-center rounded-lg
+          border-2 border-amber-200 dark:border-amber-600
+          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
+          shadow-amber-300/50 dark:shadow-amber-500/30
+          animate-pulse-slow
+        `;
+      
+      case 'new':
+        return `
+          absolute -top-2 -left-2 transform -rotate-12
+          bg-gradient-to-r from-blue-400 to-blue-600
+          text-white font-bold shadow-lg
+          flex items-center justify-center rounded-lg
+          border-2 border-blue-300 dark:border-blue-700
+          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
+          shadow-blue-400/50 dark:shadow-blue-600/30
+        `;
+      
+      case 'bestSeller':
+        return `
+          absolute -top-3 -left-2 transform -rotate-6
+          bg-gradient-to-r from-emerald-400 to-emerald-600
+          text-white font-bold shadow-lg
+          flex items-center justify-center rounded-lg
+          border-2 border-emerald-300 dark:border-emerald-700
+          ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : size === 'lg' ? 'px-4 py-1.5 text-sm' : 'px-3 py-1 text-xs'}
+          shadow-emerald-400/50 dark:shadow-emerald-600/30
+        `;
+      
+      default:
+        return '';
     }
+  };
+
+  const getIconSize = () => {
+    return size === 'sm' ? 'h-2.5 w-2.5' : size === 'lg' ? 'h-4 w-4' : 'h-3 w-3';
   };
 
   switch (type) {
     case 'featured':
       return (
-        <Badge variant="outline" className={`${getSize()} bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/30 font-medium flex items-center gap-0.5`}>
-          <Star className={`${size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'} fill-current`} />
-          <span>Nổi Bật</span>
-        </Badge>
+        <div className={getTagClass()}>
+          <Star className={`${getIconSize()} fill-white mr-1`} />
+          <span className="drop-shadow-md">Nổi Bật</span>
+        </div>
       );
     case 'new':
       return (
-        <Badge variant="outline" className={`${getSize()} bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/30 font-medium flex items-center gap-0.5`}>
-          <Sparkles className={`${size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
-          <span>Mới</span>
-        </Badge>
+        <div className={getTagClass()}>
+          <Sparkles className={`${getIconSize()} mr-1`} />
+          <span className="drop-shadow-md">Mới</span>
+        </div>
       );
     case 'bestSeller':
       return (
-        <Badge variant="outline" className={`${getSize()} bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800/30 font-medium flex items-center gap-0.5`}>
-          <Trophy className={`${size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'} fill-current`} />
-          <span>Bán Chạy</span>
-        </Badge>
+        <div className={getTagClass()}>
+          <Trophy className={`${getIconSize()} fill-white mr-1`} />
+          <span className="drop-shadow-md">Bán Chạy</span>
+        </div>
       );
     default:
       return null;

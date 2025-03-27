@@ -122,6 +122,11 @@ export default {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' }
 				},
+				'pulse-slow': {
+					'0%': { boxShadow: '0 0 5px rgba(255, 255, 255, 0.5)' },
+					'50%': { boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)' },
+					'100%': { boxShadow: '0 0 5px rgba(255, 255, 255, 0.5)' }
+				},
 				'blob': {
 					'0%': { transform: 'translate(0px, 0px) scale(1)' },
 					'33%': { transform: 'translate(30px, -50px) scale(1.1)' },
@@ -140,6 +145,7 @@ export default {
 				'slide-up': 'slide-up 0.4s ease-out',
 				'slide-down': 'slide-down 0.4s ease-out',
 				'pulse-status': 'pulse-status 2s ease-in-out infinite',
+				'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
 				'blob': 'blob 7s infinite',
 				'shimmer': 'shimmer 1.5s infinite'
 			},

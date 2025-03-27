@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
@@ -262,6 +263,9 @@ const PropTradingBots = () => {
                       colorScheme={bot.colorScheme as 'default' | 'red' | 'blue' | 'green' | 'purple'}
                       isIntegrated={true}
                       accountCount={bot.accounts?.length.toString() || "0"}
+                      isFeatured={bot.isFeatured}
+                      isNew={bot.isNew}
+                      isBestSeller={bot.isBestSeller}
                     />
                   </motion.div>
                 ))}

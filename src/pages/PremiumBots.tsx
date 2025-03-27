@@ -231,7 +231,6 @@ const PremiumBots = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="md:col-span-2">
             <Input
@@ -272,7 +271,6 @@ const PremiumBots = () => {
           </div>
         </div>
 
-        {/* Bot Cards */}
         {sortedBots.length > 0 ? (
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {sortedBots.map((bot, index) => (
