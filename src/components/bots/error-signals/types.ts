@@ -1,12 +1,10 @@
 
 import { ExtendedSignal } from '@/types/signal';
-import { BotType } from '@/constants/botTypes';
 
 export interface ErrorSignalsProps {
   botId?: string;
   limit?: number;
   userId?: string;
-  botType?: BotType | string; // Support both enum and string values
 }
 
 export interface ErrorSignalsTableProps {
@@ -27,4 +25,5 @@ export interface ErrorSignalRowProps {
   isAdmin?: boolean;
 }
 
+// Re-export ExtendedSignal to make it available to components importing from this file
 export type { ExtendedSignal };

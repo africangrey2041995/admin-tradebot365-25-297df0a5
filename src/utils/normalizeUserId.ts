@@ -1,42 +1,46 @@
 
 /**
- * Helper to normalize user IDs to consistent format
- * @param userId User ID to normalize
+ * Normalize user ID by removing any non-alphanumeric characters
+ * and converting to lowercase. This helps with consistent comparison
+ * when IDs might have different formats (e.g., USR-001 vs USR001)
+ * 
+ * @param userId The user ID to normalize
  * @returns Normalized user ID
  */
-export function normalizeUserId(userId: string | undefined): string {
+export const normalizeUserId = (userId: string): string => {
+  // Check for null or undefined, return empty string
   if (!userId) return '';
   
-  // Convert to uppercase 'USR-XXX' format
-  if (userId.toLowerCase().startsWith('usr-')) {
-    return userId.toUpperCase();
-  }
-  
-  // Convert 'user-XXX' to 'USR-XXX' format
-  if (userId.toLowerCase().startsWith('user-')) {
-    return 'USR-' + userId.substring(5).toUpperCase();
-  }
-  
-  // If it doesn't match any known format, return as is
-  return userId;
-}
+  // Remove any non-alphanumeric characters and convert to lowercase
+  return userId.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+};
 
 /**
- * Validates if a string matches the expected userId format
+ * Validate a user ID format
+ * 
  * @param userId User ID to validate
- * @returns boolean indicating if the userId is valid
+ * @returns boolean indicating if the format is valid
  */
-export function validateUserId(userId: string): boolean {
-  // Check if userId follows the standardized format (e.g., 'USR-XXX', 'user-XXX', etc.)
-  return /^(USR-|user-)\w+$/i.test(userId);
-}
+export const validateUserId = (userId: string): boolean => {
+  if (!userId) return false;
+  
+  // Basic validation - check if the ID follows expected format after normalization
+  const normalized = normalizeUserId(userId);
+  
+  // Check if it has at least one letter (usr) followed by at least one digit
+  return /^[a-z]+\d+$/.test(normalized);
+};
 
 /**
- * Validates if a string matches the expected botId format
+ * Validate a bot ID format
+ * 
  * @param botId Bot ID to validate
- * @returns boolean indicating if the botId is valid
+ * @returns boolean indicating if the format is valid
  */
-export function validateBotId(botId: string): boolean {
-  // Check if botId follows the standardized format
-  return /^(MY-|PRE-|PROP-|pb-|ptb-)\w+$/i.test(botId);
-}
+export const validateBotId = (botId: string): boolean => {
+  if (!botId) return false;
+  
+  // Basic validation for bot IDs
+  // Accepts formats like BOT-123, PB-123, PRE-123, etc.
+  return /^([a-zA-Z]+-\d+|[a-zA-Z]+\d+)$/.test(botId);
+};
