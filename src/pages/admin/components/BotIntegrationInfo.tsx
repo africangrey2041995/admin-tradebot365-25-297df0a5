@@ -72,23 +72,25 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId, isAdmin 
               {'••••••••••••••••••••••••••••••'}
             </div>
             {!isAdmin && (
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={toggleShowToken}
-                className="shrink-0"
-              >
-                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
+              <>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={toggleShowToken}
+                  className="shrink-0"
+                >
+                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => copyToClipboard(signalToken, 'Signal Token')}
+                  className="shrink-0"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </>
             )}
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => copyToClipboard(signalToken, 'Signal Token')}
-              className="shrink-0"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Token này cần được bao gồm trong message của TradingView Alert để xác thực
