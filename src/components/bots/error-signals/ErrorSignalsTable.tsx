@@ -17,6 +17,7 @@ interface ErrorSignalsTableProps {
   loading: boolean;
   onRefresh?: () => void;
   error?: Error | null;
+  onViewDetails?: (signalId: string) => void;
 }
 
 const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({ 
@@ -26,7 +27,8 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   onMarkAllAsRead,
   loading,
   onRefresh,
-  error
+  error,
+  onViewDetails
 }) => {
   const handleRefresh = () => {
     if (onRefresh) {
@@ -107,7 +109,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
                   signal={signal} 
                   isUnread={unreadErrors.has(signal.id)}
                   onMarkAsRead={onMarkAsRead}
-                  onViewDetails={undefined}
+                  onViewDetails={onViewDetails}
                 />
               ))
             )}

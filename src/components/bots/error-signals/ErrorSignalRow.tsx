@@ -3,7 +3,7 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink, AlertTriangle, Info, User } from 'lucide-react';
+import { CheckCircle2, ExternalLink, AlertTriangle, Info, User, CircleInfo } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -63,17 +63,17 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const renderSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityConfig = {
-      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Thấp' },
-      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Trung bình' },
-      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cao' },
-      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200', label: 'Nghiêm trọng' }
+      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Thấp', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Trung bình', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cao', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200 font-bold', label: 'Nghiêm trọng', icon: <AlertTriangle className="h-3 w-3 mr-1" /> }
     };
     
-    const config = severityConfig[severity];
+    const config = severityConfig[severity as keyof typeof severityConfig];
     
     return (
       <Badge className={`${config.bg} ${config.text} border-none`}>
-        <AlertTriangle className="h-3 w-3 mr-1" />
+        {config.icon}
         {config.label}
       </Badge>
     );
@@ -82,10 +82,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const getBotTypeBadge = () => {
     const botType = signal.botType || 'unknown';
     const typeConfig = {
-      'USER_BOT': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Bot Người Dùng' },
-      'PREMIUM_BOT': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', label: 'Bot Premium' },
-      'PROP_BOT': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Bot Prop Trading' },
-      'unknown': { bg: 'bg-gray-100 dark:bg-gray-900/30', text: 'text-gray-700 dark:text-gray-300', label: 'Không xác định' }
+      'USER_BOT': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'User' },
+      'PREMIUM_BOT': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', label: 'Premium' },
+      'PROP_BOT': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Prop' },
+      'unknown': { bg: 'bg-gray-100 dark:bg-gray-900/30', text: 'text-gray-700 dark:text-gray-300', label: 'N/A' }
     };
     
     const config = typeConfig[botType as keyof typeof typeConfig] || typeConfig.unknown;
@@ -97,13 +97,49 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     );
   };
 
-  // Format error ID to be shorter and more readable
-  const getFormattedId = (id: string) => {
-    if (!id) return 'N/A';
-    if (id.length > 8) {
-      return `${id.substring(0, 8)}...`;
+  const getFormattedErrorDisplay = () => {
+    const errorMessage = signal.errorMessage || 'Không có thông tin lỗi';
+    const errorCode = signal.errorCode || `ERR-${signal.id?.substring(0, 6)}`;
+    
+    return (
+      <div className="flex items-center gap-1.5">
+        <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+          {errorCode}
+        </span>
+        <ErrorDetailsTooltip errorMessage={errorMessage}>
+          <CircleInfo className="h-4 w-4 text-blue-500 cursor-help" />
+        </ErrorDetailsTooltip>
+      </div>
+    );
+  };
+
+  const getFormattedBotId = () => {
+    if (!signal.botId) return 'N/A';
+    
+    if (signal.botName) {
+      return (
+        <ErrorDetailsTooltip errorMessage={`Bot ID: ${signal.botId}`}>
+          <span className="cursor-help">{signal.botName}</span>
+        </ErrorDetailsTooltip>
+      );
     }
-    return id;
+    
+    return signal.botId;
+  };
+
+  const getFormattedUserId = () => {
+    if (!signal.userId) return 'N/A';
+    
+    const displayId = signal.userId.includes('-') 
+      ? signal.userId.split('-')[1] 
+      : signal.userId;
+      
+    return (
+      <div className="flex items-center">
+        <User className="h-3 w-3 mr-1 text-muted-foreground" />
+        <span className="text-xs font-mono">{displayId}</span>
+      </div>
+    );
   };
   
   return (
@@ -112,66 +148,46 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       hover:bg-red-50/5 dark:hover:bg-red-900/5
       transition-colors
     `}>
-      {/* ID */}
       <TableCell className="font-mono text-xs">
         <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">
-          {getFormattedId(signal.id)}
+          {signal.id ? signal.id.substring(0, 8) : 'N/A'}
         </span>
       </TableCell>
       
-      {/* Severity Level */}
       <TableCell>
         {renderSeverityBadge()}
       </TableCell>
       
-      {/* Error Description */}
       <TableCell>
-        <div className="max-w-[250px] truncate font-medium">
-          {signal.errorMessage || 'Không có thông tin lỗi'}
-        </div>
+        {getFormattedErrorDisplay()}
       </TableCell>
       
-      {/* Timestamp */}
       <TableCell className="text-sm">
         <div className="flex items-center text-muted-foreground">
           <span>{formatDateTime(signal.timestamp)}</span>
         </div>
       </TableCell>
       
-      {/* Bot Name/ID */}
       <TableCell 
         className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
         onClick={handleBotClick}
       >
         <div className="flex items-center">
-          <span>{signal.botName || signal.botId || 'N/A'}</span>
+          <span>{getFormattedBotId()}</span>
           <ExternalLink className="h-3 w-3 ml-1" />
         </div>
       </TableCell>
       
-      {/* Bot Type */}
       <TableCell>
         {getBotTypeBadge()}
       </TableCell>
       
-      {/* User ID */}
       <TableCell>
-        <div className="flex items-center">
-          <User className="h-3 w-3 mr-1 text-muted-foreground" />
-          <span className="text-xs font-mono">{signal.userId || 'N/A'}</span>
-        </div>
+        {getFormattedUserId()}
       </TableCell>
       
-      {/* Actions */}
       <TableCell>
         <div className="flex items-center gap-2">
-          <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Unknown error'}>
-            <div className="flex items-center text-red-500 cursor-help">
-              <Info className="h-4 w-4 mr-1" />
-              <span className="text-xs">Chi tiết</span>
-            </div>
-          </ErrorDetailsTooltip>
-          
           {isUnread && (
             <Button
               size="sm" 
@@ -184,15 +200,15 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
             </Button>
           )}
           
-          {!isAdmin && onViewDetails && (
+          {onViewDetails && (
             <Button
               size="sm"
               variant="ghost"
               onClick={handleViewDetails}
-              className="h-6 px-2"
+              className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             >
               <ExternalLink className="h-4 w-4 mr-1" />
-              <span className="text-xs">Xem chi tiết</span>
+              <span className="text-xs">Chi tiết</span>
             </Button>
           )}
         </div>

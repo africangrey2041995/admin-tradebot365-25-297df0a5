@@ -173,6 +173,13 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
     toast.success('Đã đánh dấu tất cả tín hiệu là đã đọc');
   };
 
+  const handleViewErrorDetails = (errorId: string) => {
+    console.log("UserErrorDisplay - Viewing error details:", errorId);
+    if (onViewDetails) {
+      onViewDetails(errorId);
+    }
+  };
+
   if (loading && filteredSignals.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -236,6 +243,7 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
         loading={loading}
         onRefresh={handleRefresh}
         error={error}
+        onViewDetails={handleViewErrorDetails}
       />
 
       {filteredSignals.length > 0 && (
