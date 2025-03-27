@@ -1,12 +1,16 @@
 
 import React, { useState } from 'react';
-import { BarChart2, Users, Settings, FileText, AlertCircle } from 'lucide-react';
+import { BarChart2, Users, Settings, FileText, AlertCircle, Pencil } from 'lucide-react';
 import EditableFeaturesCard from './EditableFeaturesCard';
 import EditableRequirementsCard from './EditableRequirementsCard';
 import EditableChallengeRulesCard from './EditableChallengeRulesCard';
 import { PropBot } from '@/types/bot';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface AdminPropBotOverviewTabProps {
   propBot: PropBot;
@@ -50,6 +54,15 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
   ]);
 
   const coinstratRules = challengeRules["Coinstrat Pro"] || [];
+  
+  // State for bot info edit dialog
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    botType: propBot.type || '',
+    exchange: propBot.exchange || '',
+    propFirm: propBot.propFirm || '',
+    challengeDuration: propBot.challengeDuration || ''
+  });
 
   const handleUpdateFeatures = (updatedFeatures: string[]) => {
     setFeatures(updatedFeatures);
@@ -67,6 +80,29 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
 
   const handleUpdateChallengeRules = (updatedRules: string[]) => {
     onUpdateChallengeRules("Coinstrat Pro", updatedRules);
+  };
+  
+  const handleEditButtonClick = () => {
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleEditFormSubmit = () => {
+    onUpdateBot({
+      type: editFormData.botType,
+      exchange: editFormData.exchange,
+      propFirm: editFormData.propFirm,
+      challengeDuration: editFormData.challengeDuration
+    });
+    setIsEditDialogOpen(false);
+    toast.success('Thông tin Bot đã được cập nhật');
   };
 
   return (
@@ -151,8 +187,14 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
         {/* Right column - Info cards */}
         <div className="space-y-6">
           <Card className="border border-neutral-200 dark:border-neutral-800">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Mục tiêu Bot</CardTitle>
+              <Button variant="ghost" size="sm" onClick={handleEditButtonClick}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Chỉnh sửa
+              </Button>
+            </CardHeader>
             <CardContent className="p-6">
-              <h3 className="font-medium mb-3 text-lg">Mục tiêu Bot</h3>
               <div className="space-y-2">
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
                   <span className="text-neutral-600 dark:text-neutral-400">Tổng giao dịch mục tiêu</span>
@@ -179,8 +221,14 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
           </Card>
           
           <Card className="border border-neutral-200 dark:border-neutral-800">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Thông tin Bot</CardTitle>
+              <Button variant="ghost" size="sm" onClick={handleEditButtonClick}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Chỉnh sửa
+              </Button>
+            </CardHeader>
             <CardContent className="p-6">
-              <h3 className="font-medium mb-3 text-lg">Thông tin Bot</h3>
               <div className="space-y-2">
                 <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
                   <span className="text-neutral-600 dark:text-neutral-400">ID Bot</span>
@@ -190,9 +238,21 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
                   <span className="text-neutral-600 dark:text-neutral-400">Ngày tạo</span>
                   <span className="font-medium">{botInfo.createdDate}</span>
                 </div>
-                <div className="flex justify-between py-1">
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
                   <span className="text-neutral-600 dark:text-neutral-400">Cập nhật lần cuối</span>
                   <span className="font-medium">{botInfo.lastUpdated}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Prop Firm</span>
+                  <span className="font-medium">{propBot.propFirm || "Chưa xác định"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-neutral-600 dark:text-neutral-400">Sàn giao dịch</span>
+                  <span className="font-medium">{propBot.exchange || "Chưa xác định"}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-neutral-600 dark:text-neutral-400">Thời gian Challenge</span>
+                  <span className="font-medium">{propBot.challengeDuration || "30 ngày"}</span>
                 </div>
               </div>
             </CardContent>
@@ -212,6 +272,73 @@ const AdminPropBotOverviewTab: React.FC<AdminPropBotOverviewTabProps> = ({
           </Card>
         </div>
       </div>
+      
+      {/* Edit dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa thông tin Bot</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="botType" className="text-right">
+                Loại Bot
+              </Label>
+              <Input
+                id="botType"
+                name="botType"
+                value={editFormData.botType}
+                onChange={handleEditFormChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="exchange" className="text-right">
+                Sàn giao dịch
+              </Label>
+              <Input
+                id="exchange"
+                name="exchange"
+                value={editFormData.exchange}
+                onChange={handleEditFormChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="propFirm" className="text-right">
+                Prop Firm
+              </Label>
+              <Input
+                id="propFirm"
+                name="propFirm"
+                value={editFormData.propFirm}
+                onChange={handleEditFormChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="challengeDuration" className="text-right">
+                Thời gian Challenge
+              </Label>
+              <Input
+                id="challengeDuration"
+                name="challengeDuration"
+                value={editFormData.challengeDuration}
+                onChange={handleEditFormChange}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleEditFormSubmit}>
+              Lưu thay đổi
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
