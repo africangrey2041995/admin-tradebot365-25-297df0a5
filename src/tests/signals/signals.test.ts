@@ -7,11 +7,11 @@
  * and display components across the application.
  */
 
-// Re-export all signal-related tests for simpler import in the test runner
-export { default as runStatusBadgeTests } from '../components/StatusBadge.test';
-export { default as runSignalLoadingStateTests } from '../components/SignalLoadingState.test';
-export { default as runSignalFiltersTests } from '../hooks/useSignalFilters.test';
-export { default as runSafeLoadingTests } from '../hooks/useSafeLoading.test';
+// Import the test suite functions from each test file
+import { runStatusBadgeTests } from '../components/StatusBadge.test';
+import { runSignalLoadingStateTests } from '../components/SignalLoadingState.test';
+import { runSignalFiltersTests } from '../hooks/useSignalFilters.test';
+import { runSafeLoadingTests } from '../hooks/useSafeLoading.test';
 
 /**
  * Run all signal component tests
