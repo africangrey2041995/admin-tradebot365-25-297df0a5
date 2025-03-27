@@ -11,6 +11,7 @@ import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
 import { ErrorSignalRowProps } from './types';
 import { formatDate } from '@/utils/formatUtils';
+import { BotType } from '@/constants/botTypes';
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
   signal, 
@@ -86,10 +87,25 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       'USER_BOT': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'User' },
       'PREMIUM_BOT': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', label: 'Premium' },
       'PROP_BOT': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Prop' },
+      'user_bot': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'User' },
+      'premium_bot': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', label: 'Premium' },
+      'prop_bot': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Prop' },
       'unknown': { bg: 'bg-gray-100 dark:bg-gray-900/30', text: 'text-gray-700 dark:text-gray-300', label: 'N/A' }
     };
     
-    const config = typeConfig[botType as keyof typeof typeConfig] || typeConfig.unknown;
+    // Try to determine bot type from botId if not available directly
+    let effectiveBotType = botType;
+    if (botType === 'unknown' && signal.botId) {
+      if (signal.botId.startsWith('MY-')) {
+        effectiveBotType = 'user_bot';
+      } else if (signal.botId.startsWith('PRE-')) {
+        effectiveBotType = 'premium_bot';
+      } else if (signal.botId.startsWith('PROP-')) {
+        effectiveBotType = 'prop_bot';
+      }
+    }
+    
+    const config = typeConfig[effectiveBotType as keyof typeof typeConfig] || typeConfig.unknown;
     
     return (
       <Badge variant="outline" className={`${config.bg} ${config.text} font-medium`}>
