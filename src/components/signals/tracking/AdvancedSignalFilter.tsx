@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, Calendar as CalendarIcon, Filter, X } from 'lucide-react';
@@ -34,15 +33,6 @@ export interface AdvancedSignalFilterProps {
  * 
  * A comprehensive filter interface for signal data with multiple 
  * filter criteria options.
- * 
- * @example
- * ```tsx
- * <AdvancedSignalFilter 
- *   onFilterChange={handleFilterChange}
- *   availableUsers={users}
- *   showExport={true}
- * />
- * ```
  */
 const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   onFilterChange,
@@ -64,14 +54,24 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     ...initialFilters
   });
   
+  // Helper to access dateRange fields safely
+  const getDateRangeField = (field: 'from' | 'to'): Date | undefined => {
+    const dateRange = filters.dateRange;
+    if (Array.isArray(dateRange)) {
+      return field === 'from' ? dateRange[0] || undefined : dateRange[1] || undefined;
+    } else {
+      return dateRange[field];
+    }
+  };
+  
   // Helper to check if any filters are active
   const hasActiveFilters = (): boolean => {
     return (
       !!filters.search ||
       filters.signalSource !== 'all' ||
       filters.status !== 'all' ||
-      !!filters.dateRange.from ||
-      !!filters.dateRange.to ||
+      !!getDateRangeField('from') ||
+      !!getDateRangeField('to') ||
       !!filters.userId
     );
   };
@@ -100,7 +100,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   const handleStatusChange = (value: string) => {
     const newFilters = {
       ...filters,
-      status: value
+      status: value as string // Fix: Use 'as string' to match the SignalFilters type
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -108,12 +108,14 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
   
   // Handle date range selection
   const handleDateRangeChange = (field: 'from' | 'to', value: Date | undefined) => {
+    const dateRange = filters.dateRange;
+    const newDateRange = Array.isArray(dateRange) 
+      ? (field === 'from' ? [value, dateRange[1]] : [dateRange[0], value])
+      : { ...dateRange, [field]: value };
+    
     const newFilters = {
       ...filters,
-      dateRange: {
-        ...filters.dateRange,
-        [field]: value
-      }
+      dateRange: newDateRange
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -195,7 +197,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select
-                  value={filters.status}
+                  value={typeof filters.status === 'string' ? filters.status : filters.status?.[0] || 'all'}
                   onValueChange={handleStatusChange}
                 >
                   <SelectTrigger>
@@ -238,17 +240,17 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !filters.dateRange.from && "text-muted-foreground"
+                        !getDateRangeField('from') && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {filters.dateRange.from ? formatDate(filters.dateRange.from) : "Pick a date"}
+                      {getDateRangeField('from') ? formatDate(getDateRangeField('from')) : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={filters.dateRange.from}
+                      selected={getDateRangeField('from')}
                       onSelect={(date) => handleDateRangeChange('from', date)}
                       initialFocus
                     />
@@ -265,17 +267,17 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !filters.dateRange.to && "text-muted-foreground"
+                        !getDateRangeField('to') && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {filters.dateRange.to ? formatDate(filters.dateRange.to) : "Pick a date"}
+                      {getDateRangeField('to') ? formatDate(getDateRangeField('to')) : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={filters.dateRange.to}
+                      selected={getDateRangeField('to')}
                       onSelect={(date) => handleDateRangeChange('to', date)}
                       initialFocus
                     />

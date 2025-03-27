@@ -1,14 +1,14 @@
-
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 
 /**
  * Common properties for all signal log hook props
  */
 export interface BaseSignalLogsProps {
-  botId: string;
-  userId: string;
+  botId?: string;
+  userId?: string;
   refreshTrigger?: boolean;
   skipLoadingState?: boolean;
+  initialData?: any[]; // Adding initialData property to fix type errors
 }
 
 /**

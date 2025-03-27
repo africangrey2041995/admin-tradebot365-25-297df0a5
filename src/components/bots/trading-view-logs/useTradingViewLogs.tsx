@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { TradingViewSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
@@ -29,6 +28,7 @@ interface UseTradingViewLogsProps {
   userId?: string;
   refreshTrigger?: boolean;
   skipLoadingState?: boolean;
+  initialData?: TradingViewSignal[];
 }
 
 interface UseTradingViewLogsResult {
@@ -42,7 +42,8 @@ export const useTradingViewLogs = ({
   botId,
   userId,
   refreshTrigger = false,
-  skipLoadingState = false
+  skipLoadingState = false,
+  initialData
 }: UseTradingViewLogsProps): UseTradingViewLogsResult => {
   const [logs, setLogs] = useState<TradingViewSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
@@ -60,13 +61,16 @@ export const useTradingViewLogs = ({
       // In a real app, we would fetch data from API here
       setTimeout(() => {
         try {
-          const allLogs = createMockTradeViewLogs();
+          const allLogs = initialData || createMockTradeViewLogs();
           
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
           
           if (botId) {
-            filteredLogs = filteredLogs.filter(log => log.botId === botId);
+            // Fix: this should check a property that exists on TradingViewSignal
+            // The TradingViewSignal doesn't have a botId property, but it has signalToken
+            // which we can use to filter by bot ID
+            filteredLogs = filteredLogs.filter(log => log.signalToken.includes(botId));
           }
           
           if (userId) {
@@ -87,7 +91,7 @@ export const useTradingViewLogs = ({
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       stopLoading();
     }
-  }, [botId, userId, startLoading, stopLoading]);
+  }, [botId, userId, startLoading, stopLoading, initialData]);
   
   // Fetch logs on mount and when dependencies change
   useEffect(() => {

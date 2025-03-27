@@ -3,51 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { CoinstratSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
-// Create a sample data set
-const createMockCoinstratLogs = (): CoinstratSignal[] => {
-  return Array(10)
-    .fill(null)
-    .map((_, index) => ({
-      id: `CS-${2000 + index}`,
-      originalSignalId: `TV-${1000 + Math.floor(Math.random() * 15)}`,
-      action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][Math.floor(Math.random() * 4)] as any,
-      instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][Math.floor(Math.random() * 4)],
-      timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
-      signalToken: `TradingView_Bot_${Math.floor(Math.random() * 5) + 1}`,
-      maxLag: (Math.floor(Math.random() * 5) + 1) * 60 + '',
-      investmentType: 'contract',
-      amount: (Math.random() * 0.5 + 0.01).toFixed(3),
-      status: ['Processed', 'Pending', 'Failed', 'Sent'][Math.floor(Math.random() * 4)],
-      errorMessage: Math.random() > 0.8 ? 'Account funding insufficient' : undefined,
-      botId: `BOT-${1000 + Math.floor(Math.random() * 5)}`,
-      userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
-      processedAccounts: Array(Math.floor(Math.random() * 3))
-        .fill(null)
-        .map((_, i) => ({
-          accountId: `ACC-${3000 + i}`,
-          name: `Account ${3000 + i}`,
-          timestamp: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)).toISOString(),
-          status: Math.random() > 0.2 ? 'success' : 'failed',
-          userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
-        })),
-      failedAccounts: Array(Math.floor(Math.random() * 2))
-        .fill(null)
-        .map((_, i) => ({
-          accountId: `ACC-${4000 + i}`,
-          name: `Account ${4000 + i}`,
-          timestamp: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)).toISOString(),
-          reason: 'Insufficient funds or connection timeout',
-          status: 'failed',
-          userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
-        })),
-    }));
-};
-
 interface UseCoinstratLogsProps {
   botId?: string;
   userId?: string;
   refreshTrigger?: boolean;
   skipLoadingState?: boolean;
+  initialData?: CoinstratSignal[];
 }
 
 interface UseCoinstratLogsResult {
@@ -57,11 +18,40 @@ interface UseCoinstratLogsResult {
   fetchLogs: () => void;
 }
 
+// Create a sample data set
+const createMockCoinstratLogs = (): CoinstratSignal[] => {
+  // Mock implementation for CoinstratSignal logs
+  return Array(10).fill(null).map((_, index) => ({
+    id: `CS-${1000 + index}`,
+    originalSignalId: `TV-${1000 + Math.floor(Math.random() * 5)}`,
+    action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][Math.floor(Math.random() * 4)] as any,
+    instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][Math.floor(Math.random() * 4)],
+    timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+    amount: (Math.random() * 0.5 + 0.01).toFixed(3),
+    status: ['Processed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    processingTime: Math.floor(Math.random() * 5000) + '',
+    errorMessage: Math.random() > 0.8 ? 'Connection timeout or symbol issues' : undefined,
+    processedAccounts: Array(Math.floor(Math.random() * 3)).fill(null).map((_, i) => ({
+      accountId: `ACC-${2000 + i}`,
+      userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
+      status: 'Success',
+      errorMessage: ''
+    })),
+    failedAccounts: Math.random() > 0.7 ? Array(Math.floor(Math.random() * 2)).fill(null).map((_, i) => ({
+      accountId: `ACC-${3000 + i}`,
+      userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
+      status: 'Failed',
+      errorMessage: 'Insufficient balance'
+    })) : []
+  }));
+};
+
 export const useCoinstratLogs = ({
   botId,
   userId,
   refreshTrigger = false,
-  skipLoadingState = false
+  skipLoadingState = false,
+  initialData
 }: UseCoinstratLogsProps): UseCoinstratLogsResult => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
@@ -79,28 +69,29 @@ export const useCoinstratLogs = ({
       // In a real app, we would fetch data from API here
       setTimeout(() => {
         try {
-          const allLogs = createMockCoinstratLogs();
+          // Use initialData if provided, otherwise create mock data
+          const allLogs = initialData || createMockCoinstratLogs();
           
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
           
           if (botId) {
-            filteredLogs = filteredLogs.filter(log => log.botId === botId);
+            // Filter by botId if provided
+            filteredLogs = filteredLogs.filter(log => log.originalSignalId.includes(botId));
           }
           
           if (userId) {
-            // For Coinstrat logs, we need to check if userId is in processedAccounts or failedAccounts
+            // Filter by userId across processed and failed accounts
             filteredLogs = filteredLogs.filter(log => {
-              // Check if userId matches the log's userId
-              if (log.userId === userId) return true;
+              const hasUserInProcessed = log.processedAccounts.some(
+                account => account.userId === userId
+              );
               
-              // Check if userId is in processedAccounts
-              const inProcessedAccounts = log.processedAccounts.some(account => account.userId === userId);
-              if (inProcessedAccounts) return true;
+              const hasUserInFailed = log.failedAccounts.some(
+                account => account.userId === userId
+              );
               
-              // Check if userId is in failedAccounts
-              const inFailedAccounts = log.failedAccounts.some(account => account.userId === userId);
-              return inFailedAccounts;
+              return hasUserInProcessed || hasUserInFailed;
             });
           }
           
@@ -118,7 +109,7 @@ export const useCoinstratLogs = ({
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       stopLoading();
     }
-  }, [botId, userId, startLoading, stopLoading]);
+  }, [botId, userId, startLoading, stopLoading, initialData]);
   
   // Fetch logs on mount and when dependencies change
   useEffect(() => {
