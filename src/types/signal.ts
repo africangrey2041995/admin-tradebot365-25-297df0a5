@@ -119,6 +119,7 @@ export interface CoinstratSignal extends BaseSignal {
  * @property errorCode Mã lỗi (nếu có)
  * @property errorSeverity Mức độ nghiêm trọng của lỗi
  * @property coinstratLogId ID của bản ghi Coinstrat Pro
+ * @property connectedUserIds Danh sách ID người dùng có tài khoản giao dịch kết nối với bot này
  */
 export interface ExtendedSignal extends TradingViewSignal {
   userId?: string;
@@ -133,6 +134,7 @@ export interface ExtendedSignal extends TradingViewSignal {
   errorCode?: string;
   errorSeverity?: 'low' | 'medium' | 'high' | 'critical';
   coinstratLogId?: string; // ID của bản ghi Coinstrat Pro
+  connectedUserIds?: string[]; // Array of user IDs that have trading accounts connected to this bot
 }
 
 /**

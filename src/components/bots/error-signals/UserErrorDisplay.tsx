@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -46,8 +47,8 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
         if (signal.botType === BotType.USER_BOT) {
           userHasAccess = signal.userId === userId;
         } else if (signal.botType === BotType.PREMIUM_BOT || signal.botType === BotType.PROP_BOT) {
-          const connectedUsers = signal.connectedUserIds as string[] | undefined;
-          userHasAccess = connectedUsers?.includes(userId) || false;
+          const connectedUsers = signal.connectedUserIds || [];
+          userHasAccess = connectedUsers.includes(userId) || false;
         }
         
         console.log(`Filtering signal ${signal.id} - Bot Type: ${signal.botType}, User Access: ${userHasAccess}, Matches Bot Type: ${matchesBotType}, Matches Bot ID: ${matchesBotId}`);

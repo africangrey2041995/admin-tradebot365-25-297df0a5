@@ -38,12 +38,12 @@ const BotMonitoringPage: React.FC = () => {
     
     const premiumBotsCount = mockErrorSignals.filter(signal => 
       signal.botType === BotType.PREMIUM_BOT && 
-      (signal.connectedUserIds as string[] | undefined)?.includes(userId)
+      (signal.connectedUserIds || []).includes(userId)
     ).length;
     
     const propBotsCount = mockErrorSignals.filter(signal => 
       signal.botType === BotType.PROP_BOT && 
-      (signal.connectedUserIds as string[] | undefined)?.includes(userId)
+      (signal.connectedUserIds || []).includes(userId)
     ).length;
     
     const totalCount = userBotsCount + premiumBotsCount + propBotsCount;
