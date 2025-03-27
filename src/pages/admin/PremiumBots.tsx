@@ -48,7 +48,7 @@ const AdminPremiumBots = () => {
     isBestSeller: false
   });
   
-  const bots: PremiumBot[] = [
+  const [bots, setBots] = useState<PremiumBot[]>([
     { 
       botId: 'PRE-001', 
       name: 'Premium DCA Bot',
@@ -139,7 +139,7 @@ const AdminPremiumBots = () => {
       exchange: 'OKX',
       description: 'Premium bot for momentum trading'
     }
-  ];
+  ]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -348,15 +348,39 @@ const AdminPremiumBots = () => {
   };
 
   const toggleFeatured = (botId: string) => {
-    // Implement logic to toggle featured status
+    setBots(bots.map(bot => {
+      if (bot.botId === botId) {
+        const newStatus = !bot.isFeatured;
+        const message = newStatus ? 'Đã đánh dấu bot là nổi bật' : 'Đã hủy đánh dấu nổi bật';
+        toast.success(message);
+        return { ...bot, isFeatured: newStatus };
+      }
+      return bot;
+    }));
   };
 
   const toggleNew = (botId: string) => {
-    // Implement logic to toggle new status
+    setBots(bots.map(bot => {
+      if (bot.botId === botId) {
+        const newStatus = !bot.isNew;
+        const message = newStatus ? 'Đã đánh dấu bot là mới' : 'Đã hủy đánh dấu mới';
+        toast.success(message);
+        return { ...bot, isNew: newStatus };
+      }
+      return bot;
+    }));
   };
 
   const toggleBestSeller = (botId: string) => {
-    // Implement logic to toggle best seller status
+    setBots(bots.map(bot => {
+      if (bot.botId === botId) {
+        const newStatus = !bot.isBestSeller;
+        const message = newStatus ? 'Đã đánh dấu bot là best seller' : 'Đã hủy đánh dấu best seller';
+        toast.success(message);
+        return { ...bot, isBestSeller: newStatus };
+      }
+      return bot;
+    }));
   };
 
   return (

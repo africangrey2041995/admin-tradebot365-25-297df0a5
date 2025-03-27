@@ -13,8 +13,9 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { BotStatusBadge } from './BotStatusBadge';
-import { BotTag } from '@/components/bots/BotTag';
 import { PremiumBot } from "@/types";
+import { toast } from "sonner";
+import { BotStatus } from '@/constants/botTypes';
 
 interface PremiumBotsTableProps {
   bots: PremiumBot[];
@@ -39,6 +40,22 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
   onToggleNew,
   onToggleBestSeller
 }) => {
+  // Handle toggle bot status
+  const handleToggleStatus = (botId: string, currentStatus: BotStatus) => {
+    const newStatus = currentStatus === BotStatus.ACTIVE ? BotStatus.INACTIVE : BotStatus.ACTIVE;
+    const actionText = newStatus === BotStatus.ACTIVE ? 'kích hoạt' : 'tạm dừng';
+    
+    // In a real application, this would make an API call to update the bot status
+    toast.success(`Đã ${actionText} bot thành công`);
+  };
+  
+  // Handle delete bot
+  const handleDeleteBot = (botId: string, botName: string) => {
+    // In a real application, this would show a confirmation dialog first
+    // and then make an API call to delete the bot
+    toast.success(`Đã xóa bot ${botName} thành công`);
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -131,16 +148,18 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                     <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
                       <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-zinc-800" />
-                      <DropdownMenuItem className="focus:bg-zinc-800" onClick={() => onViewBotDetail(bot.botId)}>
+                      <DropdownMenuItem 
+                        className="focus:bg-zinc-800 cursor-pointer" 
+                        onClick={() => onViewBotDetail(bot.botId)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         <span>Xem chi tiết</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="focus:bg-zinc-800">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Chỉnh sửa</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="focus:bg-zinc-800">
-                        {bot.status === 'active' ? (
+                      <DropdownMenuItem 
+                        className="focus:bg-zinc-800 cursor-pointer"
+                        onClick={() => handleToggleStatus(bot.botId, bot.status)}
+                      >
+                        {bot.status === BotStatus.ACTIVE ? (
                           <>
                             <Pause className="mr-2 h-4 w-4" />
                             <span>Tạm dừng</span>
@@ -155,7 +174,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                       <DropdownMenuSeparator className="bg-zinc-800" />
                       {!bot.isFeatured && (
                         <DropdownMenuItem 
-                          className="focus:bg-zinc-800"
+                          className="focus:bg-zinc-800 cursor-pointer"
                           onClick={() => onToggleFeatured && onToggleFeatured(bot.botId)}
                         >
                           <Star className="mr-2 h-4 w-4" />
@@ -164,7 +183,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                       )}
                       {!bot.isNew && (
                         <DropdownMenuItem 
-                          className="focus:bg-zinc-800"
+                          className="focus:bg-zinc-800 cursor-pointer"
                           onClick={() => onToggleNew && onToggleNew(bot.botId)}
                         >
                           <Sparkles className="mr-2 h-4 w-4" />
@@ -173,7 +192,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                       )}
                       {!bot.isBestSeller && (
                         <DropdownMenuItem 
-                          className="focus:bg-zinc-800"
+                          className="focus:bg-zinc-800 cursor-pointer"
                           onClick={() => onToggleBestSeller && onToggleBestSeller(bot.botId)}
                         >
                           <Trophy className="mr-2 h-4 w-4" />
@@ -181,7 +200,10 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator className="bg-zinc-800" />
-                      <DropdownMenuItem className="focus:bg-zinc-800 text-red-500 focus:text-red-500">
+                      <DropdownMenuItem 
+                        className="focus:bg-zinc-800 text-red-500 focus:text-red-500 cursor-pointer"
+                        onClick={() => handleDeleteBot(bot.botId, bot.name)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         <span>Xóa Bot</span>
                       </DropdownMenuItem>
