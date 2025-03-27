@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { mockUsers } from '@/mocks/usersMock';
 import { toast } from "sonner";
@@ -106,10 +107,7 @@ export const useUsersManagement = () => {
         const remainingUsers = updatedUsers.filter(user => !selectedUsers.includes(user.id));
         setUsers(remainingUsers);
         toast.success(`Đã xóa ${selectedUsers.length} người dùng`);
-        setSelectedUsers([]);
-        setBulkAction(null);
-        setBulkActionDialogOpen(false);
-        return;
+        break;
         
       case 'premium':
         updatedUsers.forEach(user => {
@@ -130,7 +128,12 @@ export const useUsersManagement = () => {
         break;
     }
     
-    setUsers(updatedUsers);
+    // Update users state if we didn't do it in the delete case
+    if (bulkAction !== 'delete') {
+      setUsers(updatedUsers);
+    }
+    
+    // Always reset state after any bulk action
     setSelectedUsers([]);
     setBulkAction(null);
     setBulkActionDialogOpen(false);
