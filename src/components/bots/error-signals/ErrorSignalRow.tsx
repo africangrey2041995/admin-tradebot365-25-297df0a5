@@ -64,10 +64,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const renderSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityConfig = {
-      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Thấp', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
-      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Trung bình', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
-      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cao', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
-      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200 font-bold', label: 'Nghiêm trọng', icon: <AlertTriangle className="h-3 w-3 mr-1" /> }
+      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Low', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Medium', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'High', icon: <AlertTriangle className="h-3 w-3 mr-1" /> },
+      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200 font-bold', label: 'Critical', icon: <AlertTriangle className="h-3 w-3 mr-1" /> }
     };
     
     const config = severityConfig[severity as keyof typeof severityConfig];
@@ -117,15 +117,19 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const getFormattedBotId = () => {
     if (!signal.botId) return 'N/A';
     
-    if (signal.botName) {
-      return (
-        <ErrorDetailsTooltip errorMessage={`Bot ID: ${signal.botId}`}>
-          <span className="cursor-help">{signal.botName}</span>
-        </ErrorDetailsTooltip>
-      );
-    }
+    // Display the bot ID directly instead of name
+    const displayId = signal.botId;
     
-    return signal.botId;
+    return (
+      <div className="flex items-center">
+        <span className="px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-mono text-xs">
+          {displayId}
+        </span>
+        <ErrorDetailsTooltip errorMessage={`Bot Name: ${signal.botName || 'Unknown'}`}>
+          <HelpCircle className="h-3 w-3 ml-1 text-muted-foreground cursor-help" />
+        </ErrorDetailsTooltip>
+      </div>
+    );
   };
 
   const getFormattedUserId = () => {
@@ -170,13 +174,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       </TableCell>
       
       <TableCell 
-        className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
+        className="cursor-pointer hover:text-blue-600"
         onClick={handleBotClick}
       >
-        <div className="flex items-center">
-          <span>{getFormattedBotId()}</span>
-          <ExternalLink className="h-3 w-3 ml-1" />
-        </div>
+        {getFormattedBotId()}
       </TableCell>
       
       <TableCell>
