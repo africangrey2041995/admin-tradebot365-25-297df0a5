@@ -4,7 +4,7 @@ import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Server, Briefcase } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Code, Database, RefreshCw, Server } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
@@ -79,47 +79,40 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
     }
   };
 
-  // Mock prop trading details
-  const mockPropDetails = {
-    firm: 'FTMO',
-    challenge: 'Phase 2',
-    maxDrawdown: '5%',
-    accountSize: '$100,000',
-    tradingDays: 30,
-    affectedUsers: 3
-  };
-
   // Mock affected accounts
   const mockAffectedAccounts = [
     {
       userId: 'USR-001',
       userName: 'Nguyen Van A',
       accountId: 'ACC-001',
+      cspAccountId: 'CSP-ACC-001',
       accountName: 'FTMO Challenge $100K',
       accountType: 'Prop Trading',
       phase: 'Challenge Phase 2',
       balance: '$98,500',
-      progress: '65%'
+      tradingAccountNumber: 'TA-12345'
     },
     {
       userId: 'USR-002',
       userName: 'Tran Thi B',
       accountId: 'ACC-002',
+      cspAccountId: 'CSP-ACC-002',
       accountName: 'FTMO Verified $50K',
       accountType: 'Prop Trading',
       phase: 'Verified',
       balance: '$51,200',
-      progress: '100%'
+      tradingAccountNumber: 'TA-67890'
     },
     {
       userId: 'USR-003',
       userName: 'Le Van C',
       accountId: 'ACC-003',
+      cspAccountId: 'CSP-ACC-003',
       accountName: 'MyForexFunds Evaluation $200K',
       accountType: 'Prop Trading',
       phase: 'Evaluation',
       balance: '$195,000',
-      progress: '40%'
+      tradingAccountNumber: 'TA-54321'
     }
   ];
 
@@ -241,10 +234,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
                         </Badge>
                       </dd>
                     </div>
-                    <div className="grid grid-cols-12 gap-2">
-                      <dt className="col-span-5 text-sm text-muted-foreground">Prop Firm:</dt>
-                      <dd className="col-span-7 text-sm font-medium">{mockPropDetails.firm}</dd>
-                    </div>
                   </dl>
                 </div>
               </div>
@@ -333,8 +322,16 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md mt-2">
                   <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                     <div>
-                      <span className="text-muted-foreground">ID:</span>
+                      <span className="text-muted-foreground">Trading Account ID:</span>
                       <span className="ml-2 font-medium">{account.accountId}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">CSP Account ID:</span>
+                      <span className="ml-2 font-medium">{account.cspAccountId}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Trading Acc Number:</span>
+                      <span className="ml-2 font-medium">{account.tradingAccountNumber}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Type:</span>
@@ -343,18 +340,6 @@ const PropTradingBotErrorView: React.FC<PropTradingBotErrorViewProps> = ({
                     <div>
                       <span className="text-muted-foreground">Balance:</span>
                       <span className="ml-2 font-medium">{account.balance}</span>
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Challenge Progress:</span>
-                      <span className="font-medium">{account.progress}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                      <div 
-                        className="bg-blue-500 h-1.5 rounded-full" 
-                        style={{ width: account.progress }}
-                      ></div>
                     </div>
                   </div>
                 </div>
