@@ -2,6 +2,17 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
+/**
+ * ActionBadge component for displaying signal action types
+ * 
+ * Supported actions:
+ * - ENTER_LONG: Green badge for opening buy positions
+ * - EXIT_LONG: Red badge for closing buy positions
+ * - ENTER_SHORT: Blue badge for opening sell positions
+ * - EXIT_SHORT: Purple badge for closing sell positions
+ * 
+ * @param action - The signal action to display (ENTER_LONG, EXIT_LONG, etc.)
+ */
 interface ActionBadgeProps {
   action: string;
 }

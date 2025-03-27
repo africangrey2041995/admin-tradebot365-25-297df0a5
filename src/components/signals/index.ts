@@ -1,17 +1,17 @@
 
-// Re-export signal components for backward compatibility
-// This will help maintain existing imports while we transition
+// Signal components - main entry point
+// This file provides a centralized export for all signal components
 
-// Core components
+// Core components and utilities
 export * from './core';
 
 // Signal type specific components
 export * from './tradingview';
 export * from './coinstrat';
 
-// Tracking and error components
-export * from './tracking';
+// Error handling and tracking components
 export * from './errors';
+export * from './tracking';
 
-// Re-export hooks
+// Signal hooks
 export * from './hooks';

@@ -2,6 +2,18 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
+/**
+ * StatusBadge component for displaying signal processing status
+ * 
+ * Supported statuses:
+ * - Processed: Green badge for successfully processed signals
+ * - Pending: Orange badge for signals awaiting processing
+ * - Failed: Red badge for signals that failed to process
+ * - Sent: Blue badge for signals that have been sent but not confirmed
+ * - Expired: Gray badge for signals that have expired
+ * 
+ * @param status - The status to display (Processed, Pending, Failed, etc.)
+ */
 interface StatusBadgeProps {
   status: string;
 }

@@ -2,6 +2,17 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
+/**
+ * UserStatusBadge component for displaying user account statuses
+ * 
+ * Supported statuses:
+ * - active: Green badge for active accounts
+ * - inactive: Gray badge for inactive accounts
+ * - pending: Orange badge for accounts pending activation
+ * - disabled: Red badge for disabled accounts
+ * 
+ * @param status - The user status to display (active, inactive, pending, disabled)
+ */
 interface UserStatusBadgeProps {
   status: 'active' | 'inactive' | 'pending' | 'disabled';
 }
