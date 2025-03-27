@@ -41,7 +41,7 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
   };
 
   // Xử lý trạng thái loading
-  if (loading) {
+  if (loading && errorSignals.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center">
         <RefreshCw className="h-6 w-6 animate-spin mb-3" />
@@ -83,48 +83,36 @@ const ErrorSignalsTable: React.FC<ErrorSignalsTableProps> = ({
           <TableHeader>
             <TableRow className="bg-red-50 dark:bg-red-900/20">
               <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Symbol</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Date</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Quantity</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Action</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Status</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">User ID</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Account</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">ID CPL</TableHead>
-              <TableHead className="text-red-700 dark:text-red-400">Error</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Mức độ</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Thời gian</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Loại Bot</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Người dùng</TableHead>
+              <TableHead className="text-red-700 dark:text-red-400">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {errorSignals.map((signal) => (
-              <ErrorSignalRow 
-                key={signal.id} 
-                signal={signal} 
-                isUnread={unreadErrors.has(signal.id)}
-                onMarkAsRead={onMarkAsRead}
-              />
-            ))}
+            {loading && errorSignals.length > 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
+                  <p className="text-muted-foreground">Đang làm mới dữ liệu...</p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              errorSignals.map((signal) => (
+                <ErrorSignalRow 
+                  key={signal.id} 
+                  signal={signal} 
+                  isUnread={unreadErrors.has(signal.id)}
+                  onMarkAsRead={onMarkAsRead}
+                  onViewDetails={undefined}
+                />
+              ))
+            )}
           </TableBody>
         </Table>
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
-          <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <strong>Important:</strong> These error signals require immediate attention to ensure proper functioning of your trading system.
-          </p>
-          <div className="mt-2 flex justify-end gap-2">
-            {onMarkAllAsRead && unreadErrors.size > 0 && (
-              <Button variant="outline" size="sm" onClick={onMarkAllAsRead} className="text-xs">
-                Mark all as read
-              </Button>
-            )}
-            {onRefresh && (
-              <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs">
-                <RefreshCw className="h-3 w-3 mr-1" />
-                Làm mới dữ liệu
-              </Button>
-            )}
-          </div>
-        </div>
       </div>
     </ErrorBoundary>
   );

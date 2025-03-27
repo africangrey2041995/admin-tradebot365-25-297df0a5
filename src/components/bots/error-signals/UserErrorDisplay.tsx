@@ -6,9 +6,9 @@ import { Search, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import ErrorSignalRow from './ErrorSignalRow';
+import ErrorSignalsTable from './ErrorSignalsTable';
 import NoErrorsState from './NoErrorsState';
+import { toast } from 'sonner';
 
 interface UserErrorDisplayProps {
   botType: BotType;
@@ -32,42 +32,45 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [unreadSignals, setUnreadSignals] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     
     setTimeout(() => {
-      const filtered = mockErrorSignals.filter(signal => {
-        const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
-        const matchesBotId = !specificBotId || signal.botId === specificBotId;
+      try {
+        const filtered = mockErrorSignals.filter(signal => {
+          const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
+          const matchesBotId = !specificBotId || signal.botId === specificBotId;
+          
+          let userHasAccess = false;
+          
+          if (signal.botType === BotType.USER_BOT) {
+            userHasAccess = signal.userId === userId;
+          } else if (signal.botType === BotType.PREMIUM_BOT || signal.botType === BotType.PROP_BOT) {
+            const connectedUsers = signal.connectedUserIds || [];
+            userHasAccess = connectedUsers.includes(userId) || false;
+          }
+          
+          return matchesBotType && matchesBotId && userHasAccess;
+        });
         
-        let userHasAccess = false;
+        setSignals(filtered);
+        setFilteredSignals(filtered);
         
-        if (signal.botType === BotType.USER_BOT) {
-          userHasAccess = signal.userId === userId;
-        } else if (signal.botType === BotType.PREMIUM_BOT || signal.botType === BotType.PROP_BOT) {
-          const connectedUsers = signal.connectedUserIds || [];
-          userHasAccess = connectedUsers.includes(userId) || false;
-        }
-        
-        console.log(`Filtering signal ${signal.id} - Bot Type: ${signal.botType}, User Access: ${userHasAccess}, Matches Bot Type: ${matchesBotType}, Matches Bot ID: ${matchesBotId}`);
-        
-        return matchesBotType && matchesBotId && userHasAccess;
-      });
-      
-      console.log(`Filtered ${filtered.length} signals for user ${userId} and bot type ${botType}`);
-      
-      setSignals(filtered);
-      setFilteredSignals(filtered);
-      
-      const newUnreadSet = new Set<string>();
-      filtered.slice(0, 3).forEach(signal => {
-        newUnreadSet.add(signal.id);
-      });
-      setUnreadSignals(newUnreadSet);
-      
-      setLoading(false);
-    }, 500);
+        const newUnreadSet = new Set<string>();
+        filtered.slice(0, 3).forEach(signal => {
+          newUnreadSet.add(signal.id);
+        });
+        setUnreadSignals(newUnreadSet);
+      } catch (err) {
+        console.error("Error fetching error signals:", err);
+        setError(err instanceof Error ? err : new Error("Unknown error occurred"));
+      } finally {
+        setLoading(false);
+      }
+    }, 800);
   }, [botType, userId, specificBotId]);
 
   useEffect(() => {
@@ -115,9 +118,43 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
 
   const handleRefresh = () => {
     setLoading(true);
+    setError(null);
+    
     setTimeout(() => {
-      setLoading(false);
-    }, 500);
+      try {
+        const filtered = mockErrorSignals.filter(signal => {
+          const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
+          const matchesBotId = !specificBotId || signal.botId === specificBotId;
+          
+          let userHasAccess = false;
+          
+          if (signal.botType === BotType.USER_BOT) {
+            userHasAccess = signal.userId === userId;
+          } else if (signal.botType === BotType.PREMIUM_BOT || signal.botType === BotType.PROP_BOT) {
+            const connectedUsers = signal.connectedUserIds || [];
+            userHasAccess = connectedUsers.includes(userId) || false;
+          }
+          
+          return matchesBotType && matchesBotId && userHasAccess;
+        });
+        
+        setSignals(filtered);
+        
+        const newUnreadSet = new Set<string>();
+        filtered.slice(0, Math.floor(Math.random() * 4)).forEach(signal => {
+          newUnreadSet.add(signal.id);
+        });
+        setUnreadSignals(newUnreadSet);
+        
+        toast.success('Dữ liệu đã được làm mới thành công');
+      } catch (err) {
+        console.error("Error refreshing data:", err);
+        setError(err instanceof Error ? err : new Error("Unknown error occurred"));
+        toast.error('Không thể làm mới dữ liệu. Vui lòng thử lại sau.');
+      } finally {
+        setLoading(false);
+      }
+    }, 800);
   };
 
   const handleMarkAsRead = (signalId: string) => {
@@ -126,23 +163,23 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
       newSet.delete(signalId);
       return newSet;
     });
+    
+    toast.success(`Đã đánh dấu tín hiệu ${signalId.substring(0, 6)}... là đã đọc`);
   };
 
   const handleMarkAllAsRead = () => {
     setUnreadSignals(new Set());
+    
+    toast.success('Đã đánh dấu tất cả tín hiệu là đã đọc');
   };
 
-  if (loading) {
+  if (loading && filteredSignals.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
         <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
         <span className="ml-2 text-muted-foreground">Đang tải dữ liệu...</span>
       </div>
     );
-  }
-
-  if (filteredSignals.length === 0) {
-    return <NoErrorsState />;
   }
 
   return (
@@ -185,55 +222,42 @@ export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
             </SelectContent>
           </Select>
           
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-red-50 dark:bg-red-900/20">
-            <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Mức độ</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Thời gian</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Bot</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Loại Bot</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Người dùng</TableHead>
-            <TableHead className="text-red-700 dark:text-red-400">Hành động</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredSignals.map((signal) => (
-            <ErrorSignalRow 
-              key={signal.id} 
-              signal={signal}
-              onMarkAsRead={handleMarkAsRead}
-              isUnread={unreadSignals.has(signal.id)}
-              onViewDetails={onViewDetails}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <ErrorSignalsTable 
+        errorSignals={filteredSignals}
+        unreadErrors={unreadSignals}
+        onMarkAsRead={handleMarkAsRead}
+        onMarkAllAsRead={handleMarkAllAsRead}
+        loading={loading}
+        onRefresh={handleRefresh}
+        error={error}
+      />
 
-      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
-        <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          <strong>Lưu ý:</strong> Các lỗi này cần được xử lý ngay để đảm bảo hệ thống của bạn hoạt động ổn định.
-        </p>
-        <div className="mt-2 flex justify-end gap-2">
-          {unreadSignals.size > 0 && (
-            <Button variant="outline" size="sm" onClick={handleMarkAllAsRead} className="text-xs">
-              Đánh dấu tất cả đã đọc
+      {filteredSignals.length > 0 && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
+          <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            <strong>Lưu ý:</strong> Các lỗi này cần được xử lý ngay để đảm bảo hệ thống của bạn hoạt động ổn định.
+          </p>
+          <div className="mt-2 flex justify-end gap-2">
+            {unreadSignals.size > 0 && (
+              <Button variant="outline" size="sm" onClick={handleMarkAllAsRead} className="text-xs">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Đánh dấu tất cả đã đọc
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs" disabled={loading}>
+              <RefreshCw className={`h-3 w-3 mr-1 ${loading ? 'animate-spin' : ''}`} />
+              Làm mới dữ liệu
             </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="text-xs">
-            <RefreshCw className="h-3 w-3 mr-1" />
-            Làm mới dữ liệu
-          </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

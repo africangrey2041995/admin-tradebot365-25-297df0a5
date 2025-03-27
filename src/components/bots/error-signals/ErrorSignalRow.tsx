@@ -10,6 +10,7 @@ import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
 import { ErrorSignalRowProps } from './types';
+import { formatUtils } from '@/utils/formatUtils';
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
   signal, 
@@ -63,10 +64,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const renderSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityConfig = {
-      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Low' },
-      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Medium' },
-      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'High' },
-      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200', label: 'Critical' }
+      low: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Thấp' },
+      medium: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Trung bình' },
+      high: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Cao' },
+      critical: { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200', label: 'Nghiêm trọng' }
     };
     
     const config = severityConfig[severity];
@@ -82,10 +83,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
   const getBotTypeBadge = () => {
     const botType = signal.botType || 'unknown';
     const typeConfig = {
-      'USER_BOT': { bg: 'bg-green-100', text: 'text-green-700', label: 'Bot Người Dùng' },
-      'PREMIUM_BOT': { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Bot Premium' },
-      'PROP_BOT': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Bot Prop Trading' },
-      'unknown': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Không xác định' }
+      'USER_BOT': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Bot Người Dùng' },
+      'PREMIUM_BOT': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', label: 'Bot Premium' },
+      'PROP_BOT': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'Bot Prop Trading' },
+      'unknown': { bg: 'bg-gray-100 dark:bg-gray-900/30', text: 'text-gray-700 dark:text-gray-300', label: 'Không xác định' }
     };
     
     const config = typeConfig[botType as keyof typeof typeConfig] || typeConfig.unknown;
@@ -96,12 +97,27 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       </Badge>
     );
   };
+
+  // Format error ID to be shorter and more readable
+  const getFormattedId = (id: string) => {
+    if (!id) return 'N/A';
+    if (id.length > 8) {
+      return `${id.substring(0, 8)}...`;
+    }
+    return id;
+  };
   
   return (
-    <TableRow className={isUnread ? "bg-red-50/10" : ""}>
+    <TableRow className={`
+      ${isUnread ? "bg-red-50/10 dark:bg-red-900/10" : ""}
+      hover:bg-red-50/5 dark:hover:bg-red-900/5
+      transition-colors
+    `}>
       {/* ID */}
       <TableCell className="font-mono text-xs">
-        {signal.id}
+        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">
+          {getFormattedId(signal.id)}
+        </span>
       </TableCell>
       
       {/* Severity Level */}
@@ -111,14 +127,16 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       
       {/* Error Description */}
       <TableCell>
-        <div className="max-w-[250px] truncate">
+        <div className="max-w-[250px] truncate font-medium">
           {signal.errorMessage || 'Không có thông tin lỗi'}
         </div>
       </TableCell>
       
       {/* Timestamp */}
       <TableCell className="text-sm">
-        {formatDate(signal.timestamp)}
+        <div className="flex items-center text-muted-foreground">
+          <span>{formatDate(signal.timestamp)}</span>
+        </div>
       </TableCell>
       
       {/* Bot Name/ID */}
@@ -126,7 +144,10 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
         className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline"
         onClick={handleBotClick}
       >
-        {signal.botName || signal.botId || 'N/A'}
+        <div className="flex items-center">
+          <span>{signal.botName || signal.botId || 'N/A'}</span>
+          <ExternalLink className="h-3 w-3 ml-1" />
+        </div>
       </TableCell>
       
       {/* Bot Type */}
@@ -171,6 +192,7 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
               onClick={handleViewDetails}
               className="h-6 px-2"
             >
+              <ExternalLink className="h-4 w-4 mr-1" />
               <span className="text-xs">Xem chi tiết</span>
             </Button>
           )}
