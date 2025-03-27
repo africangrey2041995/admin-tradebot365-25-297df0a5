@@ -28,8 +28,8 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
         {minCapital && (
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-green-400" />
-            <span className="text-sm">
-              Vốn tối thiểu: <span className="font-medium">{minCapital}</span>
+            <span className="text-sm text-gray-800 dark:text-gray-200">
+              Vốn tối thiểu: <span className="font-medium text-gray-900 dark:text-white">{minCapital}</span>
             </span>
           </div>
         )}
@@ -37,8 +37,8 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
         {potentialProfit && (
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-blue-400" />
-            <span className="text-sm">
-              Lợi nhuận dự kiến: <span className="font-medium">{potentialProfit}</span>
+            <span className="text-sm text-gray-800 dark:text-gray-200">
+              Lợi nhuận dự kiến: <span className="font-medium text-gray-900 dark:text-white">{potentialProfit}</span>
             </span>
           </div>
         )}
@@ -46,8 +46,8 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
         {maxDrawdown && (
           <div className="flex items-center gap-2">
             <ChartBar className="w-4 h-4 text-red-400" />
-            <span className="text-sm">
-              Drawdown tối đa: <span className="font-medium">{maxDrawdown}</span>
+            <span className="text-sm text-gray-800 dark:text-gray-200">
+              Drawdown tối đa: <span className="font-medium text-gray-900 dark:text-white">{maxDrawdown}</span>
             </span>
           </div>
         )}
@@ -55,8 +55,8 @@ const BotChallengeInfo: React.FC<BotChallengeInfoProps> = ({
         {challengeDuration && (
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-purple-400" />
-            <span className="text-sm">
-              Thời gian thử thách: <span className="font-medium">{challengeDuration}</span>
+            <span className="text-sm text-gray-800 dark:text-gray-200">
+              Thời gian thử thách: <span className="font-medium text-gray-900 dark:text-white">{challengeDuration}</span>
             </span>
           </div>
         )}
