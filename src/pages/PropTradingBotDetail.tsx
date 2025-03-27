@@ -280,12 +280,7 @@ const PropTradingBotDetail = () => {
                 
                 <div className="text-sm text-slate-500 dark:text-slate-400 space-y-2">
                   <p>Khi tích hợp bot này, bạn sẽ nhận được:</p>
-                  <ul className="list-disc pl-5 space-y-1 text-sm">
-                    <li>Tín hiệu giao dịch tự động 24/7</li>
-                    <li>Quản lý rủi ro theo tiêu chuẩn Prop Trading</li>
-                    <li>Báo cáo hiệu suất chi tiết</li>
-                    <li>Hỗ trợ kỹ thuật ưu tiên</li>
-                  </ul>
+                  
                 </div>
               </CardContent>
             </Card>
