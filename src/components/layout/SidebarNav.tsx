@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -14,7 +15,8 @@ import {
   TrendingUp,
   ChevronDown,
   Shield,
-  UserCircle
+  UserCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -92,6 +94,12 @@ const SidebarNav = () => {
               label="Quản Lý Tài Khoản" 
               icon={Users} 
               isActive={isActive('/accounts')} 
+            />
+            <NavItem 
+              path="/bot-errors" 
+              label="Lỗi Bot" 
+              icon={AlertTriangle} 
+              isActive={isActive('/bot-errors')} 
             />
           </div>
         </div>

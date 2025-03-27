@@ -121,7 +121,18 @@ export function useNavigation() {
     }
   };
 
-  // Removed navigateToBotErrors function
+  /**
+   * Điều hướng đến trang lỗi bot
+   */
+  const navigateToBotErrors = () => {
+    try {
+      navigate(isAdminContext ? ADMIN_ROUTES.BOT_ERRORS : USER_ROUTES.BOT_ERRORS);
+    } catch (error) {
+      console.error('Error navigating to bot errors:', error);
+      toast.error('Đã xảy ra lỗi khi chuyển hướng. Vui lòng thử lại sau.');
+      navigate(isAdminContext ? ADMIN_ROUTES.DASHBOARD : USER_ROUTES.HOME);
+    }
+  };
 
   /**
    * Điều hướng đến một đường dẫn cụ thể với xử lý lỗi
@@ -141,7 +152,7 @@ export function useNavigation() {
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
-    // Removed navigateToBotErrors
+    navigateToBotErrors,
     navigateTo,
     goBack,
     isAdminContext
