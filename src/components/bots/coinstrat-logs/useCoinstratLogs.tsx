@@ -33,7 +33,7 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
     processedAccounts: Array(Math.floor(Math.random() * 3)).fill(null).map((_, i) => ({
       accountId: `ACC-${2000 + i}`,
       userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
-      status: 'Success',
+      status: 'success',
       errorMessage: '',
       name: `Account ${2000 + i}`,
       timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
@@ -41,7 +41,7 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
     failedAccounts: Math.random() > 0.7 ? Array(Math.floor(Math.random() * 2)).fill(null).map((_, i) => ({
       accountId: `ACC-${3000 + i}`,
       userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
-      status: 'Failed',
+      status: 'failed',
       errorMessage: 'Insufficient balance',
       name: `Account ${3000 + i}`,
       timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
