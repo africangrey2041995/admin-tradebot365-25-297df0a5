@@ -29,7 +29,7 @@ export const DeletePackageDialog: React.FC<DeletePackageDialogProps> = ({
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white max-h-[90vh] overflow-y-auto">
+      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
         <AlertDialogHeader>
           <AlertDialogTitle>Xác nhận xóa gói dịch vụ</AlertDialogTitle>
           <AlertDialogDescription className="text-zinc-400">

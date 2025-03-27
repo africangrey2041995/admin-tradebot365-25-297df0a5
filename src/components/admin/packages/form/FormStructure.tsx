@@ -36,8 +36,8 @@ export function FormStructure({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white max-h-[90vh] flex flex-col overflow-hidden">
-        <DialogHeader className="sticky top-0 z-20 bg-zinc-900 pb-4">
+      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl bg-zinc-900 border-zinc-800 text-white h-[90vh] flex flex-col overflow-hidden">
+        <DialogHeader className="flex-shrink-0 pb-4 border-b border-zinc-800">
           <DialogTitle className="flex items-center gap-2">
             {isEdit ? (
               <>
@@ -54,14 +54,16 @@ export function FormStructure({
         </DialogHeader>
 
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-grow overflow-hidden">
-            <ScrollArea className="flex-grow pr-4 -mr-4 h-full">
-              <div className="space-y-6 pb-4">
-                {children}
-              </div>
-            </ScrollArea>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 h-full overflow-hidden">
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-full pr-4 -mr-4">
+                <div className="space-y-6 pb-6 pt-4">
+                  {children}
+                </div>
+              </ScrollArea>
+            </div>
             
-            <DialogFooter className="sticky bottom-0 z-20 bg-zinc-900 pt-4 mt-4 flex-shrink-0">
+            <DialogFooter className="flex-shrink-0 pt-4 mt-2 border-t border-zinc-800">
               <Button
                 type="button"
                 variant="outline"
