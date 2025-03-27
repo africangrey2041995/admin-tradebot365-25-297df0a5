@@ -6,7 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ChevronDown, ChevronRight, AlertTriangle, Server, Database, ExternalLink } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  AlertTriangle, 
+  Server, 
+  Database, 
+  ExternalLink, 
+  Key, 
+  DollarSign, 
+  Webhook, 
+  ServerCrash,
+  Clock 
+} from 'lucide-react';
 
 interface HierarchicalErrorViewProps {
   signal: ExtendedSignal;
@@ -28,6 +40,9 @@ interface CSPAccount {
   userId: string;
   accounts: Account[];
 }
+
+// Error category types
+export type ErrorCategory = 'AUTH' | 'TRADING' | 'INTEGRATION' | 'SYSTEM' | 'TIME' | 'CONN' | 'UNK';
 
 const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   signal,
@@ -76,43 +91,102 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     }
     
     // Generate error category based on error message
-    let category = 'UNK';
-    const errorMsg = signal.errorMessage?.toLowerCase() || '';
-    if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
-      category = 'AUTH';
-    } else if (errorMsg.includes('api') || errorMsg.includes('request') || errorMsg.includes('response')) {
-      category = 'API';
-    } else if (errorMsg.includes('exec') || errorMsg.includes('execution')) {
-      category = 'EXE';
-    } else if (errorMsg.includes('time') || errorMsg.includes('timeout')) {
-      category = 'TIME';
-    } else if (errorMsg.includes('connect') || errorMsg.includes('network')) {
-      category = 'CONN';
-    }
+    const category = getErrorCategory(signal.errorMessage || '');
     
     // Extract numeric part from signal ID or generate sequential
     const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)?.[0] || '001' : '001';
     
     return `ERR-${botTypePrefix}-${category}-${numericPart.padStart(3, '0')}`;
   };
+  
+  // Determine error category from error message
+  const getErrorCategory = (errorMsg: string): ErrorCategory => {
+    const lowerMsg = errorMsg.toLowerCase();
+    
+    if (lowerMsg.includes('auth') || lowerMsg.includes('token') || lowerMsg.includes('permission') || 
+        lowerMsg.includes('key') || lowerMsg.includes('login') || lowerMsg.includes('credential')) {
+      return 'AUTH';
+    } else if (lowerMsg.includes('trade') || lowerMsg.includes('order') || lowerMsg.includes('position') || 
+              lowerMsg.includes('balance') || lowerMsg.includes('fund') || lowerMsg.includes('margin') ||
+              lowerMsg.includes('liquidation')) {
+      return 'TRADING';
+    } else if (lowerMsg.includes('api') || lowerMsg.includes('request') || lowerMsg.includes('response') || 
+              lowerMsg.includes('webhook') || lowerMsg.includes('format') || lowerMsg.includes('payload')) {
+      return 'INTEGRATION';
+    } else if (lowerMsg.includes('time') || lowerMsg.includes('timeout') || lowerMsg.includes('delay') ||
+              lowerMsg.includes('expired')) {
+      return 'TIME';
+    } else if (lowerMsg.includes('connect') || lowerMsg.includes('network') || lowerMsg.includes('server') ||
+              lowerMsg.includes('unavailable') || lowerMsg.includes('unreachable')) {
+      return 'CONN';
+    } else if (lowerMsg.includes('system') || lowerMsg.includes('internal') || lowerMsg.includes('crash') ||
+              lowerMsg.includes('error') || lowerMsg.includes('exception')) {
+      return 'SYSTEM';
+    }
+    
+    return 'UNK';
+  };
+
+  // Get category icon
+  const getCategoryIcon = (category: ErrorCategory) => {
+    switch (category) {
+      case 'AUTH':
+        return <Key className="h-4 w-4 mr-1" />;
+      case 'TRADING':
+        return <DollarSign className="h-4 w-4 mr-1" />;
+      case 'INTEGRATION':
+        return <Webhook className="h-4 w-4 mr-1" />;
+      case 'SYSTEM':
+        return <ServerCrash className="h-4 w-4 mr-1" />;
+      case 'TIME':
+        return <Clock className="h-4 w-4 mr-1" />;
+      case 'CONN':
+        return <Server className="h-4 w-4 mr-1" />;
+      default:
+        return <AlertTriangle className="h-4 w-4 mr-1" />;
+    }
+  };
 
   // Generate severity badge
   const getSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
-    const severityMap: Record<string, { color: string, label: string }> = {
-      low: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300', label: 'Low' },
-      medium: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300', label: 'Medium' },
-      high: { color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300', label: 'High' },
-      critical: { color: 'bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200', label: 'Critical' },
+    const severityMap: Record<string, { color: string, label: string, description: string }> = {
+      low: { 
+        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300', 
+        label: 'Low', 
+        description: 'Minor issue, no immediate action required'
+      },
+      medium: { 
+        color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300', 
+        label: 'Medium',
+        description: 'Some features affected, should be addressed soon'
+      },
+      high: { 
+        color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300', 
+        label: 'High',
+        description: 'Functionality severely impacted, urgent attention needed'
+      },
+      critical: { 
+        color: 'bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200', 
+        label: 'Critical',
+        description: 'System is down, immediate action required'
+      },
     };
     
     const config = severityMap[severity];
     
     return (
-      <Badge className={config.color}>
-        <AlertTriangle className="h-3 w-3 mr-1" />
-        {config.label}
-      </Badge>
+      <div className="flex items-center group relative">
+        <Badge className={config.color}>
+          <AlertTriangle className="h-3 w-3 mr-1" />
+          {config.label}
+        </Badge>
+        <div className="absolute z-50 bottom-full mb-2 left-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+          <div className="bg-black text-white text-xs rounded p-2 shadow-lg max-w-xs">
+            {config.description}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -123,6 +197,30 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     } catch (e) {
       return timestamp;
     }
+  };
+
+  // Get category badge
+  const getCategoryBadge = () => {
+    const category = getErrorCategory(signal.errorMessage || '');
+    const categoryMap: Record<ErrorCategory, { color: string, label: string }> = {
+      AUTH: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300', label: 'Authentication' },
+      TRADING: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300', label: 'Trading' },
+      INTEGRATION: { color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300', label: 'Integration' },
+      SYSTEM: { color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300', label: 'System' },
+      TIME: { color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300', label: 'Timeout' },
+      CONN: { color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300', label: 'Connection' },
+      UNK: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300', label: 'Unknown' }
+    };
+    
+    const config = categoryMap[category];
+    const icon = getCategoryIcon(category);
+    
+    return (
+      <Badge className={config.color}>
+        {icon}
+        {config.label}
+      </Badge>
+    );
   };
 
   // Mock CSP accounts and trading accounts for demo
@@ -173,6 +271,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
             <AlertTriangle className="h-5 w-5" />
             Error Detail
             {getSeverityBadge()}
+            {getCategoryBadge()}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="font-mono">
