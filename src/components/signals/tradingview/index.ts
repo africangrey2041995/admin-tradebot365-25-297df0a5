@@ -1,3 +1,3 @@
 
-// TradingView specific components
-// Will be implemented in the next phase
+// Export TradingView specific components
+export * from './SignalBadges';

@@ -1,66 +1,42 @@
 
 import React from 'react';
-import { Skeleton } from "@/components/ui/skeleton";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { RefreshCw } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Loader2 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface LoadingStateProps {
-  isSimple?: boolean;
   message?: string;
-  botType?: 'premium' | 'prop' | 'user';
   showProgress?: boolean;
+  botType?: 'premium' | 'prop' | 'user';
+  className?: string;
 }
 
-const LoadingState: React.FC<LoadingStateProps> = ({ 
-  isSimple = false,
+const LoadingState: React.FC<LoadingStateProps> = ({
   message = "Loading signal data...",
+  showProgress = false,
   botType = 'user',
-  showProgress = false
+  className = ""
 }) => {
-  if (isSimple) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <RefreshCw className="h-8 w-8 text-muted-foreground animate-spin mb-3" />
-        <p className="text-sm text-muted-foreground">{message}</p>
+  const colors = {
+    premium: 'bg-amber-100 border-amber-200 text-amber-800',
+    prop: 'bg-blue-100 border-blue-200 text-blue-800',
+    user: 'bg-slate-100 border-slate-200 text-slate-800',
+  };
+
+  const bgColor = colors[botType] || colors.user;
+
+  return (
+    <div className={`p-6 rounded-lg border ${bgColor} ${className}`}>
+      <div className="flex flex-col items-center justify-center space-y-3">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="text-center">{message}</p>
+        
         {showProgress && (
-          <div className="w-48 mt-4">
-            <Progress 
-              value={100} 
-              className="h-1" 
-              indicatorClassName="animate-pulse bg-blue-500" 
-            />
+          <div className="w-full max-w-md mt-2">
+            <Progress value={100} className="h-1" indicatorClassName="animate-pulse" />
           </div>
         )}
       </div>
-    );
-  }
-  
-  return (
-    <>
-      {Array(5).fill(0).map((_, index) => (
-        <TableRow key={`loading-row-${index}`}>
-          <TableCell>
-            <Skeleton className="h-6 w-24" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="h-6 w-16" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="h-6 w-32" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="h-6 w-20" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="h-6 w-16" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="h-6 w-16" />
-          </TableCell>
-        </TableRow>
-      ))}
-    </>
+    </div>
   );
 };
 

@@ -1,3 +1,3 @@
 
-// Unified signal tracking views
-// Will be implemented in the next phase
+// Tracking related components
+// These will be implemented in future phases
