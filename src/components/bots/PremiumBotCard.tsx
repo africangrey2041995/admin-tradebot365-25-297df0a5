@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChartLine, Users, Wallet, Bot, TrendingUp, ExternalLink, Sparkles, ShieldAlert, ShieldCheck, ShieldHalf, Briefcase } from 'lucide-react';
@@ -156,9 +157,7 @@ export const PremiumBotCard = ({
   const connectedAccounts = accountCount || Math.round(subscribers * 1.5).toString();
 
   return (
-    <div className="pt-6 px-3 relative">
-      {tagToShow && <BotTag type={tagToShow} />}
-      
+    <div className="pt-6 px-3">
       <Card className={`border hover:shadow-md transition-all ${getCardColors(colorScheme)}`}>
         <CardHeader className="p-3 pb-0">
           <div className="flex justify-between items-start">
@@ -195,6 +194,11 @@ export const PremiumBotCard = ({
               </div>
             </div>
             <div className="flex flex-col gap-1 items-end">
+              {tagToShow && (
+                <div className="mb-1">
+                  <BotTag type={tagToShow} size="sm" />
+                </div>
+              )}
               <Badge className={`text-[10px] py-0.5 px-2 flex items-center ${getRiskColor(risk)}`}>
                 {getRiskIcon(risk)}
                 <span>{getRiskLabel(risk)}</span>
