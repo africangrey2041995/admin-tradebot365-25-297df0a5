@@ -22,19 +22,9 @@ interface NewBotState {
   description: string;
   riskLevel: string;
   exchangeType: string;
-  profitTarget: string;
   maxDrawdown: string;
   supportedAssets: string[];
   minInvestment: string;
-  tradingStrategy: string;
-  timeframe: string;
-  indicatorsUsed: string;
-  featureAdvancedEntries: boolean;
-  featureAutomaticSl: boolean;
-  featureDynamicTp: boolean;
-  featureSmartFilters: boolean;
-  maxActivePositions: string;
-  maxLeverage: string;
   isFeatured: boolean;
   isNew: boolean;
   isBestSeller: boolean;
@@ -70,10 +60,8 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-4">
+          <TabsList className="grid grid-cols-2 mb-4">
             <TabsTrigger value="general">Thông tin chung</TabsTrigger>
-            <TabsTrigger value="trading">Cài đặt giao dịch</TabsTrigger>
-            <TabsTrigger value="features">Tính năng</TabsTrigger>
             <TabsTrigger value="marketing">Marketing</TabsTrigger>
           </TabsList>
           
@@ -152,105 +140,6 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
                 </div>
                 
                 <div className="grid gap-2">
-                  <Label htmlFor="tradingStrategy">Chiến lược giao dịch</Label>
-                  <Select 
-                    value={newBot.tradingStrategy} 
-                    onValueChange={(value) => setNewBot({...newBot, tradingStrategy: value})}
-                  >
-                    <SelectTrigger id="tradingStrategy" className="bg-zinc-800 border-zinc-700 text-white">
-                      <SelectValue placeholder="Chọn chiến lược" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                      <SelectItem value="dca">DCA (Dollar Cost Average)</SelectItem>
-                      <SelectItem value="grid">Grid Trading</SelectItem>
-                      <SelectItem value="swing">Swing Trading</SelectItem>
-                      <SelectItem value="scalping">Scalping</SelectItem>
-                      <SelectItem value="trend_following">Trend Following</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="trading" className="space-y-4">
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="timeframe">Khung thời gian</Label>
-                  <Select 
-                    value={newBot.timeframe} 
-                    onValueChange={(value) => setNewBot({...newBot, timeframe: value})}
-                  >
-                    <SelectTrigger id="timeframe" className="bg-zinc-800 border-zinc-700 text-white">
-                      <SelectValue placeholder="Chọn khung thời gian" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                      <SelectItem value="1m">1 phút</SelectItem>
-                      <SelectItem value="5m">5 phút</SelectItem>
-                      <SelectItem value="15m">15 phút</SelectItem>
-                      <SelectItem value="30m">30 phút</SelectItem>
-                      <SelectItem value="1h">1 giờ</SelectItem>
-                      <SelectItem value="4h">4 giờ</SelectItem>
-                      <SelectItem value="1d">Ngày</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="maxLeverage">Đòn bẩy tối đa</Label>
-                  <Input
-                    id="maxLeverage"
-                    type="number"
-                    placeholder="ví dụ: 3"
-                    className="bg-zinc-800 border-zinc-700 text-white"
-                    value={newBot.maxLeverage}
-                    onChange={(e) => setNewBot({...newBot, maxLeverage: e.target.value})}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="maxActivePositions">Số vị thế tối đa</Label>
-                <Input
-                  id="maxActivePositions"
-                  type="number"
-                  placeholder="ví dụ: 3"
-                  className="bg-zinc-800 border-zinc-700 text-white"
-                  value={newBot.maxActivePositions}
-                  onChange={(e) => setNewBot({...newBot, maxActivePositions: e.target.value})}
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="indicatorsUsed">Chỉ báo sử dụng</Label>
-                <Textarea
-                  id="indicatorsUsed"
-                  placeholder="Liệt kê các chỉ báo được sử dụng trong chiến lược"
-                  className="bg-zinc-800 border-zinc-700 text-white min-h-[80px]"
-                  value={newBot.indicatorsUsed}
-                  onChange={(e) => setNewBot({...newBot, indicatorsUsed: e.target.value})}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="profitTarget">Mục tiêu lợi nhuận (%/tháng)</Label>
-                  <div className="flex items-center gap-4">
-                    <Slider
-                      id="profitTarget"
-                      defaultValue={[15]}
-                      max={50}
-                      step={1}
-                      value={[parseInt(newBot.profitTarget)]}
-                      onValueChange={(value) => setNewBot({...newBot, profitTarget: value[0].toString()})}
-                      className="flex-1"
-                    />
-                    <span className="min-w-[3rem] text-center font-medium">{newBot.profitTarget}%</span>
-                  </div>
-                </div>
-                
-                <div className="grid gap-2">
                   <Label htmlFor="maxDrawdown">Drawdown tối đa (%)</Label>
                   <div className="flex items-center gap-4">
                     <Slider
@@ -269,66 +158,6 @@ export const AddPremiumBotDialog: React.FC<AddPremiumBotDialogProps> = ({
             </div>
           </TabsContent>
           
-          <TabsContent value="features" className="space-y-4">
-            <div className="grid gap-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="featureAdvancedEntries">Điểm vào nâng cao</Label>
-                  <p className="text-sm text-zinc-400">
-                    Sử dụng nhiều điều kiện phức tạp để xác định điểm vào tối ưu
-                  </p>
-                </div>
-                <Switch
-                  id="featureAdvancedEntries"
-                  checked={newBot.featureAdvancedEntries}
-                  onCheckedChange={(checked) => setNewBot({...newBot, featureAdvancedEntries: checked})}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="featureAutomaticSl">Stop Loss tự động</Label>
-                  <p className="text-sm text-zinc-400">
-                    Tự động đặt stop loss dựa trên biến động thị trường
-                  </p>
-                </div>
-                <Switch
-                  id="featureAutomaticSl"
-                  checked={newBot.featureAutomaticSl}
-                  onCheckedChange={(checked) => setNewBot({...newBot, featureAutomaticSl: checked})}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="featureDynamicTp">Take Profit động</Label>
-                  <p className="text-sm text-zinc-400">
-                    Điều chỉnh take profit dựa trên điều kiện thị trường
-                  </p>
-                </div>
-                <Switch
-                  id="featureDynamicTp"
-                  checked={newBot.featureDynamicTp}
-                  onCheckedChange={(checked) => setNewBot({...newBot, featureDynamicTp: checked})}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="featureSmartFilters">Smart Filters</Label>
-                  <p className="text-sm text-zinc-400">
-                    Bộ lọc thông minh giúp tránh các tín hiệu giả
-                  </p>
-                </div>
-                <Switch
-                  id="featureSmartFilters"
-                  checked={newBot.featureSmartFilters}
-                  onCheckedChange={(checked) => setNewBot({...newBot, featureSmartFilters: checked})}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
           <TabsContent value="marketing" className="space-y-4">
             <div className="grid gap-4">
               <div className="flex items-center justify-between">
