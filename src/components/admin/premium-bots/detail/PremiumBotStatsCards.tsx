@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Briefcase, Activity } from 'lucide-react';
 
 interface PremiumBotStatsCardsProps {
@@ -15,46 +15,46 @@ const PremiumBotStatsCards: React.FC<PremiumBotStatsCardsProps> = ({
   processedSignals
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-3">
-              <Users className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Người Dùng Đăng Ký</p>
-              <h3 className="text-2xl font-bold">{registeredUsers}</h3>
-            </div>
-          </div>
+    <div className="grid gap-4 md:grid-cols-3">
+      <Card className="bg-zinc-900 border-zinc-800 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none" />
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-zinc-200">Người Dùng Đăng Ký</CardTitle>
+          <Users className="h-4 w-4 text-blue-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{registeredUsers}</div>
+          <p className="text-xs text-zinc-400">
+            Số người dùng đang sử dụng bot này
+          </p>
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-green-100 dark:bg-green-900 p-3">
-              <Briefcase className="h-6 w-6 text-green-500 dark:text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Tài Khoản Giao Dịch</p>
-              <h3 className="text-2xl font-bold">{tradingAccounts}</h3>
-            </div>
-          </div>
+      <Card className="bg-zinc-900 border-zinc-800 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent pointer-events-none" />
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-zinc-200">Tài Khoản Giao Dịch</CardTitle>
+          <Briefcase className="h-4 w-4 text-green-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{tradingAccounts}</div>
+          <p className="text-xs text-zinc-400">
+            Tài khoản giao dịch đang kết nối
+          </p>
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-3">
-              <Activity className="h-6 w-6 text-purple-500 dark:text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Tín Hiệu Đã Xử Lý</p>
-              <h3 className="text-2xl font-bold">{processedSignals}</h3>
-            </div>
-          </div>
+      <Card className="bg-zinc-900 border-zinc-800 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent pointer-events-none" />
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-zinc-200">Tín Hiệu Đã Xử Lý</CardTitle>
+          <Activity className="h-4 w-4 text-purple-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-white">{processedSignals}</div>
+          <p className="text-xs text-zinc-400">
+            Tổng số tín hiệu bot đã xử lý
+          </p>
         </CardContent>
       </Card>
     </div>
