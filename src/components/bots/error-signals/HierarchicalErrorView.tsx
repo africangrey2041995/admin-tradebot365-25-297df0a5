@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -29,12 +28,18 @@ interface CSPAccount {
   accounts: Account[];
 }
 
+type ExpandedSections = {
+  main: boolean;
+  csp: boolean;
+  accounts: Record<string, boolean>;
+};
+
 const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   signal,
   relatedSignals = [],
   onViewDetails
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+  const [expandedSections, setExpandedSections] = useState<ExpandedSections>({
     main: true,
     csp: false,
     accounts: {}
@@ -43,8 +48,8 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
       ...prev,
-      [section]: !prev[section]
-    }));
+      [section]: !prev[section as keyof ExpandedSections]
+    } as ExpandedSections));
   };
 
   const toggleAccount = (accountId: string) => {
@@ -57,9 +62,7 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     }));
   };
 
-  // Generate structured error ID
   const getStructuredErrorId = () => {
-    // Extract bot type prefix
     let botTypePrefix = 'ERR';
     if (signal.botType) {
       if (signal.botType.toLowerCase().includes('user')) {
@@ -71,7 +74,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
       }
     }
     
-    // Generate error category based on error message
     let category = 'UNK';
     const errorMsg = signal.errorMessage?.toLowerCase() || '';
     if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
@@ -86,13 +88,11 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
       category = 'CONN';
     }
     
-    // Extract numeric part from signal ID or generate sequential
     const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
     
     return `ERR-${botTypePrefix}-${category}-${numericPart.padStart(3, '0')}`;
   };
 
-  // Generate severity badge
   const getSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityMap = {
@@ -112,7 +112,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     );
   };
 
-  // Format timestamp
   const formatTimestamp = (timestamp: string) => {
     try {
       return format(new Date(timestamp), 'dd/MM/yyyy HH:mm:ss');
@@ -121,8 +120,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
     }
   };
 
-  // Mock CSP accounts and trading accounts for demo
-  // In a real implementation, this would come from the signal data
   const cspAccounts: CSPAccount[] = [
     {
       id: 'CSP-001',
@@ -186,7 +183,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Main signal information */}
           <Collapsible 
             open={expandedSections.main} 
             onOpenChange={() => toggleSection('main')}
@@ -263,7 +259,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
             </CollapsibleContent>
           </Collapsible>
 
-          {/* CSP Accounts */}
           <Collapsible 
             open={expandedSections.csp} 
             onOpenChange={() => toggleSection('csp')}
@@ -302,7 +297,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
                       </Badge>
                     </div>
                     
-                    {/* Trading accounts for this CSP */}
                     <div className="ml-6 mt-2 space-y-2">
                       {cspAccount.accounts.map(account => (
                         <Collapsible 
@@ -378,7 +372,6 @@ const HierarchicalErrorView: React.FC<HierarchicalErrorViewProps> = ({
             </CollapsibleContent>
           </Collapsible>
           
-          {/* Related error signals */}
           {relatedSignals.length > 0 && (
             <div className="border rounded-md p-3">
               <div className="font-medium mb-2">Related Errors</div>

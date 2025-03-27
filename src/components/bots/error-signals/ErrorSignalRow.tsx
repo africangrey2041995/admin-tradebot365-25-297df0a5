@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
@@ -10,17 +9,14 @@ import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
 import { toast } from 'sonner';
-
-interface ErrorSignalRowProps {
-  signal: ExtendedSignal;
-  isUnread: boolean;
-  onMarkAsRead: (signalId: string) => void;
-}
+import { ErrorSignalRowProps } from './types';
 
 const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({ 
   signal, 
   isUnread, 
-  onMarkAsRead 
+  onMarkAsRead,
+  onViewDetails,
+  isAdmin = false
 }) => {
   const { navigateToBotDetail } = useNavigation();
   
@@ -49,6 +45,12 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       }
     }
   };
+
+  const handleViewDetails = () => {
+    if (onViewDetails && signal.id) {
+      onViewDetails(signal.id);
+    }
+  };
   
   const formatDate = (dateString: string) => {
     try {
@@ -59,7 +61,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
-  // Format trading account to show ID, type and balance without exchange name
   const formatTradingAccount = () => {
     const parts = [];
     
@@ -78,7 +79,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     return parts.length > 0 ? parts.join(' | ') : 'N/A';
   };
   
-  // Generate a severity badge based on errorSeverity
   const renderSeverityBadge = () => {
     const severity = signal.errorSeverity || 'medium';
     const severityConfig = {
@@ -98,7 +98,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     );
   };
   
-  // Format structured error code
   const formatErrorCode = () => {
     if (signal.errorCode) {
       return (
@@ -108,7 +107,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       );
     }
     
-    // Generate structured error code based on bot type
     let botTypePrefix = 'ERR';
     if (signal.botType) {
       if (signal.botType.toLowerCase().includes('user')) {
@@ -120,7 +118,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       }
     }
     
-    // Generate error category based on error message
     let category = 'UNK';
     const errorMsg = signal.errorMessage?.toLowerCase() || '';
     if (errorMsg.includes('auth') || errorMsg.includes('token') || errorMsg.includes('permission')) {
@@ -135,7 +132,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       category = 'CONN';
     }
     
-    // Extract numeric part from signal ID or generate sequential
     const numericPart = signal.id.match(/\d+$/) ? signal.id.match(/\d+$/)[0] : '001';
     
     return (
@@ -215,6 +211,16 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
             <span className="text-xs">Mark as read</span>
+          </Button>
+        )}
+        {!isAdmin && onViewDetails && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleViewDetails}
+            className="ml-2 h-6 px-2"
+          >
+            <span className="text-xs">View details</span>
           </Button>
         )}
       </TableCell>

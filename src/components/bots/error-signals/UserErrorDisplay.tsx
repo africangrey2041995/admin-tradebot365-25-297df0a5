@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -35,7 +34,6 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
   useEffect(() => {
     setLoading(true);
     
-    // Simulate API call to fetch error signals
     setTimeout(() => {
       const filtered = mockErrorSignals.filter(
         signal => 
@@ -46,7 +44,6 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
       setSignals(filtered);
       setFilteredSignals(filtered);
       
-      // Set initial unread signals
       const newUnreadSet = new Set<string>();
       filtered.slice(0, 3).forEach(signal => {
         newUnreadSet.add(signal.id);
@@ -57,11 +54,9 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
     }, 500);
   }, [botType, userId]);
 
-  // Apply filters whenever filters change
   useEffect(() => {
     let results = [...signals];
     
-    // Apply search filter
     if (searchTerm) {
       results = results.filter(signal => 
         signal.errorMessage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,18 +67,15 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
       );
     }
     
-    // Apply severity filter
     if (severityFilter !== 'all') {
       results = results.filter(signal => signal.errorSeverity === severityFilter);
     }
     
-    // Apply sorting
     results = sortSignals(results, sortOrder);
     
     setFilteredSignals(results);
   }, [signals, searchTerm, severityFilter, sortOrder]);
 
-  // Sort signals based on sort order
   const sortSignals = (signalList: ExtendedSignal[], order: SortOrder): ExtendedSignal[] => {
     return [...signalList].sort((a, b) => {
       switch (order) {
@@ -139,7 +131,6 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Filters and tools */}
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <div className="flex flex-1 gap-2">
           <div className="relative flex-1">
@@ -184,7 +175,6 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
         </div>
       </div>
 
-      {/* Main error table */}
       <Table>
         <TableHeader>
           <TableRow className="bg-red-50 dark:bg-red-900/20">
@@ -204,13 +194,12 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
               signal={signal}
               onMarkAsRead={handleMarkAsRead}
               isUnread={unreadSignals.has(signal.id)}
-              onViewDetails={() => onViewDetails(signal.id)}
+              onViewDetails={onViewDetails}
             />
           ))}
         </TableBody>
       </Table>
 
-      {/* Information and actions */}
       <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800/30">
         <p className="text-sm text-red-700 dark:text-red-400 flex items-center">
           <AlertTriangle className="h-4 w-4 mr-2" />

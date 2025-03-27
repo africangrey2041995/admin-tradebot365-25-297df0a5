@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -59,7 +58,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     }, 500);
   }, [botType]);
 
-  // Apply filters whenever filters change
   useEffect(() => {
     let results = [...signals];
     
@@ -107,7 +105,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     setFilteredSignals(results);
   }, [signals, searchTerm, severityFilter, sortOrder, selectedCategory]);
 
-  // Sort signals based on sort order
   const sortSignals = (signalList: ExtendedSignal[], order: SortOrder): ExtendedSignal[] => {
     return [...signalList].sort((a, b) => {
       switch (order) {
@@ -136,6 +133,10 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     }, 500);
   };
 
+  const handleMarkAsRead = (signalId: string) => {
+    console.log("Admin marked signal as read:", signalId);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -161,7 +162,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Filters and tools */}
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <div className="flex flex-1 gap-2">
           <div className="relative flex-1">
@@ -233,7 +233,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
         </div>
       </div>
 
-      {/* Category filters (only show in category view) */}
       {viewMode === 'categories' && (
         <div className="flex overflow-x-auto py-2 space-x-2">
           <Badge 
@@ -278,7 +277,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
         </div>
       )}
 
-      {/* Main content based on view mode */}
       {viewMode === 'table' && (
         <Card>
           <Table>
@@ -298,10 +296,10 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
                 <ErrorSignalRow 
                   key={signal.id} 
                   signal={signal}
-                  onMarkAsRead={() => {}}
+                  onMarkAsRead={handleMarkAsRead}
                   isUnread={false}
                   isAdmin={true}
-                  onViewDetails={() => onViewDetails(signal.id)}
+                  onViewDetails={onViewDetails}
                 />
               ))}
             </TableBody>
@@ -323,7 +321,6 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
         />
       )}
 
-      {/* Results summary */}
       <div className="text-sm text-muted-foreground flex justify-between items-center">
         <div>
           Hiển thị {filteredSignals.length} trong tổng số {signals.length} lỗi
