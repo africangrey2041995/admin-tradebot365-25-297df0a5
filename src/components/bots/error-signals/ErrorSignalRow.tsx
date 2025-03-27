@@ -4,7 +4,7 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ExternalLink, AlertTriangle, Info, User, HelpCircle } from 'lucide-react';
+import { ExternalLink, AlertTriangle, HelpCircle, User } from 'lucide-react';
 import { ExtendedSignal } from '@/types';
 import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -36,17 +36,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
     }
   };
   
-  const handleMarkAsRead = () => {
-    if (signal.id) {
-      try {
-        onMarkAsRead(signal.id);
-      } catch (error) {
-        console.error('Error marking signal as read:', error);
-        toast.error('Không thể đánh dấu tín hiệu là đã đọc. Vui lòng thử lại sau.');
-      }
-    }
-  };
-
   const handleViewDetails = () => {
     if (onViewDetails && signal.id) {
       onViewDetails(signal.id);
@@ -206,18 +195,6 @@ const ErrorSignalRow: React.FC<ErrorSignalRowProps> = ({
       
       <TableCell>
         <div className="flex items-center gap-2">
-          {isUnread && (
-            <Button
-              size="sm" 
-              variant="ghost" 
-              onClick={handleMarkAsRead}
-              className="h-6 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
-            >
-              <CheckCircle2 className="h-4 w-4 mr-1" />
-              <span className="text-xs">Đã đọc</span>
-            </Button>
-          )}
-          
           {onViewDetails && (
             <Button
               size="sm"
