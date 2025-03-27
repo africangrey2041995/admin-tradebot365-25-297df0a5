@@ -10,6 +10,7 @@ import { useTradingViewLogs } from './trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from './coinstrat-logs/useCoinstratLogs';
 import SignalTrackingTab from '@/components/bots/signal-tracking/SignalTrackingTab';
 import UserAccountsTabContent from './accounts/UserAccountsTabContent';
+import BotErrorsTab from './error-signals/BotErrorsTab';
 
 interface UserBotDetailTabsProps {
   userId: string;
@@ -109,6 +110,7 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
         <TabsList className="mb-6">
           <TabsTrigger value="accounts">Tài khoản kết nối</TabsTrigger>
           <TabsTrigger value="signal-tracking">Signal Tracking</TabsTrigger>
+          <TabsTrigger value="errors">Lỗi Bot</TabsTrigger>
         </TabsList>
         
         <TabsContent value="accounts" className="animate-in fade-in-50 duration-200">
@@ -140,6 +142,13 @@ const UserBotDetailTabs: React.FC<UserBotDetailTabsProps> = ({
             botId={botId} 
             userId={userId} 
             isAdminView={isAdminView}
+          />
+        </TabsContent>
+
+        <TabsContent value="errors" className="animate-in fade-in-50 duration-200">
+          <BotErrorsTab
+            botId={botId}
+            userId={userId}
           />
         </TabsContent>
       </Tabs>

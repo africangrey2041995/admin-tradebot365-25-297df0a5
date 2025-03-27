@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -14,14 +15,16 @@ interface UserErrorDisplayProps {
   botType: BotType;
   userId: string;
   onViewDetails: (errorId: string) => void;
+  specificBotId?: string;
 }
 
 type SortOrder = 'newest' | 'oldest' | 'severity-high' | 'severity-low';
 
-const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
+export const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
   botType,
   userId,
-  onViewDetails
+  onViewDetails,
+  specificBotId
 }) => {
   const [signals, setSignals] = useState<ExtendedSignal[]>([]);
   const [filteredSignals, setFilteredSignals] = useState<ExtendedSignal[]>([]);
@@ -35,10 +38,15 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
     setLoading(true);
     
     setTimeout(() => {
+      // Lọc theo botType, userId và specificBotId (nếu có)
       const filtered = mockErrorSignals.filter(
-        signal => 
-          signal.botType?.toLowerCase().includes(botType.toLowerCase()) &&
-          signal.userId === userId
+        signal => {
+          const matchesBotType = signal.botType?.toLowerCase().includes(botType.toLowerCase()) || botType === BotType.ALL_BOTS;
+          const matchesUserId = signal.userId === userId;
+          const matchesBotId = !specificBotId || signal.botId === specificBotId;
+          
+          return matchesBotType && matchesUserId && matchesBotId;
+        }
       );
       
       setSignals(filtered);
@@ -52,7 +60,7 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
       
       setLoading(false);
     }, 500);
-  }, [botType, userId]);
+  }, [botType, userId, specificBotId]);
 
   useEffect(() => {
     let results = [...signals];
@@ -220,5 +228,3 @@ const UserErrorDisplay: React.FC<UserErrorDisplayProps> = ({
     </div>
   );
 };
-
-export default UserErrorDisplay;

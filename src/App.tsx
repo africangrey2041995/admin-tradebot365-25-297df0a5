@@ -25,7 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
-// Remove import for BotErrors
+import BotMonitoringPage from "./pages/BotMonitoringPage";
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -45,10 +45,8 @@ import AdminPropBots from "./pages/admin/PropBots";
 import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
-// Remove import for AdminBotErrors
 import AdminPackages from "./pages/admin/Packages";
-// Import the BotMonitoringPage
-import BotMonitoringPage from "./pages/admin/BotMonitoringPage";
+import AdminBotMonitoringPage from "./pages/admin/BotMonitoringPage";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -103,7 +101,8 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
-                {/* Remove BotErrors route */}
+                {/* Add Bot Monitoring page route */}
+                <Route path="/bot-monitoring" element={<BotMonitoringPage />} />
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
@@ -115,8 +114,7 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
-                  {/* Add the Bot Monitoring route */}
-                  <Route path="bot-monitoring" element={<BotMonitoringPage />} />
+                  <Route path="bot-monitoring" element={<AdminBotMonitoringPage />} />
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />
