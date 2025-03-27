@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,7 +32,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
     }));
   };
 
-  // Get severity color
   const getSeverityColor = (severity?: string) => {
     switch (severity) {
       case 'critical':
@@ -49,7 +47,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
     }
   };
 
-  // Get severity icon
   const getSeverityIcon = (severity?: string) => {
     switch (severity) {
       case 'critical':
@@ -65,7 +62,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
     }
   };
 
-  // Format timestamp
   const formatTime = (timestamp?: string) => {
     if (!timestamp) return 'Không có thời gian';
     
@@ -79,13 +75,13 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
     }
   };
 
-  // Mock affected users for the premium bot
   const mockAffectedUsers = [
     {
       id: 'USR-001',
       name: 'Nguyen Van A',
       email: 'nguyenvana@example.com',
       accountId: 'ACC-001',
+      cspAccountId: 'CSP-ACC-001',
       accountName: 'Binance Futures',
       accountType: 'Futures',
       exchange: 'Binance'
@@ -95,6 +91,7 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
       name: 'Tran Thi B',
       email: 'tranthib@example.com',
       accountId: 'ACC-002',
+      cspAccountId: 'CSP-ACC-002',
       accountName: 'Bybit Spot',
       accountType: 'Spot',
       exchange: 'Bybit'
@@ -103,7 +100,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Main error information with premium styling */}
       <div className={`p-4 border-2 rounded-lg ${getSeverityColor(signal.errorSeverity)} bg-amber-50 dark:bg-amber-950/20`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
@@ -131,7 +127,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
         </div>
       </div>
 
-      {/* Error details section */}
       <Collapsible
         open={expandedSections['error-details']}
         onOpenChange={() => toggleSection('error-details')}
@@ -260,7 +255,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Affected users section */}
       <Collapsible
         open={expandedSections['affected-users']}
         onOpenChange={() => toggleSection('affected-users')}
@@ -304,8 +298,12 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-muted-foreground">ID:</span>
+                      <span className="text-muted-foreground">Trading Account ID:</span>
                       <span className="ml-2 font-medium">{user.accountId}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">CSP Account ID:</span>
+                      <span className="ml-2 font-medium">{user.cspAccountId}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Type:</span>
@@ -323,7 +321,6 @@ const PremiumBotErrorView: React.FC<PremiumBotErrorViewProps> = ({
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Action buttons */}
       <div className="flex justify-end space-x-2 mt-4">
         <Button variant="outline" size="sm" className="flex items-center">
           <RefreshCw className="h-4 w-4 mr-1" />
