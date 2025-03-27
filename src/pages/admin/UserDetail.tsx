@@ -291,7 +291,7 @@ const AdminUserDetail = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Ngày tham gia</div>
               <div className="flex items-center gap-1">
@@ -304,13 +304,6 @@ const AdminUserDetail = () => {
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4 text-zinc-500" />
                 {user.lastLogin}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-sm text-zinc-400">Số dư tài khoản</div>
-              <div className="flex items-center gap-1">
-                <CreditCard className="h-4 w-4 text-zinc-500" />
-                {user.balance}
               </div>
             </div>
           </div>
