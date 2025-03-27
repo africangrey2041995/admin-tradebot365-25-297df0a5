@@ -10,7 +10,6 @@ import {
 import { 
   LayoutDashboard, 
   Users, 
-  AlertTriangle,
   Database,
   Scroll,
   Bell,
@@ -75,13 +74,6 @@ const AdminSidebarNav = () => {
             label="Người dùng" 
             icon={Users} 
             isActive={isActive('/admin/users')} 
-          />
-          {/* Removed the redundant "Bot Hệ Thống" menu item */}
-          <NavMenuItem 
-            path="/admin/bot-errors" 
-            label="Lỗi Bot" 
-            icon={AlertTriangle} 
-            isActive={isActive('/admin/bot-errors')} 
           />
         </NavGroup>
         

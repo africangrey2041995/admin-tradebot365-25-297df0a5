@@ -22,7 +22,6 @@ export const USER_ROUTES = {
   PROFILE: '/profile',
   SIGNALS: '/signals',
   CONNECTIONS: '/connections',
-  BOT_ERRORS: '/bot-errors',
 };
 
 // Admin Routes
@@ -31,7 +30,6 @@ export const ADMIN_ROUTES = {
   USERS: '/admin/users',
   USER_DETAIL: (userId: string) => `/admin/users/${userId}`,
   BOTS: '/admin/bots',
-  BOT_ERRORS: '/admin/bot-errors',
   PREMIUM_BOTS: '/admin/premium-bots',
   PREMIUM_BOT_DETAIL: (botId: string) => `/admin/premium-bots/${botId}`,
   PROP_BOTS: '/admin/prop-bots',
@@ -64,5 +62,4 @@ export const SHARED_ROUTES = {
     }
   },
   SETTINGS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.SETTINGS : USER_ROUTES.SETTINGS,
-  BOT_ERRORS: (isAdmin: boolean) => isAdmin ? ADMIN_ROUTES.BOT_ERRORS : USER_ROUTES.BOT_ERRORS,
 };
