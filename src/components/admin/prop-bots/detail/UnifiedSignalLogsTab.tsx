@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
-import AdvancedSignalFilter, { SignalFilters } from '@/components/bots/trading-view-logs/AdvancedSignalFilter';
+import AdvancedSignalFilter from '@/components/signals/tracking/AdvancedSignalFilter';
+import { SignalFilters } from '@/components/signals/types';
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
@@ -124,24 +125,29 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
         'pending': 'Pending'
       };
       
-      tvLogsFiltered = tvLogsFiltered.filter(log => 
-        log.status.toString().toLowerCase() === statusMap[filters.status]?.toLowerCase()
-      );
+      const statusFilter = typeof filters.status === 'string' ? filters.status : filters.status?.[0] || 'all';
+      
+      if (statusFilter !== 'all') {
+        tvLogsFiltered = tvLogsFiltered.filter(log => 
+          log.status.toString().toLowerCase() === statusMap[statusFilter]?.toLowerCase()
+        );
+      }
     }
     
     // Apply date filter
-    if (filters.dateRange.from || filters.dateRange.to) {
+    const dateRange = filters.dateRange as { from?: Date, to?: Date } | undefined;
+    if (dateRange?.from || dateRange?.to) {
       tvLogsFiltered = tvLogsFiltered.filter(log => {
         const logDate = new Date(log.timestamp);
         let isInRange = true;
         
-        if (filters.dateRange.from) {
-          isInRange = isInRange && logDate >= filters.dateRange.from;
+        if (dateRange.from) {
+          isInRange = isInRange && logDate >= dateRange.from;
         }
         
-        if (filters.dateRange.to) {
+        if (dateRange.to) {
           // Add one day to include the end date
-          const endDate = new Date(filters.dateRange.to);
+          const endDate = new Date(dateRange.to);
           endDate.setDate(endDate.getDate() + 1);
           isInRange = isInRange && logDate <= endDate;
         }
@@ -173,33 +179,35 @@ const UnifiedSignalLogsTab: React.FC<UnifiedSignalLogsTabProps> = ({
     
     // Apply status filter
     if (filters.status !== 'all') {
-      const statusFilter = filters.status;
+      const statusFilter = typeof filters.status === 'string' ? filters.status : filters.status?.[0] || 'all';
       
-      csLogsFiltered = csLogsFiltered.filter(log => {
-        if (statusFilter === 'success') {
-          return log.processedAccounts.length > 0;
-        } else if (statusFilter === 'failed') {
-          return log.failedAccounts.length > 0;
-        } else if (statusFilter === 'pending') {
-          return log.status.toString().toLowerCase().includes('pending');
-        }
-        return true;
-      });
+      if (statusFilter !== 'all') {
+        csLogsFiltered = csLogsFiltered.filter(log => {
+          if (statusFilter === 'success') {
+            return log.processedAccounts.length > 0;
+          } else if (statusFilter === 'failed') {
+            return log.failedAccounts.length > 0;
+          } else if (statusFilter === 'pending') {
+            return log.status.toString().toLowerCase().includes('pending');
+          }
+          return true;
+        });
+      }
     }
     
     // Apply date filter
-    if (filters.dateRange.from || filters.dateRange.to) {
+    if (dateRange?.from || dateRange?.to) {
       csLogsFiltered = csLogsFiltered.filter(log => {
         const logDate = new Date(log.timestamp);
         let isInRange = true;
         
-        if (filters.dateRange.from) {
-          isInRange = isInRange && logDate >= filters.dateRange.from;
+        if (dateRange.from) {
+          isInRange = isInRange && logDate >= dateRange.from;
         }
         
-        if (filters.dateRange.to) {
+        if (dateRange.to) {
           // Add one day to include the end date
-          const endDate = new Date(filters.dateRange.to);
+          const endDate = new Date(dateRange.to);
           endDate.setDate(endDate.getDate() + 1);
           isInRange = isInRange && logDate <= endDate;
         }

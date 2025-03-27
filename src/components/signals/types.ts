@@ -4,14 +4,18 @@
  */
 
 export interface SignalFilters {
-  dateRange?: [Date | null, Date | null];
-  status?: string[];
+  dateRange?: [Date | null, Date | null] | {
+    from?: Date;
+    to?: Date;
+  };
+  status?: string[] | string;
   actions?: string[];
   instruments?: string[];
   userId?: string;
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  signalSource?: 'all' | 'tradingview' | 'coinstrat';
 }
 
 export interface SignalUser {

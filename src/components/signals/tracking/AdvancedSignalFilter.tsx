@@ -34,7 +34,8 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     userId: '',
     search: '',
     sortBy: 'timestamp',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+    signalSource: 'all'
   });
   
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
@@ -47,19 +48,27 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     
     // Count active filters
     let count = 0;
-    if (updatedFilters.dateRange && (updatedFilters.dateRange[0] || updatedFilters.dateRange[1])) count++;
-    if (updatedFilters.status && updatedFilters.status.length > 0) count++;
+    const dateRangeArray = updatedFilters.dateRange as [Date | null, Date | null] | undefined;
+    const dateRangeObject = updatedFilters.dateRange as { from?: Date, to?: Date } | undefined;
+    
+    if (dateRangeArray && (dateRangeArray[0] || dateRangeArray[1])) count++;
+    if (dateRangeObject && (dateRangeObject.from || dateRangeObject.to)) count++;
+    
+    const statusArray = Array.isArray(updatedFilters.status) ? updatedFilters.status : [];
+    if (statusArray.length > 0) count++;
+    
     if (updatedFilters.actions && updatedFilters.actions.length > 0) count++;
     if (updatedFilters.instruments && updatedFilters.instruments.length > 0) count++;
     if (updatedFilters.userId) count++;
     if (updatedFilters.search) count++;
+    if (updatedFilters.signalSource && updatedFilters.signalSource !== 'all') count++;
     
     setActiveFiltersCount(count);
   };
 
   // Reset all filters
   const resetFilters = () => {
-    const defaultFilters = {
+    const defaultFilters: SignalFilters = {
       dateRange: [null, null],
       status: [],
       actions: [],
@@ -67,7 +76,8 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
       userId: '',
       search: '',
       sortBy: 'timestamp',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      signalSource: 'all'
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -79,6 +89,12 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     if (!date) return "";
     return format(date, "PPP", { locale: vi });
   };
+
+  // Check if we're using array format for dateRange
+  const isArrayDateRange = Array.isArray(filters.dateRange);
+  const dateRange = isArrayDateRange 
+    ? filters.dateRange as [Date | null, Date | null] 
+    : [null, null] as [Date | null, Date | null];
 
   return (
     <div className="space-y-4">
@@ -105,18 +121,18 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
                           variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal",
-                            !filters.dateRange?.[0] && "text-muted-foreground"
+                            !dateRange[0] && "text-muted-foreground"
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {filters.dateRange?.[0] ? formatDate(filters.dateRange[0]) : "Từ ngày"}
+                          {dateRange[0] ? formatDate(dateRange[0]) : "Từ ngày"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={filters.dateRange?.[0] || undefined}
-                          onSelect={(date) => handleFilterChange({ dateRange: [date, filters.dateRange?.[1] || null] })}
+                          selected={dateRange[0] || undefined}
+                          onSelect={(date) => handleFilterChange({ dateRange: [date, dateRange[1]] })}
                           initialFocus
                         />
                       </PopoverContent>
@@ -127,18 +143,18 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
                           variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal",
-                            !filters.dateRange?.[1] && "text-muted-foreground"
+                            !dateRange[1] && "text-muted-foreground"
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {filters.dateRange?.[1] ? formatDate(filters.dateRange[1]) : "Đến ngày"}
+                          {dateRange[1] ? formatDate(dateRange[1]) : "Đến ngày"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={filters.dateRange?.[1] || undefined}
-                          onSelect={(date) => handleFilterChange({ dateRange: [filters.dateRange?.[0] || null, date] })}
+                          selected={dateRange[1] || undefined}
+                          onSelect={(date) => handleFilterChange({ dateRange: [dateRange[0], date] })}
                           initialFocus
                         />
                       </PopoverContent>
@@ -211,6 +227,3 @@ export const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
 
 // Export the component as default
 export default AdvancedSignalFilter;
-
-// Re-export the SignalFilters type
-export type { SignalFilters };

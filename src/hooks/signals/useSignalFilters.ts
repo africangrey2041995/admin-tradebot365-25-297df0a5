@@ -1,16 +1,6 @@
 
 import { useState } from 'react';
-
-export interface SignalFilters {
-  search: string;
-  signalSource: 'all' | 'tradingview' | 'coinstrat';
-  status: 'all' | 'success' | 'failed' | 'pending';
-  dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
-  userId: string;
-}
+import { SignalFilters } from '@/components/signals/types';
 
 export const useSignalFilters = (initialFilters?: Partial<SignalFilters>) => {
   const [filters, setFilters] = useState<SignalFilters>({

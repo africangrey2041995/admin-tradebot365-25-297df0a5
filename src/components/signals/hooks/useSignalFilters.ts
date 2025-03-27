@@ -14,7 +14,8 @@ export const useSignalFilters = () => {
     instruments: [],
     search: '',
     sortBy: 'timestamp',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+    signalSource: 'all'
   });
 
   const updateFilters = useCallback((newFilters: Partial<SignalFilters>) => {
@@ -32,7 +33,8 @@ export const useSignalFilters = () => {
       instruments: [],
       search: '',
       sortBy: 'timestamp',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      signalSource: 'all'
     });
   }, []);
 
@@ -42,5 +44,3 @@ export const useSignalFilters = () => {
     resetFilters
   };
 };
-
-export type { SignalFilters };
