@@ -47,6 +47,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
             <TableHead className="text-zinc-400 w-28">ID</TableHead>
             <TableHead className="text-zinc-400">Tên Bot</TableHead>
             <TableHead className="text-zinc-400">Trạng thái</TableHead>
+            <TableHead className="text-zinc-400">Sàn giao dịch</TableHead>
             <TableHead className="text-zinc-400 text-right">Tài khoản</TableHead>
             <TableHead className="text-zinc-400 text-right">Lợi nhuận</TableHead>
             <TableHead className="text-zinc-400">Ngày tạo</TableHead>
@@ -69,6 +70,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
                 <TableCell>
                   <BotStatusBadge status={bot.status} />
                 </TableCell>
+                <TableCell className="text-zinc-400">{bot.exchange || "—"}</TableCell>
                 <TableCell className="text-right">{bot.users}</TableCell>
                 <TableCell className={`text-right ${bot.profit && bot.profit.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
                   {bot.profit}
@@ -117,7 +119,7 @@ export const PremiumBotsTable: React.FC<PremiumBotsTableProps> = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+              <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                 Không tìm thấy kết quả phù hợp.
               </TableCell>
             </TableRow>
