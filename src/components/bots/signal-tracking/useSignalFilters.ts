@@ -1,29 +1,35 @@
 
 import { useState, useEffect } from 'react';
-import { SignalFilters } from '../trading-view-logs/AdvancedSignalFilter';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
+
+export interface SignalFilters {
+  search: string;
+  signalSource: 'all' | 'tradingview' | 'coinstrat';
+  status: 'all' | 'success' | 'failed' | 'pending';
+  dateRange: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
+  userId: string;
+}
 
 interface UseSignalFiltersProps {
   tradingViewLogs: TradingViewSignal[];
   coinstratLogs: CoinstratSignal[];
 }
 
-interface ErrorStats {
-  totalErrors: number;
-  tradingViewErrors: number;
-  coinstratErrors: number;
-}
-
-export interface UseSignalFiltersResult {
+interface UseSignalFiltersResult {
   filteredTradingViewLogs: TradingViewSignal[];
   filteredCoinstratLogs: CoinstratSignal[];
   filters: SignalFilters;
   handleFilterChange: (filters: SignalFilters) => void;
   setInitialFilters: (initialFilters: Partial<SignalFilters>) => void;
-  errorStats: ErrorStats;
 }
 
-export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFiltersProps): UseSignalFiltersResult => {
+export const useSignalFilters = ({
+  tradingViewLogs,
+  coinstratLogs
+}: UseSignalFiltersProps): UseSignalFiltersResult => {
   const [filters, setFilters] = useState<SignalFilters>({
     search: '',
     signalSource: 'all',
@@ -32,8 +38,7 @@ export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFi
       from: undefined,
       to: undefined
     },
-    userId: '',
-    errorOnly: false // Adding the missing errorOnly property
+    userId: ''
   });
 
   const [filteredTradingViewLogs, setFilteredTradingViewLogs] = useState<TradingViewSignal[]>(tradingViewLogs);
@@ -83,15 +88,7 @@ export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFi
       };
       
       filteredTvLogs = filteredTvLogs.filter(log => 
-        log.status?.toString().toLowerCase() === statusMap[currentFilters.status]?.toLowerCase()
-      );
-    }
-    
-    // Apply error only filter
-    if (currentFilters.errorOnly) {
-      filteredTvLogs = filteredTvLogs.filter(log => 
-        log.status?.toString().toLowerCase() === 'failed' || 
-        log.errorMessage
+        log.status.toString().toLowerCase() === statusMap[currentFilters.status]?.toLowerCase()
       );
     }
     
@@ -116,16 +113,7 @@ export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFi
       });
     }
     
-    // Apply user filter if specified
-    if (currentFilters.userId) {
-      filteredTvLogs = filteredTvLogs.filter(log => 
-        log.userId === currentFilters.userId
-      );
-    }
-    
-    setFilteredTradingViewLogs(filteredTvLogs);
-    
-    // Filter Coinstrat logs with similar logic
+    // Filter Coinstrat logs
     let filteredCsLogs = [...coinstratLogs];
     
     // Apply search filter
@@ -150,22 +138,14 @@ export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFi
       
       filteredCsLogs = filteredCsLogs.filter(log => {
         if (statusFilter === 'success') {
-          return log.processedAccounts?.length > 0 && log.failedAccounts?.length === 0;
+          return log.processedAccounts.length > 0;
         } else if (statusFilter === 'failed') {
-          return log.failedAccounts?.length > 0;
+          return log.failedAccounts.length > 0;
         } else if (statusFilter === 'pending') {
-          return log.status?.toString().toLowerCase().includes('pending');
+          return log.status.toString().toLowerCase().includes('pending');
         }
         return true;
       });
-    }
-    
-    // Apply error only filter
-    if (currentFilters.errorOnly) {
-      filteredCsLogs = filteredCsLogs.filter(log => 
-        log.failedAccounts?.length > 0 || 
-        log.errorMessage
-      );
     }
     
     // Apply date filter
@@ -189,40 +169,15 @@ export const useSignalFilters = ({ tradingViewLogs, coinstratLogs }: UseSignalFi
       });
     }
     
-    // Apply user filter
-    if (currentFilters.userId) {
-      filteredCsLogs = filteredCsLogs.filter(log => {
-        // Check if any processed or failed account belongs to the selected user
-        const hasUserInProcessed = log.processedAccounts?.some(
-          account => account.userId === currentFilters.userId
-        );
-        
-        const hasUserInFailed = log.failedAccounts?.some(
-          account => account.userId === currentFilters.userId
-        );
-        
-        return hasUserInProcessed || hasUserInFailed;
-      });
-    }
-    
+    setFilteredTradingViewLogs(filteredTvLogs);
     setFilteredCoinstratLogs(filteredCsLogs);
   };
 
-  // Calculate error statistics
-  const errorStats = {
-    totalErrors: 
-      (filteredTradingViewLogs.filter(log => log.status?.toString().toLowerCase() === 'failed' || log.errorMessage).length) +
-      (filteredCoinstratLogs.filter(log => log.failedAccounts?.length > 0 || log.errorMessage).length),
-    tradingViewErrors: filteredTradingViewLogs.filter(log => log.status?.toString().toLowerCase() === 'failed' || log.errorMessage).length,
-    coinstratErrors: filteredCoinstratLogs.filter(log => log.failedAccounts?.length > 0 || log.errorMessage).length
-  };
-
   return {
-    filters,
     filteredTradingViewLogs,
     filteredCoinstratLogs,
+    filters,
     handleFilterChange,
-    setInitialFilters,
-    errorStats
+    setInitialFilters
   };
 };

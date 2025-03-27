@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, X, Calendar, Users, BarChart, AlertTriangle } from 'lucide-react';
+import { Search, Filter, X, Calendar, Users, BarChart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,7 +17,6 @@ export interface SignalFilters {
     to: Date | undefined;
   };
   userId: string;
-  errorOnly: boolean; // Thêm trường mới để lọc chỉ hiển thị lỗi
 }
 
 interface AdvancedSignalFilterProps {
@@ -42,8 +40,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
       from: undefined,
       to: undefined
     },
-    userId: '',
-    errorOnly: false // Mặc định không lọc chỉ lỗi
+    userId: ''
   });
   
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -56,7 +53,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     if (filters.status !== 'all') active.push('status');
     if (filters.dateRange.from || filters.dateRange.to) active.push('date');
     if (filters.userId) active.push('user');
-    if (filters.errorOnly) active.push('error'); // Thêm bộ lọc lỗi vào danh sách bộ lọc active
     
     setActiveFilters(active);
   }, [filters]);
@@ -94,15 +90,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
     }));
   };
 
-  const handleErrorOnlyChange = (value: boolean) => {
-    setFilters(prev => ({
-      ...prev,
-      errorOnly: value,
-      // Nếu bật lọc chỉ lỗi, tự động chuyển status về 'failed'
-      status: value ? 'failed' : prev.status
-    }));
-  };
-
   const handleDateSelect = (range: { from: Date | undefined; to: Date | undefined }) => {
     setFilters(prev => ({
       ...prev,
@@ -119,8 +106,7 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
         from: undefined,
         to: undefined
       },
-      userId: '',
-      errorOnly: false
+      userId: ''
     });
     setDateOpen(false);
   };
@@ -141,9 +127,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
         break;
       case 'user':
         setFilters(prev => ({ ...prev, userId: '' }));
-        break;
-      case 'error':
-        setFilters(prev => ({ ...prev, errorOnly: false }));
         break;
     }
   };
@@ -240,17 +223,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               </SelectContent>
             </Select>
           )}
-
-          {/* Thêm công tắc lọc chỉ lỗi */}
-          <Button
-            variant={filters.errorOnly ? "default" : "outline"}
-            size="sm"
-            className={filters.errorOnly ? "bg-red-500 hover:bg-red-600 text-white" : "text-red-500"}
-            onClick={() => handleErrorOnlyChange(!filters.errorOnly)}
-          >
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            {filters.errorOnly ? "Chỉ hiển thị lỗi" : "Lọc lỗi"}
-          </Button>
           
           {showExport && exportComponent}
           
@@ -311,16 +283,6 @@ const AdvancedSignalFilter: React.FC<AdvancedSignalFilterProps> = ({
               <Users className="h-3 w-3" />
               User: {availableUsers.find(u => u.id === filters.userId)?.name || filters.userId}
               <Button variant="ghost" size="sm" onClick={() => removeFilter('user')} className="h-4 w-4 p-0 ml-1">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-
-          {activeFilters.includes('error') && (
-            <Badge variant="outline" className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              Chỉ hiển thị lỗi
-              <Button variant="ghost" size="sm" onClick={() => removeFilter('error')} className="h-4 w-4 p-0 ml-1">
                 <X className="h-3 w-3" />
               </Button>
             </Badge>

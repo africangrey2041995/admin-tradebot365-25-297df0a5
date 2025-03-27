@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId, validateUserId } from '@/utils/normalizeUserId';
-import { CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface AccountStatusSummaryProps {
   signal: CoinstratSignal;
@@ -35,62 +34,63 @@ const AccountStatusSummary: React.FC<AccountStatusSummaryProps> = ({ signal, use
       const normalizedInputUserId = normalizeUserId(userId);
       
       // Lọc tài khoản với so sánh chuẩn hóa
-      const userProcessedAccounts = signal.processedAccounts?.filter(account => {
+      const userProcessedAccounts = signal.processedAccounts.filter(account => {
         if (!account.userId) {
           console.warn(`AccountStatusSummary - Processed account ${account.accountId} is missing userId`);
           return false;
         }
         
         return normalizeUserId(account.userId) === normalizedInputUserId;
-      }) || [];
+      });
       
-      const userFailedAccounts = signal.failedAccounts?.filter(account => {
+      const userFailedAccounts = signal.failedAccounts.filter(account => {
         if (!account.userId) {
           console.warn(`AccountStatusSummary - Failed account ${account.accountId} is missing userId`);
           return false;
         }
         
         return normalizeUserId(account.userId) === normalizedInputUserId;
-      }) || [];
+      });
       
-      setSucceeded(userProcessedAccounts.length);
-      setFailed(userFailedAccounts.length);
-      setTotal(userProcessedAccounts.length + userFailedAccounts.length);
-      setIsLoading(false);
+      console.log(`AccountStatusSummary - For signal ${signal.id}, user ${userId} (normalized: ${normalizedInputUserId})`);
+      console.log(`AccountStatusSummary - Found ${userProcessedAccounts.length} processed and ${userFailedAccounts.length} failed accounts`);
+      
+      const processedCount = userProcessedAccounts.length;
+      const failedCount = userFailedAccounts.length;
+      const totalCount = processedCount + failedCount;
+      
+      setSucceeded(processedCount);
+      setFailed(failedCount);
+      setTotal(totalCount);
     } catch (error) {
-      console.error('Error processing account status:', error);
+      console.error('Error calculating account status:', error);
+      // Set safe defaults on error
+      setSucceeded(0);
+      setFailed(0);
+      setTotal(0);
+    } finally {
       setIsLoading(false);
     }
   }, [signal, userId]);
   
   if (isLoading) {
-    return <span className="text-sm text-muted-foreground">Loading...</span>;
-  }
-  
-  if (total === 0) {
-    return <span className="text-sm text-muted-foreground">Không có tài khoản</span>;
+    return <span className="text-muted-foreground text-sm">Đang tải...</span>;
   }
   
   return (
-    <div className="flex space-x-2">
+    <div className="flex flex-col gap-2">
       {succeeded > 0 && (
-        <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 flex items-center gap-1">
-          <CheckCircle className="h-3 w-3" />
-          {succeeded}
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200">
+          {succeeded} tài khoản thành công
         </Badge>
       )}
-      
       {failed > 0 && (
-        <Badge variant="outline" className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 flex items-center gap-1">
-          <AlertTriangle className="h-3 w-3" />
-          {failed}
+        <Badge variant="outline" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-200">
+          {failed} tài khoản thất bại
         </Badge>
       )}
-      
-      {succeeded > 0 && failed > 0 && (
-        <span className="text-xs text-muted-foreground">
-          ({Math.round((succeeded / total) * 100)}% thành công)
-        </span>
+      {total === 0 && (
+        <span className="text-muted-foreground text-sm">Không có tài khoản</span>
       )}
     </div>
   );

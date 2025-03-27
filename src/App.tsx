@@ -25,6 +25,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
+// Remove import for BotErrors
 
 // Admin Pages
 import AdminLayout from "./components/admin/AdminLayout";
@@ -44,6 +45,7 @@ import AdminPropBots from "./pages/admin/PropBots";
 import AdminPropBotDetail from "./pages/admin/PropBotDetail";
 import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
+// Remove import for AdminBotErrors
 import AdminPackages from "./pages/admin/Packages";
 
 // Fixed Clerk publishable key - this is your test key
@@ -99,6 +101,7 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
+                {/* Remove BotErrors route */}
                 
                 {/* Auth routes */}
                 <Route path="/sign-in" element={<SignIn />} />
@@ -110,6 +113,7 @@ const App = () => (
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="users/:userId" element={<AdminUserDetail />} />
                   <Route path="bots" element={<AdminBots />} />
+                  {/* Remove AdminBotErrors route */}
                   <Route path="premium-bots" element={<AdminPremiumBots />} />
                   <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
                   <Route path="prop-bots" element={<AdminPropBots />} />

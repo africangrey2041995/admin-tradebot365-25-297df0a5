@@ -121,6 +121,8 @@ export function useNavigation() {
     }
   };
 
+  // Removed navigateToBotErrors function
+
   /**
    * Điều hướng đến một đường dẫn cụ thể với xử lý lỗi
    * @param path Đường dẫn cần điều hướng đến
@@ -139,6 +141,7 @@ export function useNavigation() {
   return {
     navigateToBotDetail,
     navigateToAccountDetail,
+    // Removed navigateToBotErrors
     navigateTo,
     goBack,
     isAdminContext
