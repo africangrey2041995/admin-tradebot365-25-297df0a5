@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { CoinstratSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
@@ -35,15 +34,18 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
       accountId: `ACC-${2000 + i}`,
       userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
       status: 'Success',
-      errorMessage: ''
+      errorMessage: '',
+      name: `Account ${2000 + i}`,
+      timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
     })),
     failedAccounts: Math.random() > 0.7 ? Array(Math.floor(Math.random() * 2)).fill(null).map((_, i) => ({
       accountId: `ACC-${3000 + i}`,
       userId: `USR-${2000 + Math.floor(Math.random() * 10)}`,
       status: 'Failed',
-      errorMessage: 'Insufficient balance'
+      errorMessage: 'Insufficient balance',
+      name: `Account ${3000 + i}`,
+      timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
     })) : [],
-    // Adding the missing required properties
     signalToken: `Token-${1000 + index}`,
     maxLag: `${Math.floor(Math.random() * 10) + 1}s`,
     investmentType: 'crypto'
