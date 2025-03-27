@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ExtendedSignal } from '@/types/signal';
 import { BotType } from '@/constants/botTypes';
@@ -20,8 +21,10 @@ import ErrorGroupList from './ErrorGroupList';
 import { mockErrorSignals } from '@/components/bots/error-signals/mockData';
 import ErrorCategoryList from './ErrorCategoryList';
 import { Badge } from '@/components/ui/badge';
-import ErrorSignalRow from './ErrorSignalRow';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import ErrorDetailsTooltip from './ErrorDetailsTooltip';
 
 interface AdminErrorDisplayProps {
   botType: BotType; 
@@ -50,7 +53,7 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
     // Simulate API call to fetch error signals
     setTimeout(() => {
       const filtered = mockErrorSignals.filter(
-        signal => signal.botType?.toLowerCase().includes(botType.toLowerCase())
+        signal => botType === BotType.ALL_BOTS || signal.botType?.toLowerCase().includes(botType.toLowerCase())
       );
       setSignals(filtered);
       setFilteredSignals(filtered);
@@ -135,6 +138,33 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
 
   const handleMarkAsRead = (signalId: string) => {
     console.log("Admin marked signal as read:", signalId);
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy HH:mm');
+    } catch (error) {
+      console.error(`Error formatting date: ${dateString}`, error);
+      return dateString;
+    }
+  };
+
+  const renderSeverityBadge = (severity?: string) => {
+    const severityMap = {
+      'critical': { bg: 'bg-red-200 dark:bg-red-900/50', text: 'text-red-800 dark:text-red-200', label: 'Critical' },
+      'high': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'High' },
+      'medium': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Medium' },
+      'low': { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Low' }
+    };
+    
+    const config = severityMap[severity as keyof typeof severityMap] || severityMap.medium;
+    
+    return (
+      <Badge className={`${config.bg} ${config.text} border-none`}>
+        <AlertTriangle className="h-3 w-3 mr-1" />
+        {config.label}
+      </Badge>
+    );
   };
 
   if (loading) {
@@ -278,33 +308,78 @@ const AdminErrorDisplay: React.FC<AdminErrorDisplayProps> = ({
       )}
 
       {viewMode === 'table' && (
-        <Card>
+        <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow className="bg-red-50 dark:bg-red-900/20">
-                <TableHead className="text-red-700 dark:text-red-400">ID</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Mức độ</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Mô tả</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Thời gian</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Bot ID</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Người dùng</TableHead>
-                <TableHead className="text-red-700 dark:text-red-400">Hành động</TableHead>
+            <TableHeader className="bg-red-50 dark:bg-red-900/20">
+              <TableRow>
+                <TableHead className="text-red-700 dark:text-red-400 w-[120px]">Mã lỗi</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[100px]">Mức độ</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400">Mô tả lỗi</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[140px]">Thời gian</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[120px]">Bot ID</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[100px]">Loại bot</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[120px]">Người dùng</TableHead>
+                <TableHead className="text-red-700 dark:text-red-400 w-[100px]">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredSignals.map((signal) => (
-                <ErrorSignalRow 
-                  key={signal.id} 
-                  signal={signal}
-                  onMarkAsRead={handleMarkAsRead}
-                  isUnread={false}
-                  isAdmin={true}
-                  onViewDetails={onViewDetails}
-                />
+                <TableRow key={signal.id} className="hover:bg-muted/30">
+                  <TableCell className="font-mono text-xs">
+                    {signal.id}
+                  </TableCell>
+                  <TableCell>
+                    {renderSeverityBadge(signal.errorSeverity)}
+                  </TableCell>
+                  <TableCell>
+                    <ErrorDetailsTooltip errorMessage={signal.errorMessage || 'Không có thông tin'}>
+                      <span className="text-red-500 cursor-help">
+                        {signal.errorMessage 
+                          ? (signal.errorMessage.length > 50 
+                            ? `${signal.errorMessage.substring(0, 50)}...` 
+                            : signal.errorMessage)
+                          : 'Không có thông tin lỗi'
+                        }
+                      </span>
+                    </ErrorDetailsTooltip>
+                  </TableCell>
+                  <TableCell className="text-sm whitespace-nowrap">
+                    {formatDate(signal.timestamp)}
+                  </TableCell>
+                  <TableCell 
+                    className="cursor-pointer text-blue-500 hover:text-blue-700 hover:underline font-mono text-xs"
+                    onClick={() => onViewDetails(signal.id)}
+                  >
+                    {signal.botId || 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={cn(
+                      signal.botType?.includes('premium') ? 'text-amber-500 border-amber-500' :
+                      signal.botType?.includes('prop') ? 'text-blue-500 border-blue-500' :
+                      'text-green-500 border-green-500'
+                    )}>
+                      {signal.botType?.includes('premium') ? 'Premium' :
+                      signal.botType?.includes('prop') ? 'Prop' : 'User'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {signal.userId || 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => onViewDetails(signal.id)}
+                      className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      Chi tiết
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
-        </Card>
+        </div>
       )}
 
       {viewMode === 'categories' && (
