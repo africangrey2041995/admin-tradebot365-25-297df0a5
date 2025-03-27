@@ -2,7 +2,7 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2, Lock } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +27,12 @@ export function UserStatusToggle({ userId, initialStatus, onStatusChange }: User
   const [pendingStatus, setPendingStatus] = React.useState<'active' | 'inactive' | 'suspended' | null>(null);
 
   const handleToggleClick = (newStatus: 'active' | 'inactive' | 'suspended') => {
+    // Don't allow toggling if user is suspended
+    if (status === 'suspended') {
+      toast.error('Tài khoản đã bị khóa. Vui lòng mở khóa tài khoản trước khi thay đổi trạng thái.');
+      return;
+    }
+    
     setPendingStatus(newStatus);
     setConfirmDialogOpen(true);
   };
@@ -62,7 +68,13 @@ export function UserStatusToggle({ userId, initialStatus, onStatusChange }: User
     }
   };
 
+  // Update local state when initialStatus changes (e.g., when account is locked)
+  React.useEffect(() => {
+    setStatus(initialStatus);
+  }, [initialStatus]);
+
   const isActive = status === 'active';
+  const isSuspended = status === 'suspended';
 
   return (
     <>
@@ -70,12 +82,18 @@ export function UserStatusToggle({ userId, initialStatus, onStatusChange }: User
         <div className="space-y-0.5">
           <div className="text-sm font-medium">Trạng thái tài khoản</div>
           <div className="text-xs text-muted-foreground">
-            {isActive ? 'Tài khoản đang hoạt động' : 'Tài khoản bị vô hiệu hóa'}
+            {isSuspended ? (
+              <span className="text-red-500">Tài khoản đã bị khóa</span>
+            ) : isActive ? (
+              'Tài khoản đang hoạt động'
+            ) : (
+              'Tài khoản bị vô hiệu hóa'
+            )}
           </div>
         </div>
         <Switch
           checked={isActive}
-          disabled={isLoading}
+          disabled={isLoading || isSuspended}
           onCheckedChange={(checked) => handleToggleClick(checked ? 'active' : 'inactive')}
         />
       </div>

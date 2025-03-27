@@ -40,6 +40,7 @@ import {
   Edit,
   Key,
   AlertCircle,
+  Lock,
   MapPin
 } from "lucide-react";
 import { UserPackageManagement } from '@/components/admin/users/UserPackageManagement';
@@ -47,6 +48,7 @@ import UserAccountsTab from '@/components/admin/users/accounts/UserAccountsTab';
 import { UserEditDialog } from '@/components/admin/users/UserEditDialog';
 import { ResetPasswordDialog } from '@/components/admin/users/ResetPasswordDialog';
 import { UserStatusToggle } from '@/components/admin/users/UserStatusToggle';
+import { LockAccountDialog } from '@/components/admin/users/LockAccountDialog';
 import { toast } from 'sonner';
 
 const RoleBadge = ({ role }: { role: string }) => {
@@ -92,6 +94,7 @@ const AdminUserDetail = () => {
   const [selectedAccountsList, setSelectedAccountsList] = useState<any[]>([]);
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [lockAccountDialogOpen, setLockAccountDialogOpen] = useState(false);
 
   const user = {
     id: userId || 'USR-24051',
@@ -207,7 +210,10 @@ const AdminUserDetail = () => {
   };
 
   const handleStatusChange = (newStatus: 'active' | 'inactive' | 'suspended') => {
-    toast.success(`Trạng thái người dùng đã được thay đổi thành ${newStatus === 'active' ? 'Hoạt động' : 'Không hoạt động'}`);
+    if (user) {
+      user.status = newStatus;
+    }
+    toast.success(`Trạng thái người dùng đã được thay đổi thành ${newStatus === 'active' ? 'Hoạt động' : newStatus === 'inactive' ? 'Không hoạt động' : 'Đã khóa'}`);
   };
 
   const customBotCount = user.userBots.length;
@@ -461,11 +467,9 @@ const AdminUserDetail = () => {
                   <Button 
                     variant="destructive" 
                     className="gap-2"
-                    onClick={() => {
-                      toast.error("Tính năng đang được phát triển!");
-                    }}
+                    onClick={() => setLockAccountDialogOpen(true)}
                   >
-                    <AlertCircle className="h-4 w-4" />
+                    <Lock className="h-4 w-4" />
                     Khóa tài khoản
                   </Button>
                 </div>
@@ -953,6 +957,13 @@ const AdminUserDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <LockAccountDialog 
+        open={lockAccountDialogOpen}
+        onOpenChange={setLockAccountDialogOpen}
+        user={user}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   );
 };
