@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart2, List, NetworkIcon } from 'lucide-react';
+import { BarChart2, List, NetworkIcon, Webhook } from 'lucide-react';
 import { toast } from "sonner";
 import AdminPropBotOverviewTab from './AdminPropBotOverviewTab';
 import { PropBot } from '@/types/bot';
@@ -13,6 +12,7 @@ import HierarchicalAccountsTable from './components/HierarchicalAccountsTable';
 import { CoinstratSignal } from '@/types/signal';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
 import UnifiedSignalLogsTab from './UnifiedSignalLogsTab';
+import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -55,32 +55,25 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   onUpdateChallengeRules = () => {},
   connectedAccounts = []
 }) => {
-  // Centralized state for logs
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [refreshLogsCounter, setRefreshLogsCounter] = useState(0);
 
-  // Use the hook to fetch all logs with skipLoadingState=true to use parent's loading state
   const { logs: allLogs, fetchLogs } = useCoinstratLogs({
     botId,
     userId,
     refreshTrigger: refreshLogsCounter > 0,
-    skipLoadingState: true // Skip internal loading state management
+    skipLoadingState: true
   });
 
-  // Use a consolidated loading state that reflects the parent component's loading state
   const [logsLoading, setLogsLoading] = useState(isLoading);
 
-  // Update logsLoading when parent isLoading changes
   useEffect(() => {
     setLogsLoading(isLoading);
   }, [isLoading]);
 
-  // Memoized filtered logs to prevent unnecessary recalculations
   const filteredLogs = useMemo(() => {
-    // Start with all logs
     let filtered = [...allLogs];
     
-    // Apply search filter
     if (logsFilters.search) {
       const searchLower = logsFilters.search.toLowerCase();
       filtered = filtered.filter(log => 
@@ -90,12 +83,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
       );
     }
     
-    // Apply status filter
     if (logsFilters.status !== 'all') {
       filtered = filtered.filter(log => log.status?.toLowerCase() === logsFilters.status.toLowerCase());
     }
     
-    // Apply time filter
     if (logsFilters.time !== 'all') {
       const now = new Date();
       let startDate = new Date();
@@ -125,10 +116,8 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
     return filtered;
   }, [allLogs, logsFilters]);
 
-  // Central state for accounts data
   const [accountsExportData, setAccountsExportData] = useState<(string | number)[][]>([]);
   
-  // Memoized logs export data
   const logsExportData = useMemo(() => {
     return filteredLogs.map(log => [
       log.originalSignalId || '',
@@ -164,12 +153,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   };
 
   const handleRefreshLogs = () => {
-    // Set loading state to true before refreshing
     setLogsLoading(true);
     setRefreshLogsCounter(prev => prev + 1);
     fetchLogs();
     
-    // Set a timeout to ensure loading state is shown for at least 500ms
     setTimeout(() => {
       setLogsLoading(false);
     }, 500);
@@ -210,7 +197,7 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="overview">
           <BarChart2 className="h-4 w-4 mr-2" />
           Tổng quan
@@ -222,6 +209,10 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
         <TabsTrigger value="signal-tracking">
           <NetworkIcon className="h-4 w-4 mr-2" />
           Signal Tracking
+        </TabsTrigger>
+        <TabsTrigger value="integration">
+          <Webhook className="h-4 w-4 mr-2" />
+          Tích hợp TradingView
         </TabsTrigger>
       </TabsList>
       
@@ -268,6 +259,14 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
           botId={botId}
           userId={userId}
         />
+      </TabsContent>
+      
+      <TabsContent value="integration">
+        <Card>
+          <CardContent className="p-6">
+            <BotIntegrationInfo botId={botId} />
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
   );
