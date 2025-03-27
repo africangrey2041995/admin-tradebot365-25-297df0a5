@@ -6,11 +6,13 @@ import { PropBotStatsCards } from "@/components/admin/prop-bots/PropBotStatsCard
 import { PropBotActions } from "@/components/admin/prop-bots/PropBotActions";
 import { PropBotsTable } from "@/components/admin/prop-bots/PropBotsTable";
 import { mockPropBots } from '@/mocks/propBotsMock';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import AddPropBotDialog from '@/components/admin/prop-bots/AddPropBotDialog';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_ROUTES } from '@/constants/routes';
 import { PropBot } from '@/types/bot';
+import { BotStatus } from '@/constants/botTypes';
+import { BulkActionDialog } from "@/components/admin/premium-bots/BulkActionDialog";
 
 const PropBots: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,9 +21,14 @@ const PropBots: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [propBots, setPropBots] = useState(mockPropBots);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const itemsPerPage = 10;
+
+  // New state for selection and bulk actions
+  const [selectedBots, setSelectedBots] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [bulkActionType, setBulkActionType] = useState<'activate' | 'deactivate' | null>(null);
+  const [isBulkActionDialogOpen, setIsBulkActionDialogOpen] = useState(false);
 
   // Filter and pagination logic
   const filteredBots = propBots.filter(bot => {
@@ -42,11 +49,62 @@ const PropBots: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Dữ liệu đã được làm mới",
-        description: "Dữ liệu Prop Trading Bots đã được cập nhật",
-      });
+      toast.success("Dữ liệu đã được làm mới");
     }, 800);
+  };
+
+  // Selection handlers
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedBots([]);
+      setSelectAll(false);
+    } else {
+      setSelectedBots(currentBots.map(bot => bot.botId));
+      setSelectAll(true);
+    }
+  };
+
+  const handleSelectBot = (botId: string) => {
+    if (selectedBots.includes(botId)) {
+      setSelectedBots(selectedBots.filter(id => id !== botId));
+      setSelectAll(false);
+    } else {
+      setSelectedBots([...selectedBots, botId]);
+      if (selectedBots.length + 1 === currentBots.length) {
+        setSelectAll(true);
+      }
+    }
+  };
+
+  const clearSelections = () => {
+    setSelectedBots([]);
+    setSelectAll(false);
+  };
+
+  // Bulk action handlers
+  const openBulkActionDialog = (action: 'activate' | 'deactivate') => {
+    setBulkActionType(action);
+    setIsBulkActionDialogOpen(true);
+  };
+
+  const executeBulkAction = () => {
+    if (!bulkActionType) return;
+    
+    const newStatus = bulkActionType === 'activate' ? BotStatus.ACTIVE : BotStatus.INACTIVE;
+    const actionText = bulkActionType === 'activate' ? 'kích hoạt' : 'tạm dừng';
+    
+    // Update bot statuses in state
+    setPropBots(prevBots => 
+      prevBots.map(bot => 
+        selectedBots.includes(bot.botId) 
+          ? { ...bot, status: newStatus } 
+          : bot
+      )
+    );
+    
+    toast.success(`Đã ${actionText} ${selectedBots.length} Prop Bot thành công`);
+    setIsBulkActionDialogOpen(false);
+    clearSelections();
   };
 
   const handleAddNewBot = () => {
@@ -58,10 +116,7 @@ const PropBots: React.FC = () => {
     // In a real application, we would fetch the updated data from the API
     // For now, we'll just add the new bot to our local state and refresh
     setPropBots(prevBots => [newBot, ...prevBots]);
-    toast({
-      title: "Thêm bot thành công",
-      description: `Đã thêm bot ${newBot.name} vào hệ thống`,
-    });
+    toast.success(`Đã thêm bot ${newBot.name} vào hệ thống`);
     setIsAddDialogOpen(false);
   };
 
@@ -83,10 +138,7 @@ const PropBots: React.FC = () => {
     const bot = propBots.find(b => b.botId === botId);
     if (bot) {
       const action = bot.isFeatured ? "đã bỏ đánh dấu" : "đã đánh dấu";
-      toast({
-        title: `Bot ${action} là Nổi Bật`,
-        description: `Bot "${bot.name}" ${action} là Nổi Bật`,
-      });
+      toast.success(`Bot ${action} là Nổi Bật`);
     }
   };
 
@@ -103,10 +155,7 @@ const PropBots: React.FC = () => {
     const bot = propBots.find(b => b.botId === botId);
     if (bot) {
       const action = bot.isNew ? "đã bỏ đánh dấu" : "đã đánh dấu";
-      toast({
-        title: `Bot ${action} là Mới`,
-        description: `Bot "${bot.name}" ${action} là Mới`,
-      });
+      toast.success(`Bot ${action} là Mới`);
     }
   };
 
@@ -123,10 +172,7 @@ const PropBots: React.FC = () => {
     const bot = propBots.find(b => b.botId === botId);
     if (bot) {
       const action = bot.isBestSeller ? "đã bỏ đánh dấu" : "đã đánh dấu";
-      toast({
-        title: `Bot ${action} là Bán Chạy`,
-        description: `Bot "${bot.name}" ${action} là Bán Chạy`,
-      });
+      toast.success(`Bot ${action} là Bán Chạy`);
     }
   };
 
@@ -154,6 +200,9 @@ const PropBots: React.FC = () => {
         setStatusFilter={setStatusFilter}
         isLoading={isLoading}
         refreshData={refreshData}
+        selectedBots={selectedBots}
+        clearSelections={clearSelections}
+        openBulkActionDialog={openBulkActionDialog}
       />
 
       <PropBotsTable 
@@ -165,12 +214,24 @@ const PropBots: React.FC = () => {
         onToggleFeatured={handleToggleFeatured}
         onToggleNew={handleToggleNew}
         onToggleBestSeller={handleToggleBestSeller}
+        selectedBots={selectedBots}
+        selectAll={selectAll}
+        onSelectAll={handleSelectAll}
+        onSelectBot={handleSelectBot}
       />
 
       <AddPropBotDialog 
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onSuccess={handleAddSuccess}
+      />
+
+      <BulkActionDialog
+        open={isBulkActionDialogOpen}
+        onOpenChange={setIsBulkActionDialogOpen}
+        selectedBotsCount={selectedBots.length}
+        bulkAction={bulkActionType}
+        onConfirm={executeBulkAction}
       />
     </div>
   );

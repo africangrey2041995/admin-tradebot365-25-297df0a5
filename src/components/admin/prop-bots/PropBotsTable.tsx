@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronLeft, ChevronRight, Star, Sparkles, Trophy } from 'lucide-react';
 import { BotStatusBadge } from '../premium-bots/BotStatusBadge';
 import { BotTag } from '@/components/bots/BotTag';
@@ -17,6 +18,11 @@ interface PropBotsTableProps {
   onToggleFeatured?: (botId: string, event: React.MouseEvent) => void;
   onToggleNew?: (botId: string, event: React.MouseEvent) => void;
   onToggleBestSeller?: (botId: string, event: React.MouseEvent) => void;
+  // New props for selection
+  selectedBots: string[];
+  selectAll: boolean;
+  onSelectAll: () => void;
+  onSelectBot: (botId: string) => void;
 }
 
 export const PropBotsTable: React.FC<PropBotsTableProps> = ({
@@ -27,7 +33,12 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
   onRowClick,
   onToggleFeatured,
   onToggleNew,
-  onToggleBestSeller
+  onToggleBestSeller,
+  // New props for selection
+  selectedBots,
+  selectAll,
+  onSelectAll,
+  onSelectBot
 }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
@@ -35,6 +46,14 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
         <Table>
           <TableHeader className="bg-zinc-800/50">
             <TableRow>
+              {/* New checkbox column for selection */}
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={selectAll}
+                  onCheckedChange={onSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="text-zinc-400 font-medium">Bot ID</TableHead>
               <TableHead className="text-zinc-400 font-medium">Tên</TableHead>
               <TableHead className="text-zinc-400 font-medium">Tags</TableHead>
@@ -48,7 +67,7 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
           <TableBody>
             {currentBots.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center text-zinc-500">
+                <TableCell colSpan={9} className="h-24 text-center text-zinc-500">
                   Không tìm thấy Prop Bot nào phù hợp với tiêu chí tìm kiếm.
                 </TableCell>
               </TableRow>
@@ -62,6 +81,14 @@ export const PropBotsTable: React.FC<PropBotsTableProps> = ({
                   )}
                   onClick={() => onRowClick && onRowClick(bot.botId)}
                 >
+                  {/* New checkbox cell for selection */}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedBots.includes(bot.botId)}
+                      onCheckedChange={() => onSelectBot(bot.botId)}
+                      aria-label={`Select ${bot.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium text-white">{bot.botId}</TableCell>
                   <TableCell className="text-white">{bot.name}</TableCell>
                   <TableCell>
