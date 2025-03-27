@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { AccountsFilterParams } from '../../types/account-types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AccountsFilterProps {
   filters: AccountsFilterParams;
@@ -37,25 +38,20 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange
         />
       </div>
       
-      <select 
-        className="px-2 py-1 border rounded-md text-sm"
-        value={filters.filterStatus}
-        onChange={(e) => onFilterChange('filterStatus', e.target.value)}
+      <Select 
+        value={filters.filterStatus} 
+        onValueChange={(value) => onFilterChange('filterStatus', value)}
       >
-        <option value="all">All Statuses</option>
-        <option value="connected">Connected</option>
-        <option value="disconnected">Disconnected</option>
-      </select>
-      
-      <select 
-        className="px-2 py-1 border rounded-md text-sm"
-        value={filters.filterLiveDemo}
-        onChange={(e) => onFilterChange('filterLiveDemo', e.target.value)}
-      >
-        <option value="all">All Accounts</option>
-        <option value="live">Live</option>
-        <option value="demo">Demo</option>
-      </select>
+        <SelectTrigger className="w-[150px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="inactive">Inactive</SelectItem>
+          <SelectItem value="error">Error</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };
