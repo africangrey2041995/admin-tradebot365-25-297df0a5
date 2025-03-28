@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -1185,8 +1184,8 @@ const AccountProfile = () => {
         onOpenChange={setIsConnectAllDialogOpen}
         title="Connect All API Keys"
         description={`Are you sure you want to connect all ${selectedKeyIds.length} selected API keys?`}
-        confirmLabel={isProcessingConnection ? "Processing..." : "Connect All"}
-        isLoading={isProcessingConnection}
+        confirmText={isProcessingConnection ? "Processing..." : "Connect All"}
+        isProcessing={isProcessingConnection}
         onConfirm={processConnectAll}
       />
       
@@ -1195,10 +1194,10 @@ const AccountProfile = () => {
         onOpenChange={setIsDisconnectAllDialogOpen}
         title="Disconnect All API Keys"
         description={`Are you sure you want to disconnect all ${selectedKeyIds.length} selected API keys?`}
-        confirmLabel={isProcessingConnection ? "Processing..." : "Disconnect All"}
-        isLoading={isProcessingConnection}
+        confirmText={isProcessingConnection ? "Processing..." : "Disconnect All"}
+        isProcessing={isProcessingConnection}
         onConfirm={processDisconnectAll}
-        variant="destructive"
+        variant="danger"
       />
       
       {/* Bulk Action Bar */}
