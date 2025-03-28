@@ -31,7 +31,7 @@ const createMockTradeViewLogs = (): TradingViewSignal[] => {
         status: ['Processed', 'Pending', 'Failed', 'Sent'][Math.floor(Math.random() * 4)],
         processingTime: Math.floor(Math.random() * 5000) + '',
         errorMessage: Math.random() > 0.8 ? 'Connection timeout or symbol issues' : undefined,
-        botId: botId, // Set the botId property explicitly
+        botId: botId, // Set the botId property explicitly 
         userId: `USR-${1000 + index % 10}`, // Consistent userId format
       };
     });
