@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
@@ -26,13 +26,21 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   const isSpecialTestBot = botId === 'MY-001';
   console.log(`Is special test bot (MY-001): ${isSpecialTestBot}`);
   
+  // Use a stable value for isAdminView
+  const isAdminViewStable = useRef(isAdminView);
+  
+  // Only update isAdminView ref if it changes to prevent unnecessary rerenders
+  useEffect(() => {
+    isAdminViewStable.current = isAdminView;
+  }, [isAdminView]);
+  
   const {
     tradingViewLogs,
     coinstratLogs,
     logsLoading,
     availableUsers,
     refreshSignalLogs
-  } = useSignalManagement(botId, userId, isAdminView);
+  } = useSignalManagement(botId, userId, isAdminViewStable.current);
   
   // Use a ref to track if initial load has happened
   const initialLoadRef = useRef(false);
@@ -41,6 +49,11 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   
   // Log the current state for debugging
   console.log(`SignalTrackingTab - tradingViewLogs: ${tradingViewLogs.length}, coinstratLogs: ${coinstratLogs.length}, logsLoading: ${logsLoading}`);
+  
+  // Memoize the export data preparation
+  const exportData = useMemo(() => {
+    return []; // Prepare your export data here
+  }, []);
   
   // Only refresh on mount if we haven't loaded before
   useEffect(() => {
@@ -106,7 +119,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
             showExport={true}
             exportComponent={
               <ExportDataDropdown 
-                data={[]} 
+                data={exportData} 
                 headers={['ID', 'Signal', 'Action', 'Timestamp', 'Status']} 
                 fileName={`bot-${botId}-signals`} 
               />

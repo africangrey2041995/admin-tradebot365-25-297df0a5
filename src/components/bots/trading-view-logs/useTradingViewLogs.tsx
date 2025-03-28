@@ -1,10 +1,15 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TradingViewSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
-// Create a sample data set with proper ID formats and consistent data for common bot IDs
-const createMockTradeViewLogs = (): TradingViewSignal[] => {
+// Create a consistent mock data generator with seed-based randomness
+const createMockTradeViewLogs = (seed = 123): TradingViewSignal[] => {
+  // Use the seed to create deterministic "random" values
+  const pseudoRandom = (n: number) => {
+    return ((seed * 9301 + 49297) % 233280) / 233280;
+  };
+
   // Generate different bot types for variety
   const botTypes = ['MY', 'PRE', 'PROP'];
   const getBotId = (index: number) => {
@@ -31,18 +36,27 @@ const createMockTradeViewLogs = (): TradingViewSignal[] => {
       // This ensures MY-001 bot always has signals for USR-001
       const userId = index < 3 ? commonUserIds[index % commonUserIds.length] : `USR-${1000 + index % 10}`;
       
+      // Use consistent values based on index for stable rendering
+      const actionIndex = Math.floor(pseudoRandom(index * 1) * 4);
+      const instrumentIndex = Math.floor(pseudoRandom(index * 2) * 4);
+      const statusIndex = Math.floor(pseudoRandom(index * 3) * 4);
+      
+      // Ensure timestamps are stable and don't change on every render
+      const timeOffset = index * 3600000; // Each entry 1 hour apart
+      const timestamp = new Date(Date.now() - timeOffset).toISOString();
+      
       return {
         id: `TV-${1000 + index}`,
-        action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][Math.floor(Math.random() * 4)] as any,
-        instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][Math.floor(Math.random() * 4)],
-        timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+        action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][actionIndex] as any,
+        instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][instrumentIndex],
+        timestamp: timestamp,
         signalToken: botId, // Use botId directly as the signalToken for easier filtering
-        maxLag: (Math.floor(Math.random() * 5) + 1) * 60 + '',
+        maxLag: (Math.floor(pseudoRandom(index * 4) * 5) + 1) * 60 + '',
         investmentType: 'contract',
-        amount: (Math.random() * 0.5 + 0.01).toFixed(3),
-        status: ['Processed', 'Pending', 'Failed', 'Sent'][Math.floor(Math.random() * 4)],
-        processingTime: Math.floor(Math.random() * 5000) + '',
-        errorMessage: Math.random() > 0.8 ? 'Connection timeout or symbol issues' : undefined,
+        amount: (pseudoRandom(index * 5) * 0.5 + 0.01).toFixed(3),
+        status: ['Processed', 'Pending', 'Failed', 'Sent'][statusIndex],
+        processingTime: Math.floor(pseudoRandom(index * 6) * 5000) + '',
+        errorMessage: pseudoRandom(index * 7) > 0.8 ? 'Connection timeout or symbol issues' : undefined,
         botId: botId, // Set the botId property explicitly 
         userId: userId, // Consistent userId format
       };
@@ -74,22 +88,42 @@ export const useTradingViewLogs = ({
   const [logs, setLogs] = useState<TradingViewSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
   
+  // Cache the mock data to prevent regeneration on every render
+  const mockDataRef = useRef<TradingViewSignal[]>([]);
+  
   // Use our safe loading hook
   const { loading, startLoading, stopLoading } = useSafeLoading({
     debugComponent: 'TradingViewLogs',
-    skipLoadingState
+    skipLoadingState,
+    minLoadingDurationMs: 500 // Add minimum loading time to prevent flicker
   });
+  
+  // Track the last fetch time to prevent rapid refreshes
+  const lastFetchTimeRef = useRef(0);
   
   const fetchLogs = useCallback(() => {
     try {
+      // Implement debounce - prevent fetching if last fetch was less than 1 second ago
+      const now = Date.now();
+      if (now - lastFetchTimeRef.current < 1000) {
+        console.log('TradingViewLogs - Fetch throttled, too recent');
+        return;
+      }
+      
+      lastFetchTimeRef.current = now;
       startLoading();
       console.log(`Fetching TradingView logs for botId: ${botId}, userId: ${userId}`);
       
       // In a real app, we would fetch data from API here
       setTimeout(() => {
         try {
-          const allLogs = initialData || createMockTradeViewLogs();
-          console.log(`Generated ${allLogs.length} TradingView logs`);
+          // Generate mock data only once and cache it
+          if (mockDataRef.current.length === 0) {
+            mockDataRef.current = initialData || createMockTradeViewLogs();
+            console.log(`Generated ${mockDataRef.current.length} TradingView logs`);
+          }
+          
+          const allLogs = mockDataRef.current;
           
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
@@ -115,13 +149,10 @@ export const useTradingViewLogs = ({
           if (userId) {
             console.log(`Filtering TradingView logs by userId: ${userId}`);
             
-            // Check if we're in admin view to modify behavior
-            const isAdminView = window.location.pathname.includes('/admin/');
+            // Replace URL check with pure logic based on userId
+            const isEmptyUserId = !userId || userId.trim() === '';
             
-            if (isAdminView) {
-              // In admin view, we want to show all logs for the bot, regardless of user
-              console.log('Admin view detected, showing all user logs for this bot');
-            } else {
+            if (!isEmptyUserId) {
               // More flexible user ID filtering
               filteredLogs = filteredLogs.filter(log => {
                 const logUserId = log.userId?.toLowerCase() || '';
@@ -136,16 +167,12 @@ export const useTradingViewLogs = ({
           
           console.log(`TradingView logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}`);
           
-          // Debug log some sample data if available
-          if (filteredLogs.length > 0) {
-            console.log('Sample TradingView log:', JSON.stringify(filteredLogs[0]));
-          } else {
-            console.log('No filtered TradingView logs found. Check botId and userId filtering.');
-          }
-          
-          setLogs(filteredLogs);
-          setError(null);
-          stopLoading();
+          // Introduce a slight delay to stabilize UI
+          setTimeout(() => {
+            setLogs(filteredLogs);
+            setError(null);
+            stopLoading();
+          }, 300);
         } catch (err) {
           console.error('Error processing TradingView logs:', err);
           setError(err instanceof Error ? err : new Error('Unknown error occurred'));

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { TradingViewSignal, CoinstratSignal } from '@/types/signal';
 import { useTradingViewLogs } from '@/components/bots/trading-view-logs/useTradingViewLogs';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
@@ -27,7 +27,7 @@ export const useCombinedSignalLogs = ({
   refreshTrigger = false,
   isAdminView = false // Default to false
 }: UseCombinedSignalLogsProps): UseCombinedSignalLogsResult => {
-  // Use the safeLoading hook with timeout
+  // Use the safeLoading hook with timeout and minimum loading time to prevent flicker
   const { loading, startLoading, stopLoading } = useSafeLoading({
     timeoutMs: 10000, // 10 seconds timeout
     debugComponent: 'CombinedSignalLogs',
@@ -37,20 +37,29 @@ export const useCombinedSignalLogs = ({
   // Track if fetch is in progress to prevent duplicate requests
   const fetchInProgressRef = useRef(false);
   
+  // Cache for signal logs
+  const cachedLogsRef = useRef<{
+    tradingViewLogs: TradingViewSignal[];
+    coinstratLogs: CoinstratSignal[];
+    timestamp: number;
+  }>({
+    tradingViewLogs: [],
+    coinstratLogs: [],
+    timestamp: 0
+  });
+  
+  // Track if we should update the UI
+  const shouldUpdateUIRef = useRef(true);
+  
   console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
   
-  // Detect if we're in admin view by checking the URL
-  const isInAdminView = isAdminView || window.location.pathname.includes('/admin/');
-  console.log(`Admin view detection: isAdminView prop=${isAdminView}, path check=${window.location.pathname.includes('/admin/')}, final=${isInAdminView}`);
+  // Use props for admin view detection instead of checking URL
+  const effectiveUserId = isAdminView ? '' : userId;
   
-  // Use both hooks for fetching different log types with skipLoadingState
-  // If we're in admin view, we want to see all logs for the bot, so we might skip userId filtering
-  const effectiveUserId = isInAdminView ? '' : userId;
-  
-  console.log(`Using effectiveUserId for filtering: ${effectiveUserId} (original: ${userId}, admin view: ${isInAdminView})`);
+  console.log(`Using effectiveUserId for filtering: ${effectiveUserId} (original: ${userId}, admin view: ${isAdminView})`);
   
   const {
-    logs: tradingViewLogs,
+    logs: tvFetchedLogs,
     loading: tvLoading,
     error: tvError,
     fetchLogs: fetchTvLogs
@@ -62,7 +71,7 @@ export const useCombinedSignalLogs = ({
   });
 
   const {
-    logs: coinstratLogs,
+    logs: csFetchedLogs,
     loading: csLoading,
     error: csError,
     fetchLogs: fetchCsLogs
@@ -73,10 +82,32 @@ export const useCombinedSignalLogs = ({
     skipLoadingState: true // Skip internal loading state in the hook
   });
 
+  // Memoize the logs to prevent unnecessary re-renders
+  const tradingViewLogs = useMemo(() => {
+    // Only update if we have new data and should update UI
+    if (tvFetchedLogs.length > 0 && shouldUpdateUIRef.current) {
+      cachedLogsRef.current.tradingViewLogs = tvFetchedLogs;
+      cachedLogsRef.current.timestamp = Date.now();
+    }
+    return cachedLogsRef.current.tradingViewLogs;
+  }, [tvFetchedLogs]);
+  
+  const coinstratLogs = useMemo(() => {
+    // Only update if we have new data and should update UI
+    if (csFetchedLogs.length > 0 && shouldUpdateUIRef.current) {
+      cachedLogsRef.current.coinstratLogs = csFetchedLogs;
+      cachedLogsRef.current.timestamp = Date.now();
+    }
+    return cachedLogsRef.current.coinstratLogs;
+  }, [csFetchedLogs]);
+
   const [availableUsers, setAvailableUsers] = useState<{ id: string; name: string }[]>([]);
   
-  // Extract unique users from Coinstrat logs
+  // Extract unique users from Coinstrat logs - memoized to prevent recalculations
   useEffect(() => {
+    // Skip if no logs to process
+    if (coinstratLogs.length === 0) return;
+    
     const userMap = new Map<string, string>();
     
     // Add current user to the map first
@@ -133,13 +164,12 @@ export const useCombinedSignalLogs = ({
     }
     
     const users = Array.from(userMap.entries()).map(([id, name]) => ({ id, name }));
-    console.log(`Available users for signals: ${users.length}`, users);
     setAvailableUsers(users);
   }, [coinstratLogs, tradingViewLogs, userId]);
 
-  // This is a modified version that better handles the loading state
+  // This is a modified version with debounce to prevent multiple refreshes
   const refreshLogs = useCallback(() => {
-    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}, admin view: ${isInAdminView}`);
+    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}, admin view: ${isAdminView}`);
     
     // Prevent concurrent fetches
     if (fetchInProgressRef.current) {
@@ -149,6 +179,9 @@ export const useCombinedSignalLogs = ({
     
     fetchInProgressRef.current = true;
     startLoading();
+    
+    // Temporarily disable UI updates during refresh to prevent flickering
+    shouldUpdateUIRef.current = false;
     
     // Create a promise that resolves when both fetches are complete
     Promise.all([
@@ -165,11 +198,16 @@ export const useCombinedSignalLogs = ({
       })
     ]).then(() => {
       // Both fetches have completed
-      stopLoading();
-      fetchInProgressRef.current = false;
-      console.log('CombinedSignalLogs - All fetches complete, loading state cleared');
+      setTimeout(() => {
+        // Re-enable UI updates after a short delay
+        shouldUpdateUIRef.current = true;
+        stopLoading();
+        fetchInProgressRef.current = false;
+        console.log('CombinedSignalLogs - All fetches complete, loading state cleared');
+      }, 300); // Small delay to ensure smoother transition
     }).catch(error => {
       console.error('Error in refreshLogs:', error);
+      shouldUpdateUIRef.current = true;
       stopLoading();
       fetchInProgressRef.current = false;
     });
@@ -178,18 +216,27 @@ export const useCombinedSignalLogs = ({
     setTimeout(() => {
       if (fetchInProgressRef.current) {
         console.warn('CombinedSignalLogs - Safety timeout reached, forcing loading state reset');
+        shouldUpdateUIRef.current = true;
         stopLoading();
         fetchInProgressRef.current = false;
       }
     }, 5000);
-  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading, isInAdminView]);
+  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading, isAdminView]);
 
   // Initial fetch
   useEffect(() => {
-    console.log(`Initial fetch for combined logs, botId: ${botId}, userId: ${userId}, admin view: ${isInAdminView}`);
-    refreshLogs();
+    console.log(`Initial fetch for combined logs, botId: ${botId}, userId: ${userId}, admin view: ${isAdminView}`);
+    
+    // Load from cache first if available to prevent initial flicker
+    if (cachedLogsRef.current.timestamp > 0) {
+      // Use cached data
+      console.log('Using cached signal logs');
+    } else {
+      // Fetch new data
+      refreshLogs();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [botId, userId, isInAdminView]);
+  }, [botId, userId, isAdminView]);
 
   // Handle refresh trigger from parent
   useEffect(() => {
