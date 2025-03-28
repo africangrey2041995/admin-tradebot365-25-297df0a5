@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Sidebar,
@@ -19,7 +19,8 @@ import {
   Sparkles,
   TrendingUp,
   Package,
-  ActivitySquare
+  ActivitySquare,
+  Receipt
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ import TradeBotLogo from '@/components/common/TradeBotLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import NavGroup from '@/components/layout/sidebar/NavGroup';
 import NavMenuItem from '@/components/layout/sidebar/NavMenuItem';
+import { ADMIN_ROUTES } from '@/constants/routes';
 
 const AdminSidebarNav = () => {
   const location = useLocation();
@@ -113,6 +115,12 @@ const AdminSidebarNav = () => {
             label="Gói dịch vụ" 
             icon={Package} 
             isActive={isActive('/admin/packages')} 
+          />
+          <NavMenuItem 
+            path="/admin/subscriptions" 
+            label="Quản lý đăng ký" 
+            icon={Receipt} 
+            isActive={isActive('/admin/subscriptions')} 
           />
         </NavGroup>
         

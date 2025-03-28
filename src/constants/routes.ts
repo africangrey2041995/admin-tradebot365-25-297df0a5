@@ -45,6 +45,7 @@ export const ADMIN_ROUTES = {
   EMAIL: '/admin/email',
   DATABASE: '/admin/database',
   SETTINGS: '/admin/settings',
+  SUBSCRIPTIONS: '/admin/subscriptions', // Add the subscriptions route
 };
 
 // Shared Routes (common routes with same structure for both admin and user)
