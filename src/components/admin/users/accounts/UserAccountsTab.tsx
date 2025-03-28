@@ -67,8 +67,9 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     handleToggleConnection
   } = useUserManagement('all', userId);
 
-  // Reference for the indeterminate checkbox state
-  const checkboxRef = useRef<HTMLInputElement | null>(null);
+  // Define checkbox ref using the correct type from @radix-ui/react-checkbox
+  // The Checkbox component from shadcn/ui is based on a button element
+  const checkboxRef = useRef<React.ElementRef<typeof Checkbox>>(null);
 
   const handleRefresh = () => {
     setIsLoading(true);
@@ -203,10 +204,16 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   const allAccountsSelected = filteredAccounts.length > 0 && selectedAccounts.length === filteredAccounts.length;
   const someAccountsSelected = selectedAccounts.length > 0 && selectedAccounts.length < filteredAccounts.length;
 
-  // Update the indeterminate state when selection changes
+  // Set the indeterminate state using DOM API since it's not available as a prop
   React.useEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = someAccountsSelected;
+    // Access the DOM node and set indeterminate property directly
+    const checkboxNode = checkboxRef.current;
+    if (checkboxNode) {
+      // Use the querySelector to find the actual input element inside the Checkbox component
+      const inputNode = document.getElementById('select-all-checkbox')?.querySelector('input');
+      if (inputNode) {
+        inputNode.indeterminate = someAccountsSelected;
+      }
     }
   }, [someAccountsSelected]);
 
@@ -279,6 +286,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                   <TableRow className="border-zinc-800">
                     <TableHead className="w-[40px] text-zinc-400">
                       <Checkbox 
+                        id="select-all-checkbox"
                         checked={allAccountsSelected}
                         ref={checkboxRef}
                         onCheckedChange={handleSelectAllAccounts}
