@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Card, 
   CardHeader, 
@@ -9,15 +9,22 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, ExternalLink, Webhook, Key, Link2 } from 'lucide-react';
+import { Copy, ExternalLink, Webhook, Key, Link2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ConnectionSettingsCardProps {
   webhookUrl: string;
   signalToken: string;
+  isOwner?: boolean;
 }
 
-const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsCardProps) => {
+const ConnectionSettingsCard = ({ 
+  webhookUrl, 
+  signalToken, 
+  isOwner = true 
+}: ConnectionSettingsCardProps) => {
+  const [showToken, setShowToken] = useState(false);
+  
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${type} copied to clipboard`);
@@ -26,6 +33,10 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
   const truncateMiddle = (text: string, startChars = 30, endChars = 15) => {
     if (text.length <= startChars + endChars) return text;
     return `${text.substring(0, startChars)}...${text.substring(text.length - endChars)}`;
+  };
+
+  const toggleShowToken = () => {
+    setShowToken(!showToken);
   };
 
   return (
@@ -81,15 +92,33 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
             </p>
             <div className="relative">
               <div className="flex items-center border rounded-md bg-slate-50 dark:bg-zinc-900 pl-4 pr-2 py-2">
-                <code className="text-sm flex-grow">{signalToken}</code>
-                <Button 
-                  size="icon" 
-                  variant="ghost"
-                  className="h-8 w-8 ml-2"
-                  onClick={() => copyToClipboard(signalToken, 'Signal Token')}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+                {isOwner ? (
+                  <>
+                    <code className="text-sm flex-grow">{showToken ? signalToken : '••••••••••••••••••••••••••••••'}</code>
+                    <div className="flex gap-1 ml-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={toggleShowToken}
+                      >
+                        {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      {showToken && (
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => copyToClipboard(signalToken, 'Signal Token')}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <code className="text-sm flex-grow">••••••••••••••••••••••••••••••</code>
+                )}
               </div>
             </div>
           </div>
@@ -97,7 +126,13 @@ const ConnectionSettingsCard = ({ webhookUrl, signalToken }: ConnectionSettingsC
           <div className="bg-amber-50 border border-amber-200 p-4 rounded-md">
             <h4 className="font-medium text-amber-800 mb-2">Example TradingView Alert Message</h4>
             <pre className="bg-white border border-amber-100 p-3 rounded text-xs overflow-auto text-slate-700">
-{`{{strategy.order.alert_message}}`}
+{`{
+  "token": "${showToken && isOwner ? signalToken : '[Signal Token]'}",
+  "action": "{{strategy.order.action}}",
+  "price": {{strategy.order.price}},
+  "symbol": "{{ticker}}",
+  "volume": {{strategy.order.contracts}}
+}`}
             </pre>
           </div>
         </div>

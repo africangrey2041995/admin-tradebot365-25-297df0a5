@@ -17,6 +17,11 @@ import { Webhook } from 'lucide-react';
 import { BotRiskLevel } from '@/constants/botTypes';
 import { toast } from 'sonner';
 
+// Hàm tạo Signal Token nhất quán (giống như ở BotProfile)
+const generateSignalToken = (botId: string) => {
+  return `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 10)}`;
+};
+
 const PremiumBotDetail = () => {
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
@@ -52,6 +57,9 @@ const PremiumBotDetail = () => {
     handleUpdateBotInfo,
     refreshSignalLogs
   } = usePremiumBotDetail(botId, 'admin');
+
+  // Tạo signal token từ botId
+  const signalToken = bot?.signalToken || generateSignalToken(botId || '');
 
   // Handle risk level update
   const handleUpdateRisk = (newRisk: BotRiskLevel) => {
@@ -170,7 +178,11 @@ const PremiumBotDetail = () => {
         <TabsContent value="integration">
           <Card>
             <CardContent className="p-6">
-              <BotIntegrationInfo botId={botId} />
+              <BotIntegrationInfo 
+                botId={botId} 
+                isAdmin={true}
+                signalToken={signalToken}
+              />
             </CardContent>
           </Card>
         </TabsContent>

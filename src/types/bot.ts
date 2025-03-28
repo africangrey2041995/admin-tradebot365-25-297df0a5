@@ -1,3 +1,4 @@
+
 import { BotType, BotStatus, BotRiskLevel } from '@/constants/botTypes';
 
 /**
@@ -58,6 +59,8 @@ export interface BaseBot {
   isFeatured?: boolean; // New property for featured bots
   isNew?: boolean; // New property for new bots
   isBestSeller?: boolean; // New property for best seller bots
+  signalToken?: string; // Thêm trường signalToken để xác thực tín hiệu từ TradingView
+  webhookUrl?: string; // URL webhook kết nối với API
 }
 
 // Bot của người dùng

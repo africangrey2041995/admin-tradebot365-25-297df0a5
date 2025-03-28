@@ -13,6 +13,10 @@ import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId } from '@/utils/normalizeUserId';
 
+const generateSignalToken = (botId: string) => {
+  return `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 10)}`;
+};
+
 const BotProfile = () => {
   const { botId } = useParams<{ botId: string }>();
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +108,7 @@ const BotProfile = () => {
   ];
   
   const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
-  const [signalToken] = useState(`CST${Math.random().toString(36).substring(2, 10).toUpperCase()}${botId?.replace('BOT', '')}`);
+  const [signalToken] = useState(() => generateSignalToken(botId || ''));
   
   const userId = normalizeUserId('USR-001');
   
@@ -133,6 +137,8 @@ const BotProfile = () => {
           exchange: 'coinstart_pro',
           botForm: 'trading_view',
           status: 'Active',
+          signalToken: signalToken,
+          webhookUrl: webhookUrl,
         };
         
         setBot(mockBot);
@@ -141,7 +147,7 @@ const BotProfile = () => {
     };
     
     fetchBotDetails();
-  }, [botId]);
+  }, [botId, signalToken, webhookUrl]);
 
   const handleAddAccount = (accountData: any) => {
     console.log('Adding account:', accountData, 'to bot:', botId);
@@ -210,6 +216,7 @@ const BotProfile = () => {
             <ConnectionSettingsCard 
               webhookUrl={webhookUrl} 
               signalToken={signalToken} 
+              isOwner={true}
             />
           </div>
         </div>

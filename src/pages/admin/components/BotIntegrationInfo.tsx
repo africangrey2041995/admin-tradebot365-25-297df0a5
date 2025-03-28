@@ -8,14 +8,21 @@ import { toast } from 'sonner';
 interface BotIntegrationInfoProps {
   botId: string;
   isAdmin?: boolean;
+  signalToken?: string;
 }
 
-const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId, isAdmin = false }) => {
+const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ 
+  botId, 
+  isAdmin = false,
+  signalToken: propSignalToken
+}) => {
   const [showToken, setShowToken] = useState(false);
   
-  // This would come from API in production
+  // Webhook URL được tạo từ botId
   const webhookUrl = `https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`;
-  const signalToken = `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 15)}`;
+  
+  // Sử dụng signalToken được truyền vào từ props, hoặc tạo mới nếu không có
+  const signalToken = propSignalToken || `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 15)}`;
   
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
@@ -68,33 +75,38 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId, isAdmin 
           </h3>
           <div className="flex items-center gap-2">
             <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-sm w-full font-mono border border-slate-200 dark:border-slate-700">
-              {/* Always show masked token for admins */}
-              {'••••••••••••••••••••••••••••••'}
+              {isAdmin ? (
+                showToken ? signalToken : '••••••••••••••••••••••••••••••'
+              ) : (
+                '••••••••••••••••••••••••••••••'
+              )}
             </div>
-            {!isAdmin && (
+            {isAdmin && (
               <>
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  onClick={toggleShowToken}
+                  onClick={() => setShowToken(!showToken)}
                   className="shrink-0"
                 >
                   {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={() => copyToClipboard(signalToken, 'Signal Token')}
-                  className="shrink-0"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+                {showToken && (
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => copyToClipboard(signalToken, 'Signal Token')}
+                    className="shrink-0"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                )}
               </>
             )}
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Token này cần được bao gồm trong message của TradingView Alert để xác thực
-            {isAdmin && <span className="text-amber-500 ml-1">(Ẩn cho quản trị viên)</span>}
+            {!isAdmin && <span className="text-amber-500 ml-1">(Ẩn cho người dùng không phải admin)</span>}
           </p>
         </div>
         
@@ -102,7 +114,7 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({ botId, isAdmin 
           <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Mẫu TradingView Alert Message</h4>
           <pre className="bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/50 p-3 rounded text-xs overflow-auto text-slate-700 dark:text-slate-200">
 {`{
-  "token": "${isAdmin ? '[Signal Token]' : (showToken ? signalToken : '[Signal Token]')}",
+  "token": "${(isAdmin && showToken) ? signalToken : '[Signal Token]'}",
   "action": "{{strategy.order.action}}",
   "price": {{strategy.order.price}},
   "symbol": "{{ticker}}",
