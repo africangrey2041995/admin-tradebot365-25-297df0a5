@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -846,4 +847,376 @@ const AccountProfile = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem onClick={() => handleEditKey(key)}>
-                              <Pencil className="h-4 w-4 mr-2"
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateAccessToken(key)}>
+                              <Link2 className="h-4 w-4 mr-2" />
+                              Update Access Token
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
+                              <Power className="h-4 w-4 mr-2" />
+                              {key.status === 'ACTIVE' ? 'Block Key' : 'Activate Key'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteKey(key.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash className="h-4 w-4 mr-2" />
+                              Delete Key
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Add Key Dialog */}
+      <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New API Key</DialogTitle>
+            <DialogDescription>
+              Enter the details for the new API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="userAccount">User Account</Label>
+              <Select value={selectedUser} onValueChange={setSelectedUser}>
+                <SelectTrigger id="userAccount">
+                  <SelectValue placeholder="Select user account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockUsers.map(user => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="apiName">API Name</Label>
+              <Input 
+                id="apiName" 
+                placeholder="Enter API name"
+                value={newApiName}
+                onChange={(e) => setNewApiName(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="clientId">Client ID</Label>
+              <Input 
+                id="clientId" 
+                placeholder="Enter client ID"
+                value={newClientId}
+                onChange={(e) => setNewClientId(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="secretKey">Secret Key</Label>
+              <Input 
+                id="secretKey" 
+                type="password"
+                placeholder="Enter secret key"
+                value={newSecret}
+                onChange={(e) => setNewSecret(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="accessToken">Access Token</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="accessToken" 
+                  placeholder="Enter access token"
+                  className="flex-1"
+                  value={newAccessToken}
+                  onChange={(e) => setNewAccessToken(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={handleTestConnection}
+                  disabled={isTesting || !newAccessToken.trim()}
+                >
+                  {isTesting ? 
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 
+                    isTestSuccessful ? 
+                      <CheckCircle className="h-4 w-4 mr-2 text-success" /> : 
+                      <Link className="h-4 w-4 mr-2" />
+                  }
+                  {isTesting ? 'Testing...' : isTestSuccessful ? 'Verified' : 'Test'}
+                </Button>
+              </div>
+            </div>
+            
+            {isTestSuccessful && (
+              <div className="grid gap-2">
+                <Label htmlFor="tradingAccount">Available Trading Accounts</Label>
+                <Select value={selectedTradingAccount} onValueChange={setSelectedTradingAccount}>
+                  <SelectTrigger id="tradingAccount">
+                    <SelectValue placeholder="Select trading account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTradingAccounts.map(acc => (
+                      <SelectItem key={acc.id} value={acc.id}>
+                        {acc.id} ({acc.type}) - ${acc.balance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddKeyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNewKey}
+              disabled={
+                !newApiName.trim() || 
+                !newClientId.trim() || 
+                !newSecret.trim() || 
+                !isTestSuccessful || 
+                !selectedTradingAccount
+              }
+            >
+              Add API Key
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Key Dialog */}
+      <Dialog open={isEditKeyDialogOpen} onOpenChange={setIsEditKeyDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit API Key</DialogTitle>
+            <DialogDescription>
+              Update the details for this API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="apiName">API Name</Label>
+              <Input 
+                id="apiName" 
+                placeholder="Enter API name"
+                value={newApiName}
+                onChange={(e) => setNewApiName(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="clientId">Client ID</Label>
+              <Input 
+                id="clientId" 
+                placeholder="Enter client ID"
+                value={newClientId}
+                onChange={(e) => setNewClientId(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="secretKey">Secret Key (leave blank to keep current)</Label>
+              <Input 
+                id="secretKey" 
+                type="password"
+                placeholder="Enter new secret key"
+                value={newSecret}
+                onChange={(e) => setNewSecret(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="accessToken">Access Token</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="accessToken" 
+                  placeholder="Enter access token"
+                  className="flex-1"
+                  value={newAccessToken}
+                  onChange={(e) => setNewAccessToken(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={handleTestConnection}
+                  disabled={isTesting || !newAccessToken.trim()}
+                >
+                  {isTesting ? 
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 
+                    isTestSuccessful ? 
+                      <CheckCircle className="h-4 w-4 mr-2 text-success" /> : 
+                      <Link className="h-4 w-4 mr-2" />
+                  }
+                  {isTesting ? 'Testing...' : isTestSuccessful ? 'Verified' : 'Test'}
+                </Button>
+              </div>
+            </div>
+            
+            {isTestSuccessful && (
+              <div className="grid gap-2">
+                <Label htmlFor="tradingAccount">Available Trading Accounts</Label>
+                <Select value={selectedTradingAccount} onValueChange={setSelectedTradingAccount}>
+                  <SelectTrigger id="tradingAccount">
+                    <SelectValue placeholder="Select trading account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTradingAccounts.map(acc => (
+                      <SelectItem key={acc.id} value={acc.id}>
+                        {acc.id} ({acc.type}) - ${acc.balance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditKeyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNewKey}
+              disabled={
+                !newApiName.trim() || 
+                !newClientId.trim() || 
+                (!isTestSuccessful && newAccessToken.trim()) || 
+                !selectedTradingAccount
+              }
+            >
+              Update API Key
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Update Access Token Dialog */}
+      <Dialog open={isUpdateTokenDialogOpen} onOpenChange={setIsUpdateTokenDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Update Access Token</DialogTitle>
+            <DialogDescription>
+              Update the access token for this API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="accessToken">New Access Token</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="accessToken" 
+                  placeholder="Enter access token"
+                  className="flex-1"
+                  value={newAccessToken}
+                  onChange={(e) => setNewAccessToken(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={handleTestConnection}
+                  disabled={isTesting || !newAccessToken.trim()}
+                >
+                  {isTesting ? 
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 
+                    isTestSuccessful ? 
+                      <CheckCircle className="h-4 w-4 mr-2 text-success" /> : 
+                      <Link className="h-4 w-4 mr-2" />
+                  }
+                  {isTesting ? 'Testing...' : isTestSuccessful ? 'Verified' : 'Test'}
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsUpdateTokenDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveUpdatedToken}
+              disabled={!newAccessToken.trim() || !isTestSuccessful}
+            >
+              Update Token
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Connect All Keys Dialog */}
+      <ConfirmationDialog
+        open={isConnectAllDialogOpen}
+        onOpenChange={setIsConnectAllDialogOpen}
+        title="Connect API Keys"
+        description={`Are you sure you want to connect ${selectedKeyIds.length} API keys?`}
+        action={
+          <Button 
+            onClick={processConnectAll}
+            disabled={isProcessingConnection || selectedKeyIds.length === 0}
+            className="bg-primary hover:bg-primary/90"
+          >
+            {isProcessingConnection && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isProcessingConnection ? 'Connecting...' : 'Connect All'}
+          </Button>
+        }
+      />
+      
+      {/* Disconnect All Keys Dialog */}
+      <ConfirmationDialog
+        open={isDisconnectAllDialogOpen}
+        onOpenChange={setIsDisconnectAllDialogOpen}
+        title="Disconnect API Keys"
+        description={`Are you sure you want to disconnect ${selectedKeyIds.length} API keys?`}
+        action={
+          <Button 
+            onClick={processDisconnectAll}
+            disabled={isProcessingConnection || selectedKeyIds.length === 0}
+            variant="destructive"
+          >
+            {isProcessingConnection && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isProcessingConnection ? 'Disconnecting...' : 'Disconnect All'}
+          </Button>
+        }
+      />
+      
+      {/* Bulk Action Bar */}
+      {selectedKeyIds.length > 0 && (
+        <BulkActionBar
+          count={selectedKeyIds.length}
+          onClear={clearSelection}
+          actions={[
+            {
+              label: 'Connect All',
+              icon: <Link className="h-4 w-4 mr-2" />,
+              onClick: handleConnectAll,
+              variant: 'default'
+            },
+            {
+              label: 'Disconnect All',
+              icon: <Link2 className="h-4 w-4 mr-2" />,
+              onClick: handleDisconnectAll,
+              variant: 'outline'
+            }
+          ]}
+        />
+      )}
+    </MainLayout>
+  );
+};
+
+export default AccountProfile;
