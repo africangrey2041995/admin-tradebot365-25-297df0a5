@@ -33,6 +33,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import BulkActionBar from "@/components/floating/BulkActionBar";
+import StatusIndicator from "@/components/ui/StatusIndicator";
+import { toast } from "sonner";
 
 interface UserAccountsTabProps {
   userId: string;
@@ -47,6 +51,12 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+  
+  // State for selected accounts
+  const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [bulkConfirmDialogOpen, setBulkConfirmDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'connect' | 'disconnect' | null>(null);
 
   // Use the existing hook to manage accounts for this user
   const { 
@@ -104,6 +114,64 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     }
   };
 
+  // Account selection handlers
+  const handleSelectAccount = (accountId: string, isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedAccounts(prev => [...prev, accountId]);
+    } else {
+      setSelectedAccounts(prev => prev.filter(id => id !== accountId));
+    }
+  };
+
+  const handleSelectAllAccounts = (isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedAccounts(filteredAccounts.map(acc => acc.cspAccountId));
+    } else {
+      setSelectedAccounts([]);
+    }
+  };
+
+  // Bulk actions handlers
+  const handleBulkConnectClick = () => {
+    setBulkAction('connect');
+    setBulkConfirmDialogOpen(true);
+  };
+
+  const handleBulkDisconnectClick = () => {
+    setBulkAction('disconnect');
+    setBulkConfirmDialogOpen(true);
+  };
+
+  const executeBulkAction = async () => {
+    if (!bulkAction || selectedAccounts.length === 0) return;
+    
+    setIsBulkProcessing(true);
+    const actionText = bulkAction === 'connect' ? 'kết nối' : 'ngắt kết nối';
+    
+    try {
+      // Process accounts in sequence to avoid overwhelming the API
+      for (const accountId of selectedAccounts) {
+        await handleToggleConnection(accountId);
+        // Add a small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      toast.success(`Đã ${actionText} ${selectedAccounts.length} tài khoản thành công`);
+      setSelectedAccounts([]);
+    } catch (error) {
+      console.error(`Error performing bulk ${bulkAction}:`, error);
+      toast.error(`Đã xảy ra lỗi khi ${actionText} tài khoản`);
+    } finally {
+      setIsBulkProcessing(false);
+      setBulkConfirmDialogOpen(false);
+      setBulkAction(null);
+    }
+  };
+
+  const handleCloseActionBar = () => {
+    setSelectedAccounts([]);
+  };
+
   const filteredAccounts = accounts.filter(account => {
     const matchesSearch = searchTerm === '' || 
       account.cspAccountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,8 +180,8 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
       account.cspAccountId.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === null || 
-      (statusFilter === 'connected' && account.status === 'Connected') ||
-      (statusFilter === 'disconnected' && account.status === 'Disconnected');
+      (statusFilter === 'connected' && account.status.toLowerCase() === 'connected') ||
+      (statusFilter === 'disconnected' && account.status.toLowerCase() === 'disconnected');
     
     const matchesType = typeFilter === null || typeFilter === 'all' ||
       (typeFilter === 'live' && account.isLive) ||
@@ -129,6 +197,8 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   })();
 
   const totalTradingAccounts = accounts.length;
+  const allAccountsSelected = filteredAccounts.length > 0 && selectedAccounts.length === filteredAccounts.length;
+  const someAccountsSelected = selectedAccounts.length > 0 && selectedAccounts.length < filteredAccounts.length;
 
   return (
     <div className="space-y-6">
@@ -197,6 +267,18 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-zinc-800">
+                    <TableHead className="w-[40px] text-zinc-400">
+                      <Checkbox 
+                        checked={allAccountsSelected}
+                        ref={input => {
+                          if (input) {
+                            input.indeterminate = someAccountsSelected;
+                          }
+                        }}
+                        onCheckedChange={handleSelectAllAccounts}
+                        className="bg-zinc-800 border-zinc-700"
+                      />
+                    </TableHead>
                     <TableHead className="text-zinc-400">Tài khoản CSP</TableHead>
                     <TableHead className="text-zinc-400">ID CSP</TableHead>
                     <TableHead className="text-zinc-400">API</TableHead>
@@ -209,6 +291,13 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                 <TableBody>
                   {filteredAccounts.map((account: Account) => (
                     <TableRow key={account.cspAccountId} className="border-zinc-800">
+                      <TableCell className="w-[40px]">
+                        <Checkbox 
+                          checked={selectedAccounts.includes(account.cspAccountId)}
+                          onCheckedChange={(checked) => handleSelectAccount(account.cspAccountId, !!checked)}
+                          className="bg-zinc-800 border-zinc-700"
+                        />
+                      </TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{account.cspAccountName}</div>
@@ -234,12 +323,14 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center">
-                          <div className={`h-2 w-2 rounded-full ${account.status === 'Connected' ? 'bg-green-500' : 'bg-red-500'} mr-2`}></div>
-                          <span className={account.status === 'Connected' ? 'text-green-500' : 'text-red-500'}>
-                            {account.status}
-                          </span>
-                        </div>
+                        <StatusIndicator 
+                          status={account.status.toLowerCase() === 'connected' ? 'Connected' : 'Disconnected'} 
+                          showLabel={true}
+                          lastConnectionTime={account.lastConnectionTime}
+                          lastDisconnectionTime={account.lastDisconnectionTime}
+                          errorMessage={account.errorMessage}
+                          showControls={false}
+                        />
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end">
@@ -267,7 +358,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                                 Chỉnh sửa
                               </DropdownMenuItem>
                               
-                              {account.status === 'Connected' ? (
+                              {account.status.toLowerCase() === 'connected' ? (
                                 <DropdownMenuItem 
                                   onClick={() => handleToggleStatusClick(account)} 
                                   disabled={isTogglingStatus}
@@ -315,6 +406,16 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
         </CardContent>
       </Card>
 
+      {/* Bulk action floating bar */}
+      <BulkActionBar
+        selectedCount={selectedAccounts.length}
+        onClose={handleCloseActionBar}
+        onConnectAll={handleBulkConnectClick}
+        onDisconnectAll={handleBulkDisconnectClick}
+        isProcessing={isBulkProcessing}
+      />
+
+      {/* Delete confirmation dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <AlertDialogHeader>
@@ -342,6 +443,44 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                 </>
               ) : (
                 'Xác nhận xóa'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk action confirmation dialog */}
+      <AlertDialog open={bulkConfirmDialogOpen} onOpenChange={setBulkConfirmDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {bulkAction === 'connect' ? 'Xác nhận kết nối hàng loạt' : 'Xác nhận ngắt kết nối hàng loạt'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              {bulkAction === 'connect' 
+                ? `Bạn có chắc chắn muốn kết nối ${selectedAccounts.length} tài khoản đã chọn?`
+                : `Bạn có chắc chắn muốn ngắt kết nối ${selectedAccounts.length} tài khoản đã chọn?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="bg-zinc-800 text-white border-zinc-700 hover:bg-zinc-700" 
+              disabled={isBulkProcessing}
+            >
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={executeBulkAction} 
+              className={`${bulkAction === 'connect' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white`}
+              disabled={isBulkProcessing}
+            >
+              {isBulkProcessing ? (
+                <>
+                  <span className="animate-spin inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                  Đang xử lý...
+                </>
+              ) : (
+                bulkAction === 'connect' ? 'Xác nhận kết nối' : 'Xác nhận ngắt kết nối'
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

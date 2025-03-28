@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { 
@@ -94,7 +93,6 @@ const StatusIndicator = ({
 
   const config = statusConfig[status];
   
-  // Format dates using date-fns
   const formatTime = (dateString?: string) => {
     if (!dateString) return 'N/A';
     try {
@@ -113,7 +111,6 @@ const StatusIndicator = ({
     }
   };
   
-  // Build tooltip content
   const buildTooltipContent = () => {
     const parts = [`Trạng thái: ${config.label}`];
     
