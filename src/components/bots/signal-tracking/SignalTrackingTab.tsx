@@ -19,6 +19,8 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   userId,
   isAdminView = false
 }) => {
+  console.log(`SignalTrackingTab rendered with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
+  
   const {
     tradingViewLogs,
     coinstratLogs,
@@ -32,20 +34,25 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   // Use a ref to prevent rapid successive refreshes
   const lastRefreshTimeRef = useRef(0);
   
+  // Log the current state for debugging
+  console.log(`SignalTrackingTab - tradingViewLogs: ${tradingViewLogs.length}, coinstratLogs: ${coinstratLogs.length}, logsLoading: ${logsLoading}`);
+  
   // Only refresh on mount if we haven't loaded before
   useEffect(() => {
     // Only do the initial load once
-    if (!initialLoadRef.current && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
+    if (!initialLoadRef.current) {
+      console.log('SignalTrackingTab - Performing initial load');
       initialLoadRef.current = true;
       refreshSignalLogs();
     }
-  }, [refreshSignalLogs, tradingViewLogs.length, coinstratLogs.length]);
+  }, [refreshSignalLogs]);
 
   // Handler for manual refresh with cooldown
   const handleManualRefresh = () => {
     const now = Date.now();
     // Prevent refreshing if last refresh was less than 2 seconds ago
     if (now - lastRefreshTimeRef.current > 2000) {
+      console.log('SignalTrackingTab - Manual refresh triggered');
       lastRefreshTimeRef.current = now;
       refreshSignalLogs();
     }

@@ -36,7 +36,7 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
     return {
       id: `CS-${1000 + index}`,
       // Match format of originalSignalId with botId for proper filtering
-      originalSignalId: `${botId}-SIG${1000 + Math.floor(Math.random() * 5)}`,
+      originalSignalId: `TV-${1000 + Math.floor(Math.random() * 5)}`,
       action: ['ENTER_LONG', 'EXIT_LONG', 'ENTER_SHORT', 'EXIT_SHORT'][Math.floor(Math.random() * 4)] as any,
       instrument: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'][Math.floor(Math.random() * 4)],
       timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
@@ -48,7 +48,6 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
         accountId: `ACC-${2000 + i}`,
         userId: `USR-${1000 + i % 10}`, // Consistent user ID format
         status: 'success',
-        errorMessage: '',
         name: `Account ${2000 + i}`,
         timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
       })),
@@ -56,7 +55,6 @@ const createMockCoinstratLogs = (): CoinstratSignal[] => {
         accountId: `ACC-${3000 + i}`,
         userId: `USR-${1000 + i % 10}`, // Consistent user ID format
         status: 'failed',
-        errorMessage: 'Insufficient balance',
         name: `Account ${3000 + i}`,
         timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
       })) : [],
@@ -86,12 +84,14 @@ export const useCoinstratLogs = ({
   const fetchLogs = useCallback(() => {
     try {
       startLoading();
+      console.log(`Fetching Coinstrat logs for botId: ${botId}, userId: ${userId}`);
       
       // In a real app, we would fetch data from API here
       setTimeout(() => {
         try {
           // Use initialData if provided, otherwise create mock data
           const allLogs = initialData || createMockCoinstratLogs();
+          console.log(`Generated ${allLogs.length} Coinstrat logs`);
           
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
@@ -101,8 +101,10 @@ export const useCoinstratLogs = ({
             // First try to match by signalToken which should contain the botId
             filteredLogs = filteredLogs.filter(log => 
               log.signalToken === botId || 
+              (log.signalToken && log.signalToken.includes(botId)) ||
               log.originalSignalId.includes(botId)
             );
+            console.log(`After botId filtering: ${filteredLogs.length} logs remaining`);
           }
           
           if (userId) {
@@ -119,9 +121,16 @@ export const useCoinstratLogs = ({
               
               return hasUserInProcessed || hasUserInFailed;
             });
+            console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
           }
           
           console.log(`Coinstrat logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}`);
+          
+          // Debug log some sample data if available
+          if (filteredLogs.length > 0) {
+            console.log('Sample Coinstrat log:', JSON.stringify(filteredLogs[0]));
+          }
+          
           setLogs(filteredLogs);
           setError(null);
           stopLoading();

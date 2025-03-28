@@ -35,6 +35,8 @@ export const useCombinedSignalLogs = ({
   // Track if fetch is in progress to prevent duplicate requests
   const fetchInProgressRef = useRef(false);
   
+  console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}`);
+  
   // Use both hooks for fetching different log types with skipLoadingState
   const {
     logs: tradingViewLogs,
@@ -66,6 +68,16 @@ export const useCombinedSignalLogs = ({
   useEffect(() => {
     const userMap = new Map<string, string>();
     
+    // Add current user to the map first
+    if (userId) {
+      userMap.set(
+        userId, 
+        userId.startsWith('USR-') 
+          ? `User ${userId.split('-')[1]}`
+          : userId
+      );
+    }
+    
     coinstratLogs.forEach(log => {
       // Process userIds from processedAccounts
       log.processedAccounts.forEach(account => {
@@ -92,12 +104,27 @@ export const useCombinedSignalLogs = ({
       });
     });
     
+    // Add userIds from tradingViewLogs too
+    tradingViewLogs.forEach(log => {
+      if (log.userId && !userMap.has(log.userId)) {
+        userMap.set(
+          log.userId,
+          log.userId.startsWith('USR-') 
+            ? `User ${log.userId.split('-')[1]}`
+            : log.userId
+        );
+      }
+    });
+    
     const users = Array.from(userMap.entries()).map(([id, name]) => ({ id, name }));
+    console.log(`Available users for signals: ${users.length}`, users);
     setAvailableUsers(users);
-  }, [coinstratLogs]);
+  }, [coinstratLogs, tradingViewLogs, userId]);
 
   // This is a modified version that better handles the loading state
   const refreshLogs = useCallback(() => {
+    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}`);
+    
     // Prevent concurrent fetches
     if (fetchInProgressRef.current) {
       console.log('CombinedSignalLogs - Fetch already in progress, skipping duplicate request');
@@ -139,10 +166,11 @@ export const useCombinedSignalLogs = ({
         fetchInProgressRef.current = false;
       }
     }, 5000);
-  }, [fetchTvLogs, fetchCsLogs, startLoading, stopLoading]);
+  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading]);
 
   // Initial fetch
   useEffect(() => {
+    console.log(`Initial fetch for combined logs, botId: ${botId}, userId: ${userId}`);
     refreshLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [botId, userId]);

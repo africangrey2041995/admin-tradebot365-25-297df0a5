@@ -71,11 +71,13 @@ export const useTradingViewLogs = ({
   const fetchLogs = useCallback(() => {
     try {
       startLoading();
+      console.log(`Fetching TradingView logs for botId: ${botId}, userId: ${userId}`);
       
       // In a real app, we would fetch data from API here
       setTimeout(() => {
         try {
           const allLogs = initialData || createMockTradeViewLogs();
+          console.log(`Generated ${allLogs.length} TradingView logs`);
           
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
@@ -83,19 +85,30 @@ export const useTradingViewLogs = ({
           if (botId) {
             console.log(`Filtering TradingView logs by botId: ${botId}`);
             // Filter by signalToken (which should contain the botId) or by the botId property directly
+            // Check for exact match and also for cases where the signalToken/botId includes the botId (more loose matching)
             filteredLogs = filteredLogs.filter(log => 
               log.signalToken === botId || 
-              log.botId === botId
+              log.botId === botId ||
+              (log.signalToken && log.signalToken.includes(botId)) ||
+              (log.botId && log.botId.includes(botId))
             );
+            console.log(`After botId filtering: ${filteredLogs.length} logs remaining`);
           }
           
           if (userId) {
             console.log(`Filtering TradingView logs by userId: ${userId}`);
             // Filter by userId
             filteredLogs = filteredLogs.filter(log => log.userId === userId);
+            console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
           }
           
           console.log(`TradingView logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}`);
+          
+          // Debug log some sample data if available
+          if (filteredLogs.length > 0) {
+            console.log('Sample TradingView log:', JSON.stringify(filteredLogs[0]));
+          }
+          
           setLogs(filteredLogs);
           setError(null);
           stopLoading();
