@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +66,9 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
     handleDeleteAccount,
     handleToggleConnection
   } = useUserManagement('all', userId);
+
+  // Reference for the indeterminate checkbox state
+  const checkboxRef = useRef<HTMLInputElement | null>(null);
 
   const handleRefresh = () => {
     setIsLoading(true);
@@ -200,6 +203,13 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
   const allAccountsSelected = filteredAccounts.length > 0 && selectedAccounts.length === filteredAccounts.length;
   const someAccountsSelected = selectedAccounts.length > 0 && selectedAccounts.length < filteredAccounts.length;
 
+  // Update the indeterminate state when selection changes
+  React.useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = someAccountsSelected;
+    }
+  }, [someAccountsSelected]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -270,11 +280,7 @@ export const UserAccountsTab: React.FC<UserAccountsTabProps> = ({ userId }) => {
                     <TableHead className="w-[40px] text-zinc-400">
                       <Checkbox 
                         checked={allAccountsSelected}
-                        ref={input => {
-                          if (input) {
-                            input.indeterminate = someAccountsSelected;
-                          }
-                        }}
+                        ref={checkboxRef}
                         onCheckedChange={handleSelectAllAccounts}
                         className="bg-zinc-800 border-zinc-700"
                       />
