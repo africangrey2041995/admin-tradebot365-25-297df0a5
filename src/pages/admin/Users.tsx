@@ -17,7 +17,8 @@ const Users = () => {
     handleRefresh
   } = useBotAccounts('all', 'all');
   
-  const connectedAccounts = accounts.filter(acc => acc.status === 'connected').length;
+  // Fix the comparison by ensuring we compare with a string instead of ConnectionStatus enum
+  const connectedAccounts = accounts.filter(acc => acc.status.toLowerCase() === 'connected').length;
   const disconnectedAccounts = accounts.length - connectedAccounts;
   const liveAccounts = accounts.filter(acc => acc.isLive).length;
   const demoAccounts = accounts.length - liveAccounts;

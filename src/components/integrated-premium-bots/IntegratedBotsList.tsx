@@ -13,6 +13,7 @@ interface IntegratedBotsListProps {
 const IntegratedBotsList: React.FC<IntegratedBotsListProps> = ({ bots }) => {
   const navigate = useNavigate();
 
+  // Fixed getAccountCount function to handle both the Account[] type and number type
   const getAccountCount = (accounts: Account[] | number | undefined): string => {
     if (!accounts) return "0";
     if (typeof accounts === 'number') return accounts.toString();

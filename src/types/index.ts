@@ -123,9 +123,10 @@ export function normalizeUserId(userId: string | undefined): string {
   return userId;
 }
 
-// Import from connection.ts
+// Import connection types
 import { ConnectionStatus, HealthStatus } from './connection';
 
+// Unified Account interface that combines all properties from different sources
 export interface Account {
   id?: string;
   clientId?: string;
@@ -136,7 +137,7 @@ export interface Account {
   cspUserName?: string;
   csrfToken?: string;
   ssoUrl?: string;
-  status: ConnectionStatus;
+  status: ConnectionStatus | string; // Allow string for backward compatibility
   lastUpdated?: string;
   // Added connection-related properties
   lastConnectionTime?: string;
@@ -169,4 +170,3 @@ export interface Account {
   depositCurrency?: string;
   leverage?: number;
 }
-
