@@ -81,6 +81,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
             <TableHead>Symbol</TableHead>
             <TableHead>Timestamp</TableHead>
             <TableHead>Action</TableHead>
+            <TableHead>Quantity</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Processing</TableHead>
           </TableRow>
@@ -111,6 +112,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                   <TableCell>
                     <ActionBadge action={signal.action} />
                   </TableCell>
+                  <TableCell>{signal.amount}</TableCell>
                   <TableCell>
                     <StatusBadge status={signal.status as string} />
                   </TableCell>
@@ -130,7 +132,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                 {/* Show Coinstrat logs if expanded */}
                 {isExpanded && hasCoinstratLogs && (
                   <TableRow className="bg-muted/30">
-                    <TableCell colSpan={6} className="p-0">
+                    <TableCell colSpan={7} className="p-0">
                       <div className="p-4 space-y-4">
                         <h4 className="text-sm font-medium mb-2">Processed by Coinstrat Pro:</h4>
                         {findMatchingCoinstratLogs(signal.id).map(csLog => (
@@ -212,6 +214,7 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
                 <TableCell>
                   <ActionBadge action={orphanedLog.action} />
                 </TableCell>
+                <TableCell>{orphanedLog.amount}</TableCell>
                 <TableCell>
                   <StatusBadge status={orphanedLog.status as string} />
                 </TableCell>
