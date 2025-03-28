@@ -3,21 +3,33 @@ import { useState, useEffect, useCallback } from 'react';
 import { TradingViewSignal } from '@/types/signal';
 import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
-// Create a sample data set with proper ID formats
+// Create a sample data set with proper ID formats and consistent data for common bot IDs
 const createMockTradeViewLogs = (): TradingViewSignal[] => {
   // Generate different bot types for variety
   const botTypes = ['MY', 'PRE', 'PROP'];
   const getBotId = (index: number) => {
-    const type = botTypes[index % botTypes.length];
+    // Special case for index 0-2: Always create MY-001 to ensure data is available
+    if (index < 3) {
+      return 'MY-001';
+    }
+    
+    const type = botTypes[(index % botTypes.length)];
     const num = String(1000 + Math.floor(index / botTypes.length)).substring(1);
     return `${type}-${num}`;
   };
+
+  // Create a set of common user IDs that will always be included
+  const commonUserIds = ['USR-001', 'USR-002', 'USR-003'];
 
   return Array(15)
     .fill(null)
     .map((_, index) => {
       // Generate consistent bot ID for this signal
-      const botId = getBotId(Math.floor(index / 3));
+      const botId = getBotId(index);
+      
+      // Use common user IDs for first several entries to ensure they have data
+      // This ensures MY-001 bot always has signals for USR-001
+      const userId = index < 3 ? commonUserIds[index % commonUserIds.length] : `USR-${1000 + index % 10}`;
       
       return {
         id: `TV-${1000 + index}`,
@@ -32,7 +44,7 @@ const createMockTradeViewLogs = (): TradingViewSignal[] => {
         processingTime: Math.floor(Math.random() * 5000) + '',
         errorMessage: Math.random() > 0.8 ? 'Connection timeout or symbol issues' : undefined,
         botId: botId, // Set the botId property explicitly 
-        userId: `USR-${1000 + index % 10}`, // Consistent userId format
+        userId: userId, // Consistent userId format
       };
     });
 };
@@ -84,21 +96,41 @@ export const useTradingViewLogs = ({
           
           if (botId) {
             console.log(`Filtering TradingView logs by botId: ${botId}`);
-            // Filter by signalToken (which should contain the botId) or by the botId property directly
-            // Check for exact match and also for cases where the signalToken/botId includes the botId (more loose matching)
-            filteredLogs = filteredLogs.filter(log => 
-              log.signalToken === botId || 
-              log.botId === botId ||
-              (log.signalToken && log.signalToken.includes(botId)) ||
-              (log.botId && log.botId.includes(botId))
-            );
+            
+            // More flexible filtering that checks multiple fields
+            filteredLogs = filteredLogs.filter(log => {
+              const signalToken = log.signalToken?.toLowerCase() || '';
+              const logBotId = log.botId?.toLowerCase() || '';
+              const targetBotId = botId.toLowerCase();
+              
+              return signalToken === targetBotId || 
+                     logBotId === targetBotId ||
+                     signalToken.includes(targetBotId) ||
+                     logBotId.includes(targetBotId);
+            });
+            
             console.log(`After botId filtering: ${filteredLogs.length} logs remaining`);
           }
           
           if (userId) {
             console.log(`Filtering TradingView logs by userId: ${userId}`);
-            // Filter by userId
-            filteredLogs = filteredLogs.filter(log => log.userId === userId);
+            
+            // Check if we're in admin view to modify behavior
+            const isAdminView = window.location.pathname.includes('/admin/');
+            
+            if (isAdminView) {
+              // In admin view, we want to show all logs for the bot, regardless of user
+              console.log('Admin view detected, showing all user logs for this bot');
+            } else {
+              // More flexible user ID filtering
+              filteredLogs = filteredLogs.filter(log => {
+                const logUserId = log.userId?.toLowerCase() || '';
+                const targetUserId = userId.toLowerCase();
+                
+                return logUserId === targetUserId || logUserId.includes(targetUserId);
+              });
+            }
+            
             console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
           }
           
@@ -107,6 +139,8 @@ export const useTradingViewLogs = ({
           // Debug log some sample data if available
           if (filteredLogs.length > 0) {
             console.log('Sample TradingView log:', JSON.stringify(filteredLogs[0]));
+          } else {
+            console.log('No filtered TradingView logs found. Check botId and userId filtering.');
           }
           
           setLogs(filteredLogs);

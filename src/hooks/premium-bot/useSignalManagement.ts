@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { useCombinedSignalLogs } from '@/hooks/useCombinedSignalLogs';
 
-export const useSignalManagement = (botId: string, userId: string) => {
+export const useSignalManagement = (botId: string, userId: string, isAdminView: boolean = false) => {
   // Add a ref to track last refresh time
   const lastRefreshTimeRef = useRef(0);
   
@@ -15,7 +15,8 @@ export const useSignalManagement = (botId: string, userId: string) => {
     refreshLogs
   } = useCombinedSignalLogs({
     botId,
-    userId
+    userId,
+    isAdminView
   });
 
   const processedSignalsCount = coinstratLogs.length;

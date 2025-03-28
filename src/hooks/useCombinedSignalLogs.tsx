@@ -9,6 +9,7 @@ interface UseCombinedSignalLogsProps {
   botId: string;
   userId: string;
   refreshTrigger?: boolean;
+  isAdminView?: boolean; // Added to explicitly detect admin view
 }
 
 interface UseCombinedSignalLogsResult {
@@ -23,7 +24,8 @@ interface UseCombinedSignalLogsResult {
 export const useCombinedSignalLogs = ({
   botId,
   userId,
-  refreshTrigger = false
+  refreshTrigger = false,
+  isAdminView = false // Default to false
 }: UseCombinedSignalLogsProps): UseCombinedSignalLogsResult => {
   // Use the safeLoading hook with timeout
   const { loading, startLoading, stopLoading } = useSafeLoading({
@@ -35,9 +37,18 @@ export const useCombinedSignalLogs = ({
   // Track if fetch is in progress to prevent duplicate requests
   const fetchInProgressRef = useRef(false);
   
-  console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}`);
+  console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
+  
+  // Detect if we're in admin view by checking the URL
+  const isInAdminView = isAdminView || window.location.pathname.includes('/admin/');
+  console.log(`Admin view detection: isAdminView prop=${isAdminView}, path check=${window.location.pathname.includes('/admin/')}, final=${isInAdminView}`);
   
   // Use both hooks for fetching different log types with skipLoadingState
+  // If we're in admin view, we want to see all logs for the bot, so we might skip userId filtering
+  const effectiveUserId = isInAdminView ? '' : userId;
+  
+  console.log(`Using effectiveUserId for filtering: ${effectiveUserId} (original: ${userId}, admin view: ${isInAdminView})`);
+  
   const {
     logs: tradingViewLogs,
     loading: tvLoading,
@@ -45,7 +56,7 @@ export const useCombinedSignalLogs = ({
     fetchLogs: fetchTvLogs
   } = useTradingViewLogs({
     botId,
-    userId,
+    userId: effectiveUserId,
     refreshTrigger,
     skipLoadingState: true // Skip internal loading state in the hook
   });
@@ -57,7 +68,7 @@ export const useCombinedSignalLogs = ({
     fetchLogs: fetchCsLogs
   } = useCoinstratLogs({
     botId,
-    userId,
+    userId: effectiveUserId,
     refreshTrigger,
     skipLoadingState: true // Skip internal loading state in the hook
   });
@@ -116,6 +127,11 @@ export const useCombinedSignalLogs = ({
       }
     });
     
+    // Force add USR-001 to ensure it's always available for testing
+    if (!userMap.has('USR-001')) {
+      userMap.set('USR-001', 'User 001');
+    }
+    
     const users = Array.from(userMap.entries()).map(([id, name]) => ({ id, name }));
     console.log(`Available users for signals: ${users.length}`, users);
     setAvailableUsers(users);
@@ -123,7 +139,7 @@ export const useCombinedSignalLogs = ({
 
   // This is a modified version that better handles the loading state
   const refreshLogs = useCallback(() => {
-    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}`);
+    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}, admin view: ${isInAdminView}`);
     
     // Prevent concurrent fetches
     if (fetchInProgressRef.current) {
@@ -166,14 +182,14 @@ export const useCombinedSignalLogs = ({
         fetchInProgressRef.current = false;
       }
     }, 5000);
-  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading]);
+  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading, isInAdminView]);
 
   // Initial fetch
   useEffect(() => {
-    console.log(`Initial fetch for combined logs, botId: ${botId}, userId: ${userId}`);
+    console.log(`Initial fetch for combined logs, botId: ${botId}, userId: ${userId}, admin view: ${isInAdminView}`);
     refreshLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [botId, userId]);
+  }, [botId, userId, isInAdminView]);
 
   // Handle refresh trigger from parent
   useEffect(() => {

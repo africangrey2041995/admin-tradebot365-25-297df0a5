@@ -7,6 +7,7 @@ import { useSignalManagement } from '@/hooks/premium-bot/useSignalManagement';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 import { AdvancedSignalFilter } from '@/components/signals/tracking';
 import SignalLoadingState from '@/components/signals/core/components/SignalLoadingState';
+import { toast } from 'sonner';
 
 interface SignalTrackingTabProps {
   botId: string;
@@ -21,13 +22,17 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
 }) => {
   console.log(`SignalTrackingTab rendered with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
   
+  // Set a special flag for MY-001 which we know has test data
+  const isSpecialTestBot = botId === 'MY-001';
+  console.log(`Is special test bot (MY-001): ${isSpecialTestBot}`);
+  
   const {
     tradingViewLogs,
     coinstratLogs,
     logsLoading,
     availableUsers,
     refreshSignalLogs
-  } = useSignalManagement(botId, userId);
+  } = useSignalManagement(botId, userId, isAdminView);
   
   // Use a ref to track if initial load has happened
   const initialLoadRef = useRef(false);
@@ -55,6 +60,9 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
       console.log('SignalTrackingTab - Manual refresh triggered');
       lastRefreshTimeRef.current = now;
       refreshSignalLogs();
+      toast.info("Refreshing signal logs...");
+    } else {
+      console.log('SignalTrackingTab - Manual refresh throttled, too soon');
     }
   };
 
