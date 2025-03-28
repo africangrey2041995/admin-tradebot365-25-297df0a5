@@ -1,11 +1,12 @@
 
 import { Package } from '@/types';
+import { UserPlan } from '@/constants/userConstants';
 
 // Mock data for packages
 const mockPackages: Package[] = [
   {
     id: 'pkg_free',
-    planId: 'free',
+    planId: UserPlan.FREE,
     name: 'Free',
     description: 'Truy cập cơ bản vào Trade Bot 365',
     features: [
@@ -30,7 +31,7 @@ const mockPackages: Package[] = [
   },
   {
     id: 'pkg_basic',
-    planId: 'basic',
+    planId: UserPlan.BASIC,
     name: 'Basic',
     description: 'Dành cho nhà giao dịch cá nhân',
     features: [
@@ -56,7 +57,7 @@ const mockPackages: Package[] = [
   },
   {
     id: 'pkg_premium',
-    planId: 'premium',
+    planId: UserPlan.PREMIUM,
     name: 'Premium',
     description: 'Dành cho nhà giao dịch chuyên nghiệp',
     features: [
@@ -84,7 +85,7 @@ const mockPackages: Package[] = [
   },
   {
     id: 'pkg_enterprise',
-    planId: 'enterprise',
+    planId: UserPlan.ENTERPRISE,
     name: 'Enterprise',
     description: 'Dành cho tổ chức và công ty',
     features: [

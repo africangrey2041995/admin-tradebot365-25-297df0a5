@@ -177,6 +177,21 @@ const AdminUserDetail = () => {
     }
   ];
 
+  const mockSubscription: UserSubscription = {
+    id: `sub_${Math.random().toString(36).substring(2, 10)}`,
+    userId: userId || 'USR-24051',
+    packageId: 'pkg_premium',
+    startDate: '2023-03-01',
+    endDate: '2024-03-01',
+    autoRenew: true,
+    status: 'active',
+    currentPeriod: 'monthly',
+    paymentMethod: 'Thẻ tín dụng',
+    lastPaymentDate: '2023-03-01',
+    createdAt: '2023-03-01',
+    updatedAt: '2023-03-01'
+  };
+
   const handleReturn = () => {
     navigate('/admin/users');
   };
@@ -608,7 +623,7 @@ const AdminUserDetail = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-zinc-400">
-                  {searchTerm ? "Không tìm thấy bot nào" : "Người dùng chưa tạo bot nào."}
+                  {searchTerm ? "Không tìm thấy bot nào" : "Người dùng chưa t��o bot nào."}
                 </div>
               )}
             </CardContent>
@@ -836,8 +851,7 @@ const AdminUserDetail = () => {
           <UserPackageManagement 
             userId={userId || ''}
             currentPlan={user.subscription.toLowerCase()}
-            subscriptionStartDate="2023-03-01"
-            subscriptionEndDate="2024-03-01"
+            subscription={mockSubscription}
             autoRenew={true}
             paymentMethod="Thẻ tín dụng"
             lastPaymentDate="2023-03-01"

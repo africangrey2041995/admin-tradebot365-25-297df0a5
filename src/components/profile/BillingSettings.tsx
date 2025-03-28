@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { UserPlan } from '@/constants/userConstants';
 import { useSubscription } from '@/hooks/useSubscription';
 import { SubscriptionStatusBadge } from '@/components/shared/SubscriptionStatusBadge';
 import { formatCurrency } from '@/utils/formatUtils';
+import { UserPlanBadge } from '@/components/admin/users/UserPlanBadge';
 
 type PlanType = 'free' | 'basic' | 'premium' | 'enterprise';
 
