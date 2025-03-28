@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, WifiOff, X } from 'lucide-react';
 
-interface BulkActionBarProps {
+export interface BulkActionBarProps {
   selectedCount: number;
   onClose: () => void;
   onConnectAll: () => void;

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -417,7 +416,7 @@ const AccountProfile = () => {
             }
           }
           
-          if (isTestSuccessful && newAccessToken.trim()) {
+          if (isTestSuccessful && !!newAccessToken.trim()) {
             updatedKey.accessToken = newAccessToken;
           }
           
@@ -1166,21 +1165,9 @@ const AccountProfile = () => {
       {selectedKeyIds.length > 0 && (
         <BulkActionBar
           selectedCount={selectedKeyIds.length}
-          onClear={clearSelection}
-          actions={[
-            {
-              label: "Connect All",
-              icon: <Link className="h-4 w-4 mr-2" />,
-              onClick: handleConnectAll,
-              variant: "default"
-            },
-            {
-              label: "Disconnect All",
-              icon: <Link2 className="h-4 w-4 mr-2" />,
-              onClick: handleDisconnectAll,
-              variant: "warning"
-            }
-          ]}
+          onClose={clearSelection}
+          onConnectAll={handleConnectAll}
+          onDisconnectAll={handleDisconnectAll}
           isProcessing={isProcessingConnection}
         />
       )}
