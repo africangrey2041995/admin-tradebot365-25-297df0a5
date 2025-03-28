@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { 
@@ -130,26 +131,8 @@ const AccountProfile = () => {
   const [isTesting, setIsTesting] = useState(false);
   const [isTestSuccessful, setIsTestSuccessful] = useState(false);
   const [availableTradingAccounts, setAvailableTradingAccounts] = useState(mockTradingAccounts);
-
-  const [logs, fetchLogs] = useTradingViewLogs({
-    botId,
-    userId,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  const {
-    logs: coinstratLogs,
-    fetchLogs: fetchCsLogs
-  } = useCoinstratLogs({
-    botId,
-    userId,
-    initialData: logsData,
-    refreshTrigger: refreshTrigger > 0,
-    skipLoadingState: true
-  });
-
-  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}, isAdminView: ${isAdminView}`);
+  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
+  const [isEditingAccessTokenOnly, setIsEditingAccessTokenOnly] = useState(false);
 
   const accountName = `Account ${accountId?.slice(-3)}`;
 
@@ -1183,9 +1166,21 @@ const AccountProfile = () => {
       {selectedKeyIds.length > 0 && (
         <BulkActionBar
           selectedCount={selectedKeyIds.length}
-          onClose={clearSelection}
-          onConnectAll={handleConnectAll}
-          onDisconnectAll={handleDisconnectAll}
+          onClear={clearSelection}
+          actions={[
+            {
+              label: "Connect All",
+              icon: <Link className="h-4 w-4 mr-2" />,
+              onClick: handleConnectAll,
+              variant: "default"
+            },
+            {
+              label: "Disconnect All",
+              icon: <Link2 className="h-4 w-4 mr-2" />,
+              onClick: handleDisconnectAll,
+              variant: "warning"
+            }
+          ]}
           isProcessing={isProcessingConnection}
         />
       )}
