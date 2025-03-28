@@ -416,7 +416,7 @@ const AccountProfile = () => {
             }
           }
           
-          if (isTestSuccessful && !!newAccessToken.trim()) {
+          if (isTestSuccessful && Boolean(newAccessToken.trim())) {
             updatedKey.accessToken = newAccessToken;
           }
           
