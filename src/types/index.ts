@@ -1,4 +1,3 @@
-
 // Re-export all type definitions for convenient access
 export * from './user';
 export * from './bot';
@@ -121,4 +120,26 @@ export function normalizeUserId(userId: string | undefined): string {
   
   // If it doesn't match any known format, return as is
   return userId;
+}
+
+export interface Account {
+  id?: string;
+  clientId?: string;
+  clientName?: string;
+  cspAccountName?: string;
+  cspNumber?: string;
+  cspUserEmail?: string;
+  cspUserName?: string;
+  csrfToken?: string;
+  ssoUrl?: string;
+  status: ConnectionStatus;
+  lastUpdated?: string;
+  // Added connection-related properties
+  lastConnectionTime?: string;
+  lastDisconnectionTime?: string;
+  errorMessage?: string;
+  reconnectAttempts?: number;
+  healthStatus?: HealthStatus;
+  successfulConnections?: number;
+  failedConnections?: number;
 }

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { 
@@ -13,10 +12,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Key, MoreHorizontal, Copy, Pencil, Eye, EyeOff, 
   ChevronLeft, Plus, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot,
-  User, Link, ArrowRight
+  User, Link, ArrowRight, Filter, SortAsc, SortDesc, Search, AlignJustify, 
+  CheckCircle, XCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -38,7 +39,11 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import BulkActionBar from '@/components/floating/BulkActionBar';
+import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog';
+import StatusIndicator from '@/components/ui/StatusIndicator';
+import { ConnectionStatus } from '@/types/connection';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
 interface ApiKey {
   id: string;
@@ -50,6 +55,7 @@ interface ApiKey {
   createdAt: string;
   expiryDate: string;
   status: 'ACTIVE' | 'BLOCK';
+  connectionStatus?: ConnectionStatus;
 }
 
 const generateMockApiKeys = (accountId: string): ApiKey[] => {
@@ -91,11 +97,30 @@ const mockUsers = [
 const AccountProfile = () => {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(generateMockApiKeys(accountId || ''));
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>(() => {
+    // Generate mock API keys with connection status
+    const keys = generateMockApiKeys(accountId || '');
+    return keys.map(key => ({
+      ...key,
+      connectionStatus: Math.random() > 0.5 ? 'Connected' : 'Disconnected'
+    }));
+  });
+  
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isAddKeyDialogOpen, setIsAddKeyDialogOpen] = useState(false);
   const [isEditKeyDialogOpen, setIsEditKeyDialogOpen] = useState(false);
   const [isUpdateTokenDialogOpen, setIsUpdateTokenDialogOpen] = useState(false);
+  const [selectedKeyIds, setSelectedKeyIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [sortField, setSortField] = useState<string>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [isConnectAllDialogOpen, setIsConnectAllDialogOpen] = useState(false);
+  const [isDisconnectAllDialogOpen, setIsDisconnectAllDialogOpen] = useState(false);
+  
+  const { loading: isProcessingConnection, startLoading, stopLoading } = useSafeLoading({
+    minLoadingDurationMs: 800
+  });
   
   // State for add/edit API key
   const [selectedUser, setSelectedUser] = useState('');
@@ -113,6 +138,179 @@ const AccountProfile = () => {
   const [isEditingAccessTokenOnly, setIsEditingAccessTokenOnly] = useState(false);
   
   const accountName = `Account ${accountId?.slice(-3)}`;
+  
+  // Filter and sort API keys
+  const filteredAndSortedApiKeys = useMemo(() => {
+    let result = [...apiKeys];
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(key => 
+        key.name.toLowerCase().includes(query) || 
+        key.clientId.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply status filter
+    if (filterStatus !== 'all') {
+      if (filterStatus === 'connected') {
+        result = result.filter(key => key.connectionStatus === 'Connected');
+      } else if (filterStatus === 'disconnected') {
+        result = result.filter(key => key.connectionStatus === 'Disconnected');
+      } else if (filterStatus === 'active') {
+        result = result.filter(key => key.status === 'ACTIVE');
+      } else if (filterStatus === 'blocked') {
+        result = result.filter(key => key.status === 'BLOCK');
+      }
+    }
+    
+    // Apply sorting
+    result.sort((a, b) => {
+      let valueA, valueB;
+      
+      switch (sortField) {
+        case 'name':
+          valueA = a.name;
+          valueB = b.name;
+          break;
+        case 'clientId':
+          valueA = a.clientId;
+          valueB = b.clientId;
+          break;
+        case 'status':
+          valueA = a.status;
+          valueB = b.status;
+          break;
+        case 'connectionStatus':
+          valueA = a.connectionStatus || '';
+          valueB = b.connectionStatus || '';
+          break;
+        case 'expiry':
+          valueA = new Date(a.expiryDate).getTime();
+          valueB = new Date(b.expiryDate).getTime();
+          break;
+        default:
+          valueA = a.name;
+          valueB = b.name;
+      }
+      
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return sortDirection === 'asc' 
+          ? valueA.localeCompare(valueB) 
+          : valueB.localeCompare(valueA);
+      } else {
+        return sortDirection === 'asc' 
+          ? (valueA as number) - (valueB as number) 
+          : (valueB as number) - (valueA as number);
+      }
+    });
+    
+    return result;
+  }, [apiKeys, searchQuery, filterStatus, sortField, sortDirection]);
+  
+  const toggleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+  
+  // Handle selection of API keys
+  const toggleSelectKey = (keyId: string) => {
+    setSelectedKeyIds(prev => 
+      prev.includes(keyId) 
+        ? prev.filter(id => id !== keyId) 
+        : [...prev, keyId]
+    );
+  };
+  
+  const toggleSelectAll = () => {
+    if (selectedKeyIds.length === filteredAndSortedApiKeys.length) {
+      setSelectedKeyIds([]);
+    } else {
+      setSelectedKeyIds(filteredAndSortedApiKeys.map(key => key.id));
+    }
+  };
+  
+  const clearSelection = () => {
+    setSelectedKeyIds([]);
+  };
+  
+  // Bulk operations
+  const handleConnectAll = () => {
+    setIsConnectAllDialogOpen(true);
+  };
+  
+  const handleDisconnectAll = () => {
+    setIsDisconnectAllDialogOpen(true);
+  };
+  
+  const processConnectAll = () => {
+    if (selectedKeyIds.length === 0) return;
+    
+    startLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+      setApiKeys(prev => prev.map(key => {
+        if (selectedKeyIds.includes(key.id)) {
+          return { ...key, connectionStatus: 'Connected' };
+        }
+        return key;
+      }));
+      
+      stopLoading();
+      setIsConnectAllDialogOpen(false);
+      
+      toast.success(`Đã kết nối ${selectedKeyIds.length} API key thành công`, {
+        description: 'Tất cả API key đã được kết nối.'
+      });
+    }, 1500);
+  };
+  
+  const processDisconnectAll = () => {
+    if (selectedKeyIds.length === 0) return;
+    
+    startLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+      setApiKeys(prev => prev.map(key => {
+        if (selectedKeyIds.includes(key.id)) {
+          return { ...key, connectionStatus: 'Disconnected' };
+        }
+        return key;
+      }));
+      
+      stopLoading();
+      setIsDisconnectAllDialogOpen(false);
+      
+      toast.success(`Đã ngắt kết nối ${selectedKeyIds.length} API key thành công`, {
+        description: 'Tất cả API key đã được ngắt kết nối.'
+      });
+    }, 1500);
+  };
+  
+  const handleToggleConnectionStatus = (keyId: string) => {
+    setApiKeys(prev => prev.map(key => {
+      if (key.id === keyId) {
+        const newStatus = key.connectionStatus === 'Connected' ? 'Disconnected' : 'Connected';
+        
+        // Show toast notification
+        if (newStatus === 'Connected') {
+          toast.success(`Đã kết nối API key ${key.name} thành công`);
+        } else {
+          toast.success(`Đã ngắt kết nối API key ${key.name} thành công`);
+        }
+        
+        return { ...key, connectionStatus: newStatus };
+      }
+      return key;
+    }));
+  };
 
   const toggleShowSecret = (keyId: string) => {
     setShowSecrets(prev => ({
@@ -377,26 +575,181 @@ const AccountProfile = () => {
           </Button>
         </div>
         
+        {/* Filters and search */}
+        <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Tìm kiếm API key..." 
+              className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex gap-2 items-center">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-[180px]">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>
+                    {filterStatus === 'all' && 'Tất cả trạng thái'}
+                    {filterStatus === 'connected' && 'Đã kết nối'}
+                    {filterStatus === 'disconnected' && 'Chưa kết nối'}
+                    {filterStatus === 'active' && 'Đang hoạt động'}
+                    {filterStatus === 'blocked' && 'Đã khóa'}
+                  </span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="connected">Đã kết nối</SelectItem>
+                <SelectItem value="disconnected">Chưa kết nối</SelectItem>
+                <SelectItem value="active">Đang hoạt động</SelectItem>
+                <SelectItem value="blocked">Đã khóa</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={sortField} onValueChange={setSortField}>
+              <SelectTrigger className="w-[160px]">
+                <div className="flex items-center gap-2">
+                  <AlignJustify className="h-4 w-4" />
+                  <span>
+                    {sortField === 'name' && 'Tên API'}
+                    {sortField === 'clientId' && 'Client ID'}
+                    {sortField === 'status' && 'Trạng thái'}
+                    {sortField === 'connectionStatus' && 'Kết nối'}
+                    {sortField === 'expiry' && 'Hết hạn'}
+                  </span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Tên API</SelectItem>
+                <SelectItem value="clientId">Client ID</SelectItem>
+                <SelectItem value="status">Trạng thái</SelectItem>
+                <SelectItem value="connectionStatus">Kết nối</SelectItem>
+                <SelectItem value="expiry">Hết hạn</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+              className="h-10 w-10"
+            >
+              {sortDirection === 'asc' ? (
+                <SortAsc className="h-4 w-4" />
+              ) : (
+                <SortDesc className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+        
         <Card className="border-0 shadow-sm overflow-hidden">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="w-[120px] rounded-tl-lg">Name</TableHead>
-                  <TableHead className="w-[150px]">Client ID</TableHead>
+                  <TableHead className="w-[50px]">
+                    <Checkbox 
+                      checked={filteredAndSortedApiKeys.length > 0 && selectedKeyIds.length === filteredAndSortedApiKeys.length}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead className="w-[120px] rounded-tl-lg">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="px-0 font-medium"
+                      onClick={() => toggleSort('name')}
+                    >
+                      Name
+                      {sortField === 'name' && (
+                        sortDirection === 'asc' ? 
+                          <SortAsc className="ml-1 h-3.5 w-3.5" /> : 
+                          <SortDesc className="ml-1 h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead className="w-[150px]">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="px-0 font-medium"
+                      onClick={() => toggleSort('clientId')}
+                    >
+                      Client ID
+                      {sortField === 'clientId' && (
+                        sortDirection === 'asc' ? 
+                          <SortAsc className="ml-1 h-3.5 w-3.5" /> : 
+                          <SortDesc className="ml-1 h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
                   <TableHead className="w-[150px]">Secret</TableHead>
                   <TableHead className="w-[150px]">Access Token</TableHead>
                   <TableHead className="w-[150px]">Account Trading</TableHead>
-                  <TableHead className="w-[150px]">Expiry</TableHead>
-                  <TableHead className="w-[100px]">Status</TableHead>
+                  <TableHead className="w-[150px]">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="px-0 font-medium"
+                      onClick={() => toggleSort('expiry')}
+                    >
+                      Expiry
+                      {sortField === 'expiry' && (
+                        sortDirection === 'asc' ? 
+                          <SortAsc className="ml-1 h-3.5 w-3.5" /> : 
+                          <SortDesc className="ml-1 h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead className="w-[100px]">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="px-0 font-medium"
+                      onClick={() => toggleSort('status')}
+                    >
+                      Status
+                      {sortField === 'status' && (
+                        sortDirection === 'asc' ? 
+                          <SortAsc className="ml-1 h-3.5 w-3.5" /> : 
+                          <SortDesc className="ml-1 h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead className="w-[120px]">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="px-0 font-medium"
+                      onClick={() => toggleSort('connectionStatus')}
+                    >
+                      Kết nối
+                      {sortField === 'connectionStatus' && (
+                        sortDirection === 'asc' ? 
+                          <SortAsc className="ml-1 h-3.5 w-3.5" /> : 
+                          <SortDesc className="ml-1 h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  </TableHead>
                   <TableHead className="w-[80px] text-right rounded-tr-lg">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apiKeys.map((key) => {
+                {filteredAndSortedApiKeys.map((key) => {
                   const account = parseAccountTrading(key.accountTrading);
                   return (
                     <TableRow key={key.id}>
+                      <TableCell>
+                        <Checkbox 
+                          checked={selectedKeyIds.includes(key.id)}
+                          onCheckedChange={() => toggleSelectKey(key.id)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">
                         <div className="flex items-center">
                           <div className="w-2 h-2 rounded-full mr-2 bg-primary"></div>
@@ -520,6 +873,16 @@ const AccountProfile = () => {
                           </Badge>
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <StatusIndicator 
+                          status={key.connectionStatus as ConnectionStatus || 'Disconnected'} 
+                          showLabel
+                          showControls
+                          onReconnect={key.connectionStatus === 'Disconnected' ? () => handleToggleConnectionStatus(key.id) : undefined}
+                          onDisconnect={key.connectionStatus === 'Connected' ? () => handleToggleConnectionStatus(key.id) : undefined}
+                          size="sm"
+                        />
+                      </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -541,6 +904,21 @@ const AccountProfile = () => {
                               Update Access Token
                             </DropdownMenuItem>
                             <DropdownMenuItem 
+                              onClick={() => handleToggleConnectionStatus(key.id)}
+                            >
+                              {key.connectionStatus === 'Connected' ? (
+                                <>
+                                  <XCircle className="h-4 w-4 mr-2 text-red-500" />
+                                  Ngắt kết nối
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                                  Kết nối
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
                               onClick={() => handleDeleteKey(key.id)}
                               className="text-destructive focus:text-destructive"
                             >
@@ -553,11 +931,72 @@ const AccountProfile = () => {
                     </TableRow>
                   );
                 })}
+                {filteredAndSortedApiKeys.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={10} className="h-24 text-center">
+                      {searchQuery || filterStatus !== 'all' ? (
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <Filter className="h-8 w-8 mb-2 text-muted-foreground" />
+                          <p className="text-lg font-medium text-muted-foreground">Không tìm thấy API key nào phù hợp</p>
+                          <p className="text-sm text-muted-foreground mt-1">Thử thay đổi bộ lọc hoặc tìm kiếm</p>
+                          <Button variant="outline" className="mt-4" onClick={() => {
+                            setSearchQuery('');
+                            setFilterStatus('all');
+                          }}>
+                            Xóa bộ lọc
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <Key className="h-8 w-8 mb-2 text-muted-foreground" />
+                          <p className="text-lg font-medium text-muted-foreground">Không có API key nào</p>
+                          <p className="text-sm text-muted-foreground mt-1">Thêm API key để bắt đầu.</p>
+                          <Button className="mt-4" onClick={handleAddKey}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Thêm API Key
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
+
+      {/* Bulk action bar */}
+      <BulkActionBar 
+        selectedCount={selectedKeyIds.length}
+        onClose={clearSelection}
+        onConnectAll={handleConnectAll}
+        onDisconnectAll={handleDisconnectAll}
+        isProcessing={isProcessingConnection}
+      />
+
+      {/* Confirmation Dialogs for bulk actions */}
+      <ConfirmationDialog
+        open={isConnectAllDialogOpen}
+        onOpenChange={setIsConnectAllDialogOpen}
+        title="Kết nối tất cả API key được chọn?"
+        description={`Bạn đang chuẩn bị kết nối ${selectedKeyIds.length} API key. Bạn có chắc chắn muốn tiếp tục?`}
+        confirmText="Kết nối tất cả"
+        onConfirm={processConnectAll}
+        isProcessing={isProcessingConnection}
+        variant="info"
+      />
+
+      <ConfirmationDialog
+        open={isDisconnectAllDialogOpen}
+        onOpenChange={setIsDisconnectAllDialogOpen}
+        title="Ngắt kết nối tất cả API key được chọn?"
+        description={`Bạn đang chuẩn bị ngắt kết nối ${selectedKeyIds.length} API key. Bạn có chắc chắn muốn tiếp tục?`}
+        confirmText="Ngắt kết nối tất cả"
+        onConfirm={processDisconnectAll}
+        isProcessing={isProcessingConnection}
+        variant="warning"
+      />
 
       {/* Add New API Key Dialog */}
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
