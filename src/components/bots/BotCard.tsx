@@ -18,8 +18,9 @@ export interface BotCardProps {
   exchange?: string;
   botForm?: string;
   status?: string;
-  signalToken?: string; // Thêm trường signalToken
-  webhookUrl?: string; // Thêm trường webhookUrl
+  signalToken?: string;
+  webhookUrl?: string;
+  isFavorite?: boolean; // Add the isFavorite property
 }
 
 const BotCard: React.FC<BotCardProps> = ({
