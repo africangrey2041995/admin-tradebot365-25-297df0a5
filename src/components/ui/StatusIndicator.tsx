@@ -28,6 +28,7 @@ interface StatusIndicatorProps {
   errorMessage?: string;
   reconnectAttempts?: number;
   onReconnect?: () => void;
+  onDisconnect?: () => void;
   isReconnecting?: boolean;
   healthStatus?: 'healthy' | 'warning' | 'critical';
 }
@@ -44,6 +45,7 @@ const StatusIndicator = ({
   errorMessage,
   reconnectAttempts = 0,
   onReconnect,
+  onDisconnect,
   isReconnecting = false,
   healthStatus
 }: StatusIndicatorProps) => {
@@ -149,9 +151,11 @@ const StatusIndicator = ({
 
   const tooltipContent = buildTooltipContent();
   
-  const handleReconnect = (e: React.MouseEvent) => {
+  const handleAction = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onReconnect && !isReconnecting) {
+    if (status === 'Connected' && onDisconnect && !isReconnecting) {
+      onDisconnect();
+    } else if (status === 'Disconnected' && onReconnect && !isReconnecting) {
       onReconnect();
     }
   };
@@ -192,12 +196,12 @@ const StatusIndicator = ({
               </span>
             )}
             
-            {showControls && onReconnect && (
+            {showControls && (onReconnect || onDisconnect) && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="h-7 px-2 ml-1"
-                onClick={handleReconnect}
+                onClick={handleAction}
                 disabled={isReconnecting || status === 'Pending'}
               >
                 {isReconnecting ? (

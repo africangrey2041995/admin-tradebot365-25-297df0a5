@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MoreHorizontal, Star, Mail, Link, Users, RefreshCw } from 'lucide-react';
+import { MoreHorizontal, Star, Mail, Link, Users, RefreshCw, WifiOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -25,6 +25,7 @@ interface AccountCardProps {
   onEdit: (clientId: string) => void;
   onDelete: (clientId: string) => void;
   onReconnect: (clientId: string) => void;
+  onDisconnect: (clientId: string) => void;
 }
 
 const AccountCard: React.FC<AccountCardProps> = ({
@@ -32,9 +33,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onEdit,
   onDelete,
   onReconnect,
+  onDisconnect,
 }) => {
   const navigate = useNavigate();
-  const { loading: isReconnecting, startLoading, stopLoading } = useSafeLoading({
+  const { loading: isProcessingConnection, startLoading, stopLoading } = useSafeLoading({
     minLoadingDurationMs: 800
   });
 
@@ -120,6 +122,19 @@ const AccountCard: React.FC<AccountCardProps> = ({
     }, 1500);
   };
 
+  const handleDisconnect = () => {
+    startLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+      onDisconnect(account.clientId || '');
+      stopLoading();
+      toast.success('Ngắt kết nối thành công', {
+        description: `Tài khoản ${account.cspAccountName} đã được ngắt kết nối.`
+      });
+    }, 1500);
+  };
+
   return (
     <Card className="p-5 rounded-lg border shadow-sm hover:shadow transition-all duration-300">
       <div className="flex items-center gap-4">
@@ -147,12 +162,32 @@ const AccountCard: React.FC<AccountCardProps> = ({
                     <DropdownMenuItem onClick={() => onEdit(account.clientId || '')}>
                       Chỉnh Sửa Tài Khoản
                     </DropdownMenuItem>
+                    
+                    {account.status === 'Connected' && (
+                      <DropdownMenuItem 
+                        onClick={handleDisconnect}
+                        disabled={isProcessingConnection}
+                      >
+                        {isProcessingConnection ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Đang ngắt kết nối...
+                          </>
+                        ) : (
+                          <>
+                            <WifiOff className="h-4 w-4 mr-2" />
+                            Ngắt Kết Nối
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                    )}
+                    
                     {account.status === 'Disconnected' && (
                       <DropdownMenuItem 
                         onClick={handleReconnect}
-                        disabled={isReconnecting}
+                        disabled={isProcessingConnection}
                       >
-                        {isReconnecting ? (
+                        {isProcessingConnection ? (
                           <>
                             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                             Đang kết nối lại...
@@ -165,6 +200,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
                         )}
                       </DropdownMenuItem>
                     )}
+                    
                     <DropdownMenuItem 
                       onClick={() => onDelete(account.clientId || '')}
                       className="text-destructive focus:text-destructive"
@@ -211,7 +247,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
           reconnectAttempts={connectionDetails.reconnectAttempts}
           healthStatus={connectionDetails.healthStatus}
           onReconnect={account.status === 'Disconnected' ? handleReconnect : undefined}
-          isReconnecting={isReconnecting}
+          isReconnecting={isProcessingConnection}
           showControls
         />
         <Button variant="outline" size="sm" className="text-sm" onClick={handleViewProfile}>
