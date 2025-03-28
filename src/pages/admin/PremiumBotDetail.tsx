@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,6 @@ import { Webhook } from 'lucide-react';
 import { BotRiskLevel } from '@/constants/botTypes';
 import { toast } from 'sonner';
 
-// Hàm tạo Signal Token nhất quán (giống như ở BotProfile)
 const generateSignalToken = (botId: string) => {
   return `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 10)}`;
 };
@@ -59,7 +57,7 @@ const PremiumBotDetail = () => {
   } = usePremiumBotDetail(botId, 'admin');
 
   // Tạo signal token từ botId
-  const signalToken = bot?.signalToken || generateSignalToken(botId || '');
+  const signalToken = bot?.signalToken || `tb365_${botId?.toLowerCase()}_sample_token`;
 
   // Handle risk level update
   const handleUpdateRisk = (newRisk: BotRiskLevel) => {

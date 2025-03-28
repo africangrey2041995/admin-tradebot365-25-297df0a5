@@ -13,10 +13,6 @@ import { Account } from '@/types';
 import { CoinstratSignal } from '@/types/signal';
 import { normalizeUserId } from '@/utils/normalizeUserId';
 
-const generateSignalToken = (botId: string) => {
-  return `tb365_${botId?.toLowerCase()}_${Math.random().toString(36).substring(2, 10)}`;
-};
-
 const BotProfile = () => {
   const { botId } = useParams<{ botId: string }>();
   const [isLoading, setIsLoading] = useState(true);
@@ -108,7 +104,7 @@ const BotProfile = () => {
   ];
   
   const [webhookUrl] = useState(`https://api.tradebot365.com/webhook/${botId?.toLowerCase()}`);
-  const [signalToken] = useState(() => generateSignalToken(botId || ''));
+  const [signalToken] = useState(`tb365_${botId?.toLowerCase()}_sample_token`);
   
   const userId = normalizeUserId('USR-001');
   
