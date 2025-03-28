@@ -23,28 +23,6 @@ interface LoadingStateProps {
   isSimple?: boolean;
 }
 
-// Simple inline loading state component
-const SimpleLoadingState: React.FC<LoadingStateProps> = ({ isSimple }) => {
-  if (isSimple) {
-    return (
-      <div className="animate-pulse space-y-4 py-4">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-8 flex justify-center items-center">
-      <div className="text-center">
-        <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-        <p className="text-lg font-medium">Loading signal data...</p>
-      </div>
-    </div>
-  );
-};
-
 const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
   tradingViewLogs,
   coinstratLogs,
@@ -72,11 +50,9 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
     return coinstratLogs.filter(log => log.originalSignalId === tvSignalId);
   };
 
-  console.log(`UnifiedSignalView - tradingViewLogs: ${tradingViewLogs.length}, coinstratLogs: ${coinstratLogs.length}, isLoading: ${isLoading}`);
-
   // Render nothing if no logs and loading
   if ((tradingViewLogs.length === 0 && coinstratLogs.length === 0) && isLoading) {
-    return <SimpleLoadingState isSimple={true} />;
+    return <LoadingState isSimple={true} />;
   }
 
   // Render no data message if no logs and not loading
@@ -248,6 +224,13 @@ const UnifiedSignalView: React.FC<UnifiedSignalViewProps> = ({
             ))}
         </TableBody>
       </Table>
+      
+      {isLoading && (
+        <div className="py-4 flex items-center justify-center">
+          <RefreshCw className="h-5 w-5 text-muted-foreground animate-spin mr-2" />
+          <span className="text-sm text-muted-foreground">Refreshing logs...</span>
+        </div>
+      )}
     </div>
   );
 };

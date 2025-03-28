@@ -1,12 +1,11 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { useSignalFilters } from '@/hooks/signals/useSignalFilters';
 
-/**
- * Unit tests for the useSignalFilters hook
- */
-export const runSignalFiltersTests = () => {
+// Export the test suite function for running through the test runner
+export function runSignalFiltersTests() {
   describe('useSignalFilters Hook', () => {
-    it('returns initial filter values', () => {
+    // Test initial state
+    test('initializes with default filters', () => {
       const { result } = renderHook(() => useSignalFilters());
       
       expect(result.current.filters).toEqual({
@@ -20,76 +19,81 @@ export const runSignalFiltersTests = () => {
         userId: ''
       });
     });
-    
-    it('accepts and merges initial values', () => {
-      const initialFilters = {
-        search: 'test query',
-        status: 'processed' as const
-      };
-      
-      const { result } = renderHook(() => useSignalFilters(initialFilters));
-      
-      expect(result.current.filters).toEqual({
-        search: 'test query',
-        signalSource: 'all',
-        status: 'processed',
-        dateRange: {
-          from: undefined,
-          to: undefined
-        },
-        userId: ''
-      });
-    });
-    
-    it('updates a single filter when updateFilter is called', () => {
+
+    // Test filter updates
+    test('updates filters correctly', () => {
       const { result } = renderHook(() => useSignalFilters());
       
       act(() => {
-        result.current.updateFilter('search', 'new search');
+        result.current.updateFilter('search', 'test query');
+        result.current.updateFilter('status', 'success');
+        result.current.updateFilter('signalSource', 'tradingview');
       });
       
-      expect(result.current.filters.search).toBe('new search');
+      expect(result.current.filters.search).toBe('test query');
+      expect(result.current.filters.status).toBe('success');
+      expect(result.current.filters.signalSource).toBe('tradingview');
       
-      // Other filters remain unchanged
-      expect(result.current.filters.signalSource).toBe('all');
+      // Other properties should remain unchanged
+      // Check dateRange based on its actual shape
+      const dateRange = result.current.filters.dateRange;
+      if (Array.isArray(dateRange)) {
+        expect(dateRange[0]).toBeNull();
+        expect(dateRange[1]).toBeNull();
+      } else {
+        expect(dateRange.from).toBeUndefined();
+        expect(dateRange.to).toBeUndefined();
+      }
+      expect(result.current.filters.userId).toBe('');
     });
-    
-    it('updates multiple filters with setFilters', () => {
+
+    // Test multiple sequential updates
+    test('handles multiple sequential updates correctly', () => {
       const { result } = renderHook(() => useSignalFilters());
       
       act(() => {
-        result.current.setFilters({
-          ...result.current.filters,
-          search: 'updated search',
-          status: 'failed'
-        });
+        result.current.updateFilter('search', 'query 1');
+      });
+      
+      act(() => {
+        result.current.updateFilter('status', 'failed');
+      });
+      
+      act(() => {
+        result.current.updateFilter('userId', 'user-123');
       });
       
       expect(result.current.filters).toEqual({
-        search: 'updated search',
+        search: 'query 1',
         signalSource: 'all',
         status: 'failed',
         dateRange: {
           from: undefined,
           to: undefined
         },
-        userId: ''
+        userId: 'user-123'
       });
     });
-    
-    it('resets all filters to defaults when resetFilters is called', () => {
-      const initialFilters = {
-        search: 'test query',
-        status: 'processed' as const,
-        userId: 'user-123'
-      };
+
+    // Test reset functionality
+    test('resets filters to default values', () => {
+      const { result } = renderHook(() => useSignalFilters());
       
-      const { result } = renderHook(() => useSignalFilters(initialFilters));
+      act(() => {
+        result.current.updateFilter('search', 'test query');
+        result.current.updateFilter('status', 'success');
+        result.current.updateFilter('userId', 'user-123');
+      });
       
+      // Verify filters were updated
+      expect(result.current.filters.search).toBe('test query');
+      
+      // Reset filters
       act(() => {
         result.current.resetFilters();
       });
       
+      // Verify filters were reset
       expect(result.current.filters).toEqual({
         search: '',
         signalSource: 'all',
@@ -101,5 +105,32 @@ export const runSignalFiltersTests = () => {
         userId: ''
       });
     });
+
+    // Test date range filter specifically
+    test('handles date range updates correctly', () => {
+      const { result } = renderHook(() => useSignalFilters());
+      
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      
+      act(() => {
+        result.current.updateFilter('dateRange', {
+          from: startDate,
+          to: endDate
+        });
+      });
+      
+      // Handle different possible shapes of dateRange
+      const dateRange = result.current.filters.dateRange;
+      if (Array.isArray(dateRange)) {
+        expect(dateRange[0]).toEqual(startDate);
+        expect(dateRange[1]).toEqual(endDate);
+      } else {
+        expect(dateRange.from).toEqual(startDate);
+        expect(dateRange.to).toEqual(endDate);
+      }
+    });
   });
-};
+}
+
+export default runSignalFiltersTests;

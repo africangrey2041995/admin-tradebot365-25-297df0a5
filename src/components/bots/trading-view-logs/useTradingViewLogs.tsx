@@ -1,125 +1,100 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { TradingViewSignal } from '@/types/signal';
-import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
-import { getMockTradingViewLogs } from './mockData';
+import { useState, useCallback, useEffect } from 'react';
+import { TradingViewSignal } from '@/types';
+import { useSafeLoading } from '@/hooks/useSafeLoading';
+
+// Mock data for testing
+const mockLogs: TradingViewSignal[] = [
+  {
+    id: 'tv-signal-1',
+    action: 'ENTER_LONG',
+    instrument: 'BTCUSDT',
+    timestamp: new Date().toISOString(),
+    signalToken: 'token123',
+    maxLag: '3600',
+    investmentType: 'contract',
+    amount: '1',
+    status: 'Processed'
+  },
+  {
+    id: 'tv-signal-2',
+    action: 'EXIT_LONG',
+    instrument: 'ETHUSDT',
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    signalToken: 'token123',
+    maxLag: '3600',
+    investmentType: 'contract',
+    amount: '0.5',
+    status: 'Processed'
+  },
+  {
+    id: 'tv-signal-3',
+    action: 'ENTER_SHORT',
+    instrument: 'SOLUSDT',
+    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    signalToken: 'token123',
+    maxLag: '3600',
+    investmentType: 'contract',
+    amount: '10',
+    status: 'Failed',
+    errorMessage: 'Insufficient balance'
+  }
+];
 
 interface UseTradingViewLogsProps {
-  botId?: string;
-  userId?: string;
+  botId: string;
+  userId: string;
   refreshTrigger?: boolean;
-  skipLoadingState?: boolean;
   initialData?: TradingViewSignal[];
-  isAdminView?: boolean; // Add admin view flag
+  skipLoadingState?: boolean;
 }
 
-interface UseTradingViewLogsResult {
-  logs: TradingViewSignal[];
-  loading: boolean;
-  error: Error | null;
-  fetchLogs: () => void;
-}
-
-export const useTradingViewLogs = ({
-  botId,
-  userId,
+export const useTradingViewLogs = ({ 
+  botId, 
+  userId, 
   refreshTrigger = false,
-  skipLoadingState = false,
   initialData,
-  isAdminView = false // Default to false
-}: UseTradingViewLogsProps): UseTradingViewLogsResult => {
-  const [logs, setLogs] = useState<TradingViewSignal[]>([]);
+  skipLoadingState = false
+}: UseTradingViewLogsProps) => {
+  const [logs, setLogs] = useState<TradingViewSignal[]>(initialData || []);
   const [error, setError] = useState<Error | null>(null);
   
-  // Cache the mock data to prevent regeneration on every render
-  const mockDataRef = useRef<TradingViewSignal[]>([]);
-  
-  // Use our safe loading hook
   const { loading, startLoading, stopLoading } = useSafeLoading({
+    timeoutMs: 10000,
+    minLoadingDurationMs: 500,
     debugComponent: 'TradingViewLogs',
-    skipLoadingState,
-    minLoadingDurationMs: 500 // Add minimum loading time to prevent flicker
+    skipLoadingState
   });
   
-  // Track the last fetch time to prevent rapid refreshes
-  const lastFetchTimeRef = useRef(0);
-  
   const fetchLogs = useCallback(() => {
-    try {
-      // Implement debounce - prevent fetching if last fetch was less than 1 second ago
-      const now = Date.now();
-      if (now - lastFetchTimeRef.current < 1000) {
-        console.log('TradingViewLogs - Fetch throttled, too recent');
-        return;
+    console.log(`Fetching TradingView logs for bot ${botId} and user ${userId}`);
+    startLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+      try {
+        // In a real application, this would be an API call
+        // For now, we'll just use mock data
+        const fetchedLogs = [...mockLogs];
+        setLogs(fetchedLogs);
+        setError(null);
+        stopLoading();
+      } catch (err) {
+        console.error('Error fetching TradingView logs:', err);
+        setError(err instanceof Error ? err : new Error('Failed to fetch TradingView logs'));
+        stopLoading();
       }
-      
-      lastFetchTimeRef.current = now;
-      startLoading();
-      console.log(`Fetching TradingView logs for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
-      
-      // In a real app, we would fetch data from API here
-      setTimeout(() => {
-        try {
-          // Generate mock data only once and cache it
-          if (mockDataRef.current.length === 0) {
-            mockDataRef.current = initialData || getMockTradingViewLogs(botId);
-            console.log(`Loaded ${mockDataRef.current.length} TradingView logs for botId: ${botId}`);
-          }
-          
-          const allLogs = mockDataRef.current;
-          
-          // Filter logs based on botId and/or userId
-          let filteredLogs = [...allLogs];
-          
-          // Only apply userId filter if provided AND not in admin view
-          if (userId && !isAdminView) {
-            console.log(`Filtering TradingView logs by userId: ${userId}`);
-            
-            // Check if userId is empty
-            const isEmptyUserId = !userId || userId.trim() === '';
-            
-            if (!isEmptyUserId) {
-              // More flexible user ID filtering
-              filteredLogs = filteredLogs.filter(log => {
-                const logUserId = log.userId?.toLowerCase() || '';
-                const targetUserId = userId.toLowerCase();
-                
-                return logUserId === targetUserId || logUserId.includes(targetUserId);
-              });
-            }
-            
-            console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
-          } else if (isAdminView) {
-            console.log(`Admin view: Not filtering by userId, showing all logs for botId: ${botId}`);
-          }
-          
-          console.log(`TradingView logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
-          
-          // Introduce a slight delay to stabilize UI
-          setTimeout(() => {
-            setLogs(filteredLogs);
-            setError(null);
-            stopLoading();
-          }, 300);
-        } catch (err) {
-          console.error('Error processing TradingView logs:', err);
-          setError(err instanceof Error ? err : new Error('Unknown error occurred'));
-          stopLoading();
-        }
-      }, 1000);
-    } catch (err) {
-      console.error('Error fetching TradingView logs:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
-      stopLoading();
-    }
-  }, [botId, userId, startLoading, stopLoading, initialData, isAdminView]);
+    }, 1000);
+  }, [botId, userId, startLoading, stopLoading]);
   
-  // Fetch logs on mount and when dependencies change
+  // Initial fetch when component mounts
   useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+    if (!initialData) {
+      fetchLogs();
+    }
+  }, [fetchLogs, initialData]);
   
-  // Handle refresh trigger from parent
+  // Fetch when refreshTrigger changes
   useEffect(() => {
     if (refreshTrigger) {
       fetchLogs();

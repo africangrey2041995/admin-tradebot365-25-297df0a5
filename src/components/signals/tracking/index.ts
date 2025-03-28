@@ -1,18 +1,6 @@
 
-/**
- * Signal Tracking Components
- * 
- * This module provides components for tracking, filtering, and displaying
- * signal data within the application.
- */
-
-// Export tracking components
+// Export all tracking-related components
 export { default as AdvancedSignalFilter } from './AdvancedSignalFilter';
+// Make sure to export the SignalFilters type from the types file
+export type { SignalFilters } from '../types';
 
-// Export types
-export type { 
-  SignalFilters,
-  SignalUser,
-  SignalThemeOptions,
-  SignalDisplayOptions
-} from '../types';

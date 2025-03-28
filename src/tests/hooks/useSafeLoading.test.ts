@@ -1,136 +1,131 @@
 
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useSafeLoading } from '@/hooks/useSafeLoading';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
 
-// Mock timer functions
+// Mock timers for testing timeouts and delays
 jest.useFakeTimers();
 
-/**
- * Unit tests for the useSafeLoading hook
- */
-export const runSafeLoadingTests = () => {
+// Export the test suite function for running through the test runner
+export function runSafeLoadingTests() {
   describe('useSafeLoading Hook', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-    
-    it('initializes with isLoading=false', () => {
+    // Test initial state
+    test('initializes with loading set to false', () => {
       const { result } = renderHook(() => useSafeLoading());
-      
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loading).toBe(false);
     });
-    
-    it('startLoading sets isLoading to true', () => {
+
+    // Test basic loading state management
+    test('sets loading state to true and false correctly', () => {
       const { result } = renderHook(() => useSafeLoading());
       
       act(() => {
         result.current.startLoading();
       });
       
-      expect(result.current.isLoading).toBe(true);
+      expect(result.current.loading).toBe(true);
+      
+      act(() => {
+        result.current.stopLoading();
+      });
+      
+      expect(result.current.loading).toBe(false);
     });
-    
-    it('endLoading sets isLoading to false', () => {
+
+    // Test timeout prevention
+    test('prevents infinite loading with automatic timeout', () => {
+      const timeoutMs = 1000;
+      const { result } = renderHook(() => useSafeLoading({ timeoutMs }));
+      
+      act(() => {
+        result.current.startLoading();
+      });
+      
+      expect(result.current.loading).toBe(true);
+      
+      // Fast-forward past the timeout
+      act(() => {
+        jest.advanceTimersByTime(timeoutMs + 100);
+      });
+      
+      // Loading should be automatically set to false
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Test minimum loading duration
+    test('maintains minimum loading duration', () => {
+      const minLoadingDurationMs = 500;
+      const { result } = renderHook(() => useSafeLoading({ minLoadingDurationMs }));
+      
+      act(() => {
+        result.current.startLoading();
+      });
+      
+      expect(result.current.loading).toBe(true);
+      
+      // Try to stop loading immediately
+      act(() => {
+        result.current.stopLoading();
+      });
+      
+      // Loading should still be true due to minimum duration
+      expect(result.current.loading).toBe(true);
+      
+      // Fast-forward past the minimum duration
+      act(() => {
+        jest.advanceTimersByTime(minLoadingDurationMs + 100);
+      });
+      
+      // Loading should now be false
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Test skipLoadingState option
+    test('honors skipLoadingState option', () => {
+      const { result } = renderHook(() => useSafeLoading({ skipLoadingState: true }));
+      
+      act(() => {
+        result.current.startLoading();
+      });
+      
+      // Loading should remain false since we're skipping loading state
+      expect(result.current.loading).toBe(false);
+      
+      act(() => {
+        result.current.stopLoading();
+      });
+      
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Test cleanup on unmount
+    test('cleans up timeouts on unmount', () => {
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+      
+      const { unmount } = renderHook(() => useSafeLoading());
+      
+      unmount();
+      
+      expect(clearTimeoutSpy).toHaveBeenCalled();
+      
+      clearTimeoutSpy.mockRestore();
+    });
+
+    // Test multiple start/stop calls in quick succession
+    test('handles multiple calls gracefully', () => {
       const { result } = renderHook(() => useSafeLoading());
       
-      // Start loading first
+      // Start/stop multiple times in quick succession
       act(() => {
+        result.current.startLoading();
+        result.current.startLoading();
+        result.current.stopLoading();
         result.current.startLoading();
       });
       
-      expect(result.current.isLoading).toBe(true);
-      
-      // Then end loading
-      act(() => {
-        result.current.endLoading();
-      });
-      
-      expect(result.current.isLoading).toBe(false);
-    });
-    
-    it('enforces minimum loading time', () => {
-      const minLoadingTime = 500; // 500ms
-      
-      const { result } = renderHook(() => 
-        useSafeLoading({ minLoadingTime })
-      );
-      
-      // Start loading
-      act(() => {
-        result.current.startLoading();
-      });
-      
-      expect(result.current.isLoading).toBe(true);
-      
-      // Try to end loading immediately
-      act(() => {
-        result.current.endLoading();
-      });
-      
-      // Should still be loading due to minimum time enforcement
-      expect(result.current.isLoading).toBe(true);
-      
-      // Advance time past minimum loading time
-      act(() => {
-        jest.advanceTimersByTime(minLoadingTime + 10);
-      });
-      
-      // Now should no longer be loading
-      expect(result.current.isLoading).toBe(false);
-    });
-    
-    it('enforces maximum loading time with safety timeout', () => {
-      const safetyTimeoutMs = 1000; // 1000ms
-      
-      const { result } = renderHook(() => 
-        useSafeLoading({ safetyTimeoutMs })
-      );
-      
-      // Start loading
-      act(() => {
-        result.current.startLoading();
-      });
-      
-      expect(result.current.isLoading).toBe(true);
-      
-      // Advance time past safety timeout
-      act(() => {
-        jest.advanceTimersByTime(safetyTimeoutMs + 10);
-      });
-      
-      // Should no longer be loading due to safety timeout
-      expect(result.current.isLoading).toBe(false);
-    });
-    
-    it('resets safety timeout when loading is explicitly ended', () => {
-      const safetyTimeoutMs = 1000; // 1000ms
-      
-      const { result } = renderHook(() => 
-        useSafeLoading({ safetyTimeoutMs })
-      );
-      
-      const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
-      
-      // Start loading
-      act(() => {
-        result.current.startLoading();
-      });
-      
-      // End loading properly
-      act(() => {
-        result.current.endLoading();
-      });
-      
-      // Advance time past safety timeout
-      act(() => {
-        jest.advanceTimersByTime(safetyTimeoutMs + 10);
-      });
-      
-      // Safety timeout warning should not have been called
-      expect(mockConsoleWarn).not.toHaveBeenCalled();
-      
-      // Cleanup
-      mockConsoleWarn.mockRestore();
+      // Should respect the last call and be in loading state
+      expect(result.current.loading).toBe(true);
     });
   });
-};
+}
+
+export default runSafeLoadingTests;

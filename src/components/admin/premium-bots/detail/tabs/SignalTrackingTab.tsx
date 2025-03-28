@@ -24,8 +24,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   availableUsers,
   onRefresh
 }) => {
-  console.log(`Admin SignalTrackingTab rendering with ${tradingViewLogs.length} TV logs and ${coinstratLogs.length} CS logs`);
-  
+  // No need to transform, just pass the original availableUsers which is already in the correct format
   return (
     <Card>
       <CardContent className="p-6">

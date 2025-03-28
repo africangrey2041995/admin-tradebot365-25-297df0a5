@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import UnifiedSignalView from '@/components/bots/trading-view-logs/UnifiedSignalView';
@@ -7,7 +7,6 @@ import { useSignalManagement } from '@/hooks/premium-bot/useSignalManagement';
 import ExportDataDropdown from '@/components/admin/prop-bots/detail/ExportDataDropdown';
 import { AdvancedSignalFilter } from '@/components/signals/tracking';
 import SignalLoadingState from '@/components/signals/core/components/SignalLoadingState';
-import { toast } from 'sonner';
 
 interface SignalTrackingTabProps {
   botId: string;
@@ -20,63 +19,35 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
   userId,
   isAdminView = false
 }) => {
-  console.log(`SignalTrackingTab rendered with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
-  
-  // Use a stable ref for botId to prevent unnecessary fetches
-  const botIdRef = useRef(botId);
-  useEffect(() => {
-    botIdRef.current = botId;
-  }, [botId]);
-  
-  // Use a stable value for isAdminView
-  const isAdminViewStable = useRef(isAdminView);
-  // Only update isAdminView ref if it changes to prevent unnecessary rerenders
-  useEffect(() => {
-    isAdminViewStable.current = isAdminView;
-  }, [isAdminView]);
-  
   const {
     tradingViewLogs,
     coinstratLogs,
     logsLoading,
     availableUsers,
     refreshSignalLogs
-  } = useSignalManagement(botIdRef.current, userId, isAdminViewStable.current);
+  } = useSignalManagement(botId, userId);
   
   // Use a ref to track if initial load has happened
   const initialLoadRef = useRef(false);
   // Use a ref to prevent rapid successive refreshes
   const lastRefreshTimeRef = useRef(0);
   
-  // Log the current state for debugging
-  console.log(`SignalTrackingTab - tradingViewLogs: ${tradingViewLogs.length}, coinstratLogs: ${coinstratLogs.length}, logsLoading: ${logsLoading}`);
-  
-  // Memoize the export data preparation
-  const exportData = useMemo(() => {
-    return []; // Prepare your export data here
-  }, []);
-  
   // Only refresh on mount if we haven't loaded before
   useEffect(() => {
     // Only do the initial load once
-    if (!initialLoadRef.current) {
-      console.log('SignalTrackingTab - Performing initial load');
+    if (!initialLoadRef.current && tradingViewLogs.length === 0 && coinstratLogs.length === 0) {
       initialLoadRef.current = true;
       refreshSignalLogs();
     }
-  }, [refreshSignalLogs]);
+  }, [refreshSignalLogs, tradingViewLogs.length, coinstratLogs.length]);
 
   // Handler for manual refresh with cooldown
   const handleManualRefresh = () => {
     const now = Date.now();
     // Prevent refreshing if last refresh was less than 2 seconds ago
     if (now - lastRefreshTimeRef.current > 2000) {
-      console.log('SignalTrackingTab - Manual refresh triggered');
       lastRefreshTimeRef.current = now;
       refreshSignalLogs();
-      toast.info("Refreshing signal logs...");
-    } else {
-      console.log('SignalTrackingTab - Manual refresh throttled, too soon');
     }
   };
 
@@ -120,7 +91,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
             showExport={true}
             exportComponent={
               <ExportDataDropdown 
-                data={exportData} 
+                data={[]} 
                 headers={['ID', 'Signal', 'Action', 'Timestamp', 'Status']} 
                 fileName={`bot-${botId}-signals`} 
               />

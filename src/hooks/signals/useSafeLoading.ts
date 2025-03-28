@@ -14,50 +14,31 @@ export const useSafeLoading = ({
   debugComponent = '',
   skipLoadingState = false
 }: UseSafeLoadingProps = {}) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const minLoadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Add a debounce timer to prevent rapid loading state changes
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const startLoading = () => {
     if (skipLoadingState) return;
     
-    // Clear any existing debounce timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
+    console.debug(`${debugComponent} - Starting loading state`);
+    setLoading(true);
+    startTimeRef.current = Date.now();
+    
+    // Set a timeout to prevent infinite loading
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
     
-    // Set a small delay before showing loading state to prevent flicker
-    debounceTimerRef.current = setTimeout(() => {
-      console.debug(`${debugComponent} - Starting loading state`);
-      setIsLoading(true);
-      startTimeRef.current = Date.now();
-      
-      // Set a timeout to prevent infinite loading
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      
-      timeoutRef.current = setTimeout(() => {
-        console.warn(`${debugComponent} - Loading timeout reached, forcing state reset`);
-        setIsLoading(false);
-        startTimeRef.current = null;
-      }, timeoutMs);
-    }, 100); // Very short delay to prevent flashing on fast operations
+    timeoutRef.current = setTimeout(() => {
+      console.warn(`${debugComponent} - Loading timeout reached, forcing state reset`);
+      setLoading(false);
+      startTimeRef.current = null;
+    }, timeoutMs);
   };
   
   const stopLoading = () => {
     if (skipLoadingState) return;
-    
-    // Clear the debounce timer if it exists
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
     
     // If there's a min duration, check if we need to delay the stop
     if (startTimeRef.current && minLoadingDurationMs > 0) {
@@ -67,16 +48,10 @@ export const useSafeLoading = ({
         // We need to wait a bit more before stopping
         const remainingTime = minLoadingDurationMs - elapsedTime;
         
-        // Clear existing minimum loading timeout if any
-        if (minLoadingTimeoutRef.current) {
-          clearTimeout(minLoadingTimeoutRef.current);
-        }
-        
-        minLoadingTimeoutRef.current = setTimeout(() => {
+        setTimeout(() => {
           console.debug(`${debugComponent} - Min duration satisfied, stopping loading state`);
-          setIsLoading(false);
+          setLoading(false);
           startTimeRef.current = null;
-          minLoadingTimeoutRef.current = null;
           
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -90,7 +65,7 @@ export const useSafeLoading = ({
     
     // If no min duration or it's already satisfied
     console.debug(`${debugComponent} - Stopping loading state`);
-    setIsLoading(false);
+    setLoading(false);
     startTimeRef.current = null;
     
     if (timeoutRef.current) {
@@ -105,19 +80,11 @@ export const useSafeLoading = ({
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      
-      if (minLoadingTimeoutRef.current) {
-        clearTimeout(minLoadingTimeoutRef.current);
-      }
-      
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
   }, []);
   
   return {
-    loading: isLoading,
+    loading,
     startLoading,
     stopLoading
   };

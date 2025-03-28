@@ -1,174 +1,94 @@
 
 import React from 'react';
-import { Loader2, Bot, RefreshCw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
+import { Loader2 } from 'lucide-react';
 
 /**
- * Props for the SignalLoadingState component
- */
-export interface SignalLoadingStateProps {
-  /** The message to display during loading */
-  message?: string;
-  
-  /** The type of bot associated with this loading state */
-  botType?: 'user' | 'premium' | 'prop' | 'default';
-  
-  /** Whether to show a progress bar */
-  showProgress?: boolean;
-  
-  /** Whether to use a simplified loading display */
-  isSimple?: boolean;
-  
-  /** Additional CSS classes */
-  className?: string;
-  
-  /** Progress value (0-100) if determinate */
-  progressValue?: number;
-  
-  /** Whether the progress is determinate (has a specific value) */
-  isDeterminate?: boolean;
-}
-
-/**
- * Signal Loading State Component
+ * SignalLoadingState Component
  * 
- * Displays an appropriate loading indicator for signal-related operations
- * with customizable messaging and visualization based on context.
+ * Displays a loading indicator for signal-related data with customizable
+ * styling based on the bot type and display preferences.
  * 
  * @example
  * ```tsx
  * // Basic usage
  * <SignalLoadingState />
  * 
- * // With custom message
- * <SignalLoadingState message="Fetching signal history..." />
- * 
- * // With progress bar
+ * // With custom message and bot type
  * <SignalLoadingState 
- *   message="Processing signals..." 
- *   showProgress 
- *   progressValue={75} 
- *   isDeterminate 
+ *   message="Loading premium signals..." 
+ *   botType="premium" 
+ * />
+ * 
+ * // With progress bar and simple mode
+ * <SignalLoadingState 
+ *   showProgress={true} 
+ *   isSimple={true} 
  * />
  * ```
- * 
- * @accessibility
- * - Uses aria-live to announce loading state to screen readers
- * - Animated elements respect reduced motion preferences
- * - Progress indicators include appropriate ARIA attributes
  */
-const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
-  message = 'Loading signals...',
-  botType = 'default',
+export interface SignalLoadingStateProps {
+  /**
+   * Custom message to display during loading
+   * @default "Loading signals..."
+   */
+  message?: string;
+  
+  /**
+   * Whether to show a progress bar
+   * @default false
+   */
+  showProgress?: boolean;
+  
+  /**
+   * Type of bot, affects the color scheme
+   * @default 'user'
+   */
+  botType?: 'premium' | 'prop' | 'user';
+  
+  /**
+   * Whether to use a simplified, more compact view
+   * @default false
+   */
+  isSimple?: boolean;
+  
+  /**
+   * Additional CSS classes to apply
+   */
+  className?: string;
+}
+
+/**
+ * A component that displays a loading state for signals with customizable appearance.
+ * The appearance changes based on the bot type (premium, prop, or user) and
+ * can show a progress bar if needed.
+ */
+export const SignalLoadingState: React.FC<SignalLoadingStateProps> = ({
+  message = "Loading signals...",
   showProgress = false,
+  botType = 'user',
   isSimple = false,
-  className,
-  progressValue = 0,
-  isDeterminate = false
+  className = ''
 }) => {
-  // Helper to render the appropriate loading icon based on bot type
-  const renderIcon = () => {
+  // Determine style classes based on bot type
+  const getBotTypeClasses = () => {
     switch (botType) {
-      case 'user':
-        return (
-          <div className="relative">
-            <Bot 
-              className="h-10 w-10 text-blue-500 dark:text-blue-400" 
-              aria-hidden="true"
-            />
-            <Loader2 
-              className="absolute top-1/2 -right-3 h-5 w-5 text-blue-600 dark:text-blue-300 animate-spin" 
-              aria-hidden="true"
-            />
-          </div>
-        );
       case 'premium':
-        return (
-          <div className="relative">
-            <Bot 
-              className="h-10 w-10 text-purple-500 dark:text-purple-400" 
-              aria-hidden="true"
-            />
-            <Loader2 
-              className="absolute top-1/2 -right-3 h-5 w-5 text-purple-600 dark:text-purple-300 animate-spin" 
-              aria-hidden="true"
-            />
-          </div>
-        );
+        return 'text-amber-600 dark:text-amber-400';
       case 'prop':
-        return (
-          <div className="relative">
-            <Bot 
-              className="h-10 w-10 text-green-500 dark:text-green-400" 
-              aria-hidden="true"
-            />
-            <Loader2 
-              className="absolute top-1/2 -right-3 h-5 w-5 text-green-600 dark:text-green-300 animate-spin" 
-              aria-hidden="true"
-            />
-          </div>
-        );
+        return 'text-emerald-600 dark:text-emerald-400';
+      case 'user':
       default:
-        return (
-          <RefreshCw 
-            className="h-10 w-10 text-gray-500 dark:text-gray-400 animate-spin" 
-            aria-hidden="true"
-          />
-        );
+        return 'text-primary';
     }
   };
-  
-  // If simple display is requested, show minimal loading state
-  if (isSimple) {
-    return (
-      <div 
-        className={cn(
-          "flex items-center justify-center p-4",
-          className
-        )}
-        role="status"
-        aria-live="polite"
-      >
-        <div className="flex items-center space-x-2">
-          <RefreshCw className="h-5 w-5 text-muted-foreground animate-spin" aria-hidden="true" />
-          <span className="text-sm text-muted-foreground">{message}</span>
-        </div>
-      </div>
-    );
-  }
-  
+
   return (
-    <div 
-      className={cn(
-        "flex flex-col items-center justify-center py-6",
-        className
-      )}
-      role="status"
-      aria-live="polite"
-    >
-      {renderIcon()}
-      
-      <h3 className="mt-4 text-lg font-medium text-center">
-        {message}
-      </h3>
-      
+    <div className={`flex flex-col items-center justify-center py-8 ${isSimple ? 'min-h-[100px]' : 'min-h-[200px]'} ${className}`}>
+      <Loader2 className={`h-8 w-8 animate-spin mb-4 ${getBotTypeClasses()}`} />
+      <p className="text-muted-foreground text-sm">{message}</p>
       {showProgress && (
-        <div className="w-full max-w-xs mt-4">
-          <Progress 
-            value={isDeterminate ? progressValue : undefined} 
-            className="h-2" 
-            aria-label={isDeterminate ? `${progressValue}% complete` : "Loading progress"}
-            aria-valuenow={isDeterminate ? progressValue : undefined}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          />
-          
-          {isDeterminate && (
-            <div className="mt-1 text-xs text-right text-muted-foreground">
-              {progressValue}%
-            </div>
-          )}
+        <div className="w-48 h-1.5 mt-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-full bg-primary dark:bg-primary rounded-full animate-pulse" style={{ width: '60%' }}></div>
         </div>
       )}
     </div>

@@ -51,7 +51,6 @@ export interface BaseSignal {
  * @property accountName Tên của tài khoản giao dịch
  * @property coinstratSignalId ID của tín hiệu tương ứng trong hệ thống Coinstrat
  * @property coinstratLogId ID của bản ghi Coinstrat Pro
- * @property botId ID của bot tạo ra tín hiệu, định dạng chuẩn MY-XXX, PRE-XXX, PROP-XXX
  */
 export interface TradingViewSignal extends BaseSignal {
   source?: string;
@@ -60,7 +59,6 @@ export interface TradingViewSignal extends BaseSignal {
   accountName?: string;
   coinstratSignalId?: string;
   coinstratLogId?: string; // ID của bản ghi Coinstrat Pro
-  botId?: string; // Adding the botId property that was missing
 }
 
 /**

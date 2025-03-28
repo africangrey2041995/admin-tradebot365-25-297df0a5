@@ -15,18 +15,18 @@
 export interface SignalFilters {
   /**
    * Date range for filtering signals by timestamp
-   * Can be an object with from/to properties or a tuple [from, to]
+   * Supports both array format [from, to] and object format {from, to}
    */
-  dateRange: { 
-    from?: Date; 
-    to?: Date; 
-  } | [Date | null, Date | null];
+  dateRange?: [Date | null, Date | null] | {
+    from?: Date;
+    to?: Date;
+  };
   
   /**
    * Status filter - can be a single status or array of statuses
    * Use 'all' to show all statuses
    */
-  status: string | string[];
+  status?: string[] | string;
   
   /**
    * Filter by signal actions (buy, sell, etc.)
@@ -41,12 +41,12 @@ export interface SignalFilters {
   /**
    * Filter by user ID
    */
-  userId: string;
+  userId?: string;
   
   /**
    * Search text filter, usually applied to multiple fields
    */
-  search: string;
+  search?: string;
   
   /**
    * Field to sort results by
@@ -64,7 +64,7 @@ export interface SignalFilters {
    * Filter by signal source platform
    * @default 'all'
    */
-  signalSource: 'all' | 'tradingview' | 'coinstrat';
+  signalSource?: 'all' | 'tradingview' | 'coinstrat';
 }
 
 /**
