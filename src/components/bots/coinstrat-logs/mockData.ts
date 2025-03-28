@@ -1,11 +1,12 @@
 
 import { CoinstratSignal } from '@/types/signal';
 
-// Create fixed timestamp dates
-const createFixedDate = (daysAgo: number, hoursAgo: number = 0) => {
+// Create fixed timestamp dates with optional minutes offset
+const createFixedDate = (daysAgo: number, hoursAgo: number = 0, minutesOffset: number = 0) => {
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
   date.setHours(date.getHours() - hoursAgo);
+  date.setMinutes(date.getMinutes() + minutesOffset);
   return date.toISOString();
 };
 
@@ -180,15 +181,6 @@ const MOCK_COINSTRAT_LOGS: Record<string, CoinstratSignal[]> = {
       failedAccounts: []
     }
   ]
-};
-
-// Helper function to add a minute offset to a date string
-const createFixedDate = (daysAgo: number, hoursAgo: number = 0, minutesOffset: number = 0) => {
-  const date = new Date();
-  date.setDate(date.getDate() - daysAgo);
-  date.setHours(date.getHours() - hoursAgo);
-  date.setMinutes(date.getMinutes() + minutesOffset);
-  return date.toISOString();
 };
 
 // Get mock data by botId, with fallback to default
