@@ -65,7 +65,8 @@ export const useCombinedSignalLogs = ({
   
   console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
   
-  // Use props for admin view detection instead of checking URL
+  // Use an empty userId when in admin view to get all signals for a bot
+  // This is the key fix - in admin view, we want ALL signals for a bot, not filtered by userId
   const effectiveUserId = isAdminViewRef.current ? '' : userIdRef.current;
   
   console.log(`Using effectiveUserId for filtering: ${effectiveUserId} (original: ${userId}, admin view: ${isAdminView})`);
@@ -79,7 +80,8 @@ export const useCombinedSignalLogs = ({
     botId: botIdRef.current,
     userId: effectiveUserId,
     refreshTrigger,
-    skipLoadingState: true // Skip internal loading state in the hook
+    skipLoadingState: true, // Skip internal loading state in the hook
+    isAdminView: isAdminViewRef.current // Pass admin view flag to the hook
   });
 
   const {
@@ -91,8 +93,14 @@ export const useCombinedSignalLogs = ({
     botId: botIdRef.current,
     userId: effectiveUserId,
     refreshTrigger,
-    skipLoadingState: true // Skip internal loading state in the hook
+    skipLoadingState: true, // Skip internal loading state in the hook
+    isAdminView: isAdminViewRef.current // Pass admin view flag to the hook
   });
+
+  // Log fetched data for debugging
+  useEffect(() => {
+    console.log(`TV logs fetched: ${tvFetchedLogs.length}, CS logs fetched: ${csFetchedLogs.length}, admin view: ${isAdminViewRef.current}`);
+  }, [tvFetchedLogs.length, csFetchedLogs.length]);
 
   // Memoize the logs to prevent unnecessary re-renders
   const tradingViewLogs = useMemo(() => {

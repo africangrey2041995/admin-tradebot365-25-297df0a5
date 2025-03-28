@@ -10,6 +10,7 @@ interface UseCoinstratLogsProps {
   refreshTrigger?: boolean;
   skipLoadingState?: boolean;
   initialData?: CoinstratSignal[];
+  isAdminView?: boolean; // Add admin view flag
 }
 
 interface UseCoinstratLogsResult {
@@ -24,7 +25,8 @@ export const useCoinstratLogs = ({
   userId,
   refreshTrigger = false,
   skipLoadingState = false,
-  initialData
+  initialData,
+  isAdminView = false // Default to false
 }: UseCoinstratLogsProps): UseCoinstratLogsResult => {
   const [logs, setLogs] = useState<CoinstratSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
@@ -53,7 +55,7 @@ export const useCoinstratLogs = ({
       
       lastFetchTimeRef.current = now;
       startLoading();
-      console.log(`Fetching Coinstrat logs for botId: ${botId}, userId: ${userId}`);
+      console.log(`Fetching Coinstrat logs for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
       
       // In a real app, we would fetch data from API here
       setTimeout(() => {
@@ -68,10 +70,10 @@ export const useCoinstratLogs = ({
           const allLogs = mockDataRef.current;
           console.log(`Using ${allLogs.length} Coinstrat logs`);
           
-          // Filter logs based on userId if provided
+          // Filter logs based on userId if provided AND not in admin view
           let filteredLogs = [...allLogs];
           
-          if (userId) {
+          if (userId && !isAdminView) {
             console.log(`Filtering Coinstrat logs by userId: ${userId}`);
             
             // Check if userId is empty
@@ -93,9 +95,11 @@ export const useCoinstratLogs = ({
             }
             
             console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
+          } else if (isAdminView) {
+            console.log(`Admin view: Not filtering by userId, showing all logs for botId: ${botId}`);
           }
           
-          console.log(`Coinstrat logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}`);
+          console.log(`Coinstrat logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
           
           // Introduce a slight delay to stabilize UI
           setTimeout(() => {
@@ -114,7 +118,7 @@ export const useCoinstratLogs = ({
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       stopLoading();
     }
-  }, [botId, userId, startLoading, stopLoading, initialData]);
+  }, [botId, userId, startLoading, stopLoading, initialData, isAdminView]);
   
   // Fetch logs on mount and when dependencies change
   useEffect(() => {

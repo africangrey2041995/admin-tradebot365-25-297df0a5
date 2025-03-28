@@ -26,6 +26,7 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
   // Update the ref if the prop changes
   useEffect(() => {
     isAdminViewRef.current = isAdminView;
+    console.log(`useSignalManagement - isAdminView updated to: ${isAdminView}`);
   }, [isAdminView]);
   
   const {
@@ -39,6 +40,11 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
     userId,
     isAdminView: isAdminViewRef.current
   });
+
+  // Log signal counts for debugging
+  useEffect(() => {
+    console.log(`Signal counts - TV: ${fetchedTradingViewLogs.length}, CS: ${fetchedCoinstratLogs.length}, Admin view: ${isAdminViewRef.current}`);
+  }, [fetchedTradingViewLogs.length, fetchedCoinstratLogs.length]);
 
   // Use the cached values or update cache if new data is received
   const tradingViewLogs = useMemo(() => {

@@ -10,6 +10,7 @@ interface UseTradingViewLogsProps {
   refreshTrigger?: boolean;
   skipLoadingState?: boolean;
   initialData?: TradingViewSignal[];
+  isAdminView?: boolean; // Add admin view flag
 }
 
 interface UseTradingViewLogsResult {
@@ -24,7 +25,8 @@ export const useTradingViewLogs = ({
   userId,
   refreshTrigger = false,
   skipLoadingState = false,
-  initialData
+  initialData,
+  isAdminView = false // Default to false
 }: UseTradingViewLogsProps): UseTradingViewLogsResult => {
   const [logs, setLogs] = useState<TradingViewSignal[]>([]);
   const [error, setError] = useState<Error | null>(null);
@@ -53,7 +55,7 @@ export const useTradingViewLogs = ({
       
       lastFetchTimeRef.current = now;
       startLoading();
-      console.log(`Fetching TradingView logs for botId: ${botId}, userId: ${userId}`);
+      console.log(`Fetching TradingView logs for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
       
       // In a real app, we would fetch data from API here
       setTimeout(() => {
@@ -69,8 +71,8 @@ export const useTradingViewLogs = ({
           // Filter logs based on botId and/or userId
           let filteredLogs = [...allLogs];
           
-          // Only apply userId filter if provided
-          if (userId) {
+          // Only apply userId filter if provided AND not in admin view
+          if (userId && !isAdminView) {
             console.log(`Filtering TradingView logs by userId: ${userId}`);
             
             // Check if userId is empty
@@ -87,9 +89,11 @@ export const useTradingViewLogs = ({
             }
             
             console.log(`After userId filtering: ${filteredLogs.length} logs remaining`);
+          } else if (isAdminView) {
+            console.log(`Admin view: Not filtering by userId, showing all logs for botId: ${botId}`);
           }
           
-          console.log(`TradingView logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}`);
+          console.log(`TradingView logs filtered: ${filteredLogs.length} results for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
           
           // Introduce a slight delay to stabilize UI
           setTimeout(() => {
@@ -108,7 +112,7 @@ export const useTradingViewLogs = ({
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       stopLoading();
     }
-  }, [botId, userId, startLoading, stopLoading, initialData]);
+  }, [botId, userId, startLoading, stopLoading, initialData, isAdminView]);
   
   // Fetch logs on mount and when dependencies change
   useEffect(() => {
