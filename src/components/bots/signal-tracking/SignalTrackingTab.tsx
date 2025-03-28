@@ -22,13 +22,14 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
 }) => {
   console.log(`SignalTrackingTab rendered with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
   
-  // Set a special flag for MY-001 which we know has test data
-  const isSpecialTestBot = botId === 'MY-001';
-  console.log(`Is special test bot (MY-001): ${isSpecialTestBot}`);
+  // Use a stable ref for botId to prevent unnecessary fetches
+  const botIdRef = useRef(botId);
+  useEffect(() => {
+    botIdRef.current = botId;
+  }, [botId]);
   
   // Use a stable value for isAdminView
   const isAdminViewStable = useRef(isAdminView);
-  
   // Only update isAdminView ref if it changes to prevent unnecessary rerenders
   useEffect(() => {
     isAdminViewStable.current = isAdminView;
@@ -40,7 +41,7 @@ const SignalTrackingTab: React.FC<SignalTrackingTabProps> = ({
     logsLoading,
     availableUsers,
     refreshSignalLogs
-  } = useSignalManagement(botId, userId, isAdminViewStable.current);
+  } = useSignalManagement(botIdRef.current, userId, isAdminViewStable.current);
   
   // Use a ref to track if initial load has happened
   const initialLoadRef = useRef(false);

@@ -21,6 +21,13 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
   // Add a ref for tracking if a refresh is in progress
   const isRefreshingRef = useRef(false);
   
+  // Use a stable isAdminView value that won't cause unnecessary re-renders
+  const isAdminViewRef = useRef(isAdminView);
+  // Update the ref if the prop changes
+  useEffect(() => {
+    isAdminViewRef.current = isAdminView;
+  }, [isAdminView]);
+  
   const {
     tradingViewLogs: fetchedTradingViewLogs,
     coinstratLogs: fetchedCoinstratLogs,
@@ -30,7 +37,7 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
   } = useCombinedSignalLogs({
     botId,
     userId,
-    isAdminView
+    isAdminView: isAdminViewRef.current
   });
 
   // Use the cached values or update cache if new data is received
@@ -53,14 +60,17 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
   const processedSignalsCount = useMemo(() => 
     coinstratLogs.length, [coinstratLogs]);
 
-  // Wrap refreshLogs with a cooldown mechanism
+  // Wrap refreshLogs with a debounce mechanism
   const refreshSignalLogs = useCallback(() => {
     const now = Date.now();
+    
     // Prevent refreshing if last refresh was less than 3 seconds ago
     // or if a refresh is already in progress
     if (now - lastRefreshTimeRef.current > 3000 && !isRefreshingRef.current) {
       lastRefreshTimeRef.current = now;
       isRefreshingRef.current = true;
+      
+      console.log(`Refreshing signals for botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminViewRef.current}`);
       
       // Attempt the refresh
       refreshLogs();
@@ -72,8 +82,10 @@ export const useSignalManagement = (botId: string, userId: string, isAdminView: 
       setTimeout(() => {
         isRefreshingRef.current = false;
       }, 2000);
+    } else {
+      console.log('Signal refresh throttled - too recent or already in progress');
     }
-  }, [refreshLogs]);
+  }, [refreshLogs, botId, userId]);
 
   // Clean up on unmount
   useEffect(() => {

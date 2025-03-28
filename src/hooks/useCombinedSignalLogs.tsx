@@ -48,13 +48,25 @@ export const useCombinedSignalLogs = ({
     timestamp: 0
   });
   
+  // Store stable refs to props to prevent unnecessary re-renders
+  const botIdRef = useRef(botId);
+  const userIdRef = useRef(userId);
+  const isAdminViewRef = useRef(isAdminView);
+  
+  // Update refs when props change
+  useEffect(() => {
+    botIdRef.current = botId;
+    userIdRef.current = userId;
+    isAdminViewRef.current = isAdminView;
+  }, [botId, userId, isAdminView]);
+  
   // Track if we should update the UI
   const shouldUpdateUIRef = useRef(true);
   
   console.log(`useCombinedSignalLogs initialized with botId: ${botId}, userId: ${userId}, isAdminView: ${isAdminView}`);
   
   // Use props for admin view detection instead of checking URL
-  const effectiveUserId = isAdminView ? '' : userId;
+  const effectiveUserId = isAdminViewRef.current ? '' : userIdRef.current;
   
   console.log(`Using effectiveUserId for filtering: ${effectiveUserId} (original: ${userId}, admin view: ${isAdminView})`);
   
@@ -64,7 +76,7 @@ export const useCombinedSignalLogs = ({
     error: tvError,
     fetchLogs: fetchTvLogs
   } = useTradingViewLogs({
-    botId,
+    botId: botIdRef.current,
     userId: effectiveUserId,
     refreshTrigger,
     skipLoadingState: true // Skip internal loading state in the hook
@@ -76,7 +88,7 @@ export const useCombinedSignalLogs = ({
     error: csError,
     fetchLogs: fetchCsLogs
   } = useCoinstratLogs({
-    botId,
+    botId: botIdRef.current,
     userId: effectiveUserId,
     refreshTrigger,
     skipLoadingState: true // Skip internal loading state in the hook
@@ -169,7 +181,7 @@ export const useCombinedSignalLogs = ({
 
   // This is a modified version with debounce to prevent multiple refreshes
   const refreshLogs = useCallback(() => {
-    console.log(`Refreshing combined logs for botId: ${botId}, userId: ${userId}, admin view: ${isAdminView}`);
+    console.log(`Refreshing combined logs for botId: ${botIdRef.current}, userId: ${userIdRef.current}, admin view: ${isAdminViewRef.current}`);
     
     // Prevent concurrent fetches
     if (fetchInProgressRef.current) {
@@ -221,7 +233,7 @@ export const useCombinedSignalLogs = ({
         fetchInProgressRef.current = false;
       }
     }, 5000);
-  }, [botId, userId, fetchTvLogs, fetchCsLogs, startLoading, stopLoading, isAdminView]);
+  }, [fetchTvLogs, fetchCsLogs, startLoading, stopLoading]);
 
   // Initial fetch
   useEffect(() => {
@@ -236,7 +248,7 @@ export const useCombinedSignalLogs = ({
       refreshLogs();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [botId, userId, isAdminView]);
+  }, []);
 
   // Handle refresh trigger from parent
   useEffect(() => {
