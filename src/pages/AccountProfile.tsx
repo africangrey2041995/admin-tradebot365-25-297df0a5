@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -839,4 +840,377 @@ const AccountProfile = () => {
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleToggleStatus(key.id)}>
                               <Power className="h-4 w-4 mr-2" />
-                              {key.status === 'ACTIVE' ? 'Block
+                              {key.status === 'ACTIVE' ? 'Block' : 'Activate'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteKey(key.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <Trash className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Dialogs for API Key Management */}
+      <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add New API Key</DialogTitle>
+            <DialogDescription>
+              Connect a new API key to this account
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="user-account">User Account</Label>
+                <Select value={selectedUser} onValueChange={setSelectedUser}>
+                  <SelectTrigger id="user-account">
+                    <SelectValue placeholder="Select user account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockUsers.map(user => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name} - {user.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="api-name">API Name</Label>
+                <Input 
+                  id="api-name" 
+                  placeholder="Enter API name" 
+                  value={newApiName}
+                  onChange={(e) => setNewApiName(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="client-id">Client ID</Label>
+                <Input 
+                  id="client-id" 
+                  placeholder="Enter client ID" 
+                  value={newClientId}
+                  onChange={(e) => setNewClientId(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="secret-key">Secret Key</Label>
+                <Input 
+                  id="secret-key" 
+                  type="password" 
+                  placeholder="Enter secret key" 
+                  value={newSecret}
+                  onChange={(e) => setNewSecret(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="access-token">Access Token</Label>
+              <Input 
+                id="access-token" 
+                placeholder="Enter access token" 
+                value={newAccessToken}
+                onChange={(e) => setNewAccessToken(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex items-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleTestConnection}
+                disabled={isTesting || !newAccessToken.trim()}
+                className="w-[140px]"
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  'Test Connection'
+                )}
+              </Button>
+              
+              {isTestSuccessful && (
+                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                  Connection Successful
+                </Badge>
+              )}
+            </div>
+            
+            {isTestSuccessful && (
+              <div>
+                <Label htmlFor="trading-account">Trading Account</Label>
+                <Select value={selectedTradingAccount} onValueChange={setSelectedTradingAccount}>
+                  <SelectTrigger id="trading-account">
+                    <SelectValue placeholder="Select trading account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTradingAccounts.map(account => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.id} - {account.type} - ${account.balance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                resetFormFields();
+                setIsAddKeyDialogOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNewKey} 
+              disabled={!isTestSuccessful || !selectedTradingAccount}
+            >
+              Save API Key
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isEditKeyDialogOpen} onOpenChange={setIsEditKeyDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit API Key</DialogTitle>
+            <DialogDescription>
+              Update API key information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-api-name">API Name</Label>
+                <Input 
+                  id="edit-api-name" 
+                  placeholder="Enter API name" 
+                  value={newApiName}
+                  onChange={(e) => setNewApiName(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-client-id">Client ID</Label>
+                <Input 
+                  id="edit-client-id" 
+                  placeholder="Enter client ID" 
+                  value={newClientId}
+                  onChange={(e) => setNewClientId(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-secret-key">Secret Key (leave blank to keep current)</Label>
+              <Input 
+                id="edit-secret-key" 
+                type="password" 
+                placeholder="Enter new secret key" 
+                value={newSecret}
+                onChange={(e) => setNewSecret(e.target.value)}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-access-token">Access Token</Label>
+              <Input 
+                id="edit-access-token" 
+                placeholder="Enter access token" 
+                value={newAccessToken}
+                onChange={(e) => setNewAccessToken(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex items-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleTestConnection}
+                disabled={isTesting || !newAccessToken.trim()}
+                className="w-[140px]"
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  'Test Connection'
+                )}
+              </Button>
+              
+              {isTestSuccessful && (
+                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                  Connection Successful
+                </Badge>
+              )}
+            </div>
+            
+            {isTestSuccessful && (
+              <div>
+                <Label htmlFor="edit-trading-account">Trading Account</Label>
+                <Select value={selectedTradingAccount} onValueChange={setSelectedTradingAccount}>
+                  <SelectTrigger id="edit-trading-account">
+                    <SelectValue placeholder="Select trading account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTradingAccounts.map(account => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.id} - {account.type} - ${account.balance}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                resetFormFields();
+                setIsEditKeyDialogOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNewKey}
+              disabled={!newApiName.trim() || !newClientId.trim() || (!isTestSuccessful && Boolean(newAccessToken.trim()))}
+            >
+              Update API Key
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isUpdateTokenDialogOpen} onOpenChange={setIsUpdateTokenDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Update Access Token</DialogTitle>
+            <DialogDescription>
+              Update the access token for this API key
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-2">
+            <div>
+              <Label htmlFor="update-access-token">New Access Token</Label>
+              <Input 
+                id="update-access-token" 
+                placeholder="Enter new access token" 
+                value={newAccessToken}
+                onChange={(e) => setNewAccessToken(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex items-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleTestConnection}
+                disabled={isTesting || !newAccessToken.trim()}
+                className="w-[140px]"
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  'Test Connection'
+                )}
+              </Button>
+              
+              {isTestSuccessful && (
+                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+                  <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                  Connection Successful
+                </Badge>
+              )}
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                resetFormFields();
+                setIsUpdateTokenDialogOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveUpdatedToken}
+              disabled={!isTestSuccessful || !newAccessToken.trim()}
+            >
+              Update Token
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <ConfirmationDialog
+        open={isConnectAllDialogOpen}
+        onOpenChange={setIsConnectAllDialogOpen}
+        title="Connect All API Keys"
+        description={`Are you sure you want to connect all ${selectedKeyIds.length} selected API keys?`}
+        confirmLabel={isProcessingConnection ? "Processing..." : "Connect All"}
+        isLoading={isProcessingConnection}
+        onConfirm={processConnectAll}
+      />
+      
+      <ConfirmationDialog
+        open={isDisconnectAllDialogOpen}
+        onOpenChange={setIsDisconnectAllDialogOpen}
+        title="Disconnect All API Keys"
+        description={`Are you sure you want to disconnect all ${selectedKeyIds.length} selected API keys?`}
+        confirmLabel={isProcessingConnection ? "Processing..." : "Disconnect All"}
+        isLoading={isProcessingConnection}
+        onConfirm={processDisconnectAll}
+        variant="destructive"
+      />
+      
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedKeyIds.length}
+        onClose={clearSelection}
+        onConnectAll={handleConnectAll}
+        onDisconnectAll={handleDisconnectAll}
+        isProcessing={isProcessingConnection}
+      />
+    </MainLayout>
+  );
+};
+
+export default AccountProfile;
