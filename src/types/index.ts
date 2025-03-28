@@ -5,6 +5,7 @@ export * from './account';
 export * from './signal';
 export * from './connection';
 export * from './admin-types';
+export * from './subscription'; // Export subscription types
 
 // Direct import from constants to avoid circular dependencies
 import { BotRiskLevel, BotType, BotStatus } from '@/constants/botTypes';
@@ -74,7 +75,7 @@ export interface VersionInfo {
   changelog: string[];
 }
 
-// Package definition - based on existing UserPlan and USER_PLAN_LIMITS
+// Package definition - update to reference subscriptions and improve structure
 export interface Package {
   id: string;
   planId: UserPlan;
@@ -96,6 +97,9 @@ export interface Package {
   updatedAt: string;
   isPopular?: boolean;
   isEnterprise?: boolean;
+  trialDays?: number; // Add trial period in days
+  subscriptionCount?: number; // Add count of current subscriptions (admin view)
+  setupFee?: number; // Optional one-time setup fee
 }
 
 // Type validation utility

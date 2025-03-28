@@ -4,6 +4,7 @@
  */
 
 import { UserRole, UserStatus, UserPlan } from '@/constants/userConstants';
+import { UserSubscription } from './subscription';
 
 // Thông tin cơ bản của user
 export interface User {
@@ -22,6 +23,7 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   plan: UserPlan;
+  subscription?: UserSubscription; // Add subscription information
   createdAt: string;
   updatedAt: string;
   lastLogin?: string;
@@ -88,4 +90,24 @@ export interface UserNotification {
 // Type guard to check premium users
 export function isPremiumUser(user: User): boolean {
   return user.plan === UserPlan.PREMIUM || user.plan === UserPlan.ENTERPRISE;
+}
+
+// Add new helper function to check if subscription is active
+export function hasActiveSubscription(user: User): boolean {
+  if (!user.subscription) return false;
+  return user.subscription.status === 'active' && new Date(user.subscription.endDate) > new Date();
+}
+
+// Add new helper to get remaining days in subscription
+export function getUserSubscriptionDaysRemaining(user: User): number {
+  if (!user.subscription) return 0;
+  
+  const endDate = new Date(user.subscription.endDate);
+  const now = new Date();
+  
+  // If subscription already expired, return 0
+  if (endDate <= now) return 0;
+  
+  const diffTime = endDate.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }

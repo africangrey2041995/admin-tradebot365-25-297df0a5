@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,27 +23,32 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { SubscriptionStatusBadge } from '@/components/shared/SubscriptionStatusBadge';
+import { UserSubscription, getDaysRemaining } from '@/types/subscription';
+import { Switch } from '@/components/ui/switch';
 
 interface UserPackageManagementProps {
   userId: string;
   currentPlan: string;
-  subscriptionStartDate?: string;
-  subscriptionEndDate?: string;
+  subscription?: UserSubscription;
   autoRenew?: boolean;
   paymentMethod?: string;
   lastPaymentDate?: string;
   paymentAmount?: string;
+  onUpdateSubscription?: (updates: Partial<UserSubscription>) => void;
+  onToggleAutoRenew?: () => void;
 }
 
 export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
   userId,
   currentPlan,
-  subscriptionStartDate = '2023-10-15',
-  subscriptionEndDate = '2024-10-15',
+  subscription,
   autoRenew = true,
   paymentMethod = 'Thẻ tín dụng',
-  lastPaymentDate = '2023-10-15',
+  lastPaymentDate,
   paymentAmount = '500,000 VND',
+  onUpdateSubscription,
+  onToggleAutoRenew
 }) => {
   const [changePackageDialogOpen, setChangePackageDialogOpen] = useState(false);
   const [extensionDialogOpen, setExtensionDialogOpen] = useState(false);
@@ -52,14 +56,28 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
   const [extensionPeriod, setExtensionPeriod] = useState('1');
   const [isLoading, setIsLoading] = useState(false);
 
+  const subscriptionStartDate = subscription?.startDate || '2023-10-15';
+  const subscriptionEndDate = subscription?.endDate || '2024-10-15';
+  const subscriptionStatus = subscription?.status || 'active';
+  const autoRenewState = subscription?.autoRenew || autoRenew;
+  const formattedLastPaymentDate = subscription?.lastPaymentDate 
+    ? new Date(subscription.lastPaymentDate).toLocaleDateString('vi-VN')
+    : lastPaymentDate
+      ? new Date(lastPaymentDate).toLocaleDateString('vi-VN')
+      : 'Chưa có';
+
   const handleChangePlan = async () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call to change plan
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Success notification
+      if (onUpdateSubscription && subscription) {
+        onUpdateSubscription({
+          packageId: `pkg_${newPlan.toLowerCase()}`,
+        });
+      }
+      
       toast.success(`Đã thay đổi gói dịch vụ từ ${USER_PLAN_DISPLAY[currentPlan as UserPlan]} sang ${USER_PLAN_DISPLAY[newPlan as UserPlan]}`);
       setChangePackageDialogOpen(false);
     } catch (error) {
@@ -69,14 +87,33 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
     }
   };
 
+  const handleToggleAutoRenew = () => {
+    if (onToggleAutoRenew) {
+      onToggleAutoRenew();
+    } else if (onUpdateSubscription && subscription) {
+      onUpdateSubscription({
+        autoRenew: !autoRenewState
+      });
+    }
+  };
+
   const handleExtendSubscription = async () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call to extend subscription
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Success notification
+      if (onUpdateSubscription && subscription) {
+        const currentEndDate = new Date(subscriptionEndDate);
+        const months = parseInt(extensionPeriod, 10);
+        currentEndDate.setMonth(currentEndDate.getMonth() + months);
+        
+        onUpdateSubscription({
+          endDate: currentEndDate.toISOString(),
+          status: 'active'
+        });
+      }
+      
       toast.success(`Đã gia hạn gói ${USER_PLAN_DISPLAY[currentPlan as UserPlan]} thêm ${extensionPeriod} tháng`);
       setExtensionDialogOpen(false);
     } catch (error) {
@@ -88,10 +125,10 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
 
   const formattedStartDate = new Date(subscriptionStartDate).toLocaleDateString('vi-VN');
   const formattedEndDate = new Date(subscriptionEndDate).toLocaleDateString('vi-VN');
-  const formattedLastPaymentDate = new Date(lastPaymentDate).toLocaleDateString('vi-VN');
-
-  const daysRemaining = Math.max(0, Math.ceil((new Date(subscriptionEndDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
-  const isExpiringSoon = daysRemaining <= 7;
+  
+  const daysRemaining = getDaysRemaining(subscriptionEndDate);
+  const isExpiringSoon = daysRemaining <= 7 && daysRemaining > 0;
+  const isExpired = daysRemaining <= 0;
 
   return (
     <>
@@ -118,6 +155,7 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
               <Button 
                 className="bg-amber-500 hover:bg-amber-600 text-white"
                 onClick={() => setExtensionDialogOpen(true)}
+                disabled={subscriptionStatus === 'cancelled'}
               >
                 Gia hạn gói
               </Button>
@@ -130,6 +168,25 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
               <div className="text-sm text-zinc-400">Gói hiện tại</div>
               <div className="flex items-center">
                 <UserPlanBadge plan={currentPlan} />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="text-sm text-zinc-400">Trạng thái</div>
+              <div className="flex flex-col gap-2">
+                {subscription ? (
+                  <SubscriptionStatusBadge 
+                    subscription={subscription} 
+                    className="inline-flex"
+                  />
+                ) : (
+                  <Badge 
+                    variant="outline" 
+                    className={isExpired ? "bg-red-500/20 text-red-500" : "bg-green-500/20 text-green-500"}
+                  >
+                    {isExpired ? 'Đã hết hạn' : 'Đang hoạt động'}
+                  </Badge>
+                )}
               </div>
             </div>
             
@@ -148,31 +205,36 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
                     <span className="text-sm">Sắp hết hạn ({daysRemaining} ngày)</span>
                   </div>
                 )}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="text-sm text-zinc-400">Tự động gia hạn</div>
-              <div className="flex items-center">
-                {autoRenew ? (
-                  <Badge className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0">
-                    Bật
-                  </Badge>
-                ) : (
-                  <Badge className="bg-red-500/20 text-red-500 hover:bg-red-500/30 border-0">
-                    Tắt
-                  </Badge>
+                {isExpired && (
+                  <div className="flex items-center mt-1 text-red-500">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    <span className="text-sm">Đã hết hạn</span>
+                  </div>
                 )}
               </div>
             </div>
             
-            <div className="space-y-2">
-              <div className="text-sm text-zinc-400">Phương thức thanh toán</div>
-              <div>{paymentMethod}</div>
+            <div className="space-y-3">
+              <div className="text-sm text-zinc-400">Tự động gia hạn</div>
+              <div className="flex items-center justify-between">
+                <Switch 
+                  checked={autoRenewState} 
+                  onCheckedChange={handleToggleAutoRenew}
+                  disabled={subscriptionStatus === 'cancelled'}
+                />
+                <span className="text-sm">
+                  {autoRenewState ? 'Bật' : 'Tắt'}
+                </span>
+              </div>
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <div className="space-y-2">
+              <div className="text-sm text-zinc-400">Phương thức thanh toán</div>
+              <div>{subscription?.paymentMethod || paymentMethod}</div>
+            </div>
+            
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Lần thanh toán gần nhất</div>
               <div className="flex items-center">
@@ -183,12 +245,16 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
             
             <div className="space-y-2">
               <div className="text-sm text-zinc-400">Số tiền</div>
-              <div>{paymentAmount}</div>
+              <div>{subscription?.paymentHistory?.[0]?.amount 
+                ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                    .format(subscription.paymentHistory[0].amount)
+                : paymentAmount}
+              </div>
             </div>
             
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2">
               <div className="text-sm text-zinc-400">Giới hạn gói</div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center justify-between border border-zinc-800 rounded-md p-2">
                   <span className="text-zinc-400">Bots</span>
                   <Badge className="bg-zinc-800">{USER_PLAN_LIMITS[currentPlan as UserPlan]?.bots || 'N/A'}</Badge>
@@ -203,7 +269,6 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
         </CardContent>
       </Card>
 
-      {/* Dialog to change package */}
       <Dialog open={changePackageDialogOpen} onOpenChange={setChangePackageDialogOpen}>
         <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
@@ -273,7 +338,6 @@ export const UserPackageManagement: React.FC<UserPackageManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Dialog to extend subscription */}
       <Dialog open={extensionDialogOpen} onOpenChange={setExtensionDialogOpen}>
         <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>

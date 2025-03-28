@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, CheckCircle, TrendingUp, Calendar, ArrowUpRight } from "lucide-react";
+import { CreditCard, CheckCircle, TrendingUp, Calendar, ArrowUpRight, AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import PlanCard from '@/components/shared/PlanCard';
 import { UserPlan } from '@/constants/userConstants';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionStatusBadge } from '@/components/shared/SubscriptionStatusBadge';
+import { formatCurrency } from '@/utils/formatUtils';
 
 type PlanType = 'free' | 'basic' | 'premium' | 'enterprise';
 
@@ -21,6 +24,16 @@ interface PlanOption {
 }
 
 const BillingSettings = () => {
+  // Use the mock user ID for demo
+  const userId = 'USR-001';
+  const { 
+    subscription, 
+    isLoading, 
+    toggleAutoRenew, 
+    updateSubscription,
+    isUpdating
+  } = useSubscription(userId);
+  
   const [currentPlan, setCurrentPlan] = useState<PlanType>('basic');
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
@@ -84,7 +97,11 @@ const BillingSettings = () => {
   };
 
   const handleUpgrade = () => {
-    if (selectedPlan) {
+    if (selectedPlan && subscription) {
+      updateSubscription(subscription.id, {
+        packageId: `pkg_${selectedPlan}`,
+        // In real app, would update other subscription details
+      });
       setCurrentPlan(selectedPlan);
       setShowUpgradeDialog(false);
       setSelectedPlan(null);
@@ -98,10 +115,33 @@ const BillingSettings = () => {
   const currentPlanDetails = getCurrentPlanDetails();
   
   const getNextBillingDate = () => {
+    if (subscription?.nextPaymentDate) {
+      return new Date(subscription.nextPaymentDate).toLocaleDateString('vi-VN');
+    }
+    
+    if (subscription?.endDate) {
+      return new Date(subscription.endDate).toLocaleDateString('vi-VN');
+    }
+    
     const today = new Date();
     const nextMonth = new Date(today.setMonth(today.getMonth() + 1));
     return nextMonth.toLocaleDateString('vi-VN');
   };
+
+  const handleToggleAutoRenew = () => {
+    if (subscription) {
+      toggleAutoRenew(subscription.id, subscription.autoRenew);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
+        <span className="ml-2">Đang tải thông tin thanh toán...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -109,9 +149,12 @@ const BillingSettings = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Gói hiện tại của bạn</h3>
-          <Badge variant="outline" className="text-primary px-2 py-1">
-            {currentPlanDetails?.name || 'Free'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <UserPlanBadge plan={subscription?.packageId?.replace('pkg_', '') || currentPlan} />
+            {subscription && (
+              <SubscriptionStatusBadge subscription={subscription} />
+            )}
+          </div>
         </div>
         
         <Card className="border border-primary/20 bg-primary/5">
@@ -125,7 +168,7 @@ const BillingSettings = () => {
                 <div className="text-right">
                   <div className="text-xl font-bold">
                     {typeof currentPlanDetails?.price === 'number' 
-                      ? (currentPlanDetails.price === 0 ? 'Miễn phí' : `${currentPlanDetails.price.toLocaleString()}₫`)
+                      ? (currentPlanDetails.price === 0 ? 'Miễn phí' : formatCurrency(currentPlanDetails.price, 'VND'))
                       : currentPlanDetails?.price}
                   </div>
                   <p className="text-sm text-muted-foreground">mỗi tháng</p>
@@ -133,14 +176,44 @@ const BillingSettings = () => {
               </div>
               
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span>Thanh toán tiếp theo: {getNextBillingDate()}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>Ngày thanh toán tiếp theo: {getNextBillingDate()}</span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <span className="text-sm mr-2">Tự động gia hạn:</span>
+                    <Badge 
+                      variant={subscription?.autoRenew ? "default" : "secondary"} 
+                      className="cursor-pointer"
+                      onClick={handleToggleAutoRenew}
+                    >
+                      {subscription?.autoRenew ? 'Bật' : 'Tắt'}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  <span>Được lập hóa đơn hàng tháng</span>
-                </div>
+                
+                {subscription?.status === 'active' && subscription.autoRenew && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span>Tài khoản của bạn sẽ được tự động gia hạn</span>
+                  </div>
+                )}
+                
+                {subscription?.status === 'active' && !subscription.autoRenew && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                    <span>Gói dịch vụ sẽ hết hạn vào {new Date(subscription.endDate).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                )}
+                
+                {subscription?.status === 'cancelled' && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                    <span>Gói dịch vụ đã bị hủy</span>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -166,6 +239,7 @@ const BillingSettings = () => {
           variant="default" 
           className="gap-2" 
           onClick={() => setShowUpgradeDialog(true)}
+          disabled={subscription?.status === 'cancelled'}
         >
           <TrendingUp className="h-4 w-4" />
           Nâng cấp gói
@@ -206,11 +280,12 @@ const BillingSettings = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowUpgradeDialog(false)}>Hủy</Button>
             <Button 
-              disabled={!selectedPlan || selectedPlan === currentPlan} 
+              disabled={!selectedPlan || selectedPlan === currentPlan || isUpdating} 
               onClick={handleUpgrade}
               className="gap-2"
             >
-              Nâng cấp <ArrowUpRight className="h-4 w-4" />
+              {isUpdating ? 'Đang xử lý...' : 'Nâng cấp'}
+              {!isUpdating && <ArrowUpRight className="h-4 w-4" />}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,160 +1,216 @@
 
 import { Package } from '@/types';
-import { ADMIN_API } from '@/constants/apiEndpoints';
-import { UserPlan } from '@/constants/userConstants';
 
-// Mock data
+// Mock data for packages
 const mockPackages: Package[] = [
   {
-    id: '1',
-    planId: UserPlan.FREE,
-    name: 'Miễn phí',
-    description: 'Gói miễn phí với các tính năng cơ bản',
-    features: ['1 Bot', '2 Tài khoản', 'Hỗ trợ cơ bản'],
+    id: 'pkg_free',
+    planId: 'free',
+    name: 'Free',
+    description: 'Truy cập cơ bản vào Trade Bot 365',
+    features: [
+      'Số lượng bot giới hạn',
+      'Số lượng tài khoản giới hạn',
+      'Tính năng cơ bản',
+    ],
     limits: {
       bots: 1,
+      accounts: 1,
+    },
+    pricing: {
+      monthly: 0,
+      quarterly: 0,
+      yearly: 0,
+      currency: 'VND',
+    },
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    trialDays: 0
+  },
+  {
+    id: 'pkg_basic',
+    planId: 'basic',
+    name: 'Basic',
+    description: 'Dành cho nhà giao dịch cá nhân',
+    features: [
+      'Tối đa 3 bot',
+      'Tối đa 2 tài khoản',
+      'Hỗ trợ email',
+      'Phân tích cơ bản',
+    ],
+    limits: {
+      bots: 3,
       accounts: 2,
     },
     pricing: {
-      monthly: 0,
-      quarterly: 0,
-      yearly: 0,
-      currency: 'VND'
+      monthly: 299000,
+      quarterly: 799000,
+      yearly: 2990000,
+      currency: 'VND',
     },
     isActive: true,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    trialDays: 7
   },
   {
-    id: '2',
-    planId: UserPlan.BASIC,
-    name: 'Cơ bản',
-    description: 'Gói cơ bản cho người mới bắt đầu',
-    features: ['3 Bot', '5 Tài khoản', 'Hỗ trợ qua email'],
+    id: 'pkg_premium',
+    planId: 'premium',
+    name: 'Premium',
+    description: 'Dành cho nhà giao dịch chuyên nghiệp',
+    features: [
+      'Bot không giới hạn',
+      'Tối đa 5 tài khoản',
+      'Hỗ trợ ưu tiên',
+      'Phân tích nâng cao',
+      'Tín hiệu Premium',
+    ],
     limits: {
-      bots: 3,
+      bots: 999, // Infinite
       accounts: 5,
     },
     pricing: {
-      monthly: 200000,
-      quarterly: 540000,
-      yearly: 1920000,
-      currency: 'VND'
+      monthly: 799000,
+      quarterly: 2190000,
+      yearly: 7990000,
+      currency: 'VND',
     },
     isActive: true,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isPopular: true,
+    trialDays: 3
   },
   {
-    id: '3',
-    planId: UserPlan.PREMIUM,
-    name: 'Cao cấp',
-    description: 'Gói cao cấp cho trader chuyên nghiệp',
-    features: ['10 Bot', '20 Tài khoản', 'Hỗ trợ ưu tiên 24/7', 'Chiến lược nâng cao'],
+    id: 'pkg_enterprise',
+    planId: 'enterprise',
+    name: 'Enterprise',
+    description: 'Dành cho tổ chức và công ty',
+    features: [
+      'Tùy chỉnh hoàn toàn',
+      'Tài khoản không giới hạn',
+      'Quản lý chuyên dụng',
+      'API riêng',
+      'SLA',
+    ],
     limits: {
-      bots: 10,
-      accounts: 20,
+      bots: 999, // Infinite
+      accounts: 999, // Infinite
     },
     pricing: {
-      monthly: 500000,
-      quarterly: 1350000,
-      yearly: 4800000,
-      currency: 'VND'
+      monthly: 0, // Custom pricing
+      quarterly: 0, // Custom pricing
+      yearly: 0, // Custom pricing
+      currency: 'VND',
     },
     isActive: true,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
-    isPopular: true
-  },
-  {
-    id: '4',
-    planId: UserPlan.ENTERPRISE,
-    name: 'Doanh nghiệp',
-    description: 'Gói doanh nghiệp với khả năng tùy chỉnh cao',
-    features: ['Không giới hạn Bot', 'Không giới hạn tài khoản', 'Hỗ trợ riêng', 'API tùy chỉnh'],
-    limits: {
-      bots: 100,
-      accounts: 200,
-    },
-    pricing: {
-      monthly: 2000000,
-      quarterly: 5400000,
-      yearly: 19200000,
-      currency: 'VND'
-    },
-    isActive: true,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
-    isEnterprise: true
-  },
-  {
-    id: '5',
-    planId: UserPlan.TRIAL,
-    name: 'Dùng thử',
-    description: 'Gói dùng thử 14 ngày',
-    features: ['2 Bot', '3 Tài khoản', 'Hỗ trợ cơ bản'],
-    limits: {
-      bots: 2,
-      accounts: 3,
-    },
-    pricing: {
-      monthly: 0,
-      quarterly: 0,
-      yearly: 0,
-      currency: 'VND'
-    },
-    isActive: true,
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isEnterprise: true,
+    trialDays: 0
   }
 ];
 
-// API functions
+// Fetch all packages
 export const fetchPackages = async (): Promise<Package[]> => {
-  // In a real app, this would be: 
-  // const response = await fetch(ADMIN_API.PACKAGES.LIST);
-  // return response.json();
-  
-  await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
-  return mockPackages;
-};
-
-export const getPackageById = async (packageId: string): Promise<Package> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  const pkg = mockPackages.find(p => p.id === packageId);
-  if (!pkg) {
-    throw new Error('Package not found');
-  }
-  return pkg;
+  return [...mockPackages];
 };
 
-export const createPackage = async (newPackage: Omit<Package, 'id' | 'createdAt' | 'updatedAt'>): Promise<Package> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const now = new Date().toISOString();
-  const createdPackage: Package = {
-    ...newPackage,
-    id: `pkg-${Math.random().toString(36).substring(2, 9)}`,
-    createdAt: now,
-    updatedAt: now
+// Fetch package by ID
+export const getPackageById = async (packageId: string): Promise<Package> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const foundPackage = mockPackages.find(pkg => pkg.id === packageId);
+  
+  if (!foundPackage) {
+    throw new Error(`Package with ID ${packageId} not found`);
+  }
+  
+  return { ...foundPackage };
+};
+
+// Create new package
+export const createPackage = async (packageData: Omit<Package, 'id' | 'createdAt' | 'updatedAt'>): Promise<Package> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  const newPackage: Package = {
+    id: `pkg_${Math.random().toString(36).substring(2, 10)}`,
+    ...packageData,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
-  return createdPackage;
+  
+  // In a real app, this would be saved to a database
+  return newPackage;
 };
 
-export const updatePackage = async (packageId: string, updates: Partial<Omit<Package, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Package> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const pkg = mockPackages.find(p => p.id === packageId);
-  if (!pkg) {
-    throw new Error('Package not found');
+// Update existing package
+export const updatePackage = async (packageId: string, updates: Partial<Package>): Promise<Package> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  const packageIndex = mockPackages.findIndex(pkg => pkg.id === packageId);
+  
+  if (packageIndex === -1) {
+    throw new Error(`Package with ID ${packageId} not found`);
   }
-  return {
-    ...pkg,
+  
+  // In a real app, this would update the database
+  const updatedPackage: Package = {
+    ...mockPackages[packageIndex],
     ...updates,
     updatedAt: new Date().toISOString()
   };
+  
+  return updatedPackage;
 };
 
+// Delete package
 export const deletePackage = async (packageId: string): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // In a real app, this would be:
-  // await fetch(`${ADMIN_API.PACKAGES.DELETE(packageId)}`, { method: 'DELETE' });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  const packageIndex = mockPackages.findIndex(pkg => pkg.id === packageId);
+  
+  if (packageIndex === -1) {
+    throw new Error(`Package with ID ${packageId} not found`);
+  }
+  
+  // In a real app, this would delete from the database
+};
+
+// Get user's package usage statistics
+export const getPackageUsage = async (userId: string, packageId: string): Promise<{
+  usedBots: number;
+  usedAccounts: number;
+  percentBots: number;
+  percentAccounts: number;
+}> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 400));
+  
+  const pkg = mockPackages.find(p => p.id === packageId);
+  
+  if (!pkg) {
+    throw new Error(`Package with ID ${packageId} not found`);
+  }
+  
+  // Mock data - in a real app this would be calculated from actual user data
+  const usedBots = Math.floor(Math.random() * pkg.limits.bots);
+  const usedAccounts = Math.floor(Math.random() * pkg.limits.accounts);
+  
+  const percentBots = pkg.limits.bots === 999 ? 50 : (usedBots / pkg.limits.bots) * 100;
+  const percentAccounts = pkg.limits.accounts === 999 ? 30 : (usedAccounts / pkg.limits.accounts) * 100;
+  
+  return {
+    usedBots,
+    usedAccounts,
+    percentBots,
+    percentAccounts
+  };
 };
