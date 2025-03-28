@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Account } from '@/types';
 import { toast } from 'sonner';
+import { ConnectionStatus } from '@/types/connection';
 
 const initialAccounts: Account[] = [
   {
@@ -27,6 +28,9 @@ const initialAccounts: Account[] = [
     brokerTitle: 'Coinstrat Pro',
     depositCurrency: 'USD',
     leverage: 200,
+    lastConnectionTime: '2023-06-20T14:45:00Z',
+    healthStatus: 'healthy',
+    successfulConnections: 23,
   },
   {
     cspAccountId: 'acc002',
@@ -51,6 +55,10 @@ const initialAccounts: Account[] = [
     brokerTitle: 'Coinstrat Pro',
     depositCurrency: 'USD',
     leverage: 100,
+    lastDisconnectionTime: '2023-06-22T11:20:00Z',
+    errorMessage: 'API authentication failed',
+    reconnectAttempts: 3,
+    failedConnections: 5,
   },
   {
     cspAccountId: 'acc003',
@@ -146,9 +154,19 @@ const useAccounts = () => {
   };
 
   const reconnectAccount = (clientId: string) => {
+    const now = new Date().toISOString();
     const updatedAccounts = accounts.map(account => 
       account.clientId === clientId 
-        ? { ...account, status: 'Connected' as const, lastUpdated: new Date().toISOString() } 
+        ? { 
+            ...account, 
+            status: 'Connected' as ConnectionStatus, 
+            lastUpdated: now,
+            lastConnectionTime: now,
+            lastDisconnectionTime: undefined,
+            errorMessage: undefined,
+            reconnectAttempts: 0,
+            successfulConnections: (account.successfulConnections || 0) + 1
+          } 
         : account
     );
     
@@ -159,12 +177,83 @@ const useAccounts = () => {
     });
   };
 
+  const disconnectAccount = (clientId: string) => {
+    const now = new Date().toISOString();
+    const updatedAccounts = accounts.map(account => 
+      account.clientId === clientId 
+        ? { 
+            ...account, 
+            status: 'Disconnected' as ConnectionStatus, 
+            lastUpdated: now,
+            lastDisconnectionTime: now,
+            reconnectAttempts: 0,
+            failedConnections: (account.failedConnections || 0) + 1
+          } 
+        : account
+    );
+    
+    setAccounts(updatedAccounts);
+    
+    toast.success('Ngắt kết nối thành công', {
+      description: 'Tài khoản đã được ngắt kết nối khỏi hệ thống',
+    });
+  };
+
+  const bulkReconnect = (clientIds: string[]) => {
+    const now = new Date().toISOString();
+    const updatedAccounts = accounts.map(account => 
+      clientIds.includes(account.clientId || '')
+        ? { 
+            ...account, 
+            status: 'Connected' as ConnectionStatus, 
+            lastUpdated: now,
+            lastConnectionTime: now,
+            lastDisconnectionTime: undefined,
+            errorMessage: undefined,
+            reconnectAttempts: 0,
+            successfulConnections: (account.successfulConnections || 0) + 1
+          } 
+        : account
+    );
+    
+    setAccounts(updatedAccounts);
+    
+    toast.success('Kết nối hàng loạt thành công', {
+      description: `Đã kết nối lại ${clientIds.length} tài khoản`,
+    });
+  };
+
+  const bulkDisconnect = (clientIds: string[]) => {
+    const now = new Date().toISOString();
+    const updatedAccounts = accounts.map(account => 
+      clientIds.includes(account.clientId || '')
+        ? { 
+            ...account, 
+            status: 'Disconnected' as ConnectionStatus, 
+            lastUpdated: now,
+            lastDisconnectionTime: now,
+            reconnectAttempts: 0,
+            failedConnections: (account.failedConnections || 0) + 1
+          } 
+        : account
+    );
+    
+    setAccounts(updatedAccounts);
+    
+    toast.success('Ngắt kết nối hàng loạt thành công', {
+      description: `Đã ngắt kết nối ${clientIds.length} tài khoản`,
+    });
+  };
+
   return {
     accounts,
     addAccount,
     updateAccount,
     deleteAccount,
     reconnectAccount,
+    disconnectAccount,
+    bulkReconnect,
+    bulkDisconnect
   };
 };
 

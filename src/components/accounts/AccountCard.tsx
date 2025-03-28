@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { MoreHorizontal, Star, Mail, Link, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { MoreHorizontal, Star, Mail, Link, Users, RefreshCw } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -17,6 +17,8 @@ import { Account } from '@/types';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { ConnectionStatus } from '@/types/connection';
+import { useSafeLoading } from '@/hooks/signals/useSafeLoading';
+import { toast } from 'sonner';
 
 interface AccountCardProps {
   account: Account;
@@ -32,6 +34,24 @@ const AccountCard: React.FC<AccountCardProps> = ({
   onReconnect,
 }) => {
   const navigate = useNavigate();
+  const { loading: isReconnecting, startLoading, stopLoading } = useSafeLoading({
+    minLoadTime: 800
+  });
+
+  // Generate mock connection details for demo purposes
+  // In a real implementation, these would come from the API
+  const connectionDetails = {
+    lastConnectionTime: account.status === 'Connected' ? 
+      new Date(Date.now() - Math.random() * 86400000 * 5).toISOString() : undefined,
+    lastDisconnectionTime: account.status === 'Disconnected' ? 
+      new Date(Date.now() - Math.random() * 86400000 * 2).toISOString() : undefined,
+    errorMessage: account.status === 'Disconnected' ? 
+      ['API timeout', 'Authentication failed', 'Network error'][Math.floor(Math.random() * 3)] : undefined,
+    reconnectAttempts: account.status === 'Disconnected' ? 
+      Math.floor(Math.random() * 5) : 0,
+    healthStatus: account.status === 'Connected' ? 
+      ['healthy', 'warning', 'critical'][Math.floor(Math.random() * 3)] as 'healthy' | 'warning' | 'critical' : undefined,
+  };
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
@@ -87,6 +107,19 @@ const AccountCard: React.FC<AccountCardProps> = ({
     navigate(`/accounts/${account.clientId}`);
   };
 
+  const handleReconnect = () => {
+    startLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+      onReconnect(account.clientId || '');
+      stopLoading();
+      toast.success('Kết nối lại thành công', {
+        description: `Tài khoản ${account.cspAccountName} đã được kết nối lại.`
+      });
+    }, 1500);
+  };
+
   return (
     <Card className="p-5 rounded-lg border shadow-sm hover:shadow transition-all duration-300">
       <div className="flex items-center gap-4">
@@ -115,8 +148,21 @@ const AccountCard: React.FC<AccountCardProps> = ({
                       Chỉnh Sửa Tài Khoản
                     </DropdownMenuItem>
                     {account.status === 'Disconnected' && (
-                      <DropdownMenuItem onClick={() => onReconnect(account.clientId || '')}>
-                        Kết Nối Lại
+                      <DropdownMenuItem 
+                        onClick={handleReconnect}
+                        disabled={isReconnecting}
+                      >
+                        {isReconnecting ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Đang kết nối lại...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Kết Nối Lại
+                          </>
+                        )}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem 
@@ -155,7 +201,19 @@ const AccountCard: React.FC<AccountCardProps> = ({
       </div>
       
       <div className="mt-4 flex justify-between items-center">
-        <StatusIndicator status={account.status as ConnectionStatus} showLabel />
+        <StatusIndicator 
+          status={account.status as ConnectionStatus} 
+          showLabel
+          lastUpdated={account.lastUpdated}
+          lastConnectionTime={connectionDetails.lastConnectionTime}
+          lastDisconnectionTime={connectionDetails.lastDisconnectionTime}
+          errorMessage={connectionDetails.errorMessage}
+          reconnectAttempts={connectionDetails.reconnectAttempts}
+          healthStatus={connectionDetails.healthStatus}
+          onReconnect={account.status === 'Disconnected' ? handleReconnect : undefined}
+          isReconnecting={isReconnecting}
+          showControls
+        />
         <Button variant="outline" size="sm" className="text-sm" onClick={handleViewProfile}>
           View Profile
         </Button>

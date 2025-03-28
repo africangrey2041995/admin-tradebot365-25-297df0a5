@@ -1,3 +1,4 @@
 
-// Re-export from main hooks location for backward compatibility
+// Re-export from new location for backward compatibility
 export { useSafeLoading } from '@/hooks/signals/useSafeLoading';
+
