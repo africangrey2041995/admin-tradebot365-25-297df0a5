@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -18,7 +17,7 @@ import {
   Key, MoreHorizontal, Copy, Pencil, Eye, EyeOff, 
   ChevronLeft, Plus, Trash, Link2, Power, Clock, Shield, ShieldAlert, CircleDot,
   User, Link, ArrowRight, Filter, SortAsc, SortDesc, Search, AlignJustify, 
-  CheckCircle, XCircle
+  CheckCircle, XCircle, RefreshCw, Loader2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -99,7 +98,6 @@ const AccountProfile = () => {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(() => {
-    // Generate mock API keys with connection status
     const keys = generateMockApiKeys(accountId || '');
     return keys.map(key => ({
       ...key,
@@ -123,7 +121,6 @@ const AccountProfile = () => {
     minLoadingDurationMs: 800
   });
   
-  // State for add/edit API key
   const [selectedUser, setSelectedUser] = useState('');
   const [newApiName, setNewApiName] = useState('');
   const [newClientId, setNewClientId] = useState('');
@@ -134,17 +131,31 @@ const AccountProfile = () => {
   const [isTestSuccessful, setIsTestSuccessful] = useState(false);
   const [availableTradingAccounts, setAvailableTradingAccounts] = useState(mockTradingAccounts);
 
-  // State for editing
-  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
-  const [isEditingAccessTokenOnly, setIsEditingAccessTokenOnly] = useState(false);
-  
+  const [logs, fetchLogs] = useTradingViewLogs({
+    botId,
+    userId,
+    refreshTrigger: refreshTrigger > 0,
+    skipLoadingState: true
+  });
+
+  const {
+    logs: coinstratLogs,
+    fetchLogs: fetchCsLogs
+  } = useCoinstratLogs({
+    botId,
+    userId,
+    initialData: logsData,
+    refreshTrigger: refreshTrigger > 0,
+    skipLoadingState: true
+  });
+
+  console.log(`UserBotDetailTabs - userId: ${userId}, botId: ${botId}, isLoading: ${isLoading}, refreshLoading: ${refreshLoading}, isAdminView: ${isAdminView}`);
+
   const accountName = `Account ${accountId?.slice(-3)}`;
-  
-  // Filter and sort API keys
+
   const filteredAndSortedApiKeys = useMemo(() => {
     let result = [...apiKeys];
     
-    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(key => 
@@ -153,7 +164,6 @@ const AccountProfile = () => {
       );
     }
     
-    // Apply status filter
     if (filterStatus !== 'all') {
       if (filterStatus === 'connected') {
         result = result.filter(key => key.connectionStatus === 'Connected');
@@ -162,7 +172,6 @@ const AccountProfile = () => {
       }
     }
     
-    // Apply sorting
     result.sort((a, b) => {
       let valueA, valueB;
       
@@ -211,7 +220,6 @@ const AccountProfile = () => {
     }
   };
   
-  // Handle selection of API keys
   const toggleSelectKey = (keyId: string) => {
     setSelectedKeyIds(prev => 
       prev.includes(keyId) 
@@ -232,7 +240,6 @@ const AccountProfile = () => {
     setSelectedKeyIds([]);
   };
   
-  // Bulk operations
   const handleConnectAll = () => {
     setIsConnectAllDialogOpen(true);
   };
@@ -246,7 +253,6 @@ const AccountProfile = () => {
     
     startLoading();
     
-    // Simulate API call
     setTimeout(() => {
       setApiKeys(prev => prev.map(key => {
         if (selectedKeyIds.includes(key.id)) {
@@ -269,7 +275,6 @@ const AccountProfile = () => {
     
     startLoading();
     
-    // Simulate API call
     setTimeout(() => {
       setApiKeys(prev => prev.map(key => {
         if (selectedKeyIds.includes(key.id)) {
@@ -292,7 +297,6 @@ const AccountProfile = () => {
       if (key.id === keyId) {
         const newStatus = key.connectionStatus === 'Connected' ? 'Disconnected' : 'Connected';
         
-        // Show toast notification
         if (newStatus === 'Connected') {
           toast.success(`Đã kết nối API key ${key.name} thành công`);
         } else {
@@ -413,7 +417,6 @@ const AccountProfile = () => {
     }
     
     if (editingKeyId) {
-      // Update existing key
       setApiKeys(prev => prev.map(key => {
         if (key.id === editingKeyId) {
           const updatedKey = { ...key };
@@ -442,7 +445,6 @@ const AccountProfile = () => {
       
       toast.success(isEditingAccessTokenOnly ? 'Access token updated successfully' : 'API key updated successfully');
     } else {
-      // Add new key
       const user = mockUsers.find(u => u.id === selectedUser);
       
       const accountTradingValue = `${selectedAccount?.id}|${selectedAccount?.type}|${selectedAccount?.balance}`;
@@ -568,7 +570,6 @@ const AccountProfile = () => {
           </Button>
         </div>
         
-        {/* Filters and search */}
         <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -877,7 +878,6 @@ const AccountProfile = () => {
         </Card>
       </div>
       
-      {/* Add Key Dialog */}
       <Dialog open={isAddKeyDialogOpen} onOpenChange={setIsAddKeyDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1000,7 +1000,6 @@ const AccountProfile = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Edit Key Dialog */}
       <Dialog open={isEditKeyDialogOpen} onOpenChange={setIsEditKeyDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1106,7 +1105,6 @@ const AccountProfile = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Update Access Token Dialog */}
       <Dialog open={isUpdateTokenDialogOpen} onOpenChange={setIsUpdateTokenDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1158,61 +1156,37 @@ const AccountProfile = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Connect All Keys Dialog */}
       <ConfirmationDialog
         open={isConnectAllDialogOpen}
         onOpenChange={setIsConnectAllDialogOpen}
         title="Connect API Keys"
         description={`Are you sure you want to connect ${selectedKeyIds.length} API keys?`}
-        action={
-          <Button 
-            onClick={processConnectAll}
-            disabled={isProcessingConnection || selectedKeyIds.length === 0}
-            className="bg-primary hover:bg-primary/90"
-          >
-            {isProcessingConnection && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isProcessingConnection ? 'Connecting...' : 'Connect All'}
-          </Button>
-        }
+        confirmText="Connect All"
+        cancelText="Cancel"
+        onConfirm={processConnectAll}
+        isProcessing={isProcessingConnection}
+        variant="info"
       />
       
-      {/* Disconnect All Keys Dialog */}
       <ConfirmationDialog
         open={isDisconnectAllDialogOpen}
         onOpenChange={setIsDisconnectAllDialogOpen}
         title="Disconnect API Keys"
         description={`Are you sure you want to disconnect ${selectedKeyIds.length} API keys?`}
-        action={
-          <Button 
-            onClick={processDisconnectAll}
-            disabled={isProcessingConnection || selectedKeyIds.length === 0}
-            variant="destructive"
-          >
-            {isProcessingConnection && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isProcessingConnection ? 'Disconnecting...' : 'Disconnect All'}
-          </Button>
-        }
+        confirmText="Disconnect All"
+        cancelText="Cancel"
+        onConfirm={processDisconnectAll}
+        isProcessing={isProcessingConnection}
+        variant="warning"
       />
       
-      {/* Bulk Action Bar */}
       {selectedKeyIds.length > 0 && (
         <BulkActionBar
-          count={selectedKeyIds.length}
-          onClear={clearSelection}
-          actions={[
-            {
-              label: 'Connect All',
-              icon: <Link className="h-4 w-4 mr-2" />,
-              onClick: handleConnectAll,
-              variant: 'default'
-            },
-            {
-              label: 'Disconnect All',
-              icon: <Link2 className="h-4 w-4 mr-2" />,
-              onClick: handleDisconnectAll,
-              variant: 'outline'
-            }
-          ]}
+          selectedCount={selectedKeyIds.length}
+          onClose={clearSelection}
+          onConnectAll={handleConnectAll}
+          onDisconnectAll={handleDisconnectAll}
+          isProcessing={isProcessingConnection}
         />
       )}
     </MainLayout>
