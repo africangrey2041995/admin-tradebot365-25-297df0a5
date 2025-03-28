@@ -1,15 +1,11 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserSubscription, SubscriptionStatus } from '@/types/subscription';
 import { toast } from 'sonner';
 
-// Mock API functions for subscriptions
 const fetchSubscriptions = async (): Promise<UserSubscription[]> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Mock subscription data
   return [
     {
       id: 'sub_001',
@@ -92,13 +88,10 @@ const updateSubscription = async (
   subscriptionId: string, 
   updates: Partial<UserSubscription>
 ): Promise<UserSubscription> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 600));
   
-  // In a real app, this would update the database
   console.log(`Updating subscription ${subscriptionId} with:`, updates);
   
-  // Mock updated subscription
   return {
     id: subscriptionId,
     userId: 'user_001',
@@ -118,19 +111,36 @@ const updateSubscription = async (
 };
 
 const cancelSubscription = async (subscriptionId: string): Promise<void> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // In a real app, this would update the database
   console.log(`Cancelling subscription ${subscriptionId}`);
 };
 
 const renewSubscription = async (subscriptionId: string): Promise<void> => {
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 700));
   
-  // In a real app, this would update the database
   console.log(`Renewing subscription ${subscriptionId}`);
+};
+
+const bulkCancelSubscriptions = async (subscriptionIds: string[]): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  console.log(`Cancelling ${subscriptionIds.length} subscriptions: `, subscriptionIds);
+};
+
+const bulkRenewSubscriptions = async (subscriptionIds: string[]): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  
+  console.log(`Renewing ${subscriptionIds.length} subscriptions: `, subscriptionIds);
+};
+
+const bulkUpdateSubscriptionStatus = async (
+  subscriptionIds: string[],
+  status: SubscriptionStatus
+): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  console.log(`Updating ${subscriptionIds.length} subscriptions to status ${status}: `, subscriptionIds);
 };
 
 export function useSubscriptionManagement() {
@@ -138,17 +148,22 @@ export function useSubscriptionManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedSubscription, setSelectedSubscription] = useState<UserSubscription | null>(null);
+  
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false);
+  const [isViewDetailsDialogOpen, setIsViewDetailsDialogOpen] = useState(false);
+  
+  const [selectedSubscriptionIds, setSelectedSubscriptionIds] = useState<string[]>([]);
+  const [isBulkActionDialogOpen, setIsBulkActionDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'cancel' | 'renew' | 'change-status'>('cancel');
+  const [newBulkStatus, setNewBulkStatus] = useState<SubscriptionStatus>('active');
 
-  // Query for fetching all subscriptions
   const subscriptionsQuery = useQuery({
     queryKey: ['adminSubscriptions'],
     queryFn: fetchSubscriptions
   });
 
-  // Update subscription mutation
   const updateMutation = useMutation({
     mutationFn: ({ subscriptionId, updates }: { subscriptionId: string, updates: Partial<UserSubscription> }) =>
       updateSubscription(subscriptionId, updates),
@@ -162,7 +177,6 @@ export function useSubscriptionManagement() {
     }
   });
 
-  // Cancel subscription mutation
   const cancelMutation = useMutation({
     mutationFn: cancelSubscription,
     onSuccess: () => {
@@ -175,7 +189,6 @@ export function useSubscriptionManagement() {
     }
   });
 
-  // Renew subscription mutation
   const renewMutation = useMutation({
     mutationFn: renewSubscription,
     onSuccess: () => {
@@ -188,7 +201,46 @@ export function useSubscriptionManagement() {
     }
   });
 
-  // Filter subscriptions based on search term and status
+  const bulkCancelMutation = useMutation({
+    mutationFn: bulkCancelSubscriptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminSubscriptions'] });
+      toast.success(`${selectedSubscriptionIds.length} đăng ký đã được hủy thành công`);
+      setIsBulkActionDialogOpen(false);
+      setSelectedSubscriptionIds([]);
+    },
+    onError: (error) => {
+      toast.error(`Lỗi khi hủy đăng ký hàng loạt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  });
+
+  const bulkRenewMutation = useMutation({
+    mutationFn: bulkRenewSubscriptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminSubscriptions'] });
+      toast.success(`${selectedSubscriptionIds.length} đăng ký đã được gia hạn thành công`);
+      setIsBulkActionDialogOpen(false);
+      setSelectedSubscriptionIds([]);
+    },
+    onError: (error) => {
+      toast.error(`Lỗi khi gia hạn đăng ký hàng loạt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  });
+
+  const bulkUpdateStatusMutation = useMutation({
+    mutationFn: ({ ids, status }: { ids: string[], status: SubscriptionStatus }) => 
+      bulkUpdateSubscriptionStatus(ids, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminSubscriptions'] });
+      toast.success(`${selectedSubscriptionIds.length} đăng ký đã được cập nhật trạng thái thành công`);
+      setIsBulkActionDialogOpen(false);
+      setSelectedSubscriptionIds([]);
+    },
+    onError: (error) => {
+      toast.error(`Lỗi khi cập nhật trạng thái hàng loạt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  });
+
   const filteredSubscriptions = subscriptionsQuery.data?.filter(subscription => {
     const matchesSearch = 
       subscription.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -200,7 +252,6 @@ export function useSubscriptionManagement() {
     return matchesSearch && matchesStatus;
   }) || [];
 
-  // Handler functions
   const handleSearch = (term: string) => {
     setSearchTerm(term);
   };
@@ -224,6 +275,11 @@ export function useSubscriptionManagement() {
     setIsRenewDialogOpen(true);
   };
 
+  const handleViewDetailsClick = (subscription: UserSubscription) => {
+    setSelectedSubscription(subscription);
+    setIsViewDetailsDialogOpen(true);
+  };
+
   const handleUpdateSubscription = (updates: Partial<UserSubscription>) => {
     if (selectedSubscription) {
       updateMutation.mutate({
@@ -245,35 +301,93 @@ export function useSubscriptionManagement() {
     }
   };
 
+  const handleSelectedRowsChange = (ids: string[]) => {
+    setSelectedSubscriptionIds(ids);
+  };
+
+  const handleBulkCancel = () => {
+    setBulkAction('cancel');
+    setIsBulkActionDialogOpen(true);
+  };
+
+  const handleBulkRenew = () => {
+    setBulkAction('renew');
+    setIsBulkActionDialogOpen(true);
+  };
+
+  const handleBulkChangeStatus = () => {
+    setBulkAction('change-status');
+    setIsBulkActionDialogOpen(true);
+  };
+
+  const handleConfirmBulkAction = (newStatus?: SubscriptionStatus) => {
+    if (selectedSubscriptionIds.length === 0) return;
+
+    switch (bulkAction) {
+      case 'cancel':
+        bulkCancelMutation.mutate(selectedSubscriptionIds);
+        break;
+      case 'renew':
+        bulkRenewMutation.mutate(selectedSubscriptionIds);
+        break;
+      case 'change-status':
+        if (newStatus) {
+          bulkUpdateStatusMutation.mutate({ 
+            ids: selectedSubscriptionIds, 
+            status: newStatus 
+          });
+        }
+        break;
+    }
+  };
+
   return {
-    // Data
     subscriptions: filteredSubscriptions,
     isLoading: subscriptionsQuery.isLoading,
     error: subscriptionsQuery.error,
     selectedSubscription,
     searchTerm,
     statusFilter,
+    selectedSubscriptionIds,
 
-    // UI state
     isEditDialogOpen,
     isCancelDialogOpen,
     isRenewDialogOpen,
+    isViewDetailsDialogOpen,
+    isBulkActionDialogOpen,
+    bulkAction,
+    newBulkStatus,
+    
     isSubmitting: updateMutation.isPending,
     isCancelling: cancelMutation.isPending,
     isRenewing: renewMutation.isPending,
+    isBulkProcessing: 
+      bulkCancelMutation.isPending || 
+      bulkRenewMutation.isPending || 
+      bulkUpdateStatusMutation.isPending,
 
-    // Actions
     setSelectedSubscription,
     handleSearch,
     handleStatusFilterChange,
     handleEditSubscription,
     handleCancelSubscriptionClick,
     handleRenewSubscriptionClick,
+    handleViewDetailsClick,
     handleUpdateSubscription,
     handleConfirmCancel,
     handleConfirmRenew,
+    
+    handleSelectedRowsChange,
+    handleBulkCancel,
+    handleBulkRenew,
+    handleBulkChangeStatus,
+    handleConfirmBulkAction,
+    setNewBulkStatus,
+    
     setIsEditDialogOpen,
     setIsCancelDialogOpen,
-    setIsRenewDialogOpen
+    setIsRenewDialogOpen,
+    setIsViewDetailsDialogOpen,
+    setIsBulkActionDialogOpen
   };
 }

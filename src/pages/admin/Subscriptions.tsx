@@ -8,6 +8,10 @@ import { SubscriptionsHeader } from '@/components/admin/subscriptions/Subscripti
 import { EditSubscriptionDialog } from '@/components/admin/subscriptions/EditSubscriptionDialog';
 import { CancelSubscriptionDialog } from '@/components/admin/subscriptions/CancelSubscriptionDialog';
 import { RenewSubscriptionDialog } from '@/components/admin/subscriptions/RenewSubscriptionDialog';
+import ViewSubscriptionDetailsDialog from '@/components/admin/subscriptions/ViewSubscriptionDetailsDialog';
+import { SubscriptionsStatsCards } from '@/components/admin/subscriptions/SubscriptionsStatsCards';
+import BulkActionsBar from '@/components/admin/subscriptions/BulkActionsBar';
+import BulkActionDialog from '@/components/admin/subscriptions/BulkActionDialog';
 
 const SubscriptionsPage: React.FC = () => {
   const {
@@ -16,23 +20,43 @@ const SubscriptionsPage: React.FC = () => {
     error,
     selectedSubscription,
     statusFilter,
+    selectedSubscriptionIds,
+    
     isEditDialogOpen,
     isCancelDialogOpen,
     isRenewDialogOpen,
+    isViewDetailsDialogOpen,
+    isBulkActionDialogOpen,
+    bulkAction,
+    newBulkStatus,
+    
     isSubmitting,
     isCancelling,
     isRenewing,
+    isBulkProcessing,
+    
     handleSearch,
     handleStatusFilterChange,
     handleEditSubscription,
     handleCancelSubscriptionClick,
     handleRenewSubscriptionClick,
+    handleViewDetailsClick,
     handleUpdateSubscription,
     handleConfirmCancel,
     handleConfirmRenew,
+    
+    handleSelectedRowsChange,
+    handleBulkCancel,
+    handleBulkRenew,
+    handleBulkChangeStatus,
+    handleConfirmBulkAction,
+    setNewBulkStatus,
+    
     setIsEditDialogOpen,
     setIsCancelDialogOpen,
-    setIsRenewDialogOpen
+    setIsRenewDialogOpen,
+    setIsViewDetailsDialogOpen,
+    setIsBulkActionDialogOpen
   } = useSubscriptionManagement();
 
   const refreshData = () => {
@@ -48,6 +72,12 @@ const SubscriptionsPage: React.FC = () => {
         isLoading={isLoading}
       />
       
+      {/* Thêm thống kê */}
+      <SubscriptionsStatsCards 
+        subscriptions={subscriptions} 
+        isLoading={isLoading} 
+      />
+      
       <Tabs defaultValue="all" value={statusFilter} onValueChange={handleStatusFilterChange}>
         <TabsList className="bg-zinc-800">
           <TabsTrigger value="all">Tất cả</TabsTrigger>
@@ -57,7 +87,7 @@ const SubscriptionsPage: React.FC = () => {
           <TabsTrigger value="cancelled">Đã hủy</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="all" className="mt-4">
+        <TabsContent value={statusFilter} className="mt-4">
           <Card className="border-zinc-800 bg-zinc-900 text-white">
             <CardContent className="pt-6">
               <SubscriptionsTable
@@ -67,66 +97,9 @@ const SubscriptionsPage: React.FC = () => {
                 onEdit={handleEditSubscription}
                 onCancel={handleCancelSubscriptionClick}
                 onRenew={handleRenewSubscriptionClick}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="active" className="mt-4">
-          <Card className="border-zinc-800 bg-zinc-900 text-white">
-            <CardContent className="pt-6">
-              <SubscriptionsTable
-                subscriptions={subscriptions}
-                isLoading={isLoading}
-                error={error instanceof Error ? error : null}
-                onEdit={handleEditSubscription}
-                onCancel={handleCancelSubscriptionClick}
-                onRenew={handleRenewSubscriptionClick}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="expired" className="mt-4">
-          <Card className="border-zinc-800 bg-zinc-900 text-white">
-            <CardContent className="pt-6">
-              <SubscriptionsTable
-                subscriptions={subscriptions}
-                isLoading={isLoading}
-                error={error instanceof Error ? error : null}
-                onEdit={handleEditSubscription}
-                onCancel={handleCancelSubscriptionClick}
-                onRenew={handleRenewSubscriptionClick}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="pending" className="mt-4">
-          <Card className="border-zinc-800 bg-zinc-900 text-white">
-            <CardContent className="pt-6">
-              <SubscriptionsTable
-                subscriptions={subscriptions}
-                isLoading={isLoading}
-                error={error instanceof Error ? error : null}
-                onEdit={handleEditSubscription}
-                onCancel={handleCancelSubscriptionClick}
-                onRenew={handleRenewSubscriptionClick}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="cancelled" className="mt-4">
-          <Card className="border-zinc-800 bg-zinc-900 text-white">
-            <CardContent className="pt-6">
-              <SubscriptionsTable
-                subscriptions={subscriptions}
-                isLoading={isLoading}
-                error={error instanceof Error ? error : null}
-                onEdit={handleEditSubscription}
-                onCancel={handleCancelSubscriptionClick}
-                onRenew={handleRenewSubscriptionClick}
+                onViewDetails={handleViewDetailsClick}
+                selectedRows={selectedSubscriptionIds}
+                onSelectedRowsChange={handleSelectedRowsChange}
               />
             </CardContent>
           </Card>
@@ -156,6 +129,36 @@ const SubscriptionsPage: React.FC = () => {
         subscription={selectedSubscription}
         onConfirm={handleConfirmRenew}
         isRenewing={isRenewing}
+      />
+      
+      {/* Thêm dialog xem chi tiết */}
+      <ViewSubscriptionDetailsDialog
+        open={isViewDetailsDialogOpen}
+        onOpenChange={setIsViewDetailsDialogOpen}
+        subscription={selectedSubscription}
+        onClose={() => setIsViewDetailsDialogOpen(false)}
+      />
+      
+      {/* Thêm dialog hành động hàng loạt */}
+      <BulkActionDialog
+        open={isBulkActionDialogOpen}
+        onOpenChange={setIsBulkActionDialogOpen}
+        count={selectedSubscriptionIds.length}
+        action={bulkAction}
+        onConfirm={handleConfirmBulkAction}
+        isProcessing={isBulkProcessing}
+        status={newBulkStatus}
+        setStatus={setNewBulkStatus}
+      />
+      
+      {/* Thanh hành động hàng loạt */}
+      <BulkActionsBar
+        selectedCount={selectedSubscriptionIds.length}
+        onCancel={handleBulkCancel}
+        onRenew={handleBulkRenew}
+        onChangeStatus={handleBulkChangeStatus}
+        onClearSelection={() => handleSelectedRowsChange([])}
+        isProcessing={isBulkProcessing}
       />
     </div>
   );

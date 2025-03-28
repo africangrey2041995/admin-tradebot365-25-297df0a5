@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DataTable } from '@/components/ui/data-table';
 import { Button } from "@/components/ui/button";
 import { 
   MoreHorizontal, 
@@ -31,7 +31,10 @@ interface SubscriptionsTableProps {
   onEdit: (subscription: UserSubscription) => void;
   onCancel: (subscription: UserSubscription) => void;
   onRenew: (subscription: UserSubscription) => void;
+  onViewDetails: (subscription: UserSubscription) => void;
   onViewUser?: (userId: string) => void;
+  selectedRows: string[];
+  onSelectedRowsChange: (rows: string[]) => void;
 }
 
 export const SubscriptionsTable: React.FC<SubscriptionsTableProps> = ({
@@ -41,7 +44,10 @@ export const SubscriptionsTable: React.FC<SubscriptionsTableProps> = ({
   onEdit,
   onCancel,
   onRenew,
-  onViewUser
+  onViewDetails,
+  onViewUser,
+  selectedRows,
+  onSelectedRowsChange
 }) => {
   const formatDate = (dateString: string) => {
     try {
@@ -58,147 +64,148 @@ export const SubscriptionsTable: React.FC<SubscriptionsTableProps> = ({
     return `Còn ${days} ngày`;
   };
 
-  if (error) {
-    return (
-      <div className="rounded-md bg-red-50 p-4 my-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <XCircle className="h-5 w-5 text-red-400" />
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">
-              Lỗi khi tải dữ liệu đăng ký
-            </h3>
-            <div className="mt-2 text-sm text-red-700">
-              <p>{error.message}</p>
-            </div>
-          </div>
+  const columns = [
+    {
+      accessorKey: 'id',
+      header: 'ID',
+      cell: (value: string) => <span className="font-mono text-xs text-zinc-400">{value}</span>
+    },
+    {
+      accessorKey: 'userId',
+      header: 'Người dùng',
+      cell: (value: string, row: UserSubscription) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-1 pl-0 text-primary"
+          onClick={() => onViewUser && onViewUser(row.userId)}
+        >
+          <User className="h-3.5 w-3.5" />
+          {value}
+        </Button>
+      )
+    },
+    {
+      accessorKey: 'packageId',
+      header: 'Gói dịch vụ',
+      cell: (value: string) => <span className="font-medium">{value}</span>
+    },
+    {
+      accessorKey: 'status',
+      header: 'Trạng thái',
+      cell: (value: string) => <SubscriptionStatusBadge status={value as any} />
+    },
+    {
+      accessorKey: 'currentPeriod',
+      header: 'Chu kỳ',
+      cell: (value: string) => (
+        <>
+          {value === 'monthly' && 'Hàng tháng'}
+          {value === 'quarterly' && 'Hàng quý'}
+          {value === 'yearly' && 'Hàng năm'}
+        </>
+      )
+    },
+    {
+      accessorKey: 'startDate',
+      header: 'Ngày bắt đầu',
+      cell: (value: string) => formatDate(value)
+    },
+    {
+      accessorKey: 'endDate',
+      header: 'Ngày kết thúc',
+      cell: (value: string) => formatDate(value)
+    },
+    {
+      accessorKey: 'timeLeft',
+      header: 'Thời gian còn lại',
+      cell: (_: any, row: UserSubscription) => (
+        <span>
+          {row.status === 'active' ? renderTimeLeft(row.endDate) : '-'}
+        </span>
+      )
+    },
+    {
+      accessorKey: 'autoRenew',
+      header: 'Tự động gia hạn',
+      cell: (value: boolean) => (
+        <>
+          {value ? (
+            <span className="text-green-500">Có</span>
+          ) : (
+            <span className="text-red-500">Không</span>
+          )}
+        </>
+      )
+    },
+    {
+      accessorKey: 'actions',
+      header: 'Tác vụ',
+      cell: (_: any, row: UserSubscription) => (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
+              <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem 
+                className="focus:bg-zinc-800 cursor-pointer" 
+                onClick={() => onViewDetails(row)}
+              >
+                <Info className="mr-2 h-4 w-4" />
+                <span>Xem chi tiết</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem 
+                className="focus:bg-zinc-800 cursor-pointer" 
+                onClick={() => onEdit(row)}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                <span>Chỉnh sửa</span>
+              </DropdownMenuItem>
+              
+              {row.status === 'active' && (
+                <DropdownMenuItem 
+                  className="focus:bg-zinc-800 text-red-500 focus:text-red-500 cursor-pointer"
+                  onClick={() => onCancel(row)}
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  <span>Hủy đăng ký</span>
+                </DropdownMenuItem>
+              )}
+              
+              {(row.status === 'expired' || row.status === 'cancelled') && (
+                <DropdownMenuItem 
+                  className="focus:bg-zinc-800 text-green-500 focus:text-green-500 cursor-pointer"
+                  onClick={() => onRenew(row)}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  <span>Gia hạn</span>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
-    );
-  }
+      )
+    }
+  ];
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-zinc-800">
-            <TableHead className="text-zinc-400">ID</TableHead>
-            <TableHead className="text-zinc-400">Người dùng</TableHead>
-            <TableHead className="text-zinc-400">Gói dịch vụ</TableHead>
-            <TableHead className="text-zinc-400">Trạng thái</TableHead>
-            <TableHead className="text-zinc-400">Chu kỳ</TableHead>
-            <TableHead className="text-zinc-400">Ngày bắt đầu</TableHead>
-            <TableHead className="text-zinc-400">Ngày kết thúc</TableHead>
-            <TableHead className="text-zinc-400">Thời gian còn lại</TableHead>
-            <TableHead className="text-zinc-400">Tự động gia hạn</TableHead>
-            <TableHead className="text-zinc-400 text-right">Tác vụ</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={10} className="h-24 text-center">
-                <div className="flex justify-center items-center">
-                  <RefreshCw className="h-6 w-6 animate-spin text-primary mr-2" />
-                  <span className="text-muted-foreground">Đang tải...</span>
-                </div>
-              </TableCell>
-            </TableRow>
-          ) : subscriptions.length > 0 ? (
-            subscriptions.map((subscription) => (
-              <TableRow key={subscription.id} className="border-zinc-800">
-                <TableCell className="font-mono text-xs text-zinc-400">{subscription.id}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-1 pl-0 text-primary"
-                    onClick={() => onViewUser && onViewUser(subscription.userId)}
-                  >
-                    <User className="h-3.5 w-3.5" />
-                    {subscription.userId}
-                  </Button>
-                </TableCell>
-                <TableCell className="font-medium">{subscription.packageId}</TableCell>
-                <TableCell>
-                  <SubscriptionStatusBadge status={subscription.status} />
-                </TableCell>
-                <TableCell>
-                  {subscription.currentPeriod === 'monthly' && 'Hàng tháng'}
-                  {subscription.currentPeriod === 'quarterly' && 'Hàng quý'}
-                  {subscription.currentPeriod === 'yearly' && 'Hàng năm'}
-                </TableCell>
-                <TableCell>{formatDate(subscription.startDate)}</TableCell>
-                <TableCell>{formatDate(subscription.endDate)}</TableCell>
-                <TableCell>
-                  {subscription.status === 'active' ? renderTimeLeft(subscription.endDate) : '-'}
-                </TableCell>
-                <TableCell>
-                  {subscription.autoRenew ? (
-                    <span className="text-green-500">Có</span>
-                  ) : (
-                    <span className="text-red-500">Không</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="border-zinc-800 bg-zinc-900 text-white">
-                      <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-zinc-800" />
-                      <DropdownMenuItem 
-                        className="focus:bg-zinc-800 cursor-pointer" 
-                        onClick={() => onEdit(subscription)}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        <span>Chỉnh sửa</span>
-                      </DropdownMenuItem>
-                      
-                      {subscription.status === 'active' && (
-                        <DropdownMenuItem 
-                          className="focus:bg-zinc-800 text-red-500 focus:text-red-500 cursor-pointer"
-                          onClick={() => onCancel(subscription)}
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          <span>Hủy đăng ký</span>
-                        </DropdownMenuItem>
-                      )}
-                      
-                      {(subscription.status === 'expired' || subscription.status === 'cancelled') && (
-                        <DropdownMenuItem 
-                          className="focus:bg-zinc-800 text-green-500 focus:text-green-500 cursor-pointer"
-                          onClick={() => onRenew(subscription)}
-                        >
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          <span>Gia hạn</span>
-                        </DropdownMenuItem>
-                      )}
-                      
-                      <DropdownMenuItem 
-                        className="focus:bg-zinc-800 cursor-pointer"
-                      >
-                        <Info className="mr-2 h-4 w-4" />
-                        <span>Xem chi tiết</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
-                Không tìm thấy kết quả phù hợp.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={subscriptions}
+      isLoading={isLoading}
+      error={error}
+      emptyMessage="Không tìm thấy đăng ký nào."
+      onRowClick={(row) => onViewDetails(row)}
+      selectable={true}
+      selectedRows={selectedRows}
+      onSelectedRowsChange={onSelectedRowsChange}
+      rowIdentifier="id"
+    />
   );
 };
