@@ -1,8 +1,8 @@
 
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import AdminLayout from '@/layouts/AdminLayout';
-import PageLoader from '@/components/common/PageLoader';
+import AdminLayout from '@/components/admin/AdminLayout';
+import PageLoader from '@/components/ui/skeleton';
 
 // Lazy-loaded admin pages
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
