@@ -1,3 +1,4 @@
+
 // Re-export all type definitions for convenient access
 export * from './user';
 export * from './bot';
@@ -122,6 +123,9 @@ export function normalizeUserId(userId: string | undefined): string {
   return userId;
 }
 
+// Import from connection.ts
+import { ConnectionStatus, HealthStatus } from './connection';
+
 export interface Account {
   id?: string;
   clientId?: string;
@@ -142,4 +146,27 @@ export interface Account {
   healthStatus?: HealthStatus;
   successfulConnections?: number;
   failedConnections?: number;
+  
+  // Add all other properties used throughout the codebase
+  cspAccountId?: string;
+  cspUserId?: string;
+  userAccount?: string;
+  apiName?: string;
+  apiId?: string;
+  tradingAccountId?: string;
+  tradingAccountNumber?: string;
+  tradingAccountType?: string;
+  tradingAccountBalance?: string;
+  isLive?: boolean;
+  createdDate?: string;
+  expireDate?: string;
+  secretId?: string;
+  accessToken?: string;
+  ctidTraderAccountId?: string;
+  volumeMultiplier?: string;
+  brokerName?: string;
+  brokerTitle?: string;
+  depositCurrency?: string;
+  leverage?: number;
 }
+
