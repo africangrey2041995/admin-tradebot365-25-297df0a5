@@ -1,73 +1,105 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-interface UseSafeLoadingOptions {
+export interface UseSafeLoadingProps {
+  timeoutMs?: number;
+  minLoadingDurationMs?: number;
+  debugComponent?: string;
+  skipLoadingState?: boolean;
+  
+  // Added for backward compatibility with old code
   initialState?: boolean;
   timeout?: number;
   minLoadTime?: number;
 }
 
-/**
- * A hook that provides a safe loading state with minimum display time
- * to prevent flickering and ensure consistent UX
- */
-export const useSafeLoading = (options: UseSafeLoadingOptions = {}) => {
-  const { 
-    initialState = false, 
-    timeout = 10000, 
-    minLoadTime = 500 
-  } = options;
+export const useSafeLoading = ({
+  timeoutMs = 10000,
+  minLoadingDurationMs = 500,
+  debugComponent = '',
+  skipLoadingState = false,
   
-  const [loading, setLoading] = useState(initialState);
-  const [error, setError] = useState<Error | null>(null);
-  const [startTime, setStartTime] = useState<number | null>(null);
-
-  const startLoading = useCallback(() => {
+  // Support for old property names
+  initialState = false,
+  timeout,
+  minLoadTime,
+}: UseSafeLoadingProps = {}) => {
+  // Use newer property names if available, fall back to older ones
+  const effectiveTimeout = timeoutMs || timeout || 10000;
+  const effectiveMinDuration = minLoadingDurationMs || minLoadTime || 500;
+  
+  const [loading, setLoading] = useState(initialState || false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  
+  const startLoading = () => {
+    if (skipLoadingState) return;
+    
+    console.debug(`${debugComponent} - Starting loading state`);
     setLoading(true);
-    setError(null);
-    setStartTime(Date.now());
-  }, []);
-
-  const stopLoading = useCallback((error?: Error) => {
-    const currentTime = Date.now();
-    const loadStartTime = startTime || currentTime;
-    const elapsedTime = currentTime - loadStartTime;
+    startTimeRef.current = Date.now();
     
-    // Ensure we show loading for at least minLoadTime to prevent flickering
-    if (elapsedTime < minLoadTime) {
-      const remainingTime = minLoadTime - elapsedTime;
-      setTimeout(() => {
-        setLoading(false);
-        if (error) setError(error);
-      }, remainingTime);
-    } else {
+    // Set a timeout to prevent infinite loading
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    timeoutRef.current = setTimeout(() => {
+      console.warn(`${debugComponent} - Loading timeout reached, forcing state reset`);
       setLoading(false);
-      if (error) setError(error);
+      startTimeRef.current = null;
+    }, effectiveTimeout);
+  };
+  
+  const stopLoading = () => {
+    if (skipLoadingState) return;
+    
+    // If there's a min duration, check if we need to delay the stop
+    if (startTimeRef.current && effectiveMinDuration > 0) {
+      const elapsedTime = Date.now() - startTimeRef.current;
+      
+      if (elapsedTime < effectiveMinDuration) {
+        // We need to wait a bit more before stopping
+        const remainingTime = effectiveMinDuration - elapsedTime;
+        
+        setTimeout(() => {
+          console.debug(`${debugComponent} - Min duration satisfied, stopping loading state`);
+          setLoading(false);
+          startTimeRef.current = null;
+          
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
+        }, remainingTime);
+        
+        return;
+      }
     }
-  }, [startTime, minLoadTime]);
-
-  // Setup safety timeout to prevent infinite loading states
+    
+    // If no min duration or it's already satisfied
+    console.debug(`${debugComponent} - Stopping loading state`);
+    setLoading(false);
+    startTimeRef.current = null;
+    
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+  
+  // Cleanup on unmount
   useEffect(() => {
-    let timeoutId: number | undefined;
-    
-    if (loading && timeout > 0) {
-      timeoutId = window.setTimeout(() => {
-        console.warn('Loading timeout reached, forcing stop');
-        stopLoading(new Error('Loading timeout reached'));
-      }, timeout);
-    }
-    
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [loading, timeout, stopLoading]);
-
-  return { 
-    loading, 
-    setLoading, 
-    startLoading, 
-    stopLoading, 
-    error, 
-    setError 
+  }, []);
+  
+  return {
+    loading,
+    startLoading,
+    stopLoading
   };
 };

@@ -9,6 +9,9 @@ export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Pending';
 // Loại tài khoản giao dịch
 export type TradingAccountType = 'Live' | 'Demo' | 'Practice';
 
+// Trạng thái sức khỏe kết nối
+export type HealthStatus = 'healthy' | 'warning' | 'critical';
+
 // Thông tin kết nối
 export interface Connection {
   accountId: string;
@@ -17,8 +20,7 @@ export interface Connection {
   lastDisconnectionTime?: string;
   errorMessage?: string;
   reconnectAttempts?: number;
-  healthStatus?: 'healthy' | 'warning' | 'critical';
+  healthStatus?: HealthStatus;
   successfulConnections?: number;
   failedConnections?: number;
 }
-

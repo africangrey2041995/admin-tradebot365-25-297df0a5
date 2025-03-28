@@ -30,6 +30,15 @@ export interface Account {
   brokerTitle?: string;         // New field from Ctrader structure
   depositCurrency?: string;     // New field from Ctrader structure
   leverage?: number;            // New field from Ctrader structure
+  
+  // Connection monitoring fields
+  lastConnectionTime?: string;
+  lastDisconnectionTime?: string;
+  errorMessage?: string;
+  reconnectAttempts?: number;
+  successfulConnections?: number;
+  failedConnections?: number;
+  healthStatus?: 'healthy' | 'warning' | 'critical';
 }
 
 // Admin-specific account interface with extended properties

@@ -35,7 +35,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const { loading: isReconnecting, startLoading, stopLoading } = useSafeLoading({
-    minLoadTime: 800
+    minLoadingDurationMs: 800
   });
 
   // Generate mock connection details for demo purposes
