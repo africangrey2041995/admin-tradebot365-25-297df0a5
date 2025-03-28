@@ -52,6 +52,7 @@ import { UserStatusToggle } from '@/components/admin/users/UserStatusToggle';
 import { LockAccountDialog } from '@/components/admin/users/LockAccountDialog';
 import { UnlockAccountDialog } from '@/components/admin/users/UnlockAccountDialog';
 import { toast } from 'sonner';
+import { UserSubscription } from '@/types/subscription';
 
 const RoleBadge = ({ role }: { role: string }) => {
   return (
