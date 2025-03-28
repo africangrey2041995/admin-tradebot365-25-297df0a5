@@ -116,10 +116,10 @@ const cancelSubscription = async (subscriptionId: string): Promise<void> => {
   console.log(`Cancelling subscription ${subscriptionId}`);
 };
 
-const renewSubscription = async (subscriptionId: string): Promise<void> => {
+const renewSubscription = async (subscriptionId: string, renewalPeriods: number = 1): Promise<void> => {
   await new Promise(resolve => setTimeout(resolve, 700));
   
-  console.log(`Renewing subscription ${subscriptionId}`);
+  console.log(`Renewing subscription ${subscriptionId} for ${renewalPeriods} periods`);
 };
 
 const bulkCancelSubscriptions = async (subscriptionIds: string[]): Promise<void> => {
@@ -128,10 +128,13 @@ const bulkCancelSubscriptions = async (subscriptionIds: string[]): Promise<void>
   console.log(`Cancelling ${subscriptionIds.length} subscriptions: `, subscriptionIds);
 };
 
-const bulkRenewSubscriptions = async (subscriptionIds: string[]): Promise<void> => {
+const bulkRenewSubscriptions = async (
+  subscriptionIds: string[], 
+  renewalPeriods: number = 1
+): Promise<void> => {
   await new Promise(resolve => setTimeout(resolve, 1200));
   
-  console.log(`Renewing ${subscriptionIds.length} subscriptions: `, subscriptionIds);
+  console.log(`Renewing ${subscriptionIds.length} subscriptions for ${renewalPeriods} periods: `, subscriptionIds);
 };
 
 const bulkUpdateSubscriptionStatus = async (
@@ -190,7 +193,8 @@ export function useSubscriptionManagement() {
   });
 
   const renewMutation = useMutation({
-    mutationFn: renewSubscription,
+    mutationFn: ({ subscriptionId, renewalPeriods }: { subscriptionId: string, renewalPeriods: number }) =>
+      renewSubscription(subscriptionId, renewalPeriods),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminSubscriptions'] });
       toast.success('Đăng ký đã được gia hạn thành công');
@@ -215,7 +219,8 @@ export function useSubscriptionManagement() {
   });
 
   const bulkRenewMutation = useMutation({
-    mutationFn: bulkRenewSubscriptions,
+    mutationFn: ({ ids, renewalPeriods }: { ids: string[], renewalPeriods: number }) => 
+      bulkRenewSubscriptions(ids, renewalPeriods),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminSubscriptions'] });
       toast.success(`${selectedSubscriptionIds.length} đăng ký đã được gia hạn thành công`);
@@ -295,9 +300,12 @@ export function useSubscriptionManagement() {
     }
   };
 
-  const handleConfirmRenew = () => {
+  const handleConfirmRenew = (renewalPeriods: number = 1) => {
     if (selectedSubscription) {
-      renewMutation.mutate(selectedSubscription.id);
+      renewMutation.mutate({ 
+        subscriptionId: selectedSubscription.id,
+        renewalPeriods
+      });
     }
   };
 
@@ -320,7 +328,7 @@ export function useSubscriptionManagement() {
     setIsBulkActionDialogOpen(true);
   };
 
-  const handleConfirmBulkAction = (newStatus?: SubscriptionStatus) => {
+  const handleConfirmBulkAction = (newStatus?: SubscriptionStatus, renewalPeriods?: number) => {
     if (selectedSubscriptionIds.length === 0) return;
 
     switch (bulkAction) {
@@ -328,7 +336,10 @@ export function useSubscriptionManagement() {
         bulkCancelMutation.mutate(selectedSubscriptionIds);
         break;
       case 'renew':
-        bulkRenewMutation.mutate(selectedSubscriptionIds);
+        bulkRenewMutation.mutate({ 
+          ids: selectedSubscriptionIds, 
+          renewalPeriods: renewalPeriods || 1 
+        });
         break;
       case 'change-status':
         if (newStatus) {

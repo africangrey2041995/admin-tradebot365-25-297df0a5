@@ -149,6 +149,7 @@ const SubscriptionsPage: React.FC = () => {
         isProcessing={isBulkProcessing}
         status={newBulkStatus}
         setStatus={setNewBulkStatus}
+        currentPeriod={selectedSubscription?.currentPeriod}
       />
       
       {/* Thanh hành động hàng loạt */}

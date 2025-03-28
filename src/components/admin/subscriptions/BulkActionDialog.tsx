@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,18 +10,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calendar } from 'lucide-react';
 import { SubscriptionStatus } from '@/types/subscription';
+import { format, addMonths, addDays, addYears } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 interface BulkActionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   count: number;
   action: 'cancel' | 'renew' | 'change-status';
-  onConfirm: (newStatus?: SubscriptionStatus) => void;
+  onConfirm: (newStatus?: SubscriptionStatus, renewalPeriods?: number) => void;
   isProcessing: boolean;
   status?: SubscriptionStatus;
   setStatus?: (status: SubscriptionStatus) => void;
+  currentPeriod?: 'monthly' | 'quarterly' | 'yearly';
 }
 
 export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
@@ -33,7 +36,51 @@ export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
   isProcessing,
   status,
   setStatus,
+  currentPeriod = 'monthly', // Mặc định nếu không có
 }) => {
+  const [renewalPeriods, setRenewalPeriods] = useState<number>(1);
+  const [estimatedEndDate, setEstimatedEndDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Tính ngày ước tính khi mở dialog gia hạn
+    if (action === 'renew') {
+      calculateEstimatedEndDate(1);
+    }
+  }, [action, open]);
+
+  const calculateEstimatedEndDate = (periods: number) => {
+    // Tính ngày kết thúc ước tính dựa trên ngày hiện tại
+    const currentDate = new Date();
+    let newDate: Date;
+
+    switch (currentPeriod) {
+      case 'monthly':
+        newDate = addMonths(currentDate, periods);
+        break;
+      case 'quarterly':
+        newDate = addMonths(currentDate, periods * 3);
+        break;
+      case 'yearly':
+        newDate = addYears(currentDate, periods);
+        break;
+      default:
+        newDate = addDays(currentDate, 30 * periods);
+    }
+
+    setEstimatedEndDate(newDate);
+  };
+
+  const handlePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const periods = parseInt(e.target.value);
+    setRenewalPeriods(periods);
+    calculateEstimatedEndDate(periods);
+  };
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    return format(date, 'dd/MM/yyyy', { locale: vi });
+  };
+
   const getTitle = () => {
     switch (action) {
       case 'cancel':
@@ -86,6 +133,19 @@ export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
     }
   };
 
+  const getPeriodLabel = () => {
+    switch (currentPeriod) {
+      case 'monthly':
+        return 'tháng';
+      case 'quarterly':
+        return 'quý';
+      case 'yearly':
+        return 'năm';
+      default:
+        return 'kỳ';
+    }
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
@@ -112,6 +172,42 @@ export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
                 </select>
               </div>
             )}
+            
+            {action === 'renew' && (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label htmlFor="bulk-renewal-periods" className="block text-sm font-medium mb-1">
+                    Số kỳ gia hạn:
+                  </label>
+                  <select 
+                    id="bulk-renewal-periods" 
+                    value={renewalPeriods}
+                    onChange={handlePeriodChange}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md p-2 text-white"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 12].map(period => (
+                      <option key={period} value={period}>
+                        {period} {getPeriodLabel()}
+                        {period > 1 ? '' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {estimatedEndDate && (
+                  <div className="bg-zinc-800 p-3 rounded-md border border-zinc-700">
+                    <div className="flex items-center text-zinc-400 mb-1">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span className="text-sm">Ước tính ngày hết hạn:</span>
+                    </div>
+                    <p className="font-medium text-green-400">{formatDate(estimatedEndDate)}</p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Lưu ý: Đây là ngày ước tính dựa trên ngày hiện tại, ngày chính xác sẽ tùy thuộc vào ngày hết hạn hiện tại của từng đăng ký.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -121,7 +217,13 @@ export const BulkActionDialog: React.FC<BulkActionDialogProps> = ({
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
-              onConfirm(action === 'change-status' ? status : undefined);
+              if (action === 'renew') {
+                onConfirm(undefined, renewalPeriods);
+              } else if (action === 'change-status') {
+                onConfirm(status);
+              } else {
+                onConfirm();
+              }
             }}
             disabled={isProcessing}
             className={getButtonClass()}
