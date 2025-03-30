@@ -1,11 +1,8 @@
 
 /**
- * Type definitions for account hierarchical structure
+ * Types liên quan đến tài khoản trong chi tiết Prop Trading Bot
  */
 
-import { Account } from '@/types';
-
-// Type definitions for hierarchical structure
 export interface TradingAccount {
   tradingAccountId: string;
   tradingAccountNumber: string;
@@ -13,39 +10,23 @@ export interface TradingAccount {
   tradingAccountBalance: string;
   isLive: boolean;
   status: string;
+  [key: string]: any;
 }
 
 export interface CSPAccount {
   cspAccountId: string;
   cspAccountName: string;
+  cspUserName: string;
+  cspUserEmail: string;
   apiName: string;
-  status: string;
-  email: string;
   tradingAccounts: TradingAccount[];
+  [key: string]: any;
 }
 
 export interface UserAccount {
   userId: string;
-  email: string;
-  name: string;
+  userName: string;
+  userEmail: string;
   cspAccounts: CSPAccount[];
-}
-
-export interface AccountsCount {
-  totalUsers: number;
-  totalCSP: number;
-  totalTrading: number;
-}
-
-export interface AccountsFilterParams {
-  searchQuery: string;
-  filterStatus: string;
-  filterLiveDemo: string;
-}
-
-export interface AccountsActionHandlers {
-  onRefresh: () => void;
-  onEdit?: (account: Account) => void;
-  onDelete?: (accountId: string) => void;
-  onToggleConnection?: (accountId: string) => void;
+  [key: string]: any;
 }

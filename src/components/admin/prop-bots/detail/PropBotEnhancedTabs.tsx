@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,8 @@ import { CoinstratSignal } from '@/types/signal';
 import { useCoinstratLogs } from '@/components/bots/coinstrat-logs/useCoinstratLogs';
 import UnifiedSignalLogsTab from './UnifiedSignalLogsTab';
 import BotIntegrationInfo from '@/pages/admin/components/BotIntegrationInfo';
+import { TradingAccount } from './types/account-types'; 
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface PropBotEnhancedTabsProps {
   activeTab: string;
@@ -57,6 +60,11 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
 }) => {
   const [logsFilters, setLogsFilters] = useState({ search: '', status: 'all', time: 'all' });
   const [refreshLogsCounter, setRefreshLogsCounter] = useState(0);
+  
+  // State cho quản lý tài khoản hàng loạt
+  const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [dialogAction, setDialogAction] = useState<'delete' | 'disconnect' | null>(null);
 
   const { logs: allLogs, fetchLogs } = useCoinstratLogs({
     botId,
@@ -70,6 +78,47 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   useEffect(() => {
     setLogsLoading(isLoading);
   }, [isLoading]);
+
+  // Xử lý chọn/bỏ chọn tài khoản
+  const handleToggleSelect = (accountId: string) => {
+    setSelectedAccounts(prev => {
+      if (prev.includes(accountId)) {
+        return prev.filter(id => id !== accountId);
+      } else {
+        return [...prev, accountId];
+      }
+    });
+  };
+
+  // Xử lý xóa tài khoản hàng loạt
+  const handleBulkDelete = () => {
+    setDialogAction('delete');
+    setConfirmDialogOpen(true);
+  };
+
+  // Xử lý ngắt kết nối tài khoản hàng loạt
+  const handleBulkDisconnect = () => {
+    setDialogAction('disconnect');
+    setConfirmDialogOpen(true);
+  };
+
+  // Xử lý xác nhận hành động hàng loạt
+  const handleConfirmAction = () => {
+    if (dialogAction === 'delete') {
+      // Thực hiện xóa tài khoản
+      toast.success(`Đã xóa ${selectedAccounts.length} tài khoản`);
+      // Thực tế cần gọi API xóa tài khoản ở đây
+    } else if (dialogAction === 'disconnect') {
+      // Thực hiện ngắt kết nối tài khoản
+      toast.success(`Đã ngắt kết nối ${selectedAccounts.length} tài khoản`);
+      // Thực tế cần gọi API ngắt kết nối tài khoản ở đây
+    }
+    
+    // Reset state sau khi hoàn tất
+    setSelectedAccounts([]);
+    setConfirmDialogOpen(false);
+    setDialogAction(null);
+  };
 
   const filteredLogs = useMemo(() => {
     let filtered = [...allLogs];
@@ -196,79 +245,105 @@ const PropBotEnhancedTabs: React.FC<PropBotEnhancedTabsProps> = ({
   };
 
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="overview">
-          <BarChart2 className="h-4 w-4 mr-2" />
-          Tổng quan
-        </TabsTrigger>
-        <TabsTrigger value="connected-accounts">
-          <List className="h-4 w-4 mr-2" />
-          Tài khoản kết nối
-        </TabsTrigger>
-        <TabsTrigger value="signal-tracking">
-          <NetworkIcon className="h-4 w-4 mr-2" />
-          Signal Tracking
-        </TabsTrigger>
-        <TabsTrigger value="integration">
-          <Webhook className="h-4 w-4 mr-2" />
-          Tích hợp TradingView
-        </TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="overview" className="space-y-4">
-        <AdminPropBotOverviewTab 
-          propBot={propBot}
-          botStats={botStats}
-          botInfo={botInfo}
-          challengeRules={challengeRules}
-          onUpdateBot={onUpdateBot}
-          onUpdateChallengeRules={onUpdateChallengeRules}
-        />
-      </TabsContent>
-      
-      <TabsContent value="connected-accounts">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex justify-end mb-4">
-              <ExportDataDropdown 
-                data={accountsExportData}
-                headers={accountsExportHeaders}
-                fileName={`prop-bot-${botId}-accounts`}
-              />
-            </div>
-            {connectedAccounts && connectedAccounts.length > 0 ? (
-              <HierarchicalAccountsTable 
-                accounts={connectedAccounts}
-                onRefresh={onRefresh}
-                onEdit={handleEditAccount}
-                onDelete={handleDeleteAccount}
-                onToggleConnection={handleToggleConnection}
-              />
-            ) : (
-              <div className="text-center py-10 text-gray-500">
-                No connected accounts found for this bot.
+    <>
+      <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">
+            <BarChart2 className="h-4 w-4 mr-2" />
+            Tổng quan
+          </TabsTrigger>
+          <TabsTrigger value="connected-accounts">
+            <List className="h-4 w-4 mr-2" />
+            Tài khoản kết nối
+          </TabsTrigger>
+          <TabsTrigger value="signal-tracking">
+            <NetworkIcon className="h-4 w-4 mr-2" />
+            Signal Tracking
+          </TabsTrigger>
+          <TabsTrigger value="integration">
+            <Webhook className="h-4 w-4 mr-2" />
+            Tích hợp TradingView
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-4">
+          <AdminPropBotOverviewTab 
+            propBot={propBot}
+            botStats={botStats}
+            botInfo={botInfo}
+            challengeRules={challengeRules}
+            onUpdateBot={onUpdateBot}
+            onUpdateChallengeRules={onUpdateChallengeRules}
+          />
+        </TabsContent>
+        
+        <TabsContent value="connected-accounts">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-end mb-4">
+                <ExportDataDropdown 
+                  data={accountsExportData}
+                  headers={accountsExportHeaders}
+                  fileName={`prop-bot-${botId}-accounts`}
+                />
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="signal-tracking">
-        <UnifiedSignalLogsTab
-          botId={botId}
-          userId={userId}
-        />
-      </TabsContent>
-      
-      <TabsContent value="integration">
-        <Card>
-          <CardContent className="p-6">
-            <BotIntegrationInfo botId={botId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+              {connectedAccounts && connectedAccounts.length > 0 ? (
+                <HierarchicalAccountsTable 
+                  accounts={connectedAccounts}
+                  onRefresh={onRefresh}
+                  onEdit={handleEditAccount}
+                  onDelete={handleDeleteAccount}
+                  onToggleConnection={handleToggleConnection}
+                  selectedAccounts={selectedAccounts}
+                  onToggleSelect={handleToggleSelect}
+                />
+              ) : (
+                <div className="text-center py-10 text-gray-500">
+                  No connected accounts found for this bot.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="signal-tracking">
+          <UnifiedSignalLogsTab
+            botId={botId}
+            userId={userId}
+          />
+        </TabsContent>
+        
+        <TabsContent value="integration">
+          <Card>
+            <CardContent className="p-6">
+              <BotIntegrationInfo botId={botId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Dialog xác nhận hành động hàng loạt */}
+      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {dialogAction === 'delete' ? 'Xác nhận xóa tài khoản' : 'Xác nhận ngắt kết nối'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {dialogAction === 'delete'
+                ? `Bạn có chắc chắn muốn xóa ${selectedAccounts.length} tài khoản đã chọn không?`
+                : `Bạn có chắc chắn muốn ngắt kết nối ${selectedAccounts.length} tài khoản đã chọn không?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction}>
+              {dialogAction === 'delete' ? 'Xóa' : 'Ngắt kết nối'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
