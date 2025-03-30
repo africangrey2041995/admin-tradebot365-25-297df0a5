@@ -111,7 +111,7 @@ const AccountsAccordionGroup: React.FC<AccountsAccordionGroupProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <span className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-xs px-2 py-1 rounded-full">
-              {accounts.length} CSP {accounts.length > 1 ? 'Accounts' : 'Account'}
+              {Object.keys(cspGroups).length} CSP {Object.keys(cspGroups).length > 1 ? 'Accounts' : 'Account'}
             </span>
           </div>
         </div>

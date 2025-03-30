@@ -19,6 +19,8 @@ export interface CSPAccount {
   cspUserName: string;
   cspUserEmail: string;
   apiName: string;
+  apiId?: string;
+  status?: string;
   tradingAccounts: TradingAccount[];
   [key: string]: any;
 }
@@ -29,4 +31,16 @@ export interface UserAccount {
   userEmail: string;
   cspAccounts: CSPAccount[];
   [key: string]: any;
+}
+
+export interface AccountsFilterParams {
+  searchQuery: string;
+  filterStatus: 'all' | 'connected' | 'disconnected' | 'error' | 'pending';
+  filterLiveDemo: 'all' | 'live' | 'demo';
+}
+
+export interface AccountsCount {
+  users: number;
+  cspAccounts: number;
+  tradingAccounts: number;
 }

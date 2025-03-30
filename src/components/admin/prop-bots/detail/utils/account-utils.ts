@@ -1,8 +1,6 @@
 
 import { Account } from '@/types';
 import { UserAccount, CSPAccount, TradingAccount, AccountsFilterParams } from '../types/account-types';
-import { Badge } from '@/components/ui/badge';
-import React from 'react';
 
 /**
  * SECTION: Hierarchical Data Structure Transformation
@@ -25,8 +23,8 @@ export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount
     if (!userMap.has(account.cspUserId)) {
       userMap.set(account.cspUserId, {
         userId: account.cspUserId,
-        email: account.cspUserEmail,
-        name: account.userAccount || account.cspUserEmail.split('@')[0],
+        userName: account.cspUserName || account.cspUserEmail.split('@')[0],
+        userEmail: account.cspUserEmail,
         cspAccounts: []
       });
     }
@@ -40,9 +38,10 @@ export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount
       cspAccount = {
         cspAccountId: account.cspAccountId || '',
         cspAccountName: account.cspAccountName || '',
+        cspUserName: account.cspUserName || '',
+        cspUserEmail: account.cspUserEmail || '',
         apiName: account.apiName || '',
         status: account.status || '',
-        email: account.cspUserEmail || '',
         tradingAccounts: []
       };
       user.cspAccounts.push(cspAccount);
@@ -78,8 +77,6 @@ export const filterAccountData = (
   data: UserAccount[], 
   filters: AccountsFilterParams
 ): UserAccount[] => {
-  console.log('Filtering accounts with:', filters);
-  
   // If no filters are applied, return the original data
   if (!filters.searchQuery && filters.filterStatus === 'all' && filters.filterLiveDemo === 'all') {
     return data;
@@ -89,12 +86,11 @@ export const filterAccountData = (
     // Apply search filtering
     if (filters.searchQuery) {
       const searchLower = filters.searchQuery.toLowerCase();
-      console.log(`Searching for: "${searchLower}" in user: ${user.name}`);
       
       // Check if user data matches search
       const matchesUser = 
-        user.name.toLowerCase().includes(searchLower) || 
-        user.email.toLowerCase().includes(searchLower) || 
+        user.userName.toLowerCase().includes(searchLower) || 
+        user.userEmail.toLowerCase().includes(searchLower) || 
         user.userId.toLowerCase().includes(searchLower);
       
       // Check if any CSP account matches search  
@@ -112,18 +108,15 @@ export const filterAccountData = (
       
       // If nothing matches the search, exclude this user
       if (!(matchesUser || matchesCSP || matchesTrading)) {
-        console.log(`No match found for user: ${user.name}`);
         return false;
       }
-      
-      console.log(`Match found for user: ${user.name}`);
     }
     
     // Filter by status if not 'all'
     if (filters.filterStatus !== 'all') {
       const statusMatches = user.cspAccounts.some(csp => 
-        csp.status.toLowerCase() === filters.filterStatus ||
-        csp.tradingAccounts.some(account => account.status.toLowerCase() === filters.filterStatus)
+        (csp.status || '').toLowerCase() === filters.filterStatus ||
+        csp.tradingAccounts.some(account => (account.status || '').toLowerCase() === filters.filterStatus)
       );
       
       if (!statusMatches) return false;
@@ -169,29 +162,6 @@ export const getTotalCounts = (data: UserAccount[]) => {
 };
 
 /**
- * SECTION: UI Components and Display Utils
- */
-
-/**
- * Get styled status badge based on connection status
- * @param status - Connection status string
- * @returns React Badge component with appropriate styling
- */
-export const getStatusBadge = (status: string) => {
-  if (status.toLowerCase() === 'connected') {
-    return React.createElement(Badge, { 
-      variant: "outline", 
-      className: "bg-green-50 text-green-700 border-green-200" 
-    }, "Connected");
-  } else {
-    return React.createElement(Badge, { 
-      variant: "outline", 
-      className: "bg-red-50 text-red-700 border-red-200" 
-    }, "Disconnected");
-  }
-};
-
-/**
  * SECTION: Data Management and Lookup Utils
  */
 
@@ -233,7 +203,7 @@ export const prepareExportData = (data: UserAccount[]): (string | number)[][] =>
       cspAccount.tradingAccounts.forEach(tradingAccount => {
         exportData.push([
           tradingAccount.tradingAccountNumber,
-          user.email,
+          user.userEmail,
           cspAccount.apiName,
           tradingAccount.tradingAccountType,
           tradingAccount.status,
@@ -244,4 +214,59 @@ export const prepareExportData = (data: UserAccount[]): (string | number)[][] =>
   });
   
   return exportData;
+};
+
+/**
+ * Trích xuất trading accounts từ một account
+ */
+export const extractTradingAccounts = (account: Account): TradingAccount[] => {
+  // Nếu account có tradingAccounts, sử dụng nó
+  if (account.tradingAccounts && Array.isArray(account.tradingAccounts)) {
+    return account.tradingAccounts.map(ta => ({
+      ...ta,
+      tradingAccountId: ta.tradingAccountId || '',
+      tradingAccountNumber: ta.tradingAccountNumber || 'Unknown',
+      tradingAccountType: ta.tradingAccountType || 'Unknown',
+      tradingAccountBalance: ta.tradingAccountBalance || '$0.00',
+      isLive: ta.isLive || false,
+      status: ta.status || 'Disconnected',
+    }));
+  }
+  
+  // Nếu không có tradingAccounts, tạo một mảng trống
+  return [];
+};
+
+/**
+ * Nhóm tài khoản theo CSP
+ */
+export const groupAccountsByCSP = (accounts: Account[]): Record<string, Account> => {
+  return accounts.reduce((grouped, account) => {
+    if (account.cspAccountId) {
+      grouped[account.cspAccountId] = account;
+    }
+    return grouped;
+  }, {} as Record<string, Account>);
+};
+
+/**
+ * Lấy tài khoản CSP từ accounts dựa trên cspAccountId
+ */
+export const getCSPAccountById = (accounts: Account[], cspAccountId: string): Account | undefined => {
+  return accounts.find(account => account.cspAccountId === cspAccountId);
+};
+
+/**
+ * Lấy trading account từ accounts dựa trên tradingAccountId
+ */
+export const getTradingAccountById = (accounts: Account[], tradingAccountId: string): TradingAccount | undefined => {
+  for (const account of accounts) {
+    if (account.tradingAccounts) {
+      const tradingAccount = account.tradingAccounts.find(ta => ta.tradingAccountId === tradingAccountId);
+      if (tradingAccount) {
+        return tradingAccount;
+      }
+    }
+  }
+  return undefined;
 };
