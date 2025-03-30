@@ -1,10 +1,34 @@
 
 import { Account } from '@/types';
-import { UserAccount, CSPAccount, TradingAccount, AccountsFilterParams } from '../types/account-types';
+import { TradingAccount, UserAccount, CSPAccount, AccountsFilterParams } from '../types/account-types';
+import { Badge } from '@/components/ui/badge';
+import React from 'react';
 
 /**
  * SECTION: Hierarchical Data Structure Transformation
  */
+
+/**
+ * Tạo và trả về badge phù hợp với trạng thái
+ */
+export const getStatusBadge = (status?: string) => {
+  if (!status) {
+    return <Badge variant="outline">Unknown</Badge>;
+  }
+
+  switch (status.toLowerCase()) {
+    case 'connected':
+      return <Badge className="bg-green-500 hover:bg-green-600">Connected</Badge>;
+    case 'disconnected':
+      return <Badge variant="secondary">Disconnected</Badge>;
+    case 'error':
+      return <Badge variant="destructive">Error</Badge>;
+    case 'pending':
+      return <Badge className="bg-amber-500 hover:bg-amber-600">Pending</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
 
 /**
  * Transform flat account list into hierarchical structure
@@ -41,6 +65,7 @@ export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount
         cspUserName: account.cspUserName || '',
         cspUserEmail: account.cspUserEmail || '',
         apiName: account.apiName || '',
+        apiId: account.apiId || '',
         status: account.status || '',
         tradingAccounts: []
       };
@@ -48,16 +73,18 @@ export const organizeAccountsHierarchically = (accounts: Account[]): UserAccount
     }
     
     // Add trading account
-    const tradingAccount: TradingAccount = {
-      tradingAccountId: account.tradingAccountId || '',
-      tradingAccountNumber: account.tradingAccountNumber || '',
-      tradingAccountType: account.tradingAccountType || '',
-      tradingAccountBalance: account.tradingAccountBalance || '',
-      isLive: account.isLive || false,
-      status: account.status || ''
-    };
-    
-    cspAccount.tradingAccounts.push(tradingAccount);
+    if (account.tradingAccountId) {
+      const tradingAccount: TradingAccount = {
+        tradingAccountId: account.tradingAccountId || '',
+        tradingAccountNumber: account.tradingAccountNumber || '',
+        tradingAccountType: account.tradingAccountType || '',
+        tradingAccountBalance: account.tradingAccountBalance || '',
+        isLive: account.isLive || false,
+        status: account.status || ''
+      };
+      
+      cspAccount.tradingAccounts.push(tradingAccount);
+    }
   });
   
   return Array.from(userMap.values());
@@ -158,7 +185,15 @@ export const getTotalCounts = (data: UserAccount[]) => {
     ), 0
   );
   
-  return { totalUsers, totalCSP, totalTrading };
+  return { 
+    totalUsers, 
+    totalCSP, 
+    totalTrading,
+    // Đồng bộ với tên trường mới trong interface
+    users: totalUsers,
+    cspAccounts: totalCSP,
+    tradingAccounts: totalTrading
+  };
 };
 
 /**
@@ -179,11 +214,80 @@ export const findOriginalAccount = (
   cspAccountId: string, 
   tradingAccountId?: string
 ): Account | undefined => {
-  return accounts.find(acc => 
-    acc.cspUserId === userId && 
-    acc.cspAccountId === cspAccountId && 
-    (tradingAccountId ? acc.tradingAccountId === tradingAccountId : true)
-  );
+  if (tradingAccountId) {
+    // Tìm account dựa trên cả tradingAccountId
+    return accounts.find(acc => 
+      acc.cspUserId === userId && 
+      acc.cspAccountId === cspAccountId && 
+      acc.tradingAccountId === tradingAccountId
+    );
+  } else {
+    // Chỉ tìm theo userId và cspAccountId
+    return accounts.find(acc => 
+      acc.cspUserId === userId && 
+      acc.cspAccountId === cspAccountId
+    );
+  }
+};
+
+/**
+ * Trích xuất trading accounts từ một account
+ */
+export const extractTradingAccounts = (account: Account): TradingAccount[] => {
+  // Trong trường hợp Account đã có sẵn thông tin trading account
+  if (account.tradingAccountId) {
+    return [{
+      tradingAccountId: account.tradingAccountId || '',
+      tradingAccountNumber: account.tradingAccountNumber || 'Unknown',
+      tradingAccountType: account.tradingAccountType || 'Unknown',
+      tradingAccountBalance: account.tradingAccountBalance || '$0.00',
+      isLive: account.isLive || false,
+      status: account.status || 'Disconnected',
+    }];
+  }
+  
+  // Nếu không có tradingAccounts, tạo một mảng trống
+  return [];
+};
+
+/**
+ * Nhóm tài khoản theo CSP
+ */
+export const groupAccountsByCSP = (accounts: Account[]): Record<string, Account> => {
+  return accounts.reduce((grouped, account) => {
+    if (account.cspAccountId) {
+      grouped[account.cspAccountId] = account;
+    }
+    return grouped;
+  }, {} as Record<string, Account>);
+};
+
+/**
+ * Lấy tài khoản CSP từ accounts dựa trên cspAccountId
+ */
+export const getCSPAccountById = (accounts: Account[], cspAccountId: string): Account | undefined => {
+  return accounts.find(account => account.cspAccountId === cspAccountId);
+};
+
+/**
+ * Lấy trading account từ accounts dựa trên tradingAccountId
+ */
+export const getTradingAccountById = (accounts: Account[], tradingAccountId: string): TradingAccount | undefined => {
+  // Tìm account có tradingAccountId tương ứng
+  const account = accounts.find(acc => acc.tradingAccountId === tradingAccountId);
+  
+  if (account) {
+    return {
+      tradingAccountId: account.tradingAccountId || '',
+      tradingAccountNumber: account.tradingAccountNumber || '',
+      tradingAccountType: account.tradingAccountType || '',
+      tradingAccountBalance: account.tradingAccountBalance || '',
+      isLive: account.isLive || false,
+      status: account.status || ''
+    };
+  }
+  
+  return undefined;
 };
 
 /**
@@ -214,59 +318,4 @@ export const prepareExportData = (data: UserAccount[]): (string | number)[][] =>
   });
   
   return exportData;
-};
-
-/**
- * Trích xuất trading accounts từ một account
- */
-export const extractTradingAccounts = (account: Account): TradingAccount[] => {
-  // Nếu account có tradingAccounts, sử dụng nó
-  if (account.tradingAccounts && Array.isArray(account.tradingAccounts)) {
-    return account.tradingAccounts.map(ta => ({
-      ...ta,
-      tradingAccountId: ta.tradingAccountId || '',
-      tradingAccountNumber: ta.tradingAccountNumber || 'Unknown',
-      tradingAccountType: ta.tradingAccountType || 'Unknown',
-      tradingAccountBalance: ta.tradingAccountBalance || '$0.00',
-      isLive: ta.isLive || false,
-      status: ta.status || 'Disconnected',
-    }));
-  }
-  
-  // Nếu không có tradingAccounts, tạo một mảng trống
-  return [];
-};
-
-/**
- * Nhóm tài khoản theo CSP
- */
-export const groupAccountsByCSP = (accounts: Account[]): Record<string, Account> => {
-  return accounts.reduce((grouped, account) => {
-    if (account.cspAccountId) {
-      grouped[account.cspAccountId] = account;
-    }
-    return grouped;
-  }, {} as Record<string, Account>);
-};
-
-/**
- * Lấy tài khoản CSP từ accounts dựa trên cspAccountId
- */
-export const getCSPAccountById = (accounts: Account[], cspAccountId: string): Account | undefined => {
-  return accounts.find(account => account.cspAccountId === cspAccountId);
-};
-
-/**
- * Lấy trading account từ accounts dựa trên tradingAccountId
- */
-export const getTradingAccountById = (accounts: Account[], tradingAccountId: string): TradingAccount | undefined => {
-  for (const account of accounts) {
-    if (account.tradingAccounts) {
-      const tradingAccount = account.tradingAccounts.find(ta => ta.tradingAccountId === tradingAccountId);
-      if (tradingAccount) {
-        return tradingAccount;
-      }
-    }
-  }
-  return undefined;
 };

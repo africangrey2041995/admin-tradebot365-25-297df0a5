@@ -20,7 +20,7 @@ export interface CSPAccount {
   cspUserEmail: string;
   apiName: string;
   apiId?: string;
-  status?: string;
+  status: string; // Thay đổi từ optional thành required
   tradingAccounts: TradingAccount[];
   [key: string]: any;
 }
@@ -43,4 +43,8 @@ export interface AccountsCount {
   users: number;
   cspAccounts: number;
   tradingAccounts: number;
+  // Thêm các trường tương đương với các tên khác đang được sử dụng
+  totalUsers: number;
+  totalCSP: number;
+  totalTrading: number;
 }
