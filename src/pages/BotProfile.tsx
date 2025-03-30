@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -152,10 +153,18 @@ const BotProfile = () => {
 
   const handleUpdateBot = (updatedBot: Partial<BotCardProps>) => {
     if (bot) {
-      setBot({
+      console.log('Updating bot with new data:', updatedBot);
+      
+      // Cập nhật state bot với dữ liệu mới
+      const updatedBotData = {
         ...bot,
         ...updatedBot
-      });
+      };
+      
+      setBot(updatedBotData);
+      
+      // Log trạng thái sau khi cập nhật để debug
+      console.log('Bot updated, new status:', updatedBotData.status);
     }
   };
 
@@ -197,9 +206,9 @@ const BotProfile = () => {
     <MainLayout title="Hồ Sơ Bot">
       <div className="flex flex-col">
         <BotProfileHeader 
-          botId={bot.botId}
-          status={bot.status} 
-          botDetails={bot}
+          botId={bot?.botId || ''}
+          status={bot?.status || 'Inactive'} 
+          botDetails={bot as BotCardProps}
           onUpdateBot={handleUpdateBot}
         />
         

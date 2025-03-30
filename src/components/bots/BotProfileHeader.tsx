@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings, Trash, Power, UserPlus } from 'lucide-react';
@@ -30,6 +31,7 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false);
+  const [isStatusToggleLoading, setIsStatusToggleLoading] = useState(false);
   
   const handleBack = () => {
     try {
@@ -69,6 +71,29 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
     } catch (error) {
       console.error('Error adding account:', error);
       toast.error('Đã xảy ra lỗi khi thêm tài khoản');
+    }
+  };
+
+  const handleToggleBotStatus = () => {
+    setIsStatusToggleLoading(true);
+    
+    try {
+      // Giả lập thời gian xử lý
+      setTimeout(() => {
+        const newStatus = status === 'Active' ? 'Inactive' : 'Active';
+        
+        // Cập nhật trạng thái bot
+        onUpdateBot({ status: newStatus });
+        
+        const actionText = status === 'Active' ? 'dừng hoạt động' : 'kích hoạt';
+        toast.success(`Bot đã được ${actionText} thành công`);
+        
+        setIsStatusToggleLoading(false);
+      }, 800);
+    } catch (error) {
+      console.error('Error toggling bot status:', error);
+      toast.error('Đã xảy ra lỗi khi thay đổi trạng thái bot');
+      setIsStatusToggleLoading(false);
     }
   };
 
@@ -124,9 +149,18 @@ const BotProfileHeader = ({ botId, status, botDetails, onUpdateBot }: BotProfile
           <Settings className="h-4 w-4" />
           <span>Cài Đặt</span>
         </Button>
-        <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+        
+        <Button 
+          className={`flex items-center gap-2 ${status === 'Active' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+          onClick={handleToggleBotStatus}
+          disabled={isStatusToggleLoading}
+        >
           <Power className="h-4 w-4" />
-          <span>{status === 'Active' ? 'Dừng Bot' : 'Khởi Động Bot'}</span>
+          {isStatusToggleLoading ? (
+            <span>Đang xử lý...</span>
+          ) : (
+            <span>{status === 'Active' ? 'Dừng Bot' : 'Khởi Động Bot'}</span>
+          )}
         </Button>
       </div>
 
