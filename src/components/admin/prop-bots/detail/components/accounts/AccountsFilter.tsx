@@ -1,64 +1,65 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 import { AccountsFilterParams } from '../../types/account-types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AccountsFilterProps {
-  filters: AccountsFilterParams;
+  filterParams: AccountsFilterParams;
   onFilterChange: (key: keyof AccountsFilterParams, value: string) => void;
 }
 
-const AccountsFilter: React.FC<AccountsFilterProps> = ({ filters, onFilterChange }) => {
-  // Reset search when component unmounts
-  useEffect(() => {
-    return () => {
-      // Cleanup function - reset search if needed
-      console.log('AccountsFilter component unmounted');
-    };
-  }, []);
-
-  // Handle search input changes with debounce
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    console.log('Search value changed:', value);
-    onFilterChange('searchQuery', value);
-  };
-
-  // Ensure we always have a non-empty value for status filter
-  const handleStatusChange = (value: string) => {
-    if (value && value.trim() !== '') {
-      onFilterChange('filterStatus', value);
-    }
-  };
-
+const AccountsFilter: React.FC<AccountsFilterProps> = ({
+  filterParams,
+  onFilterChange
+}) => {
   return (
-    <div className="space-x-2 flex">
-      <div className="relative">
-        <Search className="h-4 w-4 absolute left-2.5 top-2.5 text-gray-500" />
+    <div className="flex flex-col md:flex-row gap-4 w-full">
+      <div className="flex-1">
         <Input
           placeholder="Search accounts..."
-          className="pl-8 w-64"
-          value={filters.searchQuery}
-          onChange={handleSearchChange}
+          value={filterParams.searchQuery}
+          onChange={(e) => onFilterChange('searchQuery', e.target.value)}
+          className="w-full"
         />
       </div>
-      
-      <Select 
-        value={filters.filterStatus} 
-        onValueChange={handleStatusChange}
-      >
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Statuses</SelectItem>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
-          <SelectItem value="error">Error</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex gap-2">
+        <Select 
+          value={filterParams.filterStatus} 
+          onValueChange={(value) => onFilterChange('filterStatus', value as AccountsFilterParams['filterStatus'])}
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="connected">Connected</SelectItem>
+            <SelectItem value="disconnected">Disconnected</SelectItem>
+            <SelectItem value="error">Error</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select 
+          value={filterParams.filterLiveDemo} 
+          onValueChange={(value) => onFilterChange('filterLiveDemo', value as AccountsFilterParams['filterLiveDemo'])}
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Account Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Accounts</SelectItem>
+            <SelectItem value="live">Live</SelectItem>
+            <SelectItem value="demo">Demo</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 };

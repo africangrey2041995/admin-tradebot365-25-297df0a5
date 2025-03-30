@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Pencil, Trash, Link, Link2Off } from 'lucide-react';
 import { Account } from '@/types';
 import { TradingAccount } from '../../types/account-types';
-import { getStatusBadge } from '../../utils/account-utils';
+import { getStatusBadge } from '../../utils/account-utils.tsx';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,

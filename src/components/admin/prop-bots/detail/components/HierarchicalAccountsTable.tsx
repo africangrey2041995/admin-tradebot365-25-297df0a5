@@ -52,8 +52,9 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
     setIsRefreshing(false);
   };
 
-  const handleFilterChange = (newFilters: Partial<AccountsFilterParams>) => {
-    setFilterParams(prev => ({ ...prev, ...newFilters }));
+  // Cập nhật hàm này để khớp với interface của AccountsFilter component
+  const handleFilterChange = (key: keyof AccountsFilterParams, value: string) => {
+    setFilterParams(prev => ({ ...prev, [key]: value }));
   };
 
   return (
