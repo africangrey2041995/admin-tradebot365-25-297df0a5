@@ -24,7 +24,7 @@ const BulkActionBar: React.FC<BulkActionBarProps> = ({
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-4 w-auto min-w-[360px]">
       <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30">
-        {selectedCount} API {selectedCount === 1 ? 'key' : 'keys'} đã chọn
+        {selectedCount} tài khoản đã chọn
       </Badge>
       
       <div className="flex-1 flex items-center gap-2 justify-end">

@@ -1,18 +1,20 @@
 
 import React from 'react';
-import { Loader2 } from "lucide-react";
+import { Loader } from 'lucide-react';
 
 interface LoadingAccountsProps {
   message?: string;
 }
 
-const LoadingAccounts: React.FC<LoadingAccountsProps> = ({
-  message = "Đang tải danh sách tài khoản..."
+const LoadingAccounts: React.FC<LoadingAccountsProps> = ({ 
+  message = 'Đang tải dữ liệu tài khoản...' 
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-10 px-4 text-center space-y-4 border rounded-lg bg-gray-50">
-      <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-      <p className="text-gray-500">{message}</p>
+    <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 mb-4">
+        <Loader className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
+      </div>
+      <p className="text-slate-600 dark:text-slate-400">{message}</p>
     </div>
   );
 };

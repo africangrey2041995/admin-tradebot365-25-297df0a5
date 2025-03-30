@@ -1,108 +1,118 @@
 
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Search, Filter, X } from 'lucide-react';
 
 interface AccountsFilterProps {
-  onFilterChange: (newFilters: {
-    searchQuery: string;
-    filterStatus: string;
-    filterLiveDemo: string;
-  }) => void;
+  onFilterChange: (filter: { search?: string; status?: string | null }) => void;
   totalAccounts: number;
 }
 
-const AccountsFilter: React.FC<AccountsFilterProps> = ({
-  onFilterChange,
-  totalAccounts
-}) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [filterStatus, setFilterStatus] = React.useState('all');
-  const [filterLiveDemo, setFilterLiveDemo] = React.useState('all');
-
-  // Handle search input changes
+const AccountsFilter: React.FC<AccountsFilterProps> = ({ onFilterChange, totalAccounts }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value);
-    
-    onFilterChange({
-      searchQuery: value,
-      filterStatus,
-      filterLiveDemo
-    });
+    setSearchTerm(value);
+    onFilterChange({ search: value });
   };
-
-  // Handle status filter changes
-  const handleStatusChange = (value: string) => {
-    if (!value || value.trim() === '') return; // Prevent empty string values
-    setFilterStatus(value);
-    
-    onFilterChange({
-      searchQuery,
-      filterStatus: value,
-      filterLiveDemo
-    });
+  
+  const handleStatusFilter = (status: string | null) => {
+    setStatusFilter(status);
+    onFilterChange({ status });
   };
-
-  // Handle live/demo filter changes
-  const handleLiveDemoChange = (value: string) => {
-    if (!value || value.trim() === '') return; // Prevent empty string values
-    setFilterLiveDemo(value);
+  
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter(null);
+    onFilterChange({ search: '', status: null });
+  };
+  
+  const getStatusLabel = (status: string | null) => {
+    if (!status) return 'Tất cả trạng thái';
     
-    onFilterChange({
-      searchQuery,
-      filterStatus,
-      filterLiveDemo: value
-    });
+    switch (status.toLowerCase()) {
+      case 'connected': return 'Đã kết nối';
+      case 'disconnected': return 'Đã ngắt kết nối';
+      case 'inactive': return 'Không hoạt động';
+      default: return status;
+    }
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-medium">
-          Tài khoản
-          <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
-            {totalAccounts} Tài khoản
-          </Badge>
-        </div>
+    <div className="flex flex-wrap gap-2 w-full">
+      <div className="relative flex-1 min-w-[200px]">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Tìm kiếm tài khoản..."
+          className="pl-8"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+        {searchTerm && (
+          <button
+            className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+            onClick={() => {
+              setSearchTerm('');
+              onFilterChange({ search: '' });
+            }}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
       
-      <div className="flex flex-col md:flex-row gap-2">
-        <div className="relative md:w-1/2">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Tìm kiếm tài khoản..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="pl-8"
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Select value={filterStatus} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="connected">Đã kết nối</SelectItem>
-              <SelectItem value="disconnected">Chưa kết nối</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={filterLiveDemo} onValueChange={handleLiveDemoChange}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Tài khoản" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="live">Live</SelectItem>
-              <SelectItem value="demo">Demo</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            <span className="hidden sm:inline">Trạng thái: </span>
+            <span>{getStatusLabel(statusFilter)}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuLabel>Lọc theo trạng thái</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => handleStatusFilter(null)} className="flex justify-between">
+            Tất cả trạng thái
+            {!statusFilter && <Badge className="bg-primary">Đang chọn</Badge>}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusFilter('Connected')} className="flex justify-between">
+            Đã kết nối
+            {statusFilter === 'Connected' && <Badge className="bg-primary">Đang chọn</Badge>}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusFilter('Disconnected')} className="flex justify-between">
+            Đã ngắt kết nối
+            {statusFilter === 'Disconnected' && <Badge className="bg-primary">Đang chọn</Badge>}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleStatusFilter('Inactive')} className="flex justify-between">
+            Không hoạt động
+            {statusFilter === 'Inactive' && <Badge className="bg-primary">Đang chọn</Badge>}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {(searchTerm || statusFilter) && (
+        <Button variant="ghost" onClick={clearFilters} className="flex items-center gap-1">
+          <X className="h-4 w-4" />
+          <span>Xóa bộ lọc</span>
+        </Button>
+      )}
+      
+      <div className="ml-auto text-sm text-muted-foreground">
+        <span>Tổng cộng: {totalAccounts} tài khoản</span>
       </div>
     </div>
   );

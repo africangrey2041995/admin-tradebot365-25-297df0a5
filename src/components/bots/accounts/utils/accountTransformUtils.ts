@@ -1,58 +1,61 @@
 
 import { Account } from '@/types';
-import { CSPAccount } from '@/hooks/accounts/useAccountsTransform';
+import { CSPAccount, TradingAccount, UserAccount } from '@/hooks/accounts/useAccountsTransform';
 
 /**
- * Organizes flat account list into hierarchical CSP account structure
- * @param accounts Flat array of account objects
- * @returns Array of organized CSP accounts with trading accounts
+ * Tổ chức lại danh sách account từ dạng phẳng sang dạng phân cấp
  */
 export const organizeAccounts = (accounts: Account[]): CSPAccount[] => {
-  const cspAccountsMap = new Map<string, CSPAccount>();
+  const cspAccountMap: Record<string, CSPAccount> = {};
   
+  // Tạo cấu trúc dữ liệu phân cấp
   accounts.forEach(account => {
-    const cspAccountId = account.cspAccountId;
+    const { cspAccountId, cspAccountName, cspUserId, apiName, apiId, tradingAccountId, tradingAccountNumber, 
+      tradingAccountType, tradingAccountBalance, status, isLive } = account;
     
-    if (!cspAccountsMap.has(cspAccountId)) {
-      cspAccountsMap.set(cspAccountId, {
-        cspAccountId: account.cspAccountId,
-        cspAccountName: account.cspAccountName,
-        apiName: account.apiName || '',
-        status: account.status || '',
-        email: account.cspUserEmail || '',
+    // Tạo CSP Account nếu chưa tồn tại
+    if (!cspAccountMap[cspAccountId]) {
+      cspAccountMap[cspAccountId] = {
+        cspAccountId,
+        cspAccountName,
+        cspUserId,
+        apiName: apiName || 'Unknown API',
+        apiId: apiId || '',
         tradingAccounts: []
-      });
+      };
     }
     
-    const cspAccount = cspAccountsMap.get(cspAccountId)!;
-    
-    cspAccount.tradingAccounts.push({
-      tradingAccountId: account.tradingAccountId || '',
-      tradingAccountNumber: account.tradingAccountNumber || '',
-      tradingAccountType: account.tradingAccountType || '',
-      tradingAccountBalance: account.tradingAccountBalance || '',
-      isLive: account.isLive || false,
-      status: account.status || ''
+    // Thêm Trading Account
+    cspAccountMap[cspAccountId].tradingAccounts.push({
+      tradingAccountId: tradingAccountId || `unknown-${Math.random().toString(36).substr(2, 9)}`,
+      tradingAccountNumber: tradingAccountNumber || 'Unknown Number',
+      tradingAccountType: tradingAccountType || 'Unknown Type',
+      tradingAccountBalance: tradingAccountBalance || '$0.00',
+      status: status || 'Unknown',
+      isLive: isLive || false
     });
   });
   
-  return Array.from(cspAccountsMap.values());
+  // Chuyển đổi map thành mảng và sắp xếp
+  return Object.values(cspAccountMap).sort((a, b) => 
+    a.cspAccountName.localeCompare(b.cspAccountName)
+  );
 };
 
 /**
- * Generate a status badge with appropriate styling
- * @param status Status value to display
- * @returns Styled badge configuration
+ * Lấy màu sắc CSS class dựa trên trạng thái kết nối
  */
 export const getStatusColorClass = (status: string): string => {
   switch (status.toLowerCase()) {
     case 'connected':
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
     case 'disconnected':
-      return 'bg-red-100 text-red-800 border-red-200';
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
+    case 'connecting':
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300';
+    case 'inactive':
+      return 'bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-400';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-400';
   }
 };

@@ -11,6 +11,8 @@ interface TradingAccountsTableProps {
   onEdit: (account: Account) => void;
   onDelete: (accountId: string) => void;
   onToggleStatus: (accountId: string) => void;
+  selectedAccounts?: string[];
+  onToggleSelect?: (accountId: string) => void;
 }
 
 const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
@@ -18,7 +20,9 @@ const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
   accounts,
   onEdit,
   onDelete,
-  onToggleStatus
+  onToggleStatus,
+  selectedAccounts = [],
+  onToggleSelect
 }) => {
   const findOriginalAccount = (tradingAccountId: string): Account | undefined => {
     return accounts.find(acc => 
@@ -32,6 +36,7 @@ const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            {onToggleSelect && <TableHead className="w-12"></TableHead>}
             <TableHead>Tài khoản</TableHead>
             <TableHead>Loại</TableHead>
             <TableHead>Số dư</TableHead>
@@ -56,6 +61,8 @@ const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
                 onDelete={onDelete}
                 onToggleStatus={onToggleStatus}
                 originalAccount={originalAccount}
+                isSelected={selectedAccounts.includes(tradingAccount.tradingAccountId)}
+                onToggleSelect={onToggleSelect}
               />
             );
           })}
