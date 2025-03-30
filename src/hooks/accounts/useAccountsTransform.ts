@@ -16,6 +16,7 @@ export interface CSPAccount {
   cspAccountId: string;
   cspAccountName: string;
   apiName: string;
+  apiId: string; // Thêm thuộc tính apiId vào interface
   status: string;
   email: string;
   tradingAccounts: TradingAccount[];
@@ -73,6 +74,7 @@ export const useAccountsTransform = (accounts: Account[]): HierarchicalData => {
           cspAccountId: account.cspAccountId,
           cspAccountName: account.cspAccountName || '',
           apiName: account.apiName || '',
+          apiId: account.apiId || '', // Thêm thuộc tính apiId
           status: account.status || '',
           email: account.cspUserEmail || '',
           tradingAccounts: []
