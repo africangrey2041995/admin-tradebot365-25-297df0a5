@@ -32,7 +32,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({
       <div className="flex gap-2">
         <Select 
           value={filterParams.filterStatus} 
-          onValueChange={(value) => onFilterChange('filterStatus', value as AccountsFilterParams['filterStatus'])}
+          onValueChange={(value) => onFilterChange('filterStatus', value)}
         >
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Status" />
@@ -48,7 +48,7 @@ const AccountsFilter: React.FC<AccountsFilterProps> = ({
         
         <Select 
           value={filterParams.filterLiveDemo} 
-          onValueChange={(value) => onFilterChange('filterLiveDemo', value as AccountsFilterParams['filterLiveDemo'])}
+          onValueChange={(value) => onFilterChange('filterLiveDemo', value)}
         >
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Account Type" />
