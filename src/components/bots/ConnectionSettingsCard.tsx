@@ -126,7 +126,7 @@ const ConnectionSettingsCard = ({
           <div className="bg-amber-50 border border-amber-200 p-4 rounded-md">
             <h4 className="font-medium text-amber-800 mb-2">Example TradingView Alert Message</h4>
             <pre className="bg-white border border-amber-100 p-3 rounded text-xs overflow-auto text-slate-700">
-              {{strategy.order.alert_message}}
+              {`{{strategy.order.alert_message}}`}
             </pre>
           </div>
         </div>
