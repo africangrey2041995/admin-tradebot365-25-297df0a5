@@ -28,6 +28,8 @@ interface HierarchicalAccountsTableProps {
   onEdit?: (account: Account) => void;
   onDelete?: (accountId: string) => void;
   onToggleConnection?: (accountId: string) => void;
+  selectedAccounts?: string[];
+  onToggleSelect?: (accountId: string) => void;
 }
 
 const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({ 
@@ -35,7 +37,9 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
   onRefresh,
   onEdit = () => toast.info("Edit functionality will be implemented"),
   onDelete = (id) => toast.info(`Delete account ${id} functionality will be implemented`),
-  onToggleConnection = (id) => toast.info(`Toggle connection for ${id} functionality will be implemented`)
+  onToggleConnection = (id) => toast.info(`Toggle connection for ${id} functionality will be implemented`),
+  selectedAccounts = [],
+  onToggleSelect
 }) => {
   // Get admin status
   const { isAdmin } = useAdmin();
@@ -161,6 +165,8 @@ const HierarchicalAccountsTable: React.FC<HierarchicalAccountsTableProps> = ({
               onEdit={onEdit}
               onDelete={onDelete}
               onToggleConnection={onToggleConnection}
+              selectedAccounts={selectedAccounts}
+              onToggleSelect={onToggleSelect}
             />
           ))}
         </Accordion>

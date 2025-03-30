@@ -6,7 +6,7 @@ import { CSPAccount } from '@/hooks/accounts/useAccountsTransform';
 import TradingAccountsTable from './TradingAccountsTable';
 import { RefreshCw, Server, ExternalLink, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox as UICheckbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface CSPAccountCardProps {
   cspAccount: CSPAccount;
@@ -70,7 +70,7 @@ const CSPAccountCard: React.FC<CSPAccountCardProps> = ({
                 e.stopPropagation();
                 handleToggleAllAccounts();
               }}>
-                <UICheckbox 
+                <Checkbox 
                   checked={areAllAccountsSelected()} 
                   className={isSomeAccountSelected() && !areAllAccountsSelected() ? "bg-primary/50" : ""}
                 />

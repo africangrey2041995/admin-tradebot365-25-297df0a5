@@ -6,6 +6,7 @@ import { MoreHorizontal, Pencil, Trash, Link, Link2Off } from 'lucide-react';
 import { Account } from '@/types';
 import { TradingAccount } from '../../types/account-types';
 import { getStatusBadge } from '../../utils/account-utils';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,8 @@ interface TradingAccountRowProps {
   onDelete: (accountId: string) => void;
   onToggleConnection: (accountId: string) => void;
   originalAccount?: Account;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
 const TradingAccountRow: React.FC<TradingAccountRowProps> = ({
@@ -32,10 +35,20 @@ const TradingAccountRow: React.FC<TradingAccountRowProps> = ({
   onEdit,
   onDelete,
   onToggleConnection,
-  originalAccount
+  originalAccount,
+  isSelected = false,
+  onToggleSelect
 }) => {
   return (
     <TableRow key={`trading-${tradingAccount.tradingAccountId}`}>
+      {onToggleSelect && (
+        <TableCell>
+          <Checkbox 
+            checked={isSelected}
+            onCheckedChange={onToggleSelect}
+          />
+        </TableCell>
+      )}
       <TableCell>{tradingAccount.tradingAccountNumber}</TableCell>
       <TableCell>
         {tradingAccount.tradingAccountType} - {tradingAccount.isLive ? 'Live' : 'Demo'}

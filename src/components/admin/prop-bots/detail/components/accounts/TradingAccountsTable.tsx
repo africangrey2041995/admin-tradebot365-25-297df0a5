@@ -14,6 +14,8 @@ interface TradingAccountsTableProps {
   onEdit: (account: Account) => void;
   onDelete: (accountId: string) => void;
   onToggleConnection: (accountId: string) => void;
+  selectedAccounts?: string[];
+  onToggleSelect?: (accountId: string) => void;
 }
 
 const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
@@ -23,12 +25,15 @@ const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
   accounts,
   onEdit,
   onDelete,
-  onToggleConnection
+  onToggleConnection,
+  selectedAccounts = [],
+  onToggleSelect
 }) => {
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          {onToggleSelect && <TableHead className="w-10"></TableHead>}
           <TableHead>Account Number</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Balance</TableHead>
@@ -55,6 +60,8 @@ const TradingAccountsTable: React.FC<TradingAccountsTableProps> = ({
               onDelete={onDelete}
               onToggleConnection={onToggleConnection}
               originalAccount={originalAccount}
+              isSelected={selectedAccounts.includes(tradingAccount.tradingAccountId)}
+              onToggleSelect={onToggleSelect ? () => onToggleSelect(tradingAccount.tradingAccountId) : undefined}
             />
           );
         })}
