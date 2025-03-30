@@ -113,13 +113,7 @@ const BotIntegrationInfo: React.FC<BotIntegrationInfoProps> = ({
         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 p-4 rounded-md mt-4">
           <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-2">Mẫu TradingView Alert Message</h4>
           <pre className="bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/50 p-3 rounded text-xs overflow-auto text-slate-700 dark:text-slate-200">
-{`{
-  "token": "${(isAdmin && showToken) ? signalToken : '[Signal Token]'}",
-  "action": "{{strategy.order.action}}",
-  "price": {{strategy.order.price}},
-  "symbol": "{{ticker}}",
-  "volume": {{strategy.order.contracts}}
-}`}
+            {{strategy.order.alert_message}}
           </pre>
         </div>
       </CardContent>
