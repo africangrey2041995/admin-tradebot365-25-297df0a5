@@ -4,8 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Clock, ChevronRight } from "lucide-react";
+import { MoreHorizontal, Clock, ChevronRight, Trash, StopCircle, PlayCircle, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigation } from '@/hooks/useNavigation';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export interface BotCardProps {
   title: string;
@@ -20,7 +28,7 @@ export interface BotCardProps {
   status?: string;
   signalToken?: string;
   webhookUrl?: string;
-  isFavorite?: boolean; // Add the isFavorite property
+  isFavorite?: boolean;
 }
 
 const BotCard: React.FC<BotCardProps> = ({
@@ -35,6 +43,8 @@ const BotCard: React.FC<BotCardProps> = ({
   botForm,
   status = 'Active'
 }) => {
+  const { navigateToBotDetail } = useNavigation();
+  
   const getColorScheme = () => {
     switch (colorScheme) {
       case 'red':
@@ -50,8 +60,28 @@ const BotCard: React.FC<BotCardProps> = ({
     }
   };
 
+  const handleCardClick = () => {
+    navigateToBotDetail(botId);
+  };
+
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigateToBotDetail(botId);
+  };
+
+  const handleToggleStatus = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newStatus = status === 'Active' ? 'Inactive' : 'Active';
+    toast.success(`Bot ${title} đã được ${newStatus === 'Active' ? 'kích hoạt' : 'dừng'}`);
+  };
+
+  const handleDeleteBot = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.success(`Bot ${title} đã được xóa thành công`);
+  };
+
   return (
-    <Card className="h-full transition-all duration-200 hover:shadow-md relative overflow-hidden group">
+    <Card className="h-full transition-all duration-200 hover:shadow-md relative overflow-hidden group cursor-pointer" onClick={handleCardClick}>
       <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full opacity-10 ${colorScheme === 'red' ? 'bg-red-500' : colorScheme === 'blue' ? 'bg-blue-500' : colorScheme === 'green' ? 'bg-emerald-500' : colorScheme === 'purple' ? 'bg-purple-500' : 'bg-slate-500'}`}></div>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
@@ -66,9 +96,36 @@ const BotCard: React.FC<BotCardProps> = ({
               {avatarIcon}
             </AvatarFallback>
           </Avatar>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleViewDetails}>
+                <Eye className="h-4 w-4 mr-2" />
+                Xem chi tiết
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleToggleStatus}>
+                {status === 'Active' ? (
+                  <>
+                    <StopCircle className="h-4 w-4 mr-2" />
+                    Dừng bot
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="h-4 w-4 mr-2" />
+                    Khởi động bot
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDeleteBot} className="text-red-600">
+                <Trash className="h-4 w-4 mr-2" />
+                Xóa bot
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <CardTitle className="mt-2">{title}</CardTitle>
         <CardDescription className="line-clamp-2">{subtitle}</CardDescription>
@@ -116,7 +173,12 @@ const BotCard: React.FC<BotCardProps> = ({
           <Badge variant={status === 'Active' ? 'success' : 'secondary'} className="rounded-sm">
             {status}
           </Badge>
-          <Button variant="ghost" size="sm" className="gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-1"
+            onClick={handleViewDetails}
+          >
             Chi tiết
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>

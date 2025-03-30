@@ -16,6 +16,7 @@ import BotListing from '@/components/bots/BotListing';
 import BotsHeader from '@/components/bots/BotsHeader';
 import BotsPagination from '@/components/bots/BotsPagination';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 
 const Bots = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +26,7 @@ const Bots = () => {
   });
   const [isAddBotDialogOpen, setIsAddBotDialogOpen] = useState(false);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   const [bots, setBots] = useState<BotCardProps[]>([
     {
