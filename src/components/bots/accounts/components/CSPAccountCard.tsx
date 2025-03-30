@@ -4,7 +4,7 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/
 import { Account } from '@/types';
 import { CSPAccount } from '@/hooks/accounts/useAccountsTransform';
 import TradingAccountsTable from './TradingAccountsTable';
-import { RefreshCw, Server, ExternalLink, Checkbox } from 'lucide-react';
+import { RefreshCw, Server, ExternalLink, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox as UICheckbox } from '@/components/ui/checkbox';
 

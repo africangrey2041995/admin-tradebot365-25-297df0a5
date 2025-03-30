@@ -18,9 +18,10 @@ export const organizeAccounts = (accounts: Account[]): CSPAccount[] => {
       cspAccountMap[cspAccountId] = {
         cspAccountId,
         cspAccountName,
-        cspUserId,
         apiName: apiName || 'Unknown API',
         apiId: apiId || '',
+        status: status || '',
+        email: account.cspUserEmail || '',
         tradingAccounts: []
       };
     }
@@ -31,8 +32,8 @@ export const organizeAccounts = (accounts: Account[]): CSPAccount[] => {
       tradingAccountNumber: tradingAccountNumber || 'Unknown Number',
       tradingAccountType: tradingAccountType || 'Unknown Type',
       tradingAccountBalance: tradingAccountBalance || '$0.00',
-      status: status || 'Unknown',
-      isLive: isLive || false
+      isLive: isLive || false,
+      status: status || 'Unknown'
     });
   });
   
