@@ -4,16 +4,15 @@ import { useUser } from "@clerk/clerk-react";
 export function useAdmin() {
   const { user } = useUser();
   
-  // For testing purposes, always return false to hide admin features
-  // In production, would check actual admin metadata
-  const isAdmin = false; // Changed from true to false
+  // Đặt thành true để cho phép quyền admin trong quá trình phát triển/kiểm thử
+  const isAdmin = true; // Changed from false to true
   // const isAdmin = user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "superadmin";
   
-  // Check if user is a super admin
-  const isSuperAdmin = true; // Force true for testing
+  // Kiểm tra xem người dùng có phải là super admin
+  const isSuperAdmin = true; // Giữ nguyên cho mục đích kiểm thử
   // const isSuperAdmin = user?.publicMetadata?.role === "superadmin";
   
-  // Return a boolean indicating if the user is an admin
+  // Trả về boolean cho biết nếu người dùng là admin
   return {
     isAdmin,
     isSuperAdmin

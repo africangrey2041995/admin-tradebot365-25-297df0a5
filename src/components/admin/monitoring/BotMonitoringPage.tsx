@@ -28,18 +28,23 @@ const AdminBotMonitoringPage: React.FC = () => {
     user: 0
   });
 
+  console.log("[AdminBotMonitoringPage] Component rendered, isSuperAdmin:", isSuperAdmin);
+
   // Fetch initial data
   useEffect(() => {
+    console.log("[AdminBotMonitoringPage] useEffect triggered, fetching error stats");
     fetchErrorStats();
   }, []);
 
   // Function to fetch error statistics
   const fetchErrorStats = async () => {
+    console.log("[AdminBotMonitoringPage] Fetching error stats...");
     setLoading(true);
     try {
       // In a real app, this would be an API call
       // For now, we'll use mock data
       setTimeout(() => {
+        console.log("[AdminBotMonitoringPage] Setting mock stats data");
         setStats({
           total: 42,
           premium: 15,
@@ -49,7 +54,7 @@ const AdminBotMonitoringPage: React.FC = () => {
         setLoading(false);
       }, 800);
     } catch (error) {
-      console.error("Error fetching bot error stats:", error);
+      console.error("[AdminBotMonitoringPage] Error fetching bot error stats:", error);
       toast({
         title: "Lỗi",
         description: "Không thể tải dữ liệu thống kê lỗi bot",
@@ -61,7 +66,7 @@ const AdminBotMonitoringPage: React.FC = () => {
 
   // Function to handle error details view
   const handleViewErrorDetails = (errorId: string) => {
-    console.log("Viewing error details for:", errorId);
+    console.log("[AdminBotMonitoringPage] Viewing error details for:", errorId);
     setSelectedErrorId(errorId);
     setIsErrorModalOpen(true);
   };
@@ -72,6 +77,7 @@ const AdminBotMonitoringPage: React.FC = () => {
   };
 
   const handleResolveError = (errorId: string) => {
+    console.log("[AdminBotMonitoringPage] Resolving error:", errorId);
     toast({
       title: "Đã xử lý lỗi",
       description: `Lỗi ${errorId.substring(0, 8)}... đã được đánh dấu là đã xử lý`,
@@ -91,7 +97,7 @@ const AdminBotMonitoringPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Giám Sát Bot</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Giám Sát Bot - Admin Dashboard</h1>
           <p className="text-muted-foreground">
             Theo dõi và quản lý các lỗi của tất cả các loại bot trong hệ thống.
           </p>

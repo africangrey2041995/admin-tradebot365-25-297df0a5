@@ -9,13 +9,14 @@ import AdminBotMonitoring from '@/components/admin/monitoring/BotMonitoringPage'
  * Trang giám sát Bot dành cho Admin 
  */
 const AdminBotMonitoringPage: React.FC = () => {
-  const { isAdmin, isSuperAdmin } = useAdmin();
+  const { isAdmin } = useAdmin();
   
   // Nếu không phải admin, chuyển hướng về trang dashboard
   if (!isAdmin) {
     return <Navigate to={ADMIN_ROUTES.DASHBOARD} replace />;
   }
   
+  // Trả về component giám sát bot dành riêng cho admin
   return <AdminBotMonitoring />;
 };
 

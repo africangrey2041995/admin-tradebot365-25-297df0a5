@@ -54,93 +54,97 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <ClerkProvider 
-    publishableKey={PUBLISHABLE_KEY}
-    appearance={{
-      elements: {
-        formButtonPrimary: 'bg-[#04ce91] hover:bg-[#03b17d]',
-        card: 'bg-[#111111]',
-        formInput: 'bg-[#1a1a1a] text-white',
-        footerActionLink: 'text-[#04ce91] hover:text-[#03b17d]',
-        headerTitle: 'text-white',
-        headerSubtitle: 'text-zinc-400',
-        socialButtonsBlockButton: 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white',
-        dividerLine: 'bg-zinc-700',
-        dividerText: 'text-zinc-500',
-        formFieldLabel: 'text-zinc-400',
-        identityPreviewText: 'text-white',
-        identityPreviewEditButton: 'text-[#04ce91]'
-      },
-      layout: {
-        showOptionalFields: false,
-        socialButtonsVariant: 'iconButton',
-      }
-    }}
-  >
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AnimatePresence mode="wait">
-              <Routes>
-                {/* Main routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/bots" element={<Bots />} />
-                <Route path="/bots/:botId" element={<BotProfile />} />
-                <Route path="/premium-bots" element={<PremiumBots />} />
-                <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
-                <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
-                <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
-                <Route path="/prop-trading-bots" element={<PropTradingBots />} />
-                <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
-                <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
-                <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
-                <Route path="/accounts" element={<Accounts />} />
-                <Route path="/accounts/:accountId" element={<AccountProfile />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/settings" element={<Settings />} />
-                {/* User Bot Monitoring page route */}
-                <Route path="/bot-monitoring" element={<BotMonitoringPage />} />
-                
-                {/* Auth routes */}
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/sign-up" element={<SignUp />} />
-                
-                {/* Admin routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="users/:userId" element={<AdminUserDetail />} />
-                  <Route path="bots" element={<AdminBots />} />
-                  <Route path="bot-monitoring" element={<AdminBotMonitoringPage />} />
-                  <Route path="premium-bots" element={<AdminPremiumBots />} />
-                  <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
-                  <Route path="prop-bots" element={<AdminPropBots />} />
-                  <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
-                  <Route path="user-bots" element={<AdminUserBots />} />
-                  <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
-                  <Route path="packages" element={<AdminPackages />} />
-                  <Route path="subscriptions" element={<Subscriptions />} />
-                  <Route path="database" element={<AdminDatabase />} />
-                  <Route path="logs" element={<AdminLogs />} />
-                  <Route path="notifications" element={<AdminNotifications />} />
-                  <Route path="email" element={<AdminEmail />} />
-                  <Route path="settings" element={<AdminSettings />} />
-                  <Route path="admin-management" element={<AdminManagement />} />
-                </Route>
-                
-                {/* Not found route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AnimatePresence>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
-  </ClerkProvider>
-);
+const App = () => {
+  console.log("[App] Initializing with PUBLISHABLE_KEY:", PUBLISHABLE_KEY);
+  
+  return (
+    <ClerkProvider 
+      publishableKey={PUBLISHABLE_KEY}
+      appearance={{
+        elements: {
+          formButtonPrimary: 'bg-[#04ce91] hover:bg-[#03b17d]',
+          card: 'bg-[#111111]',
+          formInput: 'bg-[#1a1a1a] text-white',
+          footerActionLink: 'text-[#04ce91] hover:text-[#03b17d]',
+          headerTitle: 'text-white',
+          headerSubtitle: 'text-zinc-400',
+          socialButtonsBlockButton: 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 text-white',
+          dividerLine: 'bg-zinc-700',
+          dividerText: 'text-zinc-500',
+          formFieldLabel: 'text-zinc-400',
+          identityPreviewText: 'text-white',
+          identityPreviewEditButton: 'text-[#04ce91]'
+        },
+        layout: {
+          showOptionalFields: false,
+          socialButtonsVariant: 'iconButton',
+        }
+      }}
+    >
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AnimatePresence mode="wait">
+                <Routes>
+                  {/* Main routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/bots" element={<Bots />} />
+                  <Route path="/bots/:botId" element={<BotProfile />} />
+                  <Route path="/premium-bots" element={<PremiumBots />} />
+                  <Route path="/premium-bots/:botId" element={<PremiumBotDetail />} />
+                  <Route path="/integrated-premium-bots" element={<IntegratedPremiumBots />} />
+                  <Route path="/integrated-premium-bots/:botId" element={<IntegratedPremiumBotDetail />} />
+                  <Route path="/prop-trading-bots" element={<PropTradingBots />} />
+                  <Route path="/integrated-prop-bots" element={<IntegratedPropBots />} />
+                  <Route path="/integrated-prop-bots/:botId" element={<IntegratedPropBotDetail />} />
+                  <Route path="/prop-trading-bots/:botId" element={<PropTradingBotDetail />} />
+                  <Route path="/accounts" element={<Accounts />} />
+                  <Route path="/accounts/:accountId" element={<AccountProfile />} />
+                  <Route path="/profile" element={<UserProfile />} />
+                  <Route path="/settings" element={<Settings />} />
+                  {/* User Bot Monitoring page route */}
+                  <Route path="/bot-monitoring" element={<BotMonitoringPage />} />
+                  
+                  {/* Auth routes */}
+                  <Route path="/sign-in" element={<SignIn />} />
+                  <Route path="/sign-up" element={<SignUp />} />
+                  
+                  {/* Admin routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="users/:userId" element={<AdminUserDetail />} />
+                    <Route path="bots" element={<AdminBots />} />
+                    <Route path="bot-monitoring" element={<AdminBotMonitoringPage />} />
+                    <Route path="premium-bots" element={<AdminPremiumBots />} />
+                    <Route path="premium-bots/:botId" element={<AdminPremiumBotDetail />} />
+                    <Route path="prop-bots" element={<AdminPropBots />} />
+                    <Route path="prop-bots/:botId" element={<AdminPropBotDetail />} />
+                    <Route path="user-bots" element={<AdminUserBots />} />
+                    <Route path="user-bots/:botId" element={<AdminUserBotDetail />} />
+                    <Route path="packages" element={<AdminPackages />} />
+                    <Route path="subscriptions" element={<Subscriptions />} />
+                    <Route path="database" element={<AdminDatabase />} />
+                    <Route path="logs" element={<AdminLogs />} />
+                    <Route path="notifications" element={<AdminNotifications />} />
+                    <Route path="email" element={<AdminEmail />} />
+                    <Route path="settings" element={<AdminSettings />} />
+                    <Route path="admin-management" element={<AdminManagement />} />
+                  </Route>
+                  
+                  {/* Not found route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AnimatePresence>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ClerkProvider>
+  );
+};
 
 export default App;
