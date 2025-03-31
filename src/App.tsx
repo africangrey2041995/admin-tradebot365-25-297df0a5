@@ -47,7 +47,7 @@ import AdminUserBots from "./pages/admin/UserBots";
 import AdminUserBotDetail from "./pages/admin/UserBotDetail";
 import AdminPackages from "./pages/admin/Packages";
 import AdminBotMonitoringPage from "./pages/admin/BotMonitoringPage";
-import Subscriptions from "./pages/admin/Subscriptions"; // Import the Subscriptions component
+import Subscriptions from "./pages/admin/Subscriptions";
 
 // Fixed Clerk publishable key - this is your test key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_Y291cmFnZW91cy1weXRob24tNjAuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -102,7 +102,7 @@ const App = () => (
                 <Route path="/accounts/:accountId" element={<AccountProfile />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/settings" element={<Settings />} />
-                {/* Add Bot Monitoring page route */}
+                {/* User Bot Monitoring page route */}
                 <Route path="/bot-monitoring" element={<BotMonitoringPage />} />
                 
                 {/* Auth routes */}

@@ -14,7 +14,7 @@ import ErrorDetailsModal from './ErrorDetailsModal';
  * Component hiển thị trang giám sát Bot trong admin dashboard
  * Trang này hiển thị tình trạng lỗi của tất cả các loại bot
  */
-const BotMonitoringPage: React.FC = () => {
+const AdminBotMonitoringPage: React.FC = () => {
   const { isSuperAdmin } = useAdmin();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -244,8 +244,16 @@ const BotMonitoringPage: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Error details modal */}
+      <ErrorDetailsModal
+        errorId={selectedErrorId}
+        open={isErrorModalOpen}
+        onClose={handleCloseErrorModal}
+        onResolve={handleResolveError}
+      />
     </div>
   );
 };
 
-export default BotMonitoringPage;
+export default AdminBotMonitoringPage;

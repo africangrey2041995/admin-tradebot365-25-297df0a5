@@ -1,14 +1,14 @@
 
 import React from 'react';
-import BotMonitoring from '@/components/admin/monitoring/BotMonitoringPage';
 import { useAdmin } from '@/hooks/use-admin';
 import { Navigate } from 'react-router-dom';
 import { ADMIN_ROUTES } from '@/constants/routes';
+import AdminBotMonitoring from '@/components/admin/monitoring/BotMonitoringPage';
 
 /**
  * Trang giám sát Bot dành cho Admin 
  */
-const BotMonitoringPage: React.FC = () => {
+const AdminBotMonitoringPage: React.FC = () => {
   const { isAdmin, isSuperAdmin } = useAdmin();
   
   // Nếu không phải admin, chuyển hướng về trang dashboard
@@ -16,7 +16,7 @@ const BotMonitoringPage: React.FC = () => {
     return <Navigate to={ADMIN_ROUTES.DASHBOARD} replace />;
   }
   
-  return <BotMonitoring />;
+  return <AdminBotMonitoring />;
 };
 
-export default BotMonitoringPage;
+export default AdminBotMonitoringPage;
